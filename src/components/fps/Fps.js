@@ -1,0 +1,1314 @@
+import * as THREE from '../../build/three.module.js';
+import {
+    TWEEN
+} from '../../jsm/Tween.js';
+import {
+    PointerLockControls
+} from '../../jsm/controls/PointerLockControls.js';
+import {
+    Portal
+} from '../portal/Portal.js';
+import $ from 'jquery';
+import * as CANNON from 'cannon';
+import nipplejs from 'nipplejs';
+import {
+    DeviceOrientationControls
+} from '../../jsm/controls/DeviceOrientationControls.js';
+
+// MOBILE VARIABLES
+
+let fwdValue = 0;
+let bkdValue = 0;
+let rgtValue = 0;
+let lftValue = 0;
+
+if (window.mobile) {
+    var controlsDevice = new DeviceOrientationControls(window.MAIN_CAMERA);
+    var targetRotationX = 0;
+    var targetRotationOnMouseDownX = 0;
+    var targetRotationY = 0;
+    var targetRotationOnMouseDownY = 0;
+    var mouseX = 0;
+    var mouseXOnMouseDown = 0;
+    var mouseY = 0;
+    var mouseYOnMouseDown = 0;
+    var windowHalfX = window.innerWidth / 2;
+    var windowHalfY = window.innerHeight / 2;
+    var finalRotationY, outOfAngle = false;
+    var info = false;
+
+    var blocked_bottom = false,
+        blocked_top = false;
+
+    var deltaX2, touchX2;
+    var vec = [],
+        offsetX = 0;
+
+    document.getElementById("camera").addEventListener('touchstart', onDocumentTouchStart, false);
+    document.getElementById("camera").addEventListener('touchmove', onDocumentTouchMove, false);
+
+    function onDocumentTouchStart(event) {
+        for (var i = 0; i < event.touches.length; i++) {
+
+            //event.preventDefault();
+
+            mouseXOnMouseDown = event.touches[i].pageX - windowHalfX;
+            targetRotationOnMouseDownX = targetRotationX;
+
+            mouseYOnMouseDown = event.touches[i].pageY - windowHalfY;
+            targetRotationOnMouseDownY = targetRotationY;
+        }
+    }
+
+    function onDocumentTouchMove(event) {
+        for (var i = 0; i < event.touches.length; i++) {
+            mouseX = event.touches[i].pageX - windowHalfX;
+            targetRotationX = targetRotationOnMouseDownX + (mouseX - mouseXOnMouseDown) * (-0.01); //camera speed
+
+            mouseY = event.touches[i].pageY - windowHalfY;
+            deltaX2 = event.touches[i].pageY - touchX2;
+            touchX2 = event.touches[i].pageY;
+
+            if (deltaX2 > 0) {
+                if (!blocked_bottom) {
+                    targetRotationY = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * (-0.01);
+                }
+            } else {
+                if (!blocked_top) {
+                    targetRotationY = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * (-0.01);
+                }
+            }
+        }
+    }
+
+    // vars
+    let joyManager, joyManager2;
+
+    addJoystick();
+
+    function addJoystick() {
+        const options = {
+            zone: document.getElementById('joystickWrapper1'),
+            size: 120,
+            multitouch: true,
+            maxNumberOfNipples: 2,
+            mode: 'static',
+            restJoystick: true,
+            shape: 'circle',
+            // position: { top: 20, left: 20 },
+            position: {
+                top: '60px',
+                left: '60px'
+            },
+            dynamicPage: true,
+        }
+
+        /*const options2 = {
+            zone: document.getElementById('joystickWrapper2'),
+            size: 120,
+            multitouch: true,
+            maxNumberOfNipples: 2,
+            mode: 'static',
+            restJoystick: true,
+            shape: 'circle',
+            // position: { top: 20, left: 20 },
+            position: {
+                top: '60px',
+                right: '60px'
+            },
+            dynamicPage: true,
+        }*/
+
+        joyManager = nipplejs.create(options);
+        //joyManager2 = nipplejs.create(options2);
+
+        joyManager['0'].on('move', function (evt, data) {
+
+            const forward = data.vector.y
+            const turn = data.vector.x
+
+            if (forward > 0) {
+                fwdValue = Math.abs(forward)
+                bkdValue = 0
+            } else if (forward < 0) {
+                fwdValue = 0
+                bkdValue = Math.abs(forward)
+            }
+
+            if (turn > 0) {
+                lftValue = 0
+                rgtValue = Math.abs(turn)
+            } else if (turn < 0) {
+                lftValue = Math.abs(turn)
+                rgtValue = 0
+            }
+
+            headBobActive = true;
+        })
+
+        var tarx = 0,
+            tary = 0;
+
+        /*joyManager2['0'].on('start', function (evt, data) {
+            $("#mobile-controls button").css("opacity", 0)
+        })
+
+        joyManager2['0'].on('move', function (evt, data) {
+
+            const forward = data.vector.y
+            const turn = data.vector.x
+
+            targetRotationY = forward + tary
+            targetRotationX = -turn + tarx
+
+        })
+
+        joyManager2['0'].on('end', function (evt) {
+            tary = targetRotationY
+            tarx = targetRotationX
+            $("#mobile-controls button").css("opacity", 1)
+        })*/
+
+        joyManager['0'].on('end', function (evt) {
+            bkdValue = 0
+            fwdValue = 0
+            lftValue = 0
+            rgtValue = 0
+            // headBobActive = false;
+            repositioningGUn = true;
+            moving = false;
+            headBobTimer = 0;
+            //headBobActive = false;
+
+            tweenCamera(500, window.GUN.children[0].position, new THREE.Vector3(0, 0, 0))
+
+
+            setTimeout(() => {
+                //repositioningGUn = false;
+            }, 100);
+        })
+    }
+}
+
+//
+
+let playerOnFloor = false;
+let mouseTime = 0;
+
+const keyStates = {};
+
+const vector1 = new THREE.Vector3();
+const vector2 = new THREE.Vector3();
+const vector3 = new THREE.Vector3();
+
+var coords = new THREE.Vector3();
+var raycaster2 = new THREE.Raycaster();
+var crouched = false;
+var moving = false;
+
+//
+var wasInJump = false;
+var slipperyMaterial = new CANNON.Material();
+slipperyMaterial.friction = 0.00;
+
+player();
+
+if (!window.mobile)
+    controlsLock();
+// added joystick + movement
+
+
+
+function player() {
+    // define shape
+    let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 4, 2 / 2.1, 0.5 / 4));
+    // let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5, 2, 0.5)); 
+
+    // define the physical body attributes
+    window.PLAYER = new CANNON.Body({
+        mass: 50,
+        material: slipperyMaterial
+    });
+    window.PLAYER.allowSleep = false;
+    window.PLAYER.addShape(physicsShape);
+    window.PLAYER.position.set(5, 5, 5);
+    window.PLAYER.linearDamping = 0.9;
+
+    // keep the player upright
+    window.PLAYER.angularDamping = 1
+
+    // set additional properties
+    window.PLAYER.inJump = true
+
+    // construct the physical body
+    window.PLAYER.updateMassProperties()
+    window.CANNON_WORLD.addBody(window.PLAYER);
+
+    // normal collision events don't happen consistently - will stop once an object is stable on the ground
+    // so need to check contacts to detect if grounded or not
+    // https://github.com/schteppe/cannon.js/issues/313
+
+    let upVector = new CANNON.Vec3(0, 1, 0);
+    let contactNormal = new CANNON.Vec3(0, 0, 0);
+
+    window.CANNON_WORLD.addEventListener("postStep", (e) => {
+        window.PLAYER.inJump = true;
+        if (window.CANNON_WORLD.contacts.length > 0) {
+            for (let contact of window.CANNON_WORLD.contacts) {
+                if (contact.bi.id == window.PLAYER.id || contact.bj.id == window.PLAYER.id) {
+                    if (contact.bi.id == window.PLAYER.id) {
+                        // contact.ni.negate(contactNormal);
+                        contactNormal = new THREE.Vector3(contact.ni.x * -1, contact.ni.y * -1, contact.ni.z * -1)
+                    } else {
+                        // contact.ni.copy(contactNormal);
+                        contactNormal = contact.ni
+                    }
+
+                    window.PLAYER.inJump = (contactNormal.dot(upVector) <= 0.5);
+                    //console.log(window.PLAYER.inJump)
+                }
+            }
+        }
+    })
+
+    /*window.PLAYER.addEventListener("collide", function (e) {
+        console.log("The sphere just collided with the ground!");
+        console.log("Collided with body:", e.body);
+        console.log("Contact between bodies:", e.contact);
+    });*/
+}
+
+var controller = {
+    "KeyE": {
+        pressed: false
+    },
+    "KeyW": {
+        pressed: false
+    },
+    "KeyS": {
+        pressed: false
+    },
+    "KeyA": {
+        pressed: false
+    },
+    "KeyD": {
+        pressed: false
+    },
+    "Space": {
+        pressed: false
+    },
+}
+
+var itemHolder = null;
+
+document.addEventListener('keydown', (event) => {
+
+    if (event.code == "ControlLeft" && !crouched) {
+
+        console.log(window.RENDERER.info.render.calls)
+
+    }
+
+    if (window.FPS && allowEnterFPS) {
+        if (controller[event.code]) {
+            controller[event.code].pressed = true;
+        }
+        headBobActive = true;
+
+        if (event.code == "ControlLeft" && !crouched) {
+
+            crouched = true;
+
+            window.PLAYER.shapes[0].halfExtents.y -= 0.25;
+            window.PLAYER.shapes[0].updateConvexPolyhedronRepresentation();
+            window.PLAYER.computeAABB();
+            window.PLAYER.updateMassProperties();
+
+        }
+
+        if (event.code == "KeyE") {
+
+            raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
+            var intersects = raycaster2.intersectObjects(window.INTERACTIVE);
+
+            if (window.HOLDING_ITEM) {
+                window.HOLDING_ITEM = false;
+
+                // Position
+                itemHolder.position.setZero();
+                itemHolder.previousPosition.setZero();
+                itemHolder.interpolatedPosition.setZero();
+                itemHolder.initPosition.setZero();
+
+                // orientation
+                itemHolder.quaternion.set(0, 0, 0, 1);
+                itemHolder.initQuaternion.set(0, 0, 0, 1);
+                //body.previousQuaternion.set(0, 0, 0, 1);
+                itemHolder.interpolatedQuaternion.set(0, 0, 0, 1);
+
+                // Velocity
+                itemHolder.velocity.setZero();
+                itemHolder.initVelocity.setZero();
+                itemHolder.angularVelocity.setZero();
+                itemHolder.initAngularVelocity.setZero();
+
+                // Force
+                itemHolder.force.setZero();
+                itemHolder.torque.setZero();
+
+                // Sleep state reset
+                itemHolder.sleepState = 0;
+                itemHolder.timeLastSleepy = 0;
+                itemHolder._wakeUpAfterNarrowphase = false;
+
+                //itemHolder.velocity.set(0, 0, 0);
+                //itemHolder.angularVelocity.set(0, 0, 0);
+                itemHolder.position.copy(window.CURRENT_ITEM.position);
+                itemHolder.quaternion.copy(window.CURRENT_ITEM.quaternion);
+
+                window.PLAYER.velocity.set(0, 0, 0);
+                window.PLAYER.angularVelocity.set(0, 0, 0);
+
+                window.CANNON_WORLD.addBody(itemHolder);
+
+                window.CURRENT_ITEM = null;
+                itemHolder = null;
+                window.COL_Z = false;
+                window.holder.position.z = -1;
+            } else if (intersects.length > 0) {
+                if (intersects[0].distance < 2) {
+                    window.HOLDING_ITEM = true;
+                    window.CURRENT_ITEM = intersects[0].object.parent;
+                    //window.CURRENT_ITEM.item = intersects[0].object;
+                    //window.CURRENT_ITEM.mass = 0;
+                    itemHolder = intersects[0].object.parent.body;
+                    window.CANNON_WORLD.removeBody(intersects[0].object.parent.body);
+                }
+            }
+
+            window.lightningStrikeMesh.visible = window.HOLDING_ITEM;
+            window.lightningStrikeMesh2.visible = window.HOLDING_ITEM;
+            window.lightningStrikeMesh3.visible = window.HOLDING_ITEM;
+        }
+    }
+});
+
+var allowPlacePortals = false;
+
+//
+var allowEnterFPS = true;
+var openedDoor = false;
+
+$("body").on('click', '#settings-close', function () {
+    if (window.FPS && allowEnterFPS) {
+
+        if (!window.mobile) {
+            document.body.requestPointerLock();
+        } else {
+            $("#blocker").css("display", "none");
+            $("#mobile-controls").css("display", "block");
+            openFullscreen();
+        }
+
+
+        mouseTime = performance.now();
+        //
+
+        $("#container").css("filter", "none");
+
+        if (!openedDoor) {
+            openedDoor = true;
+
+            setTimeout(() => {
+
+                tweenCamera(500, window.enter_door_right_spinner.rotation, new THREE.Vector3(Math.PI,
+                    window.enter_door_right_spinner.rotation.y,
+                    window.enter_door_right_spinner.rotation.z))
+
+                tweenCamera(500, window.enter_door_left_spinner.rotation, new THREE.Vector3(Math.PI,
+                    window.enter_door_left_spinner.rotation.y,
+                    window.enter_door_left_spinner.rotation.z))
+
+                setTimeout(() => {
+                    window.enter_door_right.position.z = -4;
+                    tweenCamera(1000, window.enter_door_right.position, new THREE.Vector3(25, window.enter_door_right.position.y, window.enter_door_right.position.z))
+
+                    window.enter_door_left.position.z = -4;
+                    tweenCamera(1000, window.enter_door_left.position, new THREE.Vector3(-25, window.enter_door_left.position.y, window.enter_door_left.position.z))
+                }, 500);
+
+            }, 1000);
+        }
+    }
+})
+
+function openFullscreen() {
+    if (document.body.requestFullscreen) {
+        document.body.requestFullscreen();
+    } else if (document.body.mozRequestFullScreen) {
+        /* Firefox */
+        document.body.mozRequestFullScreen();
+    } else if (document.body.webkitRequestFullscreen) {
+        /* Chrome, Safari and Opera */
+        document.body.webkitRequestFullscreen();
+    } else if (document.body.msRequestFullscreen) {
+        /* IE/Edge */
+        document.body.msRequestFullscreen();
+    }
+}
+
+function controlsLock() {
+    const controls = new PointerLockControls(window.MAIN_CAMERA, document.body);
+    controls.pointerSpeed = 0.5;
+
+    console.log(controls)
+
+    controls.addEventListener('lock', function () {
+
+        document.getElementById('blocker').style.display = 'none';
+
+        setTimeout(() => {
+            allowPlacePortals = true;
+        }, 1000);
+
+    });
+
+    controls.addEventListener('unlock', function () {
+
+        $("#container").css("filter", "blur(3px)")
+        document.getElementById('blocker').style.display = 'block';
+        allowPlacePortals = false;
+        allowEnterFPS = false;
+
+        setTimeout(() => {
+            allowEnterFPS = true;
+        }, 1500);
+    });
+}
+
+document.addEventListener('keyup', (event) => {
+
+    if (window.FPS && allowEnterFPS) {
+
+        if (controller[event.code]) {
+            controller[event.code].pressed = false;
+        }
+
+        repositioningGUn = true;
+        moving = false;
+        headBobTimer = 0;
+        //headBobActive = false;
+
+        tweenCamera(500, window.GUN.children[0].position, new THREE.Vector3(0, 0, 0))
+
+
+        setTimeout(() => {
+            //repositioningGUn = false;
+        }, 100);
+
+        if (crouched) {
+
+            crouched = false;
+
+            /*tweenCamera(250, window.PLAYER_COLLIDER.end, new THREE.Vector3(
+                window.PLAYER_COLLIDER.end.x,
+                window.PLAYER_COLLIDER.end.y + 0.5,
+                window.PLAYER_COLLIDER.end.z))*/
+
+            window.PLAYER.shapes[0].halfExtents.y += 0.25;
+            window.PLAYER.shapes[0].updateConvexPolyhedronRepresentation();
+            window.PLAYER.computeAABB();
+            window.PLAYER.updateMassProperties();
+
+        }
+    }
+});
+
+$("body").on('pointerdown', '#crouch', function () {
+    crouched = true;
+    window.PLAYER.shapes[0].halfExtents.y -= 0.25;
+    window.PLAYER.shapes[0].updateConvexPolyhedronRepresentation();
+    window.PLAYER.computeAABB();
+    window.PLAYER.updateMassProperties();
+})
+
+$("body").on('pointerup', '#crouch', function () {
+    window.PLAYER.shapes[0].halfExtents.y += 0.25;
+    window.PLAYER.shapes[0].updateConvexPolyhedronRepresentation();
+    window.PLAYER.computeAABB();
+    window.PLAYER.updateMassProperties();
+})
+
+document.addEventListener('mouseup', (event) => {
+
+    if (!window.mobile && document.pointerLockElement !== null)
+        portalButton(event.button)
+
+});
+
+//LEFT PORTAL MOBILE
+document.getElementById("portal_l").addEventListener('pointerdown', portal_l_Touch, false);
+
+function portal_l_Touch() {
+    allowPlacePortals = true;
+    portalButton(0)
+}
+//RIGHT PORTAL MOBILE
+document.getElementById("portal_r").addEventListener('pointerdown', portal_r_Touch, false);
+
+function portal_r_Touch() {
+    allowPlacePortals = true;
+    portalButton(2)
+}
+//JUMP MOBILE
+document.getElementById("jump").addEventListener('pointerdown', jumpTouch, false);
+
+function jumpTouch() {
+    // handle jumping when space bar is pressed
+    if (!window.PLAYER.inJump) {
+        shouldJump = true;
+        //if (!window.IN_VICTORY) {hideInstructions()}
+    }
+}
+
+function portalButton(button) {
+    var id = 0,
+        id2 = 1;
+
+    if (button == 2) {
+        id = 1;
+        id2 = 0;
+    }
+
+    if (window.FPS && (button == 2 || button == 0) && allowPlacePortals) {
+        //if (document.pointerLockElement !== null) {
+        // define playerUpDirection
+        let playerUpDirection = new THREE.Vector3(0, 1, 0)
+        playerUpDirection.applyQuaternion(window.MAIN_CAMERA.quaternion)
+
+        raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
+        var intersects = raycaster2.intersectObjects(window.SURFACES_TO_PLACE_PORTAL);
+        if (intersects.length > 0) {
+
+            if (intersects[0].object.userData.portal && intersects[0].object.parent) {
+                var obj = intersects[0].object;
+                var target = new THREE.Vector3(); // create once an reuse it
+                intersects[0].object.getWorldPosition(target);
+                window.wallName = intersects[0].object.name;
+
+                var direction = new THREE.Vector3(0, 1, 0).applyQuaternion(obj.quaternion);
+                var offsetVector = new THREE.Vector3(0.0 * direction.x, 0.0 * direction.y, 0.0 * direction.z);
+
+                var x = intersects[0].point.x + offsetVector.x;
+                var y = intersects[0].point.y + offsetVector.y;
+                var z = intersects[0].point.z + offsetVector.z;
+
+
+                var boxUpName = intersects[0].object.parent.position.x + "/" +
+                    (intersects[0].object.parent.position.y + 2) + "/" +
+                    intersects[0].object.parent.position.z;
+
+                if (!window.CUBES.getObjectByName(boxUpName)) {
+                    if (intersects[0].uv.x < 0.5) {
+                        y = target.y + offsetVector.y;
+                    }
+                }
+
+                var boxDownName = intersects[0].object.parent.position.x + "/" +
+                    (intersects[0].object.parent.position.y - 2) + "/" +
+                    intersects[0].object.parent.position.z;
+
+                if (!window.CUBES.getObjectByName(boxDownName)) {
+                    if (intersects[0].uv.x > 0.5) {
+                        y = target.y + offsetVector.y;
+                    }
+                }
+
+                //--------
+
+                if (intersects[0].object.name == "front") {
+                    var boxLeftName = (intersects[0].object.parent.position.x + 2) + "/" +
+                        (intersects[0].object.parent.position.y) + "/" +
+                        intersects[0].object.parent.position.z;
+
+                    if (!window.CUBES.getObjectByName(boxLeftName)) {
+                        if (intersects[0].uv.y > 0.5) {
+                            x = target.x + offsetVector.x;
+                        }
+                    }
+
+                    var boxRightName = (intersects[0].object.parent.position.x - 2) + "/" +
+                        (intersects[0].object.parent.position.y) + "/" +
+                        intersects[0].object.parent.position.z;
+
+                    if (!window.CUBES.getObjectByName(boxRightName)) {
+                        if (intersects[0].uv.y < 0.5) {
+                            x = target.x + offsetVector.x;
+                        }
+                    }
+                } else if (intersects[0].object.name == "back") {
+                    var boxLeftName = (intersects[0].object.parent.position.x - 2) + "/" +
+                        (intersects[0].object.parent.position.y) + "/" +
+                        intersects[0].object.parent.position.z;
+
+                    if (!window.CUBES.getObjectByName(boxLeftName)) {
+                        if (intersects[0].uv.y > 0.5) {
+                            x = target.x + offsetVector.x;
+                        }
+                    }
+
+                    var boxRightName = (intersects[0].object.parent.position.x + 2) + "/" +
+                        (intersects[0].object.parent.position.y) + "/" +
+                        intersects[0].object.parent.position.z;
+
+                    if (!window.CUBES.getObjectByName(boxRightName)) {
+                        if (intersects[0].uv.y < 0.5) {
+                            x = target.x + offsetVector.x;
+                        }
+                    }
+                }
+
+                if (intersects[0].object.name == "left") {
+
+                    var boxFrontName = (intersects[0].object.parent.position.x) + "/" +
+                        (intersects[0].object.parent.position.y) + "/" +
+                        (intersects[0].object.parent.position.z + 2);
+
+                    if (!window.CUBES.getObjectByName(boxFrontName)) {
+                        if (intersects[0].uv.y > 0.5) {
+                            z = target.z + offsetVector.z;
+                        }
+                    }
+
+                    var boxBackName = (intersects[0].object.parent.position.x) + "/" +
+                        (intersects[0].object.parent.position.y) + "/" +
+                        (intersects[0].object.parent.position.z - 2);
+
+                    if (!window.CUBES.getObjectByName(boxBackName)) {
+                        if (intersects[0].uv.y < 0.5) {
+                            z = target.z + offsetVector.z;
+                        }
+                    }
+                } else if (intersects[0].object.name == "right") {
+
+                    var boxFrontName = (intersects[0].object.parent.position.x) + "/" +
+                        (intersects[0].object.parent.position.y) + "/" +
+                        (intersects[0].object.parent.position.z - 2);
+
+                    if (!window.CUBES.getObjectByName(boxFrontName)) {
+                        if (intersects[0].uv.y > 0.5) {
+                            z = target.z + offsetVector.z;
+                        }
+                    }
+
+                    var boxBackName = (intersects[0].object.parent.position.x) + "/" +
+                        (intersects[0].object.parent.position.y) + "/" +
+                        (intersects[0].object.parent.position.z + 2);
+
+                    if (!window.CUBES.getObjectByName(boxBackName)) {
+                        if (intersects[0].uv.y < 0.5) {
+                            z = target.z + offsetVector.z;
+                        }
+                    }
+                }
+
+                //const point = intersects[0].point;
+                const point = new THREE.Vector3(x, y, z);
+                // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
+                const objectMatrix = new THREE.Matrix3().getNormalMatrix(obj.matrixWorld)
+                const normal = intersects[0].face.normal.clone().applyMatrix3(objectMatrix).normalize()
+                const depthDir = playerUpDirection.clone().projectOnPlane(normal).normalize()
+
+                playerUpDirection = new THREE.Vector3(0, 1, 0)
+
+                if (button == 0) { // left click
+                    // delete the old portal this new one is replacing
+                    if (window.PORTALS[0] !== null) {
+                        deletePortal(0);
+                    }
+                    if (window.PORTALS[1] === null) {
+                        document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
+                    } else {
+                        document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
+                    }
+
+                    createPortal(0, 1, point, normal, intersects[0].object.parent.parent, playerUpDirection)
+                    window.GUN_BLOOM.color = new THREE.Color(0xFFDB82);
+                    window.nebula_left_portal.behaviours[1].isEnabled = true;
+                    window.nebula_left_portal2.behaviours[1].isEnabled = true;
+
+                    window.nebula_left_portal.behaviours[1].colorA.colors[0] = "#4F4300";
+                    window.nebula_left_portal.behaviours[1].colorB.colors[0] = "#FFBC00";
+
+                    window.nebula_left_portal2.behaviours[1].colorA.colors[0] = "#4F4300";
+                    window.nebula_left_portal2.behaviours[1].colorB.colors[0] = "#FFBC00";
+
+                    window.nebula_left_portal3.behaviours[1].colorA.colors[0] = "#4F4300";
+                    window.nebula_left_portal3.behaviours[1].colorB.colors[0] = "#FFBC00";
+                    window.nebula_left_portal3.behaviours[1].isEnabled = true;
+                    setTimeout(() => {
+                        window.nebula_left_portal3.behaviours[1].isEnabled = false;
+                    }, 50);
+                } else if (button == 2) { // left click
+                    // delete the old portal this new one is replacing
+                    if (window.PORTALS[1] !== null) {
+                        deletePortal(1);
+                    }
+
+                    if (window.PORTALS[0] === null) {
+                        document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
+                    } else {
+                        document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
+                    }
+
+                    createPortal(1, 0, point, normal, intersects[0].object.parent.parent, playerUpDirection)
+                    window.GUN_BLOOM.color = new THREE.Color(0x76EBFF);
+
+                    window.nebula_left_portal.behaviours[1].isEnabled = true;
+                    window.nebula_left_portal2.behaviours[1].isEnabled = true;
+
+                    window.nebula_left_portal.behaviours[1].colorA.colors[0] = "#08004f";
+                    window.nebula_left_portal.behaviours[1].colorB.colors[0] = "#0029FF";
+
+                    window.nebula_left_portal2.behaviours[1].colorA.colors[0] = "#08004f";
+                    window.nebula_left_portal2.behaviours[1].colorB.colors[0] = "#0029FF";
+
+                    window.nebula_left_portal3.behaviours[1].colorA.colors[0] = "#08004f";
+                    window.nebula_left_portal3.behaviours[1].colorB.colors[0] = "#0029FF";
+                    window.nebula_left_portal3.behaviours[1].isEnabled = true;
+                    setTimeout(() => {
+                        window.nebula_left_portal3.behaviours[1].isEnabled = false;
+                    }, 50);
+                }
+            } else {
+                //intersects[0].object.visible = false;
+            }
+
+        }
+
+        raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
+        var intersects = raycaster2.intersectObjects(window.nonPortal);
+
+        if (intersects.length > 0) {
+            for (var i = 0; i < intersects.length; i++) {
+                if (intersects[i].object.visible && !intersects[i].object.userData.portal) {
+
+                    //
+                    var obj = intersects[i].object;
+
+                    if (button == 0) {
+                        window.particlesGunGroup2.rotation.set(0, 0, 0);
+
+                        if (obj.name == "back") {
+                            window.particlesGunGroup2.rotation.x = Math.PI / 2;
+                        } else if (obj.name == "front") {
+                            window.particlesGunGroup2.rotation.x = -Math.PI / 2;
+                        } else if (obj.name == "right") {
+                            window.particlesGunGroup2.rotation.z = Math.PI / 2;
+                        } else if (obj.name == "left") {
+                            window.particlesGunGroup2.rotation.z = -Math.PI / 2;
+                        } else if (obj.name == "down") {
+                            window.particlesGunGroup2.rotation.y = Math.PI;
+                        }
+
+                        window.particlesGunGroup2.position.copy(intersects[i].point);
+                        window.nebula_left_portal4.behaviours[1].colorA.colors[0] = "#ffffff";
+                        window.nebula_left_portal4.behaviours[1].colorB.colors[0] = "#ffffff";
+                        window.nebula_left_portal4.behaviours[1].isEnabled = true;
+                        setTimeout(() => {
+                            window.nebula_left_portal4.behaviours[1].isEnabled = false;
+                        }, 50);
+                    } else if (button == 2) {
+                        window.particlesGunGroup2.rotation.set(0, 0, 0);
+
+                        if (obj.name == "back") {
+                            window.particlesGunGroup2.rotation.x = Math.PI / 2;
+                        } else if (obj.name == "front") {
+                            window.particlesGunGroup2.rotation.x = -Math.PI / 2;
+                        } else if (obj.name == "right") {
+                            window.particlesGunGroup2.rotation.z = Math.PI / 2;
+                        } else if (obj.name == "left") {
+                            window.particlesGunGroup2.rotation.z = -Math.PI / 2;
+                        } else if (obj.name == "down") {
+                            window.particlesGunGroup2.rotation.y = Math.PI;
+                        }
+
+                        window.particlesGunGroup2.position.copy(intersects[i].point);
+                        window.nebula_left_portal4.behaviours[1].colorA.colors[0] = "#ffffff";
+                        window.nebula_left_portal4.behaviours[1].colorB.colors[0] = "#ffffff";
+                        window.nebula_left_portal4.behaviours[1].isEnabled = true;
+                        setTimeout(() => {
+                            window.nebula_left_portal4.behaviours[1].isEnabled = false;
+                        }, 50);
+                    }
+                    //
+                    break;
+                }
+            }
+        }
+        //}
+    }
+}
+
+// deletes the portal with index portalIndex from the scene
+function deletePortal(portalIndex) {
+    window.PORTALS[portalIndex].mesh.geometry.dispose();
+    window.PORTALS[portalIndex].mesh.material.dispose();
+    window.MAIN_SCENE.remove(window.PORTALS[portalIndex]);
+    window.PORTALS[portalIndex] = null
+}
+
+// creates a new portal and adds it to the scene
+function createPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject, playerUpDirection) {
+    let color = window.PORTAL_COLORS[thisPortalIndex]
+
+    window.PORTALS[thisPortalIndex] = new Portal(
+        point,
+        normal, // normal of surface
+        playerUpDirection,
+        window.PORTALS[otherPortalIndex],
+        hostObject,
+        color,
+        thisPortalIndex)
+    window.PORTALS[thisPortalIndex].mesh.scale.set(0, 0, 0);
+    window.PORTALS[thisPortalIndex].portalShader.scale.set(0, 0, 0);
+    window.MAIN_SCENE.add(window.PORTALS[thisPortalIndex])
+    tweenCamera(500, window.PORTALS[thisPortalIndex].mesh.scale, new THREE.Vector3(0.5, 1, 1))
+    tweenCamera(500, window.PORTALS[thisPortalIndex].portalShader.scale, new THREE.Vector3(0.5, 1, 1))
+
+    if (window.PORTALS[otherPortalIndex] !== null) {
+        window.PORTALS[otherPortalIndex].output = window.PORTALS[thisPortalIndex]
+    }
+
+    if (window.PORTALS[0] !== null && window.PORTALS[1] !== null) {
+        window.PORTALS[0].portalShader.material = window.materialLeftOpened
+        window.PORTALS[1].portalShader.material = window.materialRightOpened
+    }
+
+    var pLocal = new THREE.Vector3(0, 0, -1);
+    var pWorld = pLocal.applyMatrix4(window.MAIN_CAMERA.matrixWorld);
+    var dir = pWorld.sub(window.MAIN_CAMERA.position).normalize();
+
+    window.PORTALS[thisPortalIndex].position.add(dir.clone().multiplyScalar(-0.02));
+}
+
+document.body.addEventListener('mousemove', (event) => {//rafa
+    if (window.FPS) {
+        //if (document.pointerLockElement === document.body) {
+            //window.MAIN_CAMERA.rotation.y -= event.movementX / 1000;
+            //window.MAIN_CAMERA.rotation.x -= event.movementY / 1000;
+        //}
+    }
+});
+
+let shouldJump = false;
+
+const updatePlayer = function (deltaTime) {
+
+    var velocity = 20;
+
+    if (window.mobile) {
+        //
+        velocity = 15;
+        //if (fwdValue == 0 && bkdValue == 0 && rgtValue == 0 && lftValue == 0) {
+        //horizontal rotation
+
+        //if (targetRotationX > 0.8) {
+        //targetRotationX += 0.1;
+        //   window.MAIN_CAMERA.rotation.y += (targetRotationX - window.MAIN_CAMERA.rotation.y) * 0.1;
+        //} else if (targetRotationX < -0.8) {
+        //targetRotationX -= 0.1;
+        //    window.MAIN_CAMERA.rotation.y += (targetRotationX - window.MAIN_CAMERA.rotation.y) * 0.1;
+        //} else {
+        window.MAIN_CAMERA.rotation.y += (targetRotationX - window.MAIN_CAMERA.rotation.y) * 0.1;
+        //}
+
+
+        //vertical rotation 
+        finalRotationY = (targetRotationY - window.MAIN_CAMERA.rotation.x);
+        if (window.MAIN_CAMERA.rotation.x <= 1 && window.MAIN_CAMERA.rotation.x >= -1) {
+            window.MAIN_CAMERA.rotation.x += finalRotationY * 0.1;
+            //camera.rotation.x += (targetRotationY - camera.rotation.x) * 0.1;
+        }
+
+        if (window.MAIN_CAMERA.rotation.x > 1) {
+            blocked_top = true;
+            window.MAIN_CAMERA.rotation.x = 1
+        } else
+            blocked_top = false;
+
+        if (window.MAIN_CAMERA.rotation.x < -1) {
+            blocked_bottom = true;
+            window.MAIN_CAMERA.rotation.x = -1
+        } else
+            blocked_bottom = false;
+
+
+        if (window.gyro) {
+            controlsDevice.update();
+            window.MAIN_CAMERA.rotation.z = 0
+        }
+
+    }
+
+    // gives a bit of air control
+    // define directions
+    let cameraDirection = new THREE.Vector3()
+    window.MAIN_CAMERA.getWorldDirection(cameraDirection)
+    const up = new THREE.Vector3(0, 1, 0)
+    const forward = cameraDirection.projectOnPlane(up).normalize()
+    const backward = forward.clone().negate()
+    const left = up.clone().cross(forward).normalize()
+    const right = left.clone().negate()
+
+    // physics changes while jumping
+    let jumpMultiplier = 1
+    if (window.PLAYER.inJump) {
+        jumpMultiplier = 0.05
+    }
+
+    if (!window.PLAYER.inJump) {
+        window.PLAYER.linearDamping = 0.999
+    } else {
+        window.PLAYER.linearDamping = 0.01
+    }
+
+    // regulates speed when multiple directions are pressed 
+    //let movementDirections = controller["KeyW"].pressed + controller["KeyS"].pressed + controller["KeyA"].pressed + controller["KeyD"].pressed;
+    let movementDirections = fwdValue + bkdValue + lftValue + rgtValue;
+    let movementMultiplier = 1
+    if (movementDirections == 2) {
+        movementMultiplier = (1 / Math.sqrt(movementDirections))
+    }
+
+    // apply forces in WASD directions when pressed
+    const f = velocity * window.PLAYER.mass * jumpMultiplier;
+
+    // if (this.controller["KeyW"].pressed || this.controller["KeyA"].pressed || this.controller["KeyS"].pressed || this.controller["KeyD"].pressed) { 
+    //     if (this.counter % 30 == 0 && !this.window.PLAYER.inJump) {
+    //         this.playWalkingSound()
+    //     }
+    // }
+
+    if (window.qwe) {
+        window.qwe.applyImpulse(forward.clone().multiplyScalar(1), window.qwe.position)
+    }
+
+    if (window.mobile) {
+
+        if (fwdValue > 0) {
+            window.PLAYER.applyForce(forward.clone().multiplyScalar(f * fwdValue), window.PLAYER.position)
+            //if (!window.IN_VICTORY) {hideInstructions()}
+            moving = true;
+        }
+
+        if (bkdValue > 0) {
+            window.PLAYER.applyForce(backward.clone().multiplyScalar(f * bkdValue), window.PLAYER.position)
+            //if (!window.IN_VICTORY) {hideInstructions()}
+            moving = true;
+        }
+
+        if (lftValue > 0) {
+            window.PLAYER.applyForce(left.clone().multiplyScalar(f * lftValue), window.PLAYER.position)
+            //if (!window.IN_VICTORY) {hideInstructions()}
+            moving = true;
+        }
+
+        if (rgtValue > 0) {
+            window.PLAYER.applyForce(right.clone().multiplyScalar(f * rgtValue), window.PLAYER.position)
+            //if (!window.IN_VICTORY) {hideInstructions()}
+            moving = true;
+        }
+
+        // update lastTimeStampInJump
+        wasInJump = window.PLAYER.inJump;
+
+        if (shouldJump) {
+            window.PLAYER.inJump = true
+            window.PLAYER.applyImpulse(up.clone().multiplyScalar(f * 0.25), window.PLAYER.position)
+        }
+
+        shouldJump = false;
+
+    } else {
+        if (controller["KeyW"].pressed && !window.COL_Z) {
+            window.PLAYER.applyForce(forward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+            //if (!window.IN_VICTORY) {hideInstructions()}
+            moving = true;
+        }
+        if (controller["KeyS"].pressed) {
+            window.PLAYER.applyForce(backward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+            //if (!window.IN_VICTORY) {hideInstructions()}
+            moving = true;
+        }
+        if (controller["KeyA"].pressed) {
+            window.PLAYER.applyForce(left.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+            //if (!window.IN_VICTORY) {hideInstructions()}
+            moving = true;
+        }
+        if (controller["KeyD"].pressed) {
+            window.PLAYER.applyForce(right.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+            //if (!window.IN_VICTORY) {hideInstructions()}
+            moving = true;
+        }
+
+        shouldJump = false;
+        // handle jumping when space bar is pressed
+        if (controller["Space"].pressed && !window.PLAYER.inJump) {
+            shouldJump = true;
+            //if (!window.IN_VICTORY) {hideInstructions()}
+        }
+        // update lastTimeStampInJump
+        wasInJump = window.PLAYER.inJump;
+
+        if (shouldJump) {
+            window.PLAYER.inJump = true
+            window.PLAYER.applyImpulse(up.clone().multiplyScalar(f * 0.08), window.PLAYER.position)
+        }
+    }
+
+    // always look where the camera points
+    window.PLAYER.quaternion.copy(window.MAIN_CAMERA.quaternion)
+    window.PLAYER.quaternion.x = 0
+    window.PLAYER.quaternion.z = 0
+    window.PLAYER.quaternion.normalize()
+
+    // set camera position to be at player
+    window.MAIN_CAMERA.position.copy(window.PLAYER.position)
+    window.GUN.position.copy(window.MAIN_CAMERA.position);
+
+    if (moving) {
+        // window.GUN.translateX(Math.sin(headBobTimer * headBobSpeed) * headBobHeight)
+        window.GUN.children[0].position.x += Math.sin(headBobTimer * headBobSpeed) * headBobHeight;
+    }
+
+
+    const smoothness = 0.1; // 0 to 1 only
+    const targetPosition = window.MAIN_CAMERA.quaternion.clone();
+    window.GUN.quaternion.slerp(targetPosition, smoothness);
+    //
+    var target = new THREE.Vector3(); // create once an reuse it
+    window.GUN.children[0].getWorldPosition(target);
+
+    window.particlesGunGroup.position.copy(target);
+    window.particlesGunGroup.quaternion.slerp(targetPosition, smoothness);
+
+    raycast();
+    updateHeadBob(deltaTime);
+}
+
+var headBobTimer = 0;
+var headBobSpeed = 2.5;
+var headBobHeight = 0.001;
+var headBobActive = false;
+var repositioningGUn = false;
+
+const updateHeadBob = function (deltaTime) {
+    if (headBobActive && moving) {
+        const wavLength = Math.PI;
+        const nextStep = 1 + Math.floor(((headBobTimer + 0.0000001) * headBobSpeed) / wavLength);
+        const nextStepTime = nextStep * wavLength / headBobSpeed;
+        headBobTimer = Math.min(headBobTimer + deltaTime, nextStepTime);
+
+        if (headBobTimer == nextStepTime) {
+            //headBobActive = false;
+        }
+    }
+}
+
+var levelCompleted = false;
+var leveEntered = false;
+
+var moving = false;
+window.initLevel = false;
+
+function raycast() {
+
+    if (!leveEntered) {
+        raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
+        var intersects = raycaster2.intersectObject(window.planeEnterDoor);
+
+        if (intersects.length > 0) {
+            //onsole.log(intersects[0].distance)
+            if (intersects[0].distance < 0.1) {
+                leveEntered = true;
+
+                console.log("entered")
+
+                setTimeout(() => {
+                    window.wallCorridorEnter.position.y = 0;
+                    window.wallCorridorExit.position.y = 0;
+                }, 200);
+
+
+                setTimeout(() => {
+                    window.spotLight.intensity = 20;
+                    window.lightRoom.intensity = 50;
+
+                    setTimeout(() => {
+
+                        for (var i = 0; i < window.DISPENSER_COVERS.length; i++) {
+                            tweenCamera(300, window.DISPENSER_COVERS[i].scale, new THREE.Vector3(0, 0, 0))
+                        }
+
+                        setTimeout(() => {
+                            //INITIATE BOX CANNON
+                            for (var i = 0; i < window.BOX_BODY.length; i++) {
+                                window.CANNON_WORLD.addBody(window.BOX_BODY[i])
+                            }
+                            for (var i = 0; i < window.SPHERE_BODY.length; i++) {
+                                window.CANNON_WORLD.addBody(window.SPHERE_BODY[i])
+                            }
+                            window.initLevel = true;
+
+                            setTimeout(() => {
+                                for (var i = 0; i < window.DISPENSER_COVERS.length; i++) {
+                                    tweenCamera(100, window.DISPENSER_COVERS[i].scale, new THREE.Vector3(0.012, 0.012, 0.012))
+                                }
+                            }, 1000);
+                        }, 300);
+
+                    }, 1000);
+                }, 1000);
+
+                setTimeout(() => {
+
+                    window.enter_door_right.position.z = -4;
+                    tweenCamera(1000, window.enter_door_right.position, new THREE.Vector3(-65, window.enter_door_right.position.y, window.enter_door_right.position.z))
+
+                    window.enter_door_left.position.z = -4;
+                    tweenCamera(1000, window.enter_door_left.position, new THREE.Vector3(65, window.enter_door_left.position.y, window.enter_door_left.position.z))
+
+                    setTimeout(() => {
+                        tweenCamera(500, window.enter_door_right_spinner.rotation, new THREE.Vector3(0,
+                            window.enter_door_right_spinner.rotation.y,
+                            window.enter_door_right_spinner.rotation.z))
+
+                        tweenCamera(500, window.enter_door_left_spinner.rotation, new THREE.Vector3(0,
+                            window.enter_door_left_spinner.rotation.y,
+                            window.enter_door_left_spinner.rotation.z))
+
+
+                        setTimeout(() => {
+                            window.CORRIDOR_ENTER.visible = false;
+                        }, 500);
+                    }, 1000);
+
+                }, 3000);
+            }
+        }
+    }
+
+    //
+    raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
+    var intersects = raycaster2.intersectObject(window.CORRIDOR_EXIT.getObjectByName("completed"));
+    if (intersects.length > 0) {
+        if (intersects[0].distance < 1 && !levelCompleted) {
+            levelCompleted = true;
+            $("#loading-parent").css("opacity", 1);
+            $("#loading-parent").css("pointer-events", "all");
+
+            $(".main-title").text("LEVEL COMPLETED AND VALIDATED")
+            $(".introduction-text").text("Congratulations you completed the level, now you will be redirected to the level editor where you can make modifications, save or publish this level.");
+        }
+    }
+    //
+
+    if (window.PORTALS[0] === null || window.PORTALS[1] === null) {
+        return
+    }
+
+    var portals = [window.PORTALS[0].mesh, window.PORTALS[1].mesh];
+
+    raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
+    var intersects = raycaster2.intersectObjects(portals);
+    //console.log(intersects.length)
+    if (intersects && intersects.length > 0 && !teleporting) {
+        if (intersects[0].distance < 0.3) {
+
+            var pos;
+
+            if (intersects[0].object.userData.this == 0) {
+                pos = portals[1].position;
+            } else {
+                pos = portals[0].position;
+            }
+
+            var directionOther = new THREE.Vector3(0, 1, 0).applyQuaternion(portals[intersects[0].object.userData.other].quaternion);
+            var directionThis = new THREE.Vector3(0, 1, 0).applyQuaternion(portals[intersects[0].object.userData.this].quaternion);
+
+            var reflectedPosition = new THREE.Vector3();
+            portals[intersects[0].object.userData.this].worldToLocal(reflectedPosition.copy(window.MAIN_CAMERA.position));
+
+            if (directionOther.z == -1) {
+                reflectedPosition.x *= -1.0;
+                reflectedPosition.z *= 1.0;
+
+                if (directionThis.equals(directionOther)) {
+                    window.MAIN_CAMERA.rotation.y -= Math.PI;
+                } else {
+                    if (Math.abs(directionThis.x) == 1) {
+                        window.MAIN_CAMERA.rotation.y -= Math.PI / 2 * directionThis.x;
+                    }
+                }
+            } else if (directionOther.z == 1) {
+                reflectedPosition.x *= 1.0;
+                reflectedPosition.z *= 1.0;
+
+                if (directionThis.equals(directionOther)) {
+                    window.MAIN_CAMERA.rotation.y += Math.PI;
+                } else {
+                    if (Math.abs(directionThis.x) == 1) {
+                        window.MAIN_CAMERA.rotation.y += Math.PI / 2 * directionThis.x;
+                    }
+                }
+            } else if (directionOther.x == -1) {
+                reflectedPosition.x *= 1.0;
+                reflectedPosition.z *= 1.0;
+
+                if (directionThis.equals(directionOther)) {
+                    window.MAIN_CAMERA.rotation.y -= Math.PI;
+                } else {
+                    if (Math.abs(directionThis.z) == 1) {
+                        window.MAIN_CAMERA.rotation.y += Math.PI / 2 * directionThis.z;
+                    }
+                }
+            } else if (directionOther.x == 1) {
+                reflectedPosition.x *= 1.0;
+                reflectedPosition.z *= 1.0;
+
+                if (directionThis.equals(directionOther)) {
+                    window.MAIN_CAMERA.rotation.y += Math.PI;
+                } else {
+                    if (Math.abs(directionThis.z) == 1) {
+                        window.MAIN_CAMERA.rotation.y -= Math.PI / 2 * directionThis.z;
+                    }
+                }
+            }
+
+            portals[intersects[0].object.userData.other].localToWorld(reflectedPosition);
+            window.MAIN_CAMERA.position.copy(reflectedPosition);
+
+            window.PLAYER.position.copy(reflectedPosition)
+
+            teleporting = true;
+            //setTimeout(() => {
+            teleporting = false;
+            //}, 1000);
+        }
+    }
+}
+
+function tweenCamera(duration, ini, final) {
+    new TWEEN.Tween(ini).to(final, duration)
+        .easing(TWEEN.Easing.Quadratic.InOut)
+        .start();
+}
+
+var teleporting = false;
+
+//
+
+export {
+    updatePlayer
+};

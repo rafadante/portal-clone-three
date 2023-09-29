@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Web site created using create-react-app" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,100;1,300&family=Poppins&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,100,300,500" rel="stylesheet">
+  <link href="./main.css" rel="stylesheet">
+  <title>Portal Clone</title>
+</head>
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "./build/three.module.js",
+      "three/addons/": "./jsm/"
+    }
+  }
+</script>
+
+<body>
+  <div id="root"></div>
+
+  <div id="container">
+    <img src="../assets/images/vig5.jpg" />
+  </div>
+
+  <div id="reticle" style="transform: scale(-1);">
+    <img id="reticle-img" width="50" src="../assets/textures/crosshairNone.png" />
+  </div>
+
+  <div id="ui">
+    <div id="side-bar-left">
+      <div id="info-box">
+        <h2 id="info-title">Button</h1>
+          <h3 id="info-content">Buttons have three variants which can be activated by weight, spheres and cubes. Each
+            can be linked to an object to form a trigger. You can pick which type of button to use by selecting the
+            corresponding icon on the toolbar or modifying an existing placement through the properties menu.
+        </h2>
+      </div>
+      <button id="arrow-menu">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      <div class="header">
+        <span>ITEMS</span>
+      </div>
+      <div class="body">
+        <div id="items">
+          <img
+            data-content="Can be linked to an object to form a trigger. The player can click on the button and it will activate the function that it is connected to. You can add a timer to your button through the properties menu."
+            data-title="PEDESTAL BUTTON" class="item" data-name="pedestal_button"
+            src="../assets/ui/items/pedestal_button.png" />
+          <img data-content="Can be linked to an object to form a trigger. This button accepts spheres and cubes."
+            data-title="BUTTON WEIGHT" class="item" data-name="button_weight" src="../assets/ui/items/button.png" />
+          <img data-content="Can be linked to an object to form a trigger. This button only accepts cubes."
+            data-title="BUTTON CUBE" class="item" data-name="button_box" src="../assets/ui/items/button_cube.png" />
+          <img data-content="Can be linked to an object to form a trigger. This button only accepts spheres."
+            data-title="BUTTON SPHERE" class="item" data-name="button_circle"
+            src="../assets/ui/items/button_sphere.png" />
+          <img
+            data-content="A dropper will come with it. If the player loses the cube the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
+            data-title="CUBE" class="item" data-name="cube" src="../assets/ui/items/cube.png" />
+          <img
+            data-content="A dropper will come with it. If the player loses the sphere the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
+            data-title="SPHERE" class="item" data-name="sphere" src="../assets/ui/items/sphere.png" />
+
+          <img
+            data-content="Can either start enabled or disabled through the properties menu. When enabled the player can walk up and down them."
+            data-title="STAIRS" class="item" data-name="stairs" src="../assets/ui/items/stairs.png" />
+          <img
+            data-content="Can either start enabled or disabled through the properties menu. When enabled the player can walk through them."
+            data-title="DOOR" class="item" data-name="door" src="../assets/ui/items/door.png" />
+
+          <img
+            data-content="Purely cosmetic and provide your map with additional light. Every map will start off with an observation room which cannot be removed."
+            data-title="OBSERVATION ROOM" class="item" data-name="observation_room"
+            src="../assets/ui/items/observation_room.png" />
+          <!--<img data-content="Purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically." data-title="LIGHT" class="item" data-name="light" src="../assets/ui/items/light.png" />-->
+          <img data-content="Purely cosmetic, it will look at the player." data-title="CAMERA" class="item"
+            data-name="camera" src="../assets/ui/items/camera.png" />
+          <img data-content="Purely cosmetic, it will play a radio music." data-title="RADIO" class="item"
+            data-name="radio" src="../assets/ui/items/radio.png" />
+        </div>
+      </div>
+    </div>
+
+    <div id="ui-top" class="">
+      <div id="top-menu">
+        <button id="draws">
+          <i class="fas fa-play"></i>
+        </button>
+        <button>
+          <i class="fas fa-undo"></i>
+        </button>
+        <button>
+          <i class="fas fa-redo"></i>
+        </button>
+        <button id="view-fps">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+
+      <div id="top-menu-left">
+        <span>File</span>
+        <span>Edit</span>
+        <span>Help</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading-parent">
+    <div id="gallery-img">
+      <img class="img image" id="back-loading1" src="../assets/loading/1.jpg" />
+      <img class="img image" id="back-loading2" src="../assets/loading/1.jpg" />
+      <img class="img image" id="back-loading3" src="../assets/loading/1.jpg" />
+    </div>
+
+    <div id="back-effect"></div>
+    <section class="hero">
+      <h1 class="main-title">LOADING<span>TEST LEVEL</span></h1>
+      <p class="introduction-text">
+        Get to the exit door to validate your level, you can place portals with the mouse LEFT and RIGHT buttons.
+      </p>
+    </section>
+    <div class="loading"></div>
+  </div>
+
+  <ul class="menu">
+    <li id="portalable" class="menu-item noItem">
+      <a href="#" class="menu-btn">
+        <i class="" style="font-weight: bolder;">P</i>
+        <span class="menu-text">Portalable</span>
+      </a>
+    </li>
+    <li id="conection" class="menu-item hasItem">
+      <a href="#" class="menu-btn">
+        <i class="" style="font-weight: bolder;">C</i>
+        <span class="menu-text">Connect to...</span>
+      </a>
+    </li>
+    <li id="delete" class="menu-item hasItem">
+      <a href="#" class="menu-btn">
+        <i class="" style="font-weight: bolder;">D</i>
+        <span class="menu-text">Delete</span>
+      </a>
+    </li>
+    <li class="menu-separator"></li>
+    <li id="plus-portal" class="menu-item noItem">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-plus"></i>
+        <span class="menu-text">Push Surface</span>
+      </button>
+    </li>
+    <li id="minus-portal" class="menu-item noItem">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-minus"></i>
+        <span class="menu-text">Pull Surface</span>
+      </button>
+    </li>
+  </ul>
+
+  <div id="blocker">
+    <div class="body">
+      <span id="settings-menu-title">OPTIONS</span>
+      <div class="settings-menu">
+
+        <div id="options-settings">
+          <span id="settings-close">Play</span>
+          <span class="option selected" id="settings-controls">Controls</span>
+          <span class="option" id="settings-video">Graphics</span>
+          <!--<span class="option" id="settings-audio">Audio</span>
+          <span class="option" id="settings-language">Language</span>-->
+          <span class="option" id="back-editor">Back to editor</span>
+        </div>
+        
+        <div id="options-video">
+          <!--QUALITY-->
+          <div class="options-row">
+            <span class="option-name" id="settings-close">Quality</span>
+            <div class="option-value">
+              <select name="quality" id="quality-select">
+                <option value="1">Epic</option>
+                <option value="0.75">High</option>
+                <option value="0.5">Medium Desktop</option>
+                <option value="0.5">Medium Mobile</option>
+                <option value="0.5">Low</option>
+                <option value="0.5">Potato</option>
+              </select>
+            </div>
+          </div>
+          <!--PORTAL RECURSION-->
+          <div class="options-row">
+            <span class="option-name" id="settings-close">Recursive Portals</span>
+            <div class="option-value">
+              <select name="recursive" id="recursive-select">
+                <option value="1">0</option>
+                <option value="0.75">1</option>
+                <option value="0.5">2</option>
+                <option value="1">3</option>
+                <option value="0.75">4</option>
+                <option value="0.5">5</option>
+                <option value="1">6</option>
+                <option value="0.75">7</option>
+                <option value="0.5">8</option>
+                <option value="1">9</option>
+                <option value="0.75">10</option>
+              </select>
+            </div>
+          </div>
+          <!--STATS-->
+          <div class="options-row">
+            <span class="option-name" id="settings-close">Stats</span>
+            <div class="option-value">
+              <input checked type="checkbox" />
+            </div>
+          </div>
+          <!--FPS-->
+          <div class="options-row">
+            <span class="option-name" id="settings-close">Fps</span>
+            <div class="option-value">
+              <select name="fps" id="fps-select">
+                <option value="1">60</option>
+                <option value="0.75">30</option>
+                <option value="0.5">Unlocked</option>
+              </select>
+            </div>
+          </div>
+          <!--ANTIALISING-->
+          <div class="options-row">
+            <span class="option-name" id="settings-close">Antialising</span>
+            <div class="option-value">
+              <select name="antialising" id="antialising-select">
+                <option value="none">None</option>
+                <option value="MSAA">MSAA</option>
+              </select>
+            </div>
+          </div>
+          <!--RESOLUTION-->
+          <div class="options-row">
+            <span class="option-name" id="settings-close">Resolution</span>
+            <div class="option-value">
+              <select name="resolution" id="resolution-select">
+                <option value="1">1x</option>
+                <option value="0.75">0.75x</option>
+                <option value="0.5">0.5x</option>
+                <option value="0.25">0.25x</option>
+              </select>
+            </div>
+          </div>
+          <!--SHADOWS-->
+          <div class="options-row">
+            <span class="option-name" id="settings-close">Shadows</span>
+            <div class="option-value">
+              <input checked type="checkbox" />
+            </div>
+          </div>
+          <!--SHADOW RESOLUTIONS-->
+          <div class="options-row">
+            <span class="option-name" id="settings-close">Shadows Resolution</span>
+            <div class="option-value">
+              <select name="shadows-resolution" id="shadows-resolution-select">
+                <option value="4096">4096</option>
+                <option value="2048">2048</option>
+                <option value="1024">1024</option>
+                <option value="512">512</option>
+                <option value="256">256</option>
+              </select>
+            </div>
+          </div>
+          <!--POST PROCESSING-->
+          <div class="options-row">
+            <span class="option-name" id="settings-close">Post Processing</span>
+            <div class="option-value">
+              <input checked type="checkbox" />
+            </div>
+          </div>
+          <!--BLOOM-->
+          <div class="options-row">
+            <span class="option-name" id="settings-close">Bloom</span>
+            <div class="option-value">
+              <input checked type="checkbox" />
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="warning">
+    <span>You can not spawn more cubes on this direction</span>
+  </div>
+
+  <img src="../assets/ui/items/button.png" id="follow" />
+
+
+  <div id="mobile-controls">
+
+    <button id="close">
+      <img src="./assets/ui/mobile/pause.png" />
+    </button>
+
+    <div id="mobileInterface" class="noSelect">
+      <div id="joystickWrapper1"></div>
+      <!--<div id="joystickWrapper2"></div>-->
+    </div>
+
+    <!--<div id="mobile-right-buttons">-->
+
+
+
+    <img style="    position: absolute;
+    bottom: 115px;
+    right: 70px;
+    width: 25vh;
+    z-index: 2;
+    filter: drop-shadow(2px 4px 6px black);
+    opacity: 0.8;" id="portal_l" src="./assets/ui/mobile/portalOrange2.png" />
+
+    <button id="item" style="    position: absolute;
+    bottom: 30px;
+    right: 65px;
+    top: auto;
+    margin: 0px;
+    width: 20vh;
+    height: 20vh;
+    background: #50d7d2;">
+      <img src="./assets/ui/mobile/item.png" />
+    </button>
+
+    <button id="jump" style="position: absolute;
+    bottom: 7px;
+    right: 155px;
+    top: auto;
+    margin: 0px;
+    width: 13vh;
+    height: 13vh;
+    background: #ef132b;">
+      <img src="./assets/ui/mobile/jump.png" />
+    </button>
+
+    <button id="crouch" style="position: absolute;
+    bottom: 75px;
+    right: 160px;
+    top: auto;
+    margin: 0px;
+    width: 11vh;
+    height: 11vh;
+    background: grey;">
+      <img src="./assets/ui/mobile/arrow.png" />
+    </button>
+
+    <img style="position: absolute;
+    bottom: 55px;
+    right: -20px;
+    width: 25vh;
+    z-index: 2;
+    transform: rotate(88deg);
+    filter: drop-shadow(2px 4px 6px black);
+    opacity: 0.8;" id="portal_r" src="./assets/ui/mobile/portalBlue2.png" />
+    <!--</div>-->
+
+
+
+    <div id="camera"></div>
+
+    <!--<img style="    position: absolute;
+    width: 805px;
+    right: -95px;
+    bottom: -340px;" src="./assets/gg.png" />-->
+
+  </div>
+
+</body>
+
+</html>
