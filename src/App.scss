@@ -6,8 +6,8 @@
   height: 100%;
   background-color: transparent;
   top: 0px;
-  display: none;
-  pointer-events: none;
+  display: block;
+  pointer-events: all;
   z-index: 10;
   flex-direction: column;
   transition: all 0.3s;
@@ -19,20 +19,25 @@
     justify-content: center;
     align-items: baseline;
     flex-direction: column;
-    padding: 2vh;
+    /*padding: 2vh;*/
+    margin-left: 15vh;
+    transition: all 1s;
 
     #settings-menu-title {
-      background-color: grey;
+      background-color: rgba(128, 128, 128, 0.5);
       filter: none !important;
       padding: 0px !important;
 
       height: 6vw !important;
       top: -6vw;
       width: auto !important;
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
-      font-size: 2vw;
+      /*font-size: 2vw;*/
+
+      font-weight: 900;
+      font-size: 4vh;
 
       pointer-events: none;
       padding-left: 20px !important;
@@ -40,8 +45,8 @@
     }
 
     .settings-menu {
-      background: grey;
-      width: 25%;
+      background: rgba(128, 128, 128, 0.5);
+      width: 35%;
       height: auto;
       display: flex;
       flex-direction: column;
@@ -55,12 +60,26 @@
       max-height: 60%;
       overflow-y: scroll;
 
-      #options-settings {
+      #options-settings, #options-single, #options-community, #options-about, #options-patreon {
         width: 100%;
-        display: block;
+        display: none;
       }
 
-      #options-video {
+      #options-about, #options-patreon{
+        pointer-events: none;
+
+        span{
+          display: block;
+          width: 95%;
+          text-align: justify;
+        }
+      }
+
+      #options-main {
+        width: 100%;
+      }
+
+      #options-video, #options-controls {
         width: 100%;
         display: none;
 
@@ -85,9 +104,23 @@
               margin-right: 10%;
             }
 
-            input {
+            input[type="checkbox"] {
               width: 30%;
               height: 30%;
+            }
+
+            input[type="range"] {
+              width: 65%;
+              height: 30%;
+            }
+
+            input[type="number"] {
+              width: 15%;
+              height: 30%;
+              margin-right: 4vh;
+              font-size: 2vh;
+              border: none;
+              pointer-events: none;
             }
           }
         }
@@ -96,15 +129,13 @@
       span {
         width: calc(100% - 20px);
         height: auto;
-        padding-top: 7px;
-        padding-bottom: 7px;
+        padding-top: 15px;
+        padding-bottom: 15px;
         display: flex;
         align-items: center;
         cursor: pointer;
         padding-left: 20px;
         transition: all 0.1s;
-        margin-bottom: 1.25vh;
-        margin-top: 1.25vh;
         font-size: 3vh;
       }
 
@@ -114,6 +145,34 @@
         color: black;
       }
     }
+
+    #settings-menu{
+      display: flex;
+
+      button{
+        width: 12vh;
+        height: 4vh;
+        border: none;
+        background: rgb(40, 40, 40);
+        color: white;
+        font-weight: bolder;
+        margin-top: 2vh;
+        filter: drop-shadow(2px 4px 6px black);
+        font-size: 2vh;
+        display: none;
+      }
+
+      button:hover{
+        background: #d1bb53;
+        filter: drop-shadow(1 2px 3px black);
+        color: black;
+      }
+
+      #done{
+        margin-left: 3vh;
+      }
+    }
+
   }
 }
 
@@ -154,4 +213,25 @@ select {
     color: inherit;
     background-color: grey;
   }
+}
+
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+  scrollbar-width: auto;
+  scrollbar-color:  rgba(255, 255, 255, 0.4);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 16px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 0px;
 }

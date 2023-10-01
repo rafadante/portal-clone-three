@@ -79,6 +79,9 @@ $("body").on('click', '#view-fps', function () {
         setTimeout(() => {
             $("#loading-parent").css("opacity", 0)
             $("#loading-parent").css("pointer-events", "none")
+
+            if (window.mobile)
+                $("#mobile-controls").css("display", "block");
         }, 5000);
 
         for (var i = 0; i < cubesDefault.length; i++)
@@ -741,7 +744,7 @@ $("body").on('click', '#view-fps', function () {
         window.ENTER_DOOR.children[1].visible = false;
 
         console.log(window.MAIN_SCENE)
-    }, 100);
+    }, 500);
 });
 
 var meshesWallPortal = [];
@@ -843,6 +846,7 @@ $("body").on('click', '#back-editor', function () {
 
     $("#ui").css("display", "block");
     $(".img").removeClass("image");
+    $("#mobile-controls").css("display", "none");
 
     var bb = new THREE.Box3()
     bb.setFromObject(window.ROOM);

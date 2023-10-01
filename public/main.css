@@ -11,11 +11,14 @@ body {
 	height: 100%;
 	user-select: none;
 	-webkit-tap-highlight-color: transparent;
+	overscroll-behavior: contain;
+	overflow: hidden;
 }
 
 #main-container {
 	width: 100%;
 	height: 100%;
+	display: none;
 }
 
 #main-container div{
@@ -229,6 +232,7 @@ select {
 #ui {
 	width: 100%;
 	height: 100%;
+	display: none;
 }
 
 #ui-top {
@@ -282,9 +286,9 @@ select {
 #loading-parent {
 	width: 100%;
 	height: 100%;
-	transition: all 0.5s;
-	opacity: 1;
-	pointer-events: all;
+	transition: all 1s;
+	opacity: 0;
+	pointer-events: none;
 	position: absolute;
 	z-index: 100000;
 	top: 0px;
@@ -297,6 +301,7 @@ select {
 	min-height: 100vh;
 	padding-bottom: 4em;
 	background: black;
+	display: block;
 }
 
 #back-effect {
@@ -310,7 +315,7 @@ select {
 	left: 0;
 	height: 100%;
 	width: 100%;
-	background: linear-gradient(90deg, black, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6));
+	background: linear-gradient(90deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.1));
 	z-index: 5;
 }
 
@@ -643,74 +648,6 @@ a.menu-btn {
 	border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-
-
-
-.selected {
-	/*font-size: 3vw;*/
-	/*color: rgb(255, 208, 0);
-	border-left: 3px solid rgb(255, 208, 0);*/
-}
-
-#options-controls {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	font-family: cursive;
-	font-size: 1.5vw;
-	padding: 50px;
-	font-weight: lighter;
-}
-
-#options-controls .block-settings-slider {
-	display: flex;
-	align-items: center;
-}
-
-#options-controls .block-settings-slider span {}
-
-#options-controls .block-settings-slider input {
-	width: 40%;
-	margin-left: 100px;
-	margin-right: 40px;
-}
-
-.separator-settings {
-	width: 100%;
-	height: 1px;
-	background-color: white;
-	margin-top: 30px;
-	margin-bottom: 30px;
-}
-
-#options-controls .block-settings-controls {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-}
-
-#options-controls .block-settings-controls .block {
-	width: 23%;
-	height: 8vw;
-	margin: 5px;
-	flex-direction: column;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-#options-controls .block-settings-controls .block .block-down {
-	background-color: black;
-	border: 1px solid white;
-	width: 80%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	margin-top: 20px;
-	border-radius: 30px;
-	height: 50px;
-}
-
 /*Chrome*/
 input[type="range"] {
 	-webkit-appearance: none;
@@ -807,6 +744,8 @@ input[type=range]::-webkit-slider-runnable-track {
     height: 100%;
     top: 0px;
     left: 0px;
+	opacity: 0.5;
+	transition: all 0.3s;
 }
 
 #mobileInterface {

@@ -1,5 +1,6 @@
 import $ from 'jquery';
-import "./Variables.js"
+import "./Variables.js";
+import "./components/ui/UI.js";
 import * as physics from './Physics.js';
 import * as THREE from './build/three.module.js';
 import {
@@ -40,9 +41,6 @@ import {
     updateRay,
     recreateRay
 } from './components/ray/Ray.js';
-import {
-    updateParticles
-} from './components/particles/Particles.js';
 import './components/test/Test.js';
 import {
     itemUpdate,
@@ -65,6 +63,7 @@ import {
     SelectiveBloomEffect
 } from "postprocessing";
 import Stats from "stats-gl";
+import "./components/menuShader/MenuShader.js"
 //
 //
 window.SELECTED_OBJECTS_FOR_BLOOM = new Selection()
@@ -93,8 +92,22 @@ const selectiveBloom = new SelectiveBloomEffect(window.MAIN_SCENE, window.MAIN_C
 
 selectiveBloom.selection = window.SELECTED_OBJECTS_FOR_BLOOM;
 
+const smaaEffect = new SMAAEffect(
+    EdgeDetectionMode.DEPTH
+);
+
+smaaEffect.edgeDetectionMaterial.setEdgeDetectionThreshold(0.01);
+
+var effectPass;
+
+if (window.mobile) {
+    effectPass = new EffectPass(window.MAIN_CAMERA, selectiveBloom, toneMappingEffect);
+} else {
+    effectPass = new EffectPass(window.MAIN_CAMERA, selectiveBloom, toneMappingEffect, smaaEffect);
+}
+
 //this.effect = toneMappingEffect;
-window.COMPOSER.addPass(new EffectPass(window.MAIN_CAMERA, selectiveBloom, toneMappingEffect));
+window.COMPOSER.addPass(effectPass);
 //VARIABLES
 const clickMouse = new THREE.Vector2(); // create once
 var mouse = new THREE.Vector2();
@@ -137,7 +150,14 @@ window.ITEM_CUBE.visible = false;
 window.ITEM_CUBE.name = "ITEM_CUBE";
 window.connecting = false;
 
-init();
+document.getElementById("container").appendChild(window.RENDERER.domElement);
+
+//init();
+$("body").on('click', '#option-community-build', function () {
+    setTimeout(() => {
+        init();
+    }, 2000);
+});
 //
 function init() {
     // SCENE
@@ -155,7 +175,6 @@ function init() {
     // CAMERA
     window.MAIN_SCENE.add(window.MAIN_CAMERA);
     // RENDERER
-    document.getElementById("container").appendChild(window.RENDERER.domElement);
     //
     createPortalShader(window.RENDERER);
     generateMeshPortalShader(window.MAIN_SCENE, window.MAIN_CAMERA, window.RENDERER);
@@ -314,126 +333,120 @@ function onWindowResize() {
 }
 
 const cannonDebugger = new CannonDebugger(window.MAIN_SCENE, window.CANNON_WORLD)
-
+//PÓRTAL FPS
+let clockPortal = new THREE.Clock();
+let deltaPortal = 0;
+let intervalPortal = 1 / 60;
+//SCENE FPS
 let clock = new THREE.Clock();
 let delta = 0;
-// 30 fps
-let interval = 1 / 30;
+window.interval = 1 / window.fps;
+
+console.log(window.STATS);
 
 function animate(time) {
 
-    window.STATS.begin();
-
     if (!window.FPS) {
+        window.STATS.begin();
         //contactShadowRender(window.MAIN_SCENE, window.MAIN_CAMERA, window.RENDERER);
+        //window.tuniform.iTime.value += clock.getDelta();
         window.RENDERER.render(window.MAIN_SCENE, window.MAIN_CAMERA)
-    } else {
-        //itemUpdate();
-        updateRay();
-        animatePortalShader(time, window.MAIN_SCENE, window.MAIN_CAMERA, window.RENDERER)
+        window.STATS.end();
+    } else if (!window.paused) {
 
         delta += clock.getDelta();
 
-        if (delta > interval) {
-            // The draw or time dependent code are here
-            animatePortal();
-
-            delta = delta % interval;
-        }
-
-        window.COMPOSER.render()
-        updatePlayer(1 / 30);
-        //updateParticles();
-        TWEEN.update();
-
-        if (Date.now() >= timeTarget) {
-            const timeStep = 1 / 60
-            window.CANNON_WORLD.step(timeStep)
-            timeTarget += 1000 / window.PHYSICS_UPDATEPERSEC_LIMIT
-            if (Date.now() >= timeTarget) {
-                timeTarget = Date.now()
+        if (window.fpsUnlocked) {
+            render(time);
+        } else {
+            if (delta > window.interval) {
+                // The draw or time dependent code are here
+                render(time);
+                delta = delta % window.interval;
             }
         }
-
-        if (window.initLevel) {
-
-            if (window.HOLDING_ITEM) {
-                var target = new THREE.Vector3(); // create once an reuse it
-                window.holder.getWorldPosition(target);
-                //window.CURRENT_ITEM.position.copy(target);
-
-                var x = target.x;
-                var y = target.y;
-                var z = target.z;
-
-                /*if (window.COL_X)
-                x = window.COL_X_POS;
-            if (window.COL_Y)
-                y = window.COL_Y_POS;
-            if (window.COL_Z)
-                z = window.COL_Z_POS;*/
-
-                window.CURRENT_ITEM.position.copy(new THREE.Vector3(x, y, z));
-                window.CURRENT_ITEM.rotation.copy(window.MAIN_CAMERA.rotation);
-
-                //window.CURRENT_ITEM.rotation.y = window.MAIN_CAMERA.rotation.y;
-                //  
-                /*window.CURRENT_ITEM.velocity.set(0, 0, 0);
-                window.CURRENT_ITEM.angularVelocity.set(0, 0, 0);
-                window.CURRENT_ITEM.force.setZero();
-                window.CURRENT_ITEM.torque.setZero();*/
-
-                // Position
-                //body.position.setZero();
-                //body.previousPosition.setZero();
-                //body.interpolatedPosition.setZero();
-                //body.initPosition.setZero();
-            }
-
-            for (var i = 0; i < window.ITEM_BOXES.length; i++) {
-
-                if (window.ITEM_BOXES[i] != window.CURRENT_ITEM) {
-                    window.ITEM_BOXES[i].position.copy(window.ITEM_BOXES[i].body.position);
-                    window.ITEM_BOXES[i].quaternion.copy(window.ITEM_BOXES[i].body.quaternion);
-                }
-
-            }
-            for (var i = 0; i < window.ITEM_SPHERES.length; i++) {
-
-                if (window.ITEM_SPHERES[i] != window.CURRENT_ITEM) {
-                    window.ITEM_SPHERES[i].position.copy(window.ITEM_SPHERES[i].body.position);
-                    window.ITEM_SPHERES[i].quaternion.copy(window.ITEM_SPHERES[i].body.quaternion);
-                }
-            }
-        }
-
-        for (var i = 0; i < window.ITEM_GENERAL.length; i++) {
-
-            if (window.ITEM_GENERAL[i] != window.CURRENT_ITEM) {
-                window.ITEM_GENERAL[i].position.copy(window.ITEM_GENERAL[i].body.position);
-                window.ITEM_GENERAL[i].quaternion.copy(window.ITEM_GENERAL[i].body.quaternion);
-
-                window.ITEM_GENERAL[i].translateY(-0.15);
-            }
-        }
-
-        for (var i = 0; i < window.horizontal.length; i++) {
-            window.horizontal[i].lookAt(window.GUN.position);
-            window.horizontal[i].rotation.x = Math.PI / 2;
-            window.horizontal[i].rotation.y = 0;
-        }
-
-        for (var i = 0; i < window.vertical.length; i++) {
-            window.vertical[i].lookAt(window.GUN.position);
-            window.vertical[i].rotation.z = 0;
-            window.vertical[i].rotation.y = 0;
-        }
-
-        //cannonDebugger.update();
     }
 
     requestAnimationFrame(animate);
+}
 
+function render(time) {
+    window.STATS.begin();
+
+    animatePortal();
+    updateRay();
+    animatePortalShader(time, window.MAIN_SCENE, window.MAIN_CAMERA, window.RENDERER);
+    updatePlayer(window.interval);
+    //itemUpdate();
+    TWEEN.update();
+
+    if (Date.now() >= timeTarget) {
+
+        const timeStep = 1 / window.fps;
+        window.CANNON_WORLD.step(timeStep)
+        timeTarget += 1000 / window.PHYSICS_UPDATEPERSEC_LIMIT
+        if (Date.now() >= timeTarget) {
+            timeTarget = Date.now()
+        }
+    }
+
+    if (window.initLevel) {
+
+        if (window.HOLDING_ITEM) {
+            var target = new THREE.Vector3(); // create once an reuse it
+            window.holder.getWorldPosition(target);
+            //window.CURRENT_ITEM.position.copy(target);
+
+            var x = target.x;
+            var y = target.y;
+            var z = target.z;
+
+            window.CURRENT_ITEM.position.copy(new THREE.Vector3(x, y, z));
+            window.CURRENT_ITEM.rotation.copy(window.MAIN_CAMERA.rotation);
+        }
+
+        for (var i = 0; i < window.ITEM_BOXES.length; i++) {
+
+            if (window.ITEM_BOXES[i] != window.CURRENT_ITEM) {
+                window.ITEM_BOXES[i].position.copy(window.ITEM_BOXES[i].body.position);
+                window.ITEM_BOXES[i].quaternion.copy(window.ITEM_BOXES[i].body.quaternion);
+            }
+
+        }
+        for (var i = 0; i < window.ITEM_SPHERES.length; i++) {
+
+            if (window.ITEM_SPHERES[i] != window.CURRENT_ITEM) {
+                window.ITEM_SPHERES[i].position.copy(window.ITEM_SPHERES[i].body.position);
+                window.ITEM_SPHERES[i].quaternion.copy(window.ITEM_SPHERES[i].body.quaternion);
+            }
+        }
+    }
+
+    for (var i = 0; i < window.ITEM_GENERAL.length; i++) {
+
+        if (window.ITEM_GENERAL[i] != window.CURRENT_ITEM) {
+            window.ITEM_GENERAL[i].position.copy(window.ITEM_GENERAL[i].body.position);
+            window.ITEM_GENERAL[i].quaternion.copy(window.ITEM_GENERAL[i].body.quaternion);
+
+            window.ITEM_GENERAL[i].translateY(-0.15);
+        }
+    }
+
+    for (var i = 0; i < window.horizontal.length; i++) {
+        window.horizontal[i].lookAt(window.GUN.position);
+        window.horizontal[i].rotation.x = Math.PI / 2;
+        window.horizontal[i].rotation.y = 0;
+    }
+
+    for (var i = 0; i < window.vertical.length; i++) {
+        window.vertical[i].lookAt(window.GUN.position);
+        window.vertical[i].rotation.z = 0;
+        window.vertical[i].rotation.y = 0;
+    }
+
+    //cannonDebugger.update();
+
+    window.COMPOSER.render();
     window.STATS.end();
 }
 

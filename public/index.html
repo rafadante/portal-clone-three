@@ -15,7 +15,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,100,300,500" rel="stylesheet">
   <link href="./main.css" rel="stylesheet">
-  <title>Portal Clone2</title>
+  <title>Portal Clone</title>
 </head>
 
 <script type="importmap">
@@ -32,6 +32,7 @@
 
   <div id="container">
     <img src="../assets/images/vig5.jpg" />
+    <div id="back-effect"></div>
   </div>
 
   <div id="reticle" style="transform: scale(-1);">
@@ -95,6 +96,9 @@
 
     <div id="ui-top" class="">
       <div id="top-menu">
+        <button id="view-fps">
+          <i class="fas fa-eye"></i>
+        </button>
         <button id="draws">
           <i class="fas fa-play"></i>
         </button>
@@ -104,9 +108,7 @@
         <button>
           <i class="fas fa-redo"></i>
         </button>
-        <button id="view-fps">
-          <i class="fas fa-eye"></i>
-        </button>
+
       </div>
 
       <div id="top-menu-left">
@@ -169,103 +171,276 @@
   </ul>
 
   <div id="blocker">
+
+    <img id="logo" src="./assets/ui/logo2.png" style="    position: absolute;
+    width: 50%;
+    right: 5vh;
+    margin-top: 3vh;
+    transition: all 1s;" />
+
     <div class="body">
       <span id="settings-menu-title">OPTIONS</span>
       <div class="settings-menu">
 
-        <div id="options-settings">
-          <span id="settings-close">Play</span>
-          <span class="option selected" id="settings-controls">Controls</span>
-          <span class="option" id="settings-video">Graphics</span>
+        <div id="options-main">
+          <span class="option" id="option-single">SINGLE PLAYER</span>
+          <span class="option" id="option-community">COMMUNITY CHAMBERS</span>
+          <!--<span class="option" id="option-options">OPTIONS</span>-->
+          <span class="option" id="option-patreon">PATREON</span>
+          <span class="option" id="option-about">ABOUT</span>
+        </div>
+
+        <div id="options-single" class="option-main">
+          <span class="option" id="option-single-continue">CONTINUE</span>
+          <span class="option" id="option-single-continue">NEW GAME</span>
+          <span class="option" id="option-single-load">LOAD LEVEL</span>
+        </div>
+
+        <div id="options-community" class="option-main">
+          <span class="option" id="option-community-play">PLAY COMMUNITY CHAMBERS</span>
+          <span class="option" id="option-community-build">BUILD TEST CHAMBER</span>
+          <span class="option" id="option-community-workshop">MY WORKSHOP</span>
+        </div>
+
+        <div id="options-about" class="option-main">
+          <section>
+            <span>
+              Project Portal Three is a fan-made clone of the portal games made by VALVE, I do not
+              own the original design work and it is only intended for education under "Fair Use"
+              defined in Section 107 of the Copyright Act (1976).
+              <br></br>
+              With this web version players can instantaneously teleport to new locations via portals that
+              they can shoot onto surfaces. Players can explore their environment while enjoying the novelty
+              of teleportation and interesting physical interactions. Project Portal Three leverages the Three.js and
+              Cannon.js libraries to deliver a comprehensive, visually appealing, and fun demo of the Portal
+              games.
+            </span>
+          </section>
+        </div>
+
+        <div id="options-patreon" class="option-main">
+          <section>
+            <span>
+              Do you want to help with the development of this project? My goal for this project is to create
+              a web version with Three.js of the portal and portal 2 games made by VALVE, the content presented
+              in this demo was made in X days, I intend to add more content, I will leave the list of
+              things that are still pending, if you want to support this project, you can contribute on
+              Patreon:
+              <br></br>
+              <a href="https://www.patreon.com/rafaelluizleitedesal" target="_blank">link to patreon</a>
+              <br></br>
+              ROADMAP:
+              <br></br>
+              1 - VR version with WebXR
+              <br></br>
+              2 - Create and maintain a server so players can create, save and share their levels with the community
+              <br></br>
+              3 - Create a campaing with all the items with a story inspired by the
+              portal games but with it's own turn of events.
+              <br></br>
+              4 - Test Chamber: Gun animations
+              <br></br>
+              5 - Test Chamber: Improve Graphics
+              <br></br>
+              6 - Test Chamber: Improve Performance
+              <br></br>
+              7 - Test Chamber: Improve Physics
+              <br></br>
+              8 - Test Chamber: Sound effects and music
+              <br></br>
+              9 - Editor: Sound Effects
+              <br></br>
+              10 - Editor: Add more items options:
+              <br></br>
+              10.1 - Tractor Beam: Whenever the player walks through a Tractor Beam they will float through the beam it
+              emits. The blue beam pushes the player forward, away from the receptacle, and the orange beam pulls the
+              player in towards it. The properties menu allows you to start the beam in reversed mode or completely off.
+              <br></br>
+              10.2 - Faith Plate: If a player walks onto a Faith Plate it will cause them to get bounced into the air.
+              When you place a Faith Plate within the editor it will also create a bullseye and a yellow ball. The
+              Bullseye is where the player will ultimately land, and the yellow ball is the trajectory the player will
+              travel.
+              <br></br>
+              10.3 - Light Bridges: Players and objects will not pass through the surface of Light Bridges. Within the
+              properties menu you're given the option to start the bridge enabled or disabled.
+              <br></br>
+              10.4 - Fizzlers: destroy any objects which pass through them such as cubes or turrets. If a player walks
+              through a Fizzler any previously placed portals will also be destroyed. You can increase and decrease the
+              size of the Fizzler using the arrows that appear when the object is selected.
+              <br></br>
+              10.5 - Glass: Glass panels can be placed in your level which the player cannot break. You can increase and
+              decrease the size of the panel by using the arrows that appear when the object is selected. You can change
+              the barrier type to grating within the properties menu which will allow players to place a portal on the
+              other side.
+              <br></br>
+              10.6 - Piston Platforms: Piston Platforms will move up and down whenever the player stands on it. If it is
+              connected to a trigger then the trigger must be activated before it will begin to move. You can adjust the
+              height of the platform using the arrows that appear when the object is selected.
+              <br></br>
+              10.7 - Track Platforms : Track Platforms move on rails. You can adjust the pathing using the arrows that
+              appear when the object is selected. The properties menu allow you to set the rail to oscillate and you can
+              set the platform to start active or disabled.
+              <br></br>
+              10.8 - Laser Emitters & Catchers: are designed to go together. Once the laser emitter hits the catcher you
+              can have it trigger a function such as opening a door, or enabling a set of stairs.
+              <br></br>
+              10.9 - Laser Relays: are used in conjunction with a Laser Catcher. You can connect a relay to a catcher
+              which will result in the player needing to activate both objects before the trigger will work.
+              <br></br>
+              10.10 - Angled Panel : You can adjust the surface type of an Angled Panel through the properties menu. You
+              can make the surface so it allows portals, or you can change it to glass. You can also choose if you want
+              the panel to be automatically deployed or not.
+              <br></br>
+              10.11 - Flip Panels: Flip Panels must be connected to a trigger. Once you have activated the trigger the
+              panel will flip around revealing a surface capable of allowing Portals.
+              <br></br>
+              10.12 - Turrets: will attack the player on sight if they run within their field of vision. You can adjust
+              the field of vision by moving the cone when the object is selected.
+              <br></br>
+              10.13 - Deadly Goo: If the player steps in Deadly Goo they will be instantly killed.
+              <br></br>
+              10.14 - Light Strips: are purely cosmetic and provide your map with additional light. You can place four of
+              them on a single square and they can be placed horizontally or vertically.
+              <br></br>
+              10.15 - Gels: There are four types of Gels. Blue will cause the player to bounce, orange will give the
+              player increased speed, white will allow the player to create a portal on any surface and clear will
+              remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will
+              steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can
+              disable the dropper if you'd like.
+            </span>
+          </section>
+        </div>
+
+
+        <div id="options-settings" class="option-main">
+          <span class="option selected" id="settings-controls">CONTROLS</span>
+          <span class="option" id="settings-video">GRAPHICS</span>
           <!--<span class="option" id="settings-audio">Audio</span>
           <span class="option" id="settings-language">Language</span>-->
-          <span class="option" id="back-editor">Back to editor</span>
+          <span class="option" id="back-editor">BACK TO EDITOR</span>
         </div>
-        
+
+        <div id="options-controls">
+          <!--CAMERA SENSIVITY-->
+          <div class="options-row">
+            <span class="option-name" id="">Camera Rotation Speed</span>
+            <div class="option-value">
+              <input step="0.1" id="mouse-val-range" type="range" min="0.2" max="1" value="0.5" />
+              <input step="0.1" id="mouse-val-number" type="number" min="0.2" max="1" value="0.5" />
+            </div>
+          </div>
+          <!--CAMERA FOV-->
+          <div class="options-row">
+            <span class="option-name" id="">Field ov View</span>
+            <div class="option-value">
+              <input id="fov-val-range" type="range" min="45" max="90" value="60" />
+              <input id="fov-val-number" type="number" min="45" max="90" value="60" />
+            </div>
+          </div>
+
+          <!--CAMERA FOV-->
+          <div class="options-row mobile">
+            <span class="option-name" id="">Button Opacity</span>
+            <div class="option-value">
+              <input id="opacity-val-range" type="range" min="0.1" max="1" value="0.8" step="0.1" />
+              <input id="opacity-val-number" min="0.1" max="1" value="0.8" type="number" />
+            </div>
+          </div>
+          <!--GYRO-->
+          <div class="options-row mobile">
+            <span class="option-name" id="">Gyro</span>
+            <div class="option-value">
+              <input id="gyro-input" type="checkbox" />
+            </div>
+          </div>
+        </div>
+
         <div id="options-video">
           <!--QUALITY-->
           <div class="options-row">
-            <span class="option-name" id="settings-close">Quality</span>
+            <span class="option-name" id="">Quality</span>
             <div class="option-value">
               <select name="quality" id="quality-select">
                 <option value="1">Epic</option>
                 <option value="0.75">High</option>
-                <option value="0.5">Medium Desktop</option>
-                <option value="0.5">Medium Mobile</option>
+                <option value="0.5">Medium</option>
                 <option value="0.5">Low</option>
                 <option value="0.5">Potato</option>
               </select>
             </div>
           </div>
-          <!--PORTAL RECURSION-->
+          <!--PORTAL RECURSIOrlgN-->
           <div class="options-row">
-            <span class="option-name" id="settings-close">Recursive Portals</span>
+            <span class="option-name" id="">Recursive Portals</span>
             <div class="option-value">
               <select name="recursive" id="recursive-select">
-                <option value="1">0</option>
-                <option value="0.75">1</option>
-                <option value="0.5">2</option>
-                <option value="1">3</option>
-                <option value="0.75">4</option>
-                <option value="0.5">5</option>
-                <option value="1">6</option>
-                <option value="0.75">7</option>
-                <option value="0.5">8</option>
-                <option value="1">9</option>
-                <option value="0.75">10</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
               </select>
             </div>
           </div>
           <!--STATS-->
           <div class="options-row">
-            <span class="option-name" id="settings-close">Stats</span>
+            <span class="option-name" id="">Stats</span>
             <div class="option-value">
-              <input checked type="checkbox" />
+              <input id="option-stats" checked type="checkbox" />
             </div>
           </div>
           <!--FPS-->
           <div class="options-row">
-            <span class="option-name" id="settings-close">Fps</span>
+            <span class="option-name" id="">Fps</span>
             <div class="option-value">
               <select name="fps" id="fps-select">
-                <option value="1">60</option>
-                <option value="0.75">30</option>
-                <option value="0.5">Unlocked</option>
+                <option value="60">60</option>
+                <option value="30">30</option>
+                <option value="unlocked">Unlocked</option>
               </select>
             </div>
           </div>
           <!--ANTIALISING-->
-          <div class="options-row">
-            <span class="option-name" id="settings-close">Antialising</span>
+          <!--<div class="options-row">
+            <span class="option-name" id="">Antialising</span>
             <div class="option-value">
               <select name="antialising" id="antialising-select">
                 <option value="none">None</option>
                 <option value="MSAA">MSAA</option>
               </select>
             </div>
-          </div>
+          </div>-->
           <!--RESOLUTION-->
           <div class="options-row">
-            <span class="option-name" id="settings-close">Resolution</span>
+            <span class="option-name" id="">Resolution</span>
             <div class="option-value">
               <select name="resolution" id="resolution-select">
                 <option value="1">1x</option>
-                <option value="0.75">0.75x</option>
+                <option value="0.9">0.9x</option>
+                <option value="0.8">0.8x</option>
+                <option value="0.7">0.7x</option>
+                <option value="0.6">0.6x</option>
                 <option value="0.5">0.5x</option>
-                <option value="0.25">0.25x</option>
+                <option value="0.4">0.4x</option>
+                <option value="0.3">0.3x</option>
               </select>
             </div>
           </div>
           <!--SHADOWS-->
           <div class="options-row">
-            <span class="option-name" id="settings-close">Shadows</span>
+            <span class="option-name" id="">Shadows</span>
             <div class="option-value">
-              <input checked type="checkbox" />
+              <input id="option-shadow" checked type="checkbox" />
             </div>
           </div>
           <!--SHADOW RESOLUTIONS-->
           <div class="options-row">
-            <span class="option-name" id="settings-close">Shadows Resolution</span>
+            <span class="option-name" id="">Shadows Resolution</span>
             <div class="option-value">
               <select name="shadows-resolution" id="shadows-resolution-select">
                 <option value="4096">4096</option>
@@ -277,23 +452,31 @@
             </div>
           </div>
           <!--POST PROCESSING-->
-          <div class="options-row">
-            <span class="option-name" id="settings-close">Post Processing</span>
+          <!--<div class="options-row">
+            <span class="option-name" id=">Post Processing</span>
             <div class="option-value">
               <input checked type="checkbox" />
             </div>
-          </div>
+          </div>-->
           <!--BLOOM-->
-          <div class="options-row">
-            <span class="option-name" id="settings-close">Bloom</span>
+          <!--<div class="options-row">
+            <span class="option-name" id="">Bloom</span>
             <div class="option-value">
               <input checked type="checkbox" />
             </div>
-          </div>
+          </div>-->
 
         </div>
 
       </div>
+
+
+      <div id="settings-menu">
+        <button id="settings-close">PLAY</button>
+        <button id="done">OPTIONS</button>
+        <button id="back-main">BACK</button>
+      </div>
+
     </div>
   </div>
 
@@ -316,8 +499,6 @@
     </div>
 
     <!--<div id="mobile-right-buttons">-->
-
-
 
     <img style="    position: absolute;
     bottom: 115px;

@@ -3,21 +3,25 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 
 //
-var pixelRatio, shadowMap, portalsRecursive;
+window.paused = false;
+window.fps = 60;
+var pixelRatio, shadowMap, portalsRecursive, fov;
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     window.mobile = true;
-    pixelRatio = 0.6;
+    pixelRatio = 0.5;
     shadowMap = true;
     portalsRecursive = 1;
+    fov = 70;
 } else {
     window.mobile = false;
     pixelRatio = 1;
     shadowMap = true;
     portalsRecursive = 7;
+    fov = 60;
 }
 
 //
-var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 1000);
+var camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.01, 1000);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 
@@ -45,6 +49,7 @@ var RENDERER = new THREE.WebGLRenderer({
     powerPreference: "high-performance",
     stencil: true
 });
+console.log(window.devicePixelRatio)
 RENDERER.setPixelRatio(window.devicePixelRatio * pixelRatio);
 RENDERER.setSize(window.innerWidth, window.innerHeight);
 RENDERER.outputEncoding = THREE.sRGBEncoding;

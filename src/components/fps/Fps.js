@@ -46,28 +46,44 @@ if (window.mobile) {
 
     document.getElementById("camera").addEventListener('touchstart', onDocumentTouchStart, false);
     document.getElementById("camera").addEventListener('touchmove', onDocumentTouchMove, false);
+    document.getElementById("camera").addEventListener('touchup', onDocumentTouchUp, false);
+
+    var touches = 0;
+
+    function onDocumentTouchUp(event) {
+        //event.preventDefault();
+        touches = 0;
+    }
 
     function onDocumentTouchStart(event) {
-        for (var i = 0; i < event.touches.length; i++) {
+        //for (var i = 0; i < event.touches.length; i++) {
 
-            //event.preventDefault();
+        //event.preventDefault();
+        if (event.touches.length > 0) {
+            touches = event.touches.length - 1;
 
-            mouseXOnMouseDown = event.touches[i].pageX - windowHalfX;
-            targetRotationOnMouseDownX = targetRotationX;
+            if (touches == 0 || touches == 1) {
+                mouseXOnMouseDown = event.touches[touches].pageX - windowHalfX;
+                targetRotationOnMouseDownX = targetRotationX;
 
-            mouseYOnMouseDown = event.touches[i].pageY - windowHalfY;
-            targetRotationOnMouseDownY = targetRotationY;
+                mouseYOnMouseDown = event.touches[touches].pageY - windowHalfY;
+                targetRotationOnMouseDownY = targetRotationY;
+            }
+
         }
+
+        //}
     }
 
     function onDocumentTouchMove(event) {
-        for (var i = 0; i < event.touches.length; i++) {
-            mouseX = event.touches[i].pageX - windowHalfX;
+        //event.preventDefault();
+        if (event.touches.length > 0 && (touches == 0 || touches == 1)) {
+            mouseX = event.touches[touches].pageX - windowHalfX;
             targetRotationX = targetRotationOnMouseDownX + (mouseX - mouseXOnMouseDown) * (-0.01); //camera speed
 
-            mouseY = event.touches[i].pageY - windowHalfY;
-            deltaX2 = event.touches[i].pageY - touchX2;
-            touchX2 = event.touches[i].pageY;
+            mouseY = event.touches[touches].pageY - windowHalfY;
+            deltaX2 = event.touches[touches].pageY - touchX2;
+            touchX2 = event.touches[touches].pageY;
 
             if (deltaX2 > 0) {
                 if (!blocked_bottom) {
@@ -79,6 +95,9 @@ if (window.mobile) {
                 }
             }
         }
+        //for (var i = 0; i < event.touches.length; i++) {
+
+        //}
     }
 
     // vars
@@ -103,24 +122,7 @@ if (window.mobile) {
             dynamicPage: true,
         }
 
-        /*const options2 = {
-            zone: document.getElementById('joystickWrapper2'),
-            size: 120,
-            multitouch: true,
-            maxNumberOfNipples: 2,
-            mode: 'static',
-            restJoystick: true,
-            shape: 'circle',
-            // position: { top: 20, left: 20 },
-            position: {
-                top: '60px',
-                right: '60px'
-            },
-            dynamicPage: true,
-        }*/
-
         joyManager = nipplejs.create(options);
-        //joyManager2 = nipplejs.create(options2);
 
         joyManager['0'].on('move', function (evt, data) {
 
@@ -146,29 +148,6 @@ if (window.mobile) {
             headBobActive = true;
         })
 
-        var tarx = 0,
-            tary = 0;
-
-        /*joyManager2['0'].on('start', function (evt, data) {
-            $("#mobile-controls button").css("opacity", 0)
-        })
-
-        joyManager2['0'].on('move', function (evt, data) {
-
-            const forward = data.vector.y
-            const turn = data.vector.x
-
-            targetRotationY = forward + tary
-            targetRotationX = -turn + tarx
-
-        })
-
-        joyManager2['0'].on('end', function (evt) {
-            tary = targetRotationY
-            tarx = targetRotationX
-            $("#mobile-controls button").css("opacity", 1)
-        })*/
-
         joyManager['0'].on('end', function (evt) {
             bkdValue = 0
             fwdValue = 0
@@ -181,11 +160,11 @@ if (window.mobile) {
             //headBobActive = false;
 
             tweenCamera(500, window.GUN.children[0].position, new THREE.Vector3(0, 0, 0))
-
-
             setTimeout(() => {
                 //repositioningGUn = false;
             }, 100);
+
+            touches = 0;
         })
     }
 }
@@ -399,15 +378,27 @@ var allowPlacePortals = false;
 var allowEnterFPS = true;
 var openedDoor = false;
 
+//MENU
+$("body").on('click', '#close', function () {
+    $("#blocker").css("display", "block");
+    //$("#mobile-controls").css("display", "none");
+    $("#container").css("filter", "blur(2px)");
+    //window.paused = true;
+    //openFullscreen();
+})
+
+
 $("body").on('click', '#settings-close', function () {
     if (window.FPS && allowEnterFPS) {
+
+        window.paused = false;
 
         if (!window.mobile) {
             document.body.requestPointerLock();
         } else {
             $("#blocker").css("display", "none");
             $("#mobile-controls").css("display", "block");
-            openFullscreen();
+           // openFullscreen();
         }
 
 
@@ -458,12 +449,10 @@ function openFullscreen() {
 }
 
 function controlsLock() {
-    const controls = new PointerLockControls(window.MAIN_CAMERA, document.body);
-    controls.pointerSpeed = 0.5;
+    window.PointerControls = new PointerLockControls(window.MAIN_CAMERA, document.body);
+    window.PointerControls.pointerSpeed = 0.5;
 
-    console.log(controls)
-
-    controls.addEventListener('lock', function () {
+    window.PointerControls.addEventListener('lock', function () {
 
         document.getElementById('blocker').style.display = 'none';
 
@@ -473,9 +462,9 @@ function controlsLock() {
 
     });
 
-    controls.addEventListener('unlock', function () {
+    window.PointerControls.addEventListener('unlock', function () {
 
-        $("#container").css("filter", "blur(3px)")
+        $("#container").css("filter", "blur(2px)")
         document.getElementById('blocker').style.display = 'block';
         allowPlacePortals = false;
         allowEnterFPS = false;
@@ -734,21 +723,6 @@ function portalButton(button) {
 
                     createPortal(0, 1, point, normal, intersects[0].object.parent.parent, playerUpDirection)
                     window.GUN_BLOOM.color = new THREE.Color(0xFFDB82);
-                    window.nebula_left_portal.behaviours[1].isEnabled = true;
-                    window.nebula_left_portal2.behaviours[1].isEnabled = true;
-
-                    window.nebula_left_portal.behaviours[1].colorA.colors[0] = "#4F4300";
-                    window.nebula_left_portal.behaviours[1].colorB.colors[0] = "#FFBC00";
-
-                    window.nebula_left_portal2.behaviours[1].colorA.colors[0] = "#4F4300";
-                    window.nebula_left_portal2.behaviours[1].colorB.colors[0] = "#FFBC00";
-
-                    window.nebula_left_portal3.behaviours[1].colorA.colors[0] = "#4F4300";
-                    window.nebula_left_portal3.behaviours[1].colorB.colors[0] = "#FFBC00";
-                    window.nebula_left_portal3.behaviours[1].isEnabled = true;
-                    setTimeout(() => {
-                        window.nebula_left_portal3.behaviours[1].isEnabled = false;
-                    }, 50);
                 } else if (button == 2) { // left click
                     // delete the old portal this new one is replacing
                     if (window.PORTALS[1] !== null) {
@@ -763,22 +737,6 @@ function portalButton(button) {
 
                     createPortal(1, 0, point, normal, intersects[0].object.parent.parent, playerUpDirection)
                     window.GUN_BLOOM.color = new THREE.Color(0x76EBFF);
-
-                    window.nebula_left_portal.behaviours[1].isEnabled = true;
-                    window.nebula_left_portal2.behaviours[1].isEnabled = true;
-
-                    window.nebula_left_portal.behaviours[1].colorA.colors[0] = "#08004f";
-                    window.nebula_left_portal.behaviours[1].colorB.colors[0] = "#0029FF";
-
-                    window.nebula_left_portal2.behaviours[1].colorA.colors[0] = "#08004f";
-                    window.nebula_left_portal2.behaviours[1].colorB.colors[0] = "#0029FF";
-
-                    window.nebula_left_portal3.behaviours[1].colorA.colors[0] = "#08004f";
-                    window.nebula_left_portal3.behaviours[1].colorB.colors[0] = "#0029FF";
-                    window.nebula_left_portal3.behaviours[1].isEnabled = true;
-                    setTimeout(() => {
-                        window.nebula_left_portal3.behaviours[1].isEnabled = false;
-                    }, 50);
                 }
             } else {
                 //intersects[0].object.visible = false;
@@ -786,7 +744,7 @@ function portalButton(button) {
 
         }
 
-        raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
+        /*raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
         var intersects = raycaster2.intersectObjects(window.nonPortal);
 
         if (intersects.length > 0) {
@@ -810,14 +768,6 @@ function portalButton(button) {
                         } else if (obj.name == "down") {
                             window.particlesGunGroup2.rotation.y = Math.PI;
                         }
-
-                        window.particlesGunGroup2.position.copy(intersects[i].point);
-                        window.nebula_left_portal4.behaviours[1].colorA.colors[0] = "#ffffff";
-                        window.nebula_left_portal4.behaviours[1].colorB.colors[0] = "#ffffff";
-                        window.nebula_left_portal4.behaviours[1].isEnabled = true;
-                        setTimeout(() => {
-                            window.nebula_left_portal4.behaviours[1].isEnabled = false;
-                        }, 50);
                     } else if (button == 2) {
                         window.particlesGunGroup2.rotation.set(0, 0, 0);
 
@@ -832,20 +782,12 @@ function portalButton(button) {
                         } else if (obj.name == "down") {
                             window.particlesGunGroup2.rotation.y = Math.PI;
                         }
-
-                        window.particlesGunGroup2.position.copy(intersects[i].point);
-                        window.nebula_left_portal4.behaviours[1].colorA.colors[0] = "#ffffff";
-                        window.nebula_left_portal4.behaviours[1].colorB.colors[0] = "#ffffff";
-                        window.nebula_left_portal4.behaviours[1].isEnabled = true;
-                        setTimeout(() => {
-                            window.nebula_left_portal4.behaviours[1].isEnabled = false;
-                        }, 50);
                     }
                     //
                     break;
                 }
             }
-        }
+        }*/
         //}
     }
 }
@@ -892,16 +834,17 @@ function createPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObje
     window.PORTALS[thisPortalIndex].position.add(dir.clone().multiplyScalar(-0.02));
 }
 
-document.body.addEventListener('mousemove', (event) => {//rafa
+document.body.addEventListener('mousemove', (event) => { //rafa
     if (window.FPS) {
         //if (document.pointerLockElement === document.body) {
-            //window.MAIN_CAMERA.rotation.y -= event.movementX / 1000;
-            //window.MAIN_CAMERA.rotation.x -= event.movementY / 1000;
+        //window.MAIN_CAMERA.rotation.y -= event.movementX / 1000;
+        //window.MAIN_CAMERA.rotation.x -= event.movementY / 1000;
         //}
     }
 });
 
 let shouldJump = false;
+window.rotationMobile = 0.1;
 
 const updatePlayer = function (deltaTime) {
 
@@ -920,14 +863,14 @@ const updatePlayer = function (deltaTime) {
         //targetRotationX -= 0.1;
         //    window.MAIN_CAMERA.rotation.y += (targetRotationX - window.MAIN_CAMERA.rotation.y) * 0.1;
         //} else {
-        window.MAIN_CAMERA.rotation.y += (targetRotationX - window.MAIN_CAMERA.rotation.y) * 0.1;
+        window.MAIN_CAMERA.rotation.y += (targetRotationX - window.MAIN_CAMERA.rotation.y) * window.rotationMobile;
         //}
 
 
         //vertical rotation 
         finalRotationY = (targetRotationY - window.MAIN_CAMERA.rotation.x);
         if (window.MAIN_CAMERA.rotation.x <= 1 && window.MAIN_CAMERA.rotation.x >= -1) {
-            window.MAIN_CAMERA.rotation.x += finalRotationY * 0.1;
+            window.MAIN_CAMERA.rotation.x += finalRotationY * window.rotationMobile;
             //camera.rotation.x += (targetRotationY - camera.rotation.x) * 0.1;
         }
 
@@ -1086,19 +1029,13 @@ const updatePlayer = function (deltaTime) {
     const smoothness = 0.1; // 0 to 1 only
     const targetPosition = window.MAIN_CAMERA.quaternion.clone();
     window.GUN.quaternion.slerp(targetPosition, smoothness);
-    //
-    var target = new THREE.Vector3(); // create once an reuse it
-    window.GUN.children[0].getWorldPosition(target);
-
-    window.particlesGunGroup.position.copy(target);
-    window.particlesGunGroup.quaternion.slerp(targetPosition, smoothness);
 
     raycast();
     updateHeadBob(deltaTime);
 }
 
 var headBobTimer = 0;
-var headBobSpeed = 2.5;
+var headBobSpeed = 3;
 var headBobHeight = 0.001;
 var headBobActive = false;
 var repositioningGUn = false;

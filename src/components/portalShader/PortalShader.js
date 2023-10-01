@@ -185,7 +185,7 @@ void main( )
 }
 `;
 
-window.window.materialLeftOpened = new THREE.ShaderMaterial({
+window.materialLeftOpened = new THREE.ShaderMaterial({
     uniforms: tuniform,
     vertexShader: vshader,
     fragmentShader: openedLeft,
