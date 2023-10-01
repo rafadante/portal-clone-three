@@ -740,10 +740,12 @@ $("body").on('click', '#view-fps', function () {
         window.MAIN_SCENE.remove(room2);
         window.MAIN_SCENE.remove(window.ROOM);
 
-        window.RENDERER.renderLists.dispose();
+        //window.RENDERER.renderLists.dispose();
         window.ENTER_DOOR.children[1].visible = false;
 
         console.log(window.MAIN_SCENE)
+
+        //renderer.renderLists.dispose()
     }, 500);
 });
 
