@@ -164,9 +164,9 @@ function init() {
     window.ROOM.name = "ROOM";
     window.ITEMS_ADDED.name = "ITEMS";
     window.CUBES.name = "CUBES";
-    window.MAIN_SCENE.add(window.ROOM);
+    //window.MAIN_SCENE.add(window.ROOM);
     window.MAIN_SCENE.add(window.ITEMS_ADDED);
-    //window.ROOM.add(window.CUBES);
+    window.ROOM.add(window.CUBES);
     window.MAIN_SCENE.add(window.ITEM_CUBE);
 
     console.log(window.MAIN_SCENE)
