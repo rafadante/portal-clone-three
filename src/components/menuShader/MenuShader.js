@@ -289,26 +289,39 @@ var mat2 = new THREE.ShaderMaterial({
 var plane1;
 var plane2;
 
-setTimeout(() => {
-    var planegeometry = new THREE.PlaneGeometry(1, 1);
-    plane1 = new THREE.Mesh(planegeometry, mat);
-    window.MAIN_SCENE.add(plane1);
+var transition = false;
+var transition2 = false;
+var stopMenuLoop = true;
 
-    var planegeometry = new THREE.PlaneGeometry(1, 1);
-    plane2 = new THREE.Mesh(planegeometry, mat2);
+$("#blocker").css("display", "none");
+$("#ui").css("display", "block");
+$("#container #back-effect").css("display", "none");
+$("#main-container").css("display", "block");
 
-    window.MAIN_SCENE.background = new THREE.Color(0x000000)
-
-    planeFitPerspectiveCamera(plane1, window.MAIN_CAMERA)
-
-    animate();
-    window.addEventListener('resize', onWindowResize);
-
+if (!stopMenuLoop) {
     setTimeout(() => {
-        getMonitorFPS = false;
-        console.log(window.unlockedFPS)
+        var planegeometry = new THREE.PlaneGeometry(1, 1);
+        plane1 = new THREE.Mesh(planegeometry, mat);
+        window.MAIN_SCENE.add(plane1);
+
+        var planegeometry = new THREE.PlaneGeometry(1, 1);
+        plane2 = new THREE.Mesh(planegeometry, mat2);
+
+        window.MAIN_SCENE.background = new THREE.Color(0x000000)
+
+        planeFitPerspectiveCamera(plane1, window.MAIN_CAMERA)
+
+        animate();
+        window.addEventListener('resize', onWindowResize);
+
+        setTimeout(() => {
+            getMonitorFPS = false;
+            console.log(window.unlockedFPS)
+        }, 1000);
     }, 1000);
-}, 1000);
+}
+
+
 
 function onWindowResize() {
     window.RENDERER.setSize(window.innerWidth, window.innerHeight);
@@ -329,10 +342,6 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
     plane.scale.set(scaleX, scaleY, 1);
     plane2.scale.set(scaleX, scaleY, 1);
 }
-
-var transition = false;
-var transition2 = false;
-var stopMenuLoop = false;
 
 $("body").on('click', '#option-community-build', function () {
     /*$("#blocker").css("display", "none");
@@ -460,7 +469,7 @@ function animate(time) {
                 var t0 = t.pop();
                 window.unlockedFPS = Math.floor(1000 * 10 / (time - t0));
             }
-        } 
+        }
 
         if (transition)
             window.tuniform.iTime.value += clock.getDelta();

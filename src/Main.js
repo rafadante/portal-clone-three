@@ -63,7 +63,10 @@ import {
     SelectiveBloomEffect
 } from "postprocessing";
 import Stats from "stats-gl";
-import "./components/menuShader/MenuShader.js"
+import "./components/menuShader/MenuShader.js";
+import {
+    GUI
+} from './jsm/libs/lil-gui.module.min.js';
 //
 //
 window.SELECTED_OBJECTS_FOR_BLOOM = new Selection()
@@ -152,7 +155,7 @@ window.connecting = false;
 
 document.getElementById("container").appendChild(window.RENDERER.domElement);
 
-//init();
+init();
 $("body").on('click', '#option-community-build', function () {
     setTimeout(() => {
         init();
@@ -164,7 +167,7 @@ function init() {
     window.ROOM.name = "ROOM";
     window.ITEMS_ADDED.name = "ITEMS";
     window.CUBES.name = "CUBES";
-    //window.MAIN_SCENE.add(window.ROOM);
+    window.MAIN_SCENE.add(window.ROOM);
     window.MAIN_SCENE.add(window.ITEMS_ADDED);
     window.ROOM.add(window.CUBES);
     window.MAIN_SCENE.add(window.ITEM_CUBE);
@@ -242,12 +245,16 @@ function onDocumentMouseDown(event) {
 
 function onDocumentMouseMove(event) {
     if (!window.FPS) {
+        mouse2.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse2.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
         raycastManager(event, "move");
     }
 }
 
 function onDocumentMouseUp(event) {
     if (!window.FPS) {
+        window.SELECTED_SIDE = null;
         window.SELECTING = false;
         window.CONTROLS.enabled = true;
         window.CONTROLS.update();
@@ -270,57 +277,68 @@ function onDocumentMouseUp(event) {
     }
 }
 
+const mouse2 = new THREE.Vector2(1, 1);
+const white = new THREE.Color().setHex(0xffffff);
+const orange = new THREE.Color("rgb(255, 165, 0)");
+
 function raycastManager(event, type) {
-    if (!window.FPS) {
-        var array = getMousePosition(document.getElementById("container"), event.clientX, event.clientY);
-        clickMouse.fromArray(array)
+    if (!window.FPS && window.instancedMesh) {
+        //var array = getMousePosition(document.getElementById("container"), event.clientX, event.clientY);
+        //clickMouse.fromArray(array)
 
-        const found = getIntersects(clickMouse, window.CUBES_EDIT, false);
+        ///const found = getIntersects(clickMouse, window.instancedMesh, false);
 
-        if (type == "move") {
-            if (found.length > 0) {
-                for (var i = 0; i < found.length; i++) {
-                    if (found[i].object.visible && !window.itemSelected) {
+        raycaster.setFromCamera(mouse2, window.MAIN_CAMERA);
 
-                        if (found[i].object.userData.hasItem) {
-                            document.body.style.cursor = "grab";
-                        } else {
-                            document.body.style.cursor = "crosshair";
-                        }
-                    }
+        const intersection = raycaster.intersectObject(window.instancedMesh);
+
+        if (intersection.length > 0) {
+
+            const color = new THREE.Color();
+
+            const instanceId = intersection[0].instanceId;
+            window.instancedMesh.getColorAt(instanceId, color);
+
+            if (type == "move" && window.SELECTING) {
+
+                if (!window.planeUserData[instanceId].selected &&
+                    window.planeUserData[instanceId].side == window.SELECTED_SIDE) {
+                    window.planeUserData[instanceId].selected = true;
+                    raycastSelected(intersection[0], event, type)
                 }
-            } else {
-                document.body.style.cursor = "default";
+
+
+            } else if (type == "down") {
+
+                window.SELECTING = true;
+                window.CONTROLS.enabled = false;
+                
+                if (!window.planeUserData[instanceId].selected) {
+                    window.planeUserData[instanceId].selected = true;
+                    window.SELECTED_SIDE = window.planeUserData[instanceId].side;
+                    raycastSelected(intersection[0], event, type)
+                }
+
             }
+
         }
 
-        if (window.SELECTING && type == "move") {
-            raycastSelected(found, event, type)
-        } else if (type == "down") {
+        /*if (intersection.length > 0) {
 
-            if (event.button == 0) {
-                window.buttonLeft = true;
+            const instanceId = intersection[0].instanceId;
+
+            window.instancedMesh.getColorAt(instanceId, color);
+
+            if (color.equals(white)) {
+
+                console.log(window.planeUserData[instanceId])
+                window.instancedMesh.setColorAt(instanceId, color.setHex(Math.random() * 0xffffff));
+
+                window.instancedMesh.instanceColor.needsUpdate = true;
+
             }
 
-            raycastSelected(found, event, type)
-        }
-
-        if (type == "up") {
-            if (found.length > 0)
-                addItem(found);
-        }
-
-        if (window.ITEM_HOLDED_NAME) {
-
-            $("#follow").css("display", "block");
-            $("#follow").css({
-                left: event.pageX - 25,
-                top: event.pageY - 25
-            });
-
-            //itemUpdate(found, event, type);
-            hoverItem(found);
-        }
+        }*/
     }
 }
 

@@ -1,640 +1,227 @@
 import * as THREE from '../../build/three.module.js';
 import $ from 'jquery';
 
+var limit = false;
+
 function cubeState(button) {
 
     var toRemove = [];
 
     if (button == "plus") {
         //
-        for (var i = 0; i < window.CUBE_SELECTION_ARRAY.length; i++) {
-            //
-            window.SELECTED = window.CUBE_SELECTION_ARRAY[i].selected;
-            var selectedName = window.SELECTED.name;
-            //
-            if (window.SELECTED && window.SELECTED.parent.position.y && !window.SELECTED.userData.blocked) {
+        for (var i = 0; i < window.SELECTED_ID.length; i++) {
 
-                window.CUBE_SELECTION_ARRAY[i].translateZ(-1);
+            trasnlatePlane(window.SELECTED_ID[i], 1);
 
-                var boxBehindPosition = new THREE.Vector3();
-                boxBehindPosition.copy(window.CUBE_SELECTION_ARRAY[i].position);
-                boxBehindPosition.round();
-
-                var boxBehindName = boxBehindPosition.x + "/" + boxBehindPosition.y + "/" + boxBehindPosition.z;
-
-                var box_behind = window.CUBES.getObjectByName(boxBehindName)
-
-                window.CUBE_SELECTION_ARRAY[i].translateZ(4);
-
-                var boxAheadPosition = new THREE.Vector3();
-                boxAheadPosition.copy(window.CUBE_SELECTION_ARRAY[i].position);
-                boxAheadPosition.round();
-
-                var boxAheadName = boxAheadPosition.x + "/" + boxAheadPosition.y + "/" + boxAheadPosition.z;
-
-                var box_a_head = window.CUBES.getObjectByName(boxAheadName)
-
-                window.CUBE_SELECTION_ARRAY[i].translateZ(-1);
-
-                if (box_a_head) {
-                    //
-                    console.log("1");
-                    //
-                    if (window.SELECTED.parent) {
-                        //
-                        cubeCheck(-1, window.CUBE_SELECTION_ARRAY[i].clone(), "plus")
-                        //
-                        if (!box_behind) {
-                            //if()
-                            window.CUBES.remove(window.SELECTED.parent);
-                            //window.SELECTED.parent.visible = false;
-                        }
-                    }
-                    //
-                    window.CUBE_SELECTION_ARRAY[i].selected = box_a_head.getObjectByName(selectedName);
-                    //
-                } else {
-                    //
-                    console.log("2")
-                    //
-                    if (window.SELECTED.parent) {
-                        //
-                        var count = 0;
-
-                        if (cubeUp(boxAheadPosition))
-                            count++;
-
-                        if (cubeDown(boxAheadPosition))
-                            count++;
-
-                        if (cubeLeft(boxAheadPosition))
-                            count++;
-
-                        if (cubeRight(boxAheadPosition))
-                            count++;
-
-                        if (cubeFront(boxAheadPosition))
-                            count++;
-
-                        if (cubeBack(boxAheadPosition))
-                            count++;
-
-                        if (count > 1) {
-                            console.log("21")
-                            window.CUBES.remove(window.SELECTED.parent);
-                            cubeCheck(-1, window.CUBE_SELECTION_ARRAY[i].clone(), "plus");
-                        } else {
-                            console.log("22")
-                            //
-                            cubeCheck(-1, window.CUBE_SELECTION_ARRAY[i].clone(), "plus");
-                            //
-                            var opposite;
-                            //
-                            if (selectedName == "up")
-                                opposite = "down";
-                            else if (selectedName == "down")
-                                opposite = "up";
-                            else if (selectedName == "left")
-                                opposite = "right";
-                            else if (selectedName == "right")
-                                opposite = "left";
-                            else if (selectedName == "front")
-                                opposite = "back";
-                            else if (selectedName == "back")
-                                opposite = "front";
-                            //
-
-                            console.log(opposite)
-
-                            window.SELECTED.parent.traverse(child => {
-                                if (child.material) {
-                                    child.material = new THREE.MeshBasicMaterial();
-                                    child.material.visible = false;
-                                }
-                            });
-
-                            if (window.SELECTED.userData.portal)
-                                window.SELECTED.parent.getObjectByName(opposite).material = window.MATERIAL_PORTAL_EDITOR_FLIPED;
-                            else
-                                window.SELECTED.parent.getObjectByName(opposite).material = window.MATERIAL_NON_PORTAL_EDITOR_FLIPED;
-
-                            
-
-                            
-
-                            
-
-                            //cubeCheck(-1, window.CUBE_SELECTION_ARRAY[i].clone(), "minus", window.SELECTED.parent)
-
-                            window.SELECTED.parent.getObjectByName(opposite).userData.blocked = true;
-                            window.SELECTED.parent.userData.blocked = true;
-
-                            window.SELECTED.parent.getObjectByName(opposite).visible = true;
-                            window.CUBE_SELECTION_ARRAY[i].selected = window.SELECTED.parent.getObjectByName(opposite);
-                        }
-                    }
-                }
-            } else {
-                warning()
-            }
         }
     } else if (button == "minus") {
-        for (var i = 0; i < window.CUBE_SELECTION_ARRAY.length; i++) {
-            //
-            window.SELECTED = window.CUBE_SELECTION_ARRAY[i].selected;
-            var selectedName = window.SELECTED.name;
-            //
-            if (window.SELECTED.parent.position.y >= -31 &&
-                (window.SELECTED.parent.position.z >= -31 &&
-                    window.SELECTED.parent.position.z <= 43) &&
-                (window.SELECTED.parent.position.x <= 45 &&
-                    window.SELECTED.parent.position.x >= -29)) {
+        //
+        for (var i = 0; i < window.SELECTED_ID.length; i++) {
 
-
-                if (window.SELECTED) {
-
-                    window.CUBE_SELECTION_ARRAY[i].translateZ(-1);
-
-                    var newBoxPosition = new THREE.Vector3();
-                    newBoxPosition.copy(window.CUBE_SELECTION_ARRAY[i].position);
-                    newBoxPosition.round();
-
-                    var newBoxName = newBoxPosition.x + "/" + newBoxPosition.y + "/" + newBoxPosition.z;
-
-                    var box_behind = window.CUBES.getObjectByName(newBoxName)
-
-                    window.CUBE_SELECTION_ARRAY[i].translateZ(-1);
-
-                    if (box_behind) {
-                        //
-                        console.log("3")
-
-                        if (window.SELECTED.userData.blocked) {
-
-                            if (window.SELECTED.userData.portal)
-                                window.SELECTED.material = window.MATERIAL_PORTAL_EDITOR;
-                            else
-                                window.SELECTED.material = window.MATERIAL_NON_PORTAL_EDITOR;
-                            //
-                            window.SELECTED.userData.blocked = false;
-                            window.SELECTED.parent.userData.blocked = false;
-
-                            if (window.SELECTED.parent.userData.top)
-                                window.SELECTED.visible = false;
-                            //
-                            if (selectedName == "up")
-                                selectedName = "down";
-                            else if (selectedName == "down")
-                                selectedName = "up";
-                            else if (selectedName == "left")
-                                selectedName = "right";
-                            else if (selectedName == "right")
-                                selectedName = "left";
-                            else if (selectedName == "front")
-                                selectedName = "back";
-                            else if (selectedName == "back")
-                                selectedName = "front";
-                        }
-                        //
-                        window.CUBE_SELECTION_ARRAY[i].selected = box_behind.getObjectByName(selectedName);
-                        cubeCheck(1, window.CUBE_SELECTION_ARRAY[i].clone(), "minus", window.SELECTED.parent)
-                        //
-                    } else {
-
-                        if (window.SELECTED.parent.userData.inverted) {
-
-                            console.log("4")
-
-                            window.SELECTED.visible = false;
-                            //
-                            window.CUBE_SELECTION_ARRAY[i].translateZ(1);
-
-                            var newBoxPosition = new THREE.Vector3();
-                            newBoxPosition.copy(window.CUBE_SELECTION_ARRAY[i].position);
-                            newBoxPosition.round();
-
-                            var newBoxName = newBoxPosition.x + "/" + newBoxPosition.y + "/" + newBoxPosition.z;
-
-                            window.CUBE_SELECTION_ARRAY[i].translateZ(-1);
-                            //
-                            var newInvertedBox = window.INVERTED_CUBE.clone();
-                            newInvertedBox.position.copy(newBoxPosition);
-                            newInvertedBox.name = newBoxName;
-                            newInvertedBox.userData.inverted = true;
-
-                            if (newInvertedBox.position.y == 7) {
-                                newInvertedBox.getObjectByName("down").visible = false
-                            }
-
-                            //
-                            window.CUBES.add(newInvertedBox);
-                            window.CUBE_SELECTION_ARRAY[i].selected = newInvertedBox.getObjectByName(selectedName);
-                            window.CUBE_SELECTION_ARRAY[i].selected.userData.extrusion = false;
-                            //
-                            disableFace(selectedName, newInvertedBox);
-                            addFaceToArray(newInvertedBox);
-                            cubeCheck(1, window.CUBE_SELECTION_ARRAY[i].clone(), "minus", newInvertedBox)
-
-                            if (!cubeUp(newInvertedBox.position))
-                                newInvertedBox.getObjectByName("down").visible = true;
-
-                            if (!cubeDown(newInvertedBox.position))
-                                newInvertedBox.getObjectByName("up").visible = true;
-
-                            if (!cubeLeft(newInvertedBox.position))
-                                newInvertedBox.getObjectByName("right").visible = true;
-
-                            if (!cubeRight(newInvertedBox.position))
-                                newInvertedBox.getObjectByName("left").visible = true;
-
-                            if (!cubeBack(newInvertedBox.position))
-                                newInvertedBox.getObjectByName("front").visible = true;
-
-                            if (!cubeFront(newInvertedBox.position))
-                                newInvertedBox.getObjectByName("back").visible = true;
-
-                            newInvertedBox.traverse(child => {
-                                if (child.material) {
-                                    child.userData.portal = window.STATE_PORTAL;
-
-                                    if (window.STATE_PORTAL) {
-                                        child.material = window.MATERIAL_PORTAL_EDITOR;
-                                    } else {
-                                        child.material = window.MATERIAL_NON_PORTAL_EDITOR;
-                                    }
-                                }
-                            });
-
-
-                            //IF WALL CONFLICTS WITH ANOTHER OPEN WALL
-                            //window.CUBE_SELECTION_ARRAY[i].selected.visible = true;
-                            if (!window.CUBE_SELECTION_ARRAY[i].selected.visible) {
-                                toRemove.push(window.CUBE_SELECTION_ARRAY[i])
-                                var parent = window.CUBE_SELECTION_ARRAY[i].parent;
-                                if (parent)
-                                    parent.remove(window.CUBE_SELECTION_ARRAY[i]);
-                            }
-                        }
-                    }
-                }
-            } else {
-                warning();
-            }
-        }
-    }
-    //REPOSITION SHADOW CONTACT PLANE
-    var box = new THREE.Box3().setFromObject(window.CUBES);
-    var obj_size = box.getSize(new THREE.Vector3(0, 0, 0));
-    window.CONTACT_SHADOW_POSITION.position.y = -(obj_size.y - 7.9);
-    //
-    if (toRemove.length > 0)
-        window.CUBE_SELECTION_ARRAY = [];
-
-    removeFromArray()
-}
-
-function removeFromArray() {
-    window.CUBES_EDIT = [];
-    window.CUBES.traverse(child => {
-        if (child.material) {
-            if (child.visible == true) {
-                window.CUBES_EDIT.push(child);
-            }
-        }
-    });
-}
-
-function cubeUp(position) {
-    var obj = new THREE.Object3D();
-    //window.MAIN_SCENE.add(obj);
-    obj.position.copy(position);
-    obj.translateY(2);
-    obj.position.round();
-    var name = obj.position.x + "/" + obj.position.y + "/" + obj.position.z;
-    var boxUp = window.CUBES.getObjectByName(name);
-    return boxUp;
-}
-
-function cubeDown(position) {
-    var obj = new THREE.Object3D();
-    //window.MAIN_SCENE.add(obj);
-    obj.position.copy(position);
-    obj.translateY(-2);
-    obj.position.round();
-    var name = obj.position.x + "/" + obj.position.y + "/" + obj.position.z;
-    var boxDown = window.CUBES.getObjectByName(name);
-    return boxDown;
-}
-
-function cubeRight(position) {
-    var obj = new THREE.Object3D();
-    //window.MAIN_SCENE.add(obj);
-    obj.position.copy(position);
-    obj.translateX(-2);
-    obj.position.round();
-    var name = obj.position.x + "/" + obj.position.y + "/" + obj.position.z;
-    var boxRight = window.CUBES.getObjectByName(name);
-    return boxRight;
-}
-
-function cubeLeft(position) {
-    var obj = new THREE.Object3D();
-    //(obj);
-    obj.position.copy(position);
-    obj.translateX(2);
-    obj.position.round();
-    var name = obj.position.x + "/" + obj.position.y + "/" + obj.position.z;
-    var boxLeft = window.CUBES.getObjectByName(name);
-    return boxLeft;
-}
-
-function cubeBack(position) {
-    var obj = new THREE.Object3D();
-    //window.MAIN_SCENE.add(obj);
-    obj.position.copy(position);
-    obj.translateZ(2);
-    obj.position.round();
-    var name = obj.position.x + "/" + obj.position.y + "/" + obj.position.z;
-    var boxBack = window.CUBES.getObjectByName(name);
-    return boxBack;
-}
-
-function cubeFront(position) {
-    var obj = new THREE.Object3D();
-    //window.MAIN_SCENE.add(obj);
-    obj.position.copy(position);
-    obj.translateZ(-2);
-    obj.position.round();
-    var name = obj.position.x + "/" + obj.position.y + "/" + obj.position.z;
-    var boxFront = window.CUBES.getObjectByName(name);
-    return boxFront;
-}
-
-function cubeCheck(dirZ, clone, type, newInvertedBox) {
-
-    var obj = new THREE.Object3D();
-    //window.MAIN_SCENE.add(obj);
-
-    clone.translateZ(dirZ);
-
-    //CUBE UP
-    obj.position.copy(clone.position);
-    obj.translateY(2);
-    obj.position.round();
-    var name = obj.position.x + "/" + obj.position.y + "/" + obj.position.z;
-    var boxUp = window.CUBES.getObjectByName(name);
-    if (boxUp) {
-        if (type == "plus_minus" && !boxUp.parent.userData.blocked) {
-            if (boxUp.userData.inverted) {
-                boxUp.getObjectByName("up").visible = true;
-                boxUp.getObjectByName("up").userData.portal = window.STATE_PORTAL;
-
-                if (window.STATE_PORTAL) {
-                    boxUp.getObjectByName("up").material = window.MATERIAL_PORTAL_EDITOR;
-                } else {
-                    boxUp.getObjectByName("up").material = window.MATERIAL_NON_PORTAL_EDITOR;
-                }
-            } else {
-                newInvertedBox.getObjectByName("up").visible = false;
-            }
-        } else if (type == "plus" && boxUp.userData.inverted && !boxUp.parent.userData.blocked) {
-            boxUp.getObjectByName("up").visible = true;
-            boxUp.getObjectByName("up").userData.portal = window.STATE_PORTAL;
-
-            if (window.STATE_PORTAL) {
-                boxUp.getObjectByName("up").material = window.MATERIAL_PORTAL_EDITOR;
-            } else {
-                boxUp.getObjectByName("up").material = window.MATERIAL_NON_PORTAL_EDITOR;
-            }
-
-        } else {
-            if (boxUp.userData.inverted) {
-                boxUp.getObjectByName("up").visible = false;
-                newInvertedBox.getObjectByName("down").visible = false;
-            }
-        }
-    }
-
-    //CUBE DOWN
-    obj.position.copy(clone.position);
-    obj.translateY(-2);
-    obj.position.round();
-    var name = obj.position.x + "/" + obj.position.y + "/" + obj.position.z;
-    var boxDown = window.CUBES.getObjectByName(name);
-    if (boxDown) {
-        if (type == "plus_minus" && !boxDown.parent.userData.blocked) {
-            if (boxDown.userData.inverted) {
-                boxDown.getObjectByName("down").visible = true;
-                boxDown.getObjectByName("down").userData.portal = window.STATE_PORTAL;
-
-                if (window.STATE_PORTAL) {
-                    boxDown.getObjectByName("down").material = window.MATERIAL_PORTAL_EDITOR;
-                } else {
-                    boxDown.getObjectByName("down").material = window.MATERIAL_NON_PORTAL_EDITOR;
-                }
-            } else {
-                newInvertedBox.getObjectByName("down").visible = false;
-            }
-        } else if (type == "plus" && boxDown.userData.inverted && !boxDown.parent.userData.blocked) {
-            boxDown.getObjectByName("down").visible = true;
-            boxDown.getObjectByName("down").userData.portal = window.STATE_PORTAL;
-
-            if (window.STATE_PORTAL) {
-                boxDown.getObjectByName("down").material = window.MATERIAL_PORTAL_EDITOR;
-            } else {
-                boxDown.getObjectByName("down").material = window.MATERIAL_NON_PORTAL_EDITOR;
-            }
-        } else {
-            if (boxDown.userData.inverted) {
-                boxDown.getObjectByName("down").visible = false;
-                newInvertedBox.getObjectByName("up").visible = false;
-            }
-        }
-    }
-
-    //CUBE RIGHT
-    obj.position.copy(clone.position);
-    obj.translateX(-2);
-    obj.position.round();
-    var name = obj.position.x + "/" + obj.position.y + "/" + obj.position.z;
-    var boxRight = window.CUBES.getObjectByName(name);
-    if (boxRight) {
-        if (type == "plus_minus" && !boxRight.parent.userData.blocked) {
-            if (boxRight.userData.inverted) {
-                boxRight.getObjectByName("right").visible = true;
-                boxRight.getObjectByName("right").userData.portal = window.STATE_PORTAL;
-
-                if (window.STATE_PORTAL) {
-                    boxRight.getObjectByName("right").material = window.MATERIAL_PORTAL_EDITOR;
-                } else {
-                    boxRight.getObjectByName("right").material = window.MATERIAL_NON_PORTAL_EDITOR;
-                }
-            } else {
-                newInvertedBox.getObjectByName("right").visible = false;
-            }
-        } else if (type == "plus" && boxRight.userData.inverted && !boxRight.parent.userData.blocked) {
-            boxRight.getObjectByName("right").visible = true;
-            boxRight.getObjectByName("right").userData.portal = window.STATE_PORTAL;
-
-            if (window.STATE_PORTAL) {
-                boxRight.getObjectByName("right").material = window.MATERIAL_PORTAL_EDITOR;
-            } else {
-                boxRight.getObjectByName("right").material = window.MATERIAL_NON_PORTAL_EDITOR;
-            }
-        } else {
-            if (boxRight.userData.inverted) {
-                boxRight.getObjectByName("right").visible = false;
-                newInvertedBox.getObjectByName("left").visible = false;
-            }
+            trasnlatePlane(window.SELECTED_ID[i], -1);
 
         }
     }
 
-    //CUBE LEFT
-    obj.position.copy(clone.position);
-    obj.translateX(2);
-    obj.position.round();
-    var name = obj.position.x + "/" + obj.position.y + "/" + obj.position.z;
-    var boxLeft = window.CUBES.getObjectByName(name);
-    if (boxLeft) {
-        if (type == "plus_minus" && !boxLeft.parent.userData.blocked) {
-            if (boxLeft.userData.inverted) {
-                boxLeft.getObjectByName("left").visible = true;
-                boxLeft.getObjectByName("left").userData.portal = window.STATE_PORTAL;
+    //console.log(IndexArray)
 
-                if (window.STATE_PORTAL) {
-                    boxLeft.getObjectByName("left").material = window.MATERIAL_PORTAL_EDITOR;
-                } else {
-                    boxLeft.getObjectByName("left").material = window.MATERIAL_NON_PORTAL_EDITOR;
-                }
-            } else {
-                newInvertedBox.getObjectByName("left").visible = false;
-            }
-        } else if (type == "plus" && boxLeft.userData.inverted && !boxLeft.parent.userData.blocked) {
-            boxLeft.getObjectByName("left").visible = true;
-            boxLeft.getObjectByName("left").userData.portal = window.STATE_PORTAL;
+    for (var i = 0; i < IndexArray.length; i++) {
 
-            if (window.STATE_PORTAL) {
-                boxLeft.getObjectByName("left").material = window.MATERIAL_PORTAL_EDITOR;
-            } else {
-                boxLeft.getObjectByName("left").material = window.MATERIAL_NON_PORTAL_EDITOR;
-            }
-        } else {
-            if (boxLeft.userData.inverted) {
-                boxLeft.getObjectByName("left").visible = false;
-                newInvertedBox.getObjectByName("right").visible = false;
-            }
-        }
+        var erase = new THREE.Object3D();
+        erase.position.set(0, 10000, 0);
+
+        erase.updateMatrix();
+        window.instancedMesh.setMatrixAt(IndexArray[i], erase.matrix);
+        window.planeUserData[IndexArray[i]] = {};
+        window.instancedMesh.instanceMatrix.needsUpdate = true;
     }
 
-    //CUBE BACK
-    obj.position.copy(clone.position);
-    obj.translateZ(2);
-    obj.position.round();
-    var name = obj.position.x + "/" + obj.position.y + "/" + obj.position.z;
-    var boxBack = window.CUBES.getObjectByName(name);
-    if (boxBack) {
-        if (type == "plus_minus" && !boxBack.parent.userData.blocked) {
-            if (boxBack.userData.inverted) {
-                boxBack.getObjectByName("back").visible = true;
-                boxBack.getObjectByName("back").userData.portal = window.STATE_PORTAL;
+    if (limit) {
+        window.SELECTED_SIDE = null;
+        window.SELECTING = false;
+        window.SELECTED_ID = [];
+        window.SELECTED_COLOR = [];
+    }
 
-                if (window.STATE_PORTAL) {
-                    boxBack.getObjectByName("back").material = window.MATERIAL_PORTAL_EDITOR;
-                } else {
-                    boxBack.getObjectByName("back").material = window.MATERIAL_NON_PORTAL_EDITOR;
-                }
-            } else {
-                newInvertedBox.getObjectByName("back").visible = false;
-            }
-        } else if (type == "plus" && boxBack.userData.inverted && !boxBack.parent.userData.blocked) {
-            boxBack.getObjectByName("back").visible = true;
-            boxBack.getObjectByName("back").userData.portal = window.STATE_PORTAL;
+    IndexArray = [];
+    limit = false;
+}
 
-            if (window.STATE_PORTAL) {
-                boxBack.getObjectByName("back").material = window.MATERIAL_PORTAL_EDITOR;
-            } else {
-                boxBack.getObjectByName("back").material = window.MATERIAL_NON_PORTAL_EDITOR;
-            }
-        } else {
-            if (boxBack.userData.inverted) {
-                boxBack.getObjectByName("back").visible = false;
-                newInvertedBox.getObjectByName("front").visible = false;
-            }
+function getPlaneByName(name) {
+    return window.planeUserData.filter(
+        function (data) {
+            return data.name == name
         }
+    );
+}
+
+function trasnlatePlane(id, val) {
+
+    var dummy = new THREE.Object3D();
+    dummy.position.copy(window.planeUserData[id].position);
+    dummy.rotation.copy(window.planeUserData[id].rotation);
+
+    //-----------------------------------------------------
+
+    dummy.translateZ(val * 2);
+    dummy.position.copy(dummy.position.round());
+
+    var frontExists = getPlaneByName(dummy.position.x + "/" + dummy.position.y + "/" + dummy.position.z);
+
+    var clone = dummy.clone();
+
+    clone.translateZ(-val * 2);
+
+    checkSides(clone.clone(), val, id, "left");
+    checkSides(clone.clone(), val, id, "right");
+    checkSides(clone.clone(), val, id, "up");
+    checkSides(clone.clone(), val, id, "down");
+
+    //------------------------------------------------
+
+    //console.log(frontExists)
+    //console.log(dummy.position.x + "/" + dummy.position.y + "/" + dummy.position.z)
+
+    if (frontExists.length > 0) {
+
+        window.instancedMesh.setColorAt(id, new THREE.Color(0xffffff));
+        window.instancedMesh.instanceColor.needsUpdate = true;
+
+        var erase = new THREE.Object3D();
+        erase.position.set(0, 10000, 0);
+        erase.updateMatrix();
+        window.instancedMesh.setMatrixAt(id, erase.matrix);
+        window.planeUserData[id] = {};
+
+        window.instancedMesh.setColorAt(frontExists[0].id_instanced, new THREE.Color(0xffffff));
+        window.instancedMesh.instanceColor.needsUpdate = true;
+
+        //---------------------------------------
+
+        var erase = new THREE.Object3D();
+        erase.position.set(0, 10000, 0);
+        erase.updateMatrix();
+        window.instancedMesh.setMatrixAt(frontExists[0].id_instanced, erase.matrix);
+        window.planeUserData[frontExists[0].id_instanced] = {};
+        window.instancedMesh.instanceMatrix.needsUpdate = true;
+        //
+
+        limit = true;
+
     } else {
-        if (type == "plus") {
 
-        }
+        window.planeUserData[id].position = dummy.position.clone();
+        window.planeUserData[id].rotation = dummy.rotation.clone();
+        window.planeUserData[id].name = dummy.position.x + "/" + dummy.position.y + "/" + dummy.position.z;
+
+        dummy.updateMatrix();
+        window.instancedMesh.setMatrixAt(id, dummy.matrix)
+
+        window.instancedMesh.instanceMatrix.needsUpdate = true;
+
     }
 
-    //CUBE FRONT
-    obj.position.copy(clone.position);
-    obj.translateZ(-2);
-    obj.position.round();
-    var name = obj.position.x + "/" + obj.position.y + "/" + obj.position.z;
-    var boxFront = window.CUBES.getObjectByName(name);
-    if (boxFront) {
-        if (type == "plus_minus" && !boxFront.parent.userData.blocked) {
-            if (boxFront.userData.inverted) {
-                boxFront.getObjectByName("front").visible = true;
-                boxFront.getObjectByName("front").userData.portal = window.STATE_PORTAL;
+    //----------------------------------------------------
 
-                if (window.STATE_PORTAL) {
-                    boxFront.getObjectByName("front").material = window.MATERIAL_PORTAL_EDITOR;
-                } else {
-                    boxFront.getObjectByName("front").material = window.MATERIAL_NON_PORTAL_EDITOR;
-                }
-            } else {
-                newInvertedBox.getObjectByName("front").visible = false;
-            }
-        } else if (type == "plus" && boxFront.userData.inverted && !boxFront.parent.userData.blocked) {
-            boxFront.getObjectByName("front").visible = true;
-            boxFront.getObjectByName("front").userData.portal = window.STATE_PORTAL;
-
-            if (window.STATE_PORTAL) {
-                boxFront.getObjectByName("front").material = window.MATERIAL_PORTAL_EDITOR;
-            } else {
-                boxFront.getObjectByName("front").material = window.MATERIAL_NON_PORTAL_EDITOR;
-            }
-        } else {
-            if (boxFront.userData.inverted) {
-                boxFront.getObjectByName("front").visible = false;
-                newInvertedBox.getObjectByName("back").visible = false;
-            }
-        }
-    }
+    
 }
 
-function addFaceToArray(box) {
-    box.traverse(child => {
-        child.userData.portal = window.SELECTED.userData.portal;
+var IndexArray = [];
 
-        if (child.material) {
-            if (!child.userData.portal) {
-                child.material = window.MATERIAL_NON_PORTAL_EDITOR;
+function checkSides(dummy, val, id, side) {
+
+    dummy.translateZ(val);
+
+    if (side == "left")
+        dummy.translateX(-1 * val);
+    else if (side == "right")
+        dummy.translateX(1 * val);
+    else if (side == "up")
+        dummy.translateY(1 * val);
+    else if (side == "down")
+        dummy.translateY(-1 * val);
+
+    dummy.position.copy(dummy.position.round());
+
+    var sideExists = getPlaneByName(dummy.position.x + "/" + dummy.position.y + "/" + dummy.position.z);
+
+    //console.log(sideExists.length)
+    //console.log(dummy.position.x + "/" + dummy.position.y + "/" + dummy.position.z)
+
+    if (sideExists.length == 0) { //if there is no face create one
+
+        if (side == "left") {
+
+            if (window.planeUserData[id].side == "back")
+                dummy.rotation.y += Math.PI / 2;
+            else
+                dummy.rotation.y -= Math.PI / 2;
+
+        } else if (side == "right") {
+
+            if (window.planeUserData[id].side == "back")
+                dummy.rotation.y -= Math.PI / 2;
+            else
+                dummy.rotation.y += Math.PI / 2;
+
+        } else if (side == "up") {
+
+            if (window.planeUserData[id].side == "back")
+                dummy.rotation.x += Math.PI / 2;
+            else if (window.planeUserData[id].side == "right" ||
+                window.planeUserData[id].side == "left") {
+                dummy.rotation.set(-Math.PI / 2, 0, 0)
+            } else
+                dummy.rotation.x -= Math.PI / 2;
+
+        } else if (side == "down") {
+
+            if (window.planeUserData[id].side == "back")
+                dummy.rotation.x -= Math.PI / 2;
+            else if (window.planeUserData[id].side == "right" ||
+                window.planeUserData[id].side == "left") {
+                dummy.rotation.set(Math.PI / 2, 0, 0)
+            } else
+                dummy.rotation.x += Math.PI / 2;
+
+        }
+
+        dummy.updateMatrix();
+
+        // GET EMPTY ARRAY
+        var idEmptyToFill;
+        for (var i = 0; i < window.planeUserData.length; i++) {
+            if (!window.planeUserData[i].exists) {
+                idEmptyToFill = i;
+                break;
             }
         }
-    })
-}
 
-function disableFace(selectedName, box) {
-    if (selectedName == "back") {
-        box.getObjectByName("front").visible = false;
-    } else if (selectedName == "front") {
-        box.getObjectByName("back").visible = false;
-    }
+        window.instancedMesh.setMatrixAt(idEmptyToFill, dummy.matrix);
+        window.instancedMesh.setColorAt(idEmptyToFill, new THREE.Color().setHex(0xffffff));
 
-    if (selectedName == "up") {
-        box.getObjectByName("down").visible = false;
-    } else if (selectedName == "down") {
-        box.getObjectByName("up").visible = false;
-    }
+        window.instancedMesh.instanceMatrix.needsUpdate = true;
+        window.instancedMesh.instanceColor.needsUpdate = true;
 
-    if (selectedName == "left") {
-        box.getObjectByName("right").visible = false;
-    } else if (selectedName == "right") {
-        box.getObjectByName("left").visible = false;
+        dummy.position.copy(dummy.position.round());
+
+        window.planeUserData[idEmptyToFill] = {
+            iniPos: dummy.position.clone(),
+            base: true,
+            side: side,
+            name: dummy.position.x + "/" + dummy.position.y + "/" + dummy.position.z,
+            selected: false,
+            position: dummy.position.clone(),
+            rotation: dummy.rotation.clone(),
+            exists: true,
+            id_instanced: idEmptyToFill
+        };
+
+    } else { //if there is a face delete it
+
+        //const index = window.planeUserData.indexOf(sideExists[0]);
+        IndexArray.push(sideExists[0].id_instanced);
+
     }
 }
 
@@ -645,120 +232,104 @@ function warning() {
     }, 3000);
 }
 
-function buildIniCubes(obj) {
-    //GROUND
-    buildLayer(-1, -1, 1, obj, 'x', 'z', 'y', 6, 8, "up");
-    buildLayer(-1, -1, 3, obj, 'x', 'z', 'y', 6, 8, "up");
-    buildLayer(-1, -1, 5, obj, 'x', 'z', 'y', 6, 8, "up");
-    buildLayer(-1, -1, 7, obj, 'x', 'z', 'y', 6, 8, "up");
-
-    //buildLayer(-1, -1, 9, obj, 'x', 'z', 'y', 10, 10, "up");
-    //buildLayer(-1, -1, 11, obj, 'x', 'z', 'y', 10, 10, "up");
-    //buildLayer(-1, -1, 13, obj, 'x', 'z', 'y', 10, 10, "up");
-    //buildLayer(-1, -1, 15, obj, 'x', 'z', 'y', 10, 10, "up");
-    //WALL BACK
-    //buildLayer(-1, -1, -1, obj, 'x', 'y', 'z', 4, 8, "back");
-    //WALL FRONT
-    //buildLayer(-1, -1, 13, obj, 'x', 'y', 'z', 4, 8, "front");
-    //WALL LEFT SIDE
-    //buildLayer(-1, -1, 17, obj, 'z', 'y', 'x', 4, 6, "right");
-    //WALL RIGHT SIDE
-    //buildLayer(-1, -1, -1, obj, 'z', 'y', 'x', 4, 6, "left");
-    //
-
-    removeFromArray();
+var a = 0;
+window.planeUserData = [];
+for (var i = 0; i < 3000; i++) {
+    window.planeUserData.push({})
 }
 
-function buildLayer(x, y, z, obj, x2, y2, z2, height, width, side) {
+function buildIniCubes(obj) {
+
+    const geometry = new THREE.PlaneGeometry(2, 2);
+
+    window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 3000);
+    window.instancedMesh.position.y = 10000;
+    window.instancedMesh.castShadow = true;
+    window.instancedMesh.receiveShadow = true;
+    window.instancedMesh.name = "cube-parent";
+    window.CUBES.add(window.instancedMesh);
+
+    //GROUND
+    buildLayer(-1, -1, -10000, 'x', 'z', 'y', 6, 8, "down", new THREE.Vector3(-Math.PI / 2, 0, 0));
+    //CEILING
+    buildLayer(-1, -1, -9992, 'x', 'z', 'y', 6, 8, "up", new THREE.Vector3(Math.PI / 2, 0, 0));
+    //WALL FRONT
+    buildLayer(-1, -10001, 0, 'x', 'y', 'z', 4, 8, "front", new THREE.Vector3(0, 0, 0));
+    //WALL BACK
+    buildLayer(-1, -10001, 12, 'x', 'y', 'z', 4, 8, "back", new THREE.Vector3(0, Math.PI, 0));
+    //WALL RIGHT
+    buildLayer(-1, -10001, 16, 'z', 'y', 'x', 4, 6, "right", new THREE.Vector3(0, -Math.PI / 2, 0));
+    //WALL LEFT
+    buildLayer(-1, -10001, 0, 'z', 'y', 'x', 4, 6, "left", new THREE.Vector3(0, Math.PI / 2, 0));
+
+    //console.log(window.instancedMesh);
+    //console.log(window.planeUserData);
+
+    /*var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.planeUserData));
+    var dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", "scene.json");
+    dlAnchorElem.click();*/
+}
+
+function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
+
+    var clone = new THREE.Object3D();
+
     for (var i = 0; i < width; i++) {
+
         x += 2;
+
         for (var j = 0; j < height; j++) {
+
             y += 2;
-            var clone = obj.clone();
+
+            clone.rotation.set(rot.x, rot.y, rot.z);
+
             clone.position[x2] = x;
             clone.position[y2] = y;
             clone.position[z2] = z;
-            clone.name = clone.position.x + "/" + clone.position.y + "/" + clone.position.z;
-            clone.userData.iniPos = clone.position.clone();
-            clone.userData.base = true;
-            clone.userData.side = side;
 
-            clone.traverse(child => {
-                
+            clone.updateMatrix();
+            window.instancedMesh.setMatrixAt(a, clone.matrix);
 
-                child.userData.inverted = true;
-                child.userData.checks = 0;
+            var target = new THREE.Vector3();
+            clone.getWorldPosition(target);
+            var portal;
 
-                if(child.material){
-                    child.material = window.MATERIAL_PORTAL_EDITOR;
-                }
-
-                if(child.name == "down"){
-                    child.userData.portal = false;
-                    child.material = window.MATERIAL_NON_PORTAL_EDITOR;
-                }else if (side == "front") {
-                    if (clone.position.x <= 5) {
-                        child.userData.portal = false;
-                        child.material = window.MATERIAL_NON_PORTAL_EDITOR;
-                    } else {
-                        child.userData.portal = true;
-                    }
-                } else if (side == "left") {
-                    if (clone.position.z >= 7) {
-                        child.userData.portal = false;
-                        child.material = window.MATERIAL_NON_PORTAL_EDITOR;
-                    } else {
-                        child.userData.portal = true;
-                    }
-                } else if (side == "up") {
-                    if (clone.position.x <= 5 && clone.position.z >= 7 && clone.position.y <= 5) {
-                        child.userData.portal = false;
-                        child.material = window.MATERIAL_NON_PORTAL_EDITOR;
-                    } else if (clone.position.x >= 10 && clone.position.z <= 1 && clone.position.y <= 3) {
-                        child.userData.portal = false;
-                        child.material = window.MATERIAL_NON_PORTAL_EDITOR;
-                    }else {
-                        child.userData.portal = true;
-                    }
-                } else {
-                    child.userData.portal = true;
-                }
-
-                if (child.material) {
-                    child.userData.cloned = false;
-                    //child.material.visible = false;
-                }
-            });
-
-            if (z == 7) {
-                //clone.getObjectByName("down").visible = false;
-                clone.userData.top = true;
+            if (clone.position.x <= 5 && clone.position.z >= 7 && clone.position.y <= -10000 + 5) {
+                portal = false;
+                window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0x808080));
+            } else if (clone.position.x >= 10 && clone.position.z <= 1 && clone.position.y <= -10000 + 3) {
+                portal = false;
+                window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0x808080));
+            } else {
+                portal = true;
+                window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0xffffff));
             }
 
-            if (clone.position.equals(new THREE.Vector3(15, 7, 7))) {
-                //clone.getObjectByName("right").visible = false;
-                clone.getObjectByName("right").userData.hasItem = true;
-                clone.getObjectByName("right").userData.itemName = "window";
-            }else if (clone.position.equals(new THREE.Vector3(15, 7, 5))) {
-                //clone.getObjectByName("right").visible = false;
+            //ADD USERDATA TO ARRAY LINKED WITH THE INSTANCED ID
+            clone.position.copy(clone.position.round());
+            window.planeUserData[a] = {
+                iniPos: clone.position.clone(),
+                base: true,
+                side: side,
+                name: clone.position.x + "/" + clone.position.y + "/" + clone.position.z,
+                selected: false,
+                position: clone.position.clone(),
+                rotation: clone.rotation.clone(),
+                exists: true,
+                id_instanced: a,
+                portal: portal
             }
 
-            if (clone.position.equals(new THREE.Vector3(13, 1, 1))) {
-                clone.getObjectByName("back").userData.hasItem = true;
-                clone.getObjectByName("back").userData.itemName = "exitDoor";
-                clone.getObjectByName("back").userData.connection = true;
-            } else if (clone.position.equals(new THREE.Vector3(3, 1, 11))) {
-                clone.getObjectByName("front").userData.hasItem = true;
-                clone.getObjectByName("front").userData.itemName = "enterDoor";
-            }
-
-            //clone.visible = false;
-
-            window.CUBES.add(clone);
-            //console.log(window.CUBES)
-            cubeCheck(0, clone.clone(), "minus", clone);
+            a++;
         }
-        y = -1;
+
+        if (side == "up" || side == "down")
+            y = -1;
+        else
+            y = -10001;
     }
 
     window.RENDERER.renderLists.dispose();
