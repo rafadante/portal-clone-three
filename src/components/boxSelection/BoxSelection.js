@@ -2,15 +2,6 @@ import * as THREE from '../../build/three.module.js';
 import $ from 'jquery';
 
 window.itemSelected = false;
-var itemSelectedName;
-var previousItemHolder;
-var currentArrayDirection;
-var arrayUp = [
-    []
-]
-var arrayBack = [
-    []
-];
 var color = new THREE.Color();
 const orange = new THREE.Color("rgb(255, 165, 0)");
 
@@ -43,6 +34,8 @@ function raycastSelected(found, event, type) {
 
     window.instancedMesh.setColorAt(instanceId, orange);
     window.instancedMesh.instanceColor.needsUpdate = true;
+
+    console.log(window.planeUserData[instanceId].position)
 }
 
 //UI

@@ -240,6 +240,7 @@ window.materialWallPortal = new THREE.MeshPhysicalMaterial({
 map = new THREE.TextureLoader().load('./assets/textures/wall4/base.jpg');
 map.encoding = THREE.sRGBEncoding;
 //map.colorSpace = THREE.SRGBColorSpace;
+map.flipY = true;
 map.wrapS = map.wrapT = THREE.RepeatWrapping;
 map.repeat.set(0.5, 0.5);
 materialWallPortal.map = map;

@@ -298,6 +298,13 @@ $("#ui").css("display", "block");
 $("#container #back-effect").css("display", "none");
 $("#main-container").css("display", "block");
 
+$("#option-main").css("display", "none");
+$("#options-settings").css("display", "block");
+$("#settings-menu-title").text("OPTIONS");
+$("#back-main").css("display", "none");
+$("#settings-close").css("display", "block");
+$("#main-container").css("display", "block");
+
 if (!stopMenuLoop) {
     setTimeout(() => {
         var planegeometry = new THREE.PlaneGeometry(1, 1);

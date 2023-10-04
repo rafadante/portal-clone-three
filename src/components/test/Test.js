@@ -7,7 +7,6 @@ import {
 } from 'three-to-cannon';
 import * as BufferGeometryUtils from '../../jsm/utils/BufferGeometryUtils.js';
 
-var room2;
 var cubesDefault = [];
 
 /*$("#container img").attr("src", './assets/images/vig5.jpg');
@@ -101,10 +100,8 @@ $("body").on('click', '#view-fps', function () {
         $("#blocker").css("display", "block");
         $("#blocker").css("pointer-events", "all");
 
-        room2 = window.ROOM.clone();
         var toDelete = [];
         window.ROOM.visible = false;
-        window.MAIN_SCENE.add(room2);
 
         window.materialWallPortal.envMap = window.ENV_MAP_FPS;
         window.materialWallPortal.envMapIntensity = 0.2;
@@ -128,144 +125,217 @@ $("body").on('click', '#view-fps', function () {
         window.nonPortal = [];
         window.cubes = [];
 
-        room2.traverse(child => {
-            if (child.userData.hasItem && child.userData.itemName == "window") {
-                nameWindow = child.name;
-            }
-        })
-
-        var target = new THREE.Vector3(); // create once an reuse it
-        window.side_window.getWorldPosition(target);
-        room2.getObjectByName(target.x + "/" + target.y + "/" + target.z).getObjectByName(nameWindow).visible = false;
-
-        //console.log(room2.getObjectByName(target.x + "/" + target.y + "/" + target.z).getObjectByName(nameWindow))
-
-        //room2.remove(room2.getObjectByName(target.x + "/" + target.y + "/" + target.z));
-
         var bb = [];
 
         const matrix = new THREE.Matrix4();
 
         var sideUp = [];
 
-        room2.traverse(child => {
-            if (child.material) {
-                if (child.userData.isCube && child.parent) {
+        for (var i = 0; i < window.planeUserData.length; i++) {
 
-                    if (child.parent && child.visible) {
+            if (window.planeUserData[i].exists) {
 
-                        if (child.name == "up" || child.name == "down" || child.name == "back" ||
-                            child.name == "front" || child.name == "left" || child.name == "right") {
-                            sideUp.push(child)
-                        }
+                if (!window.planeUserData[i].hasItem &&
+                    (window.planeUserData[i].itemName != "enterDoor" ||
+                        window.planeUserData[i].itemName != "exitDoor" ||
+                        window.planeUserData[i].itemName != "window")) {
 
-                        if (child.userData.portal) {
 
-                            if (child.visible)
-                                window.SURFACES_TO_PLACE_PORTAL.push(child);
 
-                            if (child.userData.name == "up") {
-                                child.material = window.materialFloorPortal;
-                                meshesFloorPortal.push(child)
-                            } else if (child.userData.name == "down") {
-                                child.material = materialUpPortal;
-                                meshesUpPortal.push(child)
-                            } else {
-                                child.material = window.materialWallPortal;
-                                meshesWallPortal.push(child);
-                            }
+                    if (window.planeUserData[i].portal) {
+
+                        if (window.planeUserData[i].side == "up") {
+                            meshesFloorPortal.push(window.planeUserData[i])
+                        } else if (window.planeUserData[i].side == "down") {
+                            meshesUpPortal.push(window.planeUserData[i])
+                            sideUp.push(window.planeUserData[i])
                         } else {
-                            if (child.userData.name == "up") {
-                                child.material = window.materialFloorNonPortal;
-                                meshesFloorNonPortal.push(child)
-                            } else if (child.userData.name == "down") {
-                                child.material = materialUpNonPortal;
-                                meshesUpNonPortal.push(child)
-                            } else {
-                                child.material = window.materialWallNonPortal;
-                                meshesWallNonPortal.push(child);
-                            }
-
-                            window.nonPortal.push(child);
+                            meshesWallPortal.push(window.planeUserData[i]);
                         }
 
-                        //child.updateMatrix(); // as needed
-                        //bb.push(child);
+                    } else {
 
-                        var target = new THREE.Vector3();
-                        child.getWorldPosition(target);
+                        if (window.planeUserData[i].side == "up") {
+                            meshesFloorNonPortal.push(window.planeUserData[i])
+                        } else if (window.planeUserData[i].side == "down") {
+                            meshesUpNonPortal.push(window.planeUserData[i])
+                            sideUp.push(window.planeUserData[i])
+                        } else {
+                            meshesWallNonPortal.push(window.planeUserData[i]);
+                        }
 
-                        matrix.makeTranslation(
-                            target.x,
-                            target.y,
-                            target.z
-                        );
-
-                        bb.push(child.geometry.clone().applyMatrix4(matrix));
                     }
-
-
-                    if (child.visible == false || !child.parent)
-                        toDelete.push(child);
-                    else
-                        window.cubes.push(child)
-                }
-            }
-
-            if (child.userData.hasItem || child.name == "warning" || child.name == "spawn") {
-
-                if (child.userData.itemName) {
-                    if (!child.userData.itemName.includes("cube-") &&
-                        !child.userData.itemName.includes("sphere-") &&
-                        !child.userData.itemName.includes("pedestal_button-") &&
-                        !child.userData.itemName.includes("button_circle-") &&
-                        !child.userData.itemName.includes("button_box-") &&
-                        !child.userData.itemName.includes("button_weight-") &&
-                        !child.userData.itemName.includes("camera-") &&
-                        !child.userData.itemName.includes("radio-"))
-                        toDelete.push(child);
-                } else {
-                    toDelete.push(child);
                 }
 
             }
 
-            if (child.name.includes("side"))
-                child.visible = false;
-
-        });
+        }
 
         console.log(sideUp)
+        //GROUP COLUMNS
+
+        var colums = [];
+
+        for (var i = 0; i < sideUp.length; i++) {
+
+            var z = sideUp[i].position.z;
+            var row = [];
+
+            for (var j = 0; j < sideUp.length; j++) {
+
+                if (!sideUp[j].checked) {
+
+                    if (sideUp[j].position.z == z) {
+
+                        sideUp[j].position.checked = false;
+                        row.push(sideUp[j].position)
+                        sideUp[j].checked = true;
+
+                    }
+
+                }
+
+            }
+
+            if (row.length > 0) {
+                colums.push(row.sort((a, b) => a.x - b.x))
+            }
+
+        }
+
+        //TRANSFORM COLUM ARRAY IN A MATRIX
+
+        var columsNew = [];
+
+        for (var i = 0; i < colums.length; i++) {
+
+            columsNew.push([]);
+
+            for (var j = 0; j < colums[i].length; j++) {
+
+                var y = colums[i][j].y;
+                var row = [];
+
+                for (var c = 0; c < colums[i].length; c++) {
+
+                    if (!colums[i][c].checked) {
+
+                        if (colums[i][c].y == y) { //&& ((colums[i][c].x - 2) == row[row.length - 1].x)
+
+                            if (row.length > 0) {
+
+                                if (colums[i][c].x - 2 == row[row.length - 1].x) {
+
+                                    colums[i][c].checked = true;
+                                    row.push(colums[i][c])
+
+                                }else{
+                                    break;
+                                }
+
+                            } else {
+                                colums[i][c].checked = true;
+                                row.push(colums[i][c])
+                            }
+
+
+                        } else {
+                            break;
+                        }
+
+                    }
+
+                }
+
+                if (row.length > 0)
+                    columsNew[i].push(row);
+
+            }
+
+        }
+
+        console.log(colums)
+        console.log(columsNew)
+        var totalBodies = 0;
+
+        for (var i = 0; i < columsNew.length; i++) {
+
+            for (var j = 0; j < columsNew[i].length; j++) {
+
+                var shape = new CANNON.Box(new CANNON.Vec3(columsNew[i][j].length, 0.0001, 1));
+
+                var box = new CANNON.Body({
+                    mass: 0,
+                    shape: shape,
+                    material: window.PHYSICS_MATERIAL
+                })
+
+                var obj = new THREE.Object3D();
+                obj.position.copy(new THREE.Vector3(columsNew[i][j][0].x,
+                    columsNew[i][j][0].y,
+                    columsNew[i][j][0].z));
+                obj.translateY(10000);
+
+                box.position.copy(obj.position);
+
+                box.position.x += columsNew[i][j].length - 1;
+
+                window.CANNON_WORLD.addBody(box);
+                totalBodies++;
+
+            }
+
+        }
+
+        console.log(totalBodies)
+
+        //
+
+        /*for (var i = 0; i < colums.length; i++) {
+
+            var v = [];
+
+            for(var j =0; j<colums[i].length; j++){
+                v.push(colums[i][j].x)
+            }
+
+            xArray.push(v.sort())
+
+        }*/
 
         //UP COLLIDERS
-        for (var i = 0; i < sideUp.length; i++) {
+        /*for (var i = 0; i < sideUp.length; i++) {
 
             var mergedGroup = [];
 
-            if (!sideUp[i].userData.merged && sideUp[i].visible && sideUp[i].userData.itemName != "enterDoor") {
+            //console.log(sideUp[i].merged)
+
+            if (!sideUp[i].merged && sideUp[i].itemName != "enterDoor") {
 
                 mergedGroup.push(sideUp[i])
-                sideUp[i].userData.merged = true;
+                sideUp[i].merged = true;
 
                 for (var j = 0, o = 2; j < 100; j++, o += 2) {
 
-                    if (sideUp[i].name == "left" || sideUp[i].name == "right") {
-                        var neighbour = room2.getObjectByName(sideUp[i].parent.position.x + "/" +
-                            sideUp[i].parent.position.y + "/" +
-                            (sideUp[i].parent.position.z + o))
+                    if (sideUp[i].side == "left" || sideUp[i].side == "right") {
+                        var neighbour = getPlaneByName(sideUp, sideUp[i].position.x + "/" +
+                            sideUp[i].position.y + "/" +
+                            (sideUp[i].position.z + o))
                     } else {
-                        var neighbour = room2.getObjectByName((sideUp[i].parent.position.x + o) + "/" +
-                            sideUp[i].parent.position.y + "/" +
-                            sideUp[i].parent.position.z)
+                        var neighbour = getPlaneByName(sideUp, (sideUp[i].position.x + o) + "/" +
+                            sideUp[i].position.y + "/" +
+                            sideUp[i].position.z)
                     }
 
-                    if (sideUp[i].name == "left" || sideUp[i].name == "right") {
+                    if (sideUp[i].side == "left" || sideUp[i].side == "right") {
                         var shape = new CANNON.Box(new CANNON.Vec3(0.001, 1, mergedGroup.length));
                     } else {
                         var shape = new CANNON.Box(new CANNON.Vec3(mergedGroup.length, 0.001, 1));
                     }
 
-                    if (!neighbour) {
+                    //console.log(neighbour.length)
+
+                    if (neighbour.length == 0) {
 
                         var box = new CANNON.Body({
                             mass: 0,
@@ -273,54 +343,37 @@ $("body").on('click', '#view-fps', function () {
                             material: window.PHYSICS_MATERIAL
                         })
 
-                        var target = new THREE.Vector3();
-                        sideUp[i].getWorldPosition(target);
+                        var obj = new THREE.Object3D();
+                        obj.position.copy(sideUp[i].position);
+                        obj.translateY(10000)
 
-                        box.position.copy(target);
+                        box.position.copy(obj.position);
 
-                        if (sideUp[i].name == "left" || sideUp[i].name == "right")
+                        if (sideUp[i].side == "left" || sideUp[i].side == "right")
                             box.position.z += mergedGroup.length - 1;
                         else
                             box.position.x += mergedGroup.length - 1;
 
-                        if (sideUp[i].name == "back" || sideUp[i].name == "front")
+                        if (sideUp[i].side == "back" || sideUp[i].side == "front")
                             box.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
 
                         window.CANNON_WORLD.addBody(box);
 
+                        console.log("ooooooooo")
+
                         break;
                     } else {
-                        if (neighbour.getObjectByName(sideUp[i].name).visible &&
-                            neighbour.getObjectByName(sideUp[i].name).userData.itemName != "enterDoor") {
-                            mergedGroup.push(neighbour.getObjectByName(sideUp[i].name))
-                            neighbour.getObjectByName(sideUp[i].name).userData.merged = true;
-                        } else {
 
-                            var box = new CANNON.Body({
-                                mass: 0,
-                                shape: shape,
-                                material: window.PHYSICS_MATERIAL
-                            })
+                        //console.log(neighbour)
+                        mergedGroup.push(neighbour[0])
+                        neighbour[0].merged = true;
 
-                            var target = new THREE.Vector3();
-                            sideUp[i].getWorldPosition(target);
-
-                            box.position.copy(target)
-                            if (sideUp[i].name == "left" || sideUp[i].name == "right")
-                                box.position.z += mergedGroup.length - 1;
-                            else
-                                box.position.x += mergedGroup.length - 1;
-
-                            if (sideUp[i].name == "back" || sideUp[i].name == "front")
-                                box.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
-
-                            window.CANNON_WORLD.addBody(box);
-                            break;
-                        }
                     }
                 }
+
+                //console.log(mergedGroup)
             }
-        }
+        }*/
 
         window.horizontal = [];
         window.vertical = [];
@@ -328,199 +381,6 @@ $("body").on('click', '#view-fps', function () {
         let PHYSICS_MATERIAL = new CANNON.Material();
         PHYSICS_MATERIAL.friction = 0.4; //0.01
         PHYSICS_MATERIAL.restitution = 0; //0.1
-
-        window.MAIN_SCENE.traverse(child => {
-            if (child.name.includes("observation_room")) {
-                child.children[0].visible = false;
-                child.children[1].visible = true;
-            }
-
-            if (child.name.includes("cube-")) {
-                window.DISPENSER_COVERS.push(child.dispenser.getObjectByName("cover"))
-                window.ITEM_BOXES.push(child);
-            }
-
-            if (child.name.includes("sphere-")) {
-                window.DISPENSER_COVERS.push(child.dispenser.getObjectByName("cover"))
-                window.ITEM_SPHERES.push(child);
-            }
-
-            if (child.name == "interactive") {
-                window.INTERACTIVE.push(child);
-            }
-
-            if (child.name.includes("pedestal_button")) {
-
-                const result = threeToCannon(child, {
-                    type: ShapeType.BOX
-                });
-
-                var pedestal_button = new CANNON.Body({
-                    mass: 0,
-                    shape: result.shape,
-                    material: window.PHYSICS_MATERIAL
-                })
-
-                var target = new THREE.Vector3();
-                child.getWorldPosition(target);
-
-                pedestal_button.position.copy(target);
-                pedestal_button.position.y += result.shape.halfExtents.y;
-
-                window.CANNON_WORLD.addBody(pedestal_button);
-            }
-
-            if (child.name.includes("coliider_button_circle")) {
-
-                const result = threeToCannon(child, {
-                    type: ShapeType.HULL
-                });
-                child.material.visible = false;
-
-                var button_sphere = new CANNON.Body({
-                    mass: 0,
-                    shape: result.shape,
-                    material: window.PHYSICS_MATERIAL
-                })
-
-                var target = new THREE.Vector3();
-                child.getWorldPosition(target);
-                button_sphere.position.copy(target);
-                var target = new THREE.Quaternion();
-                child.getWorldQuaternion(target);
-                button_sphere.quaternion.copy(target);
-                window.CANNON_WORLD.addBody(button_sphere);
-            }
-
-            if (child.name.includes("button_weight")) {
-                const result = threeToCannon(child, {
-                    type: ShapeType.HULL
-                });
-
-                var button_weight = new CANNON.Body({
-                    mass: 0,
-                    shape: result.shape,
-                    material: window.PHYSICS_MATERIAL
-                })
-
-                var target = new THREE.Vector3();
-                child.getWorldPosition(target);
-
-                target.y += 0.1;
-
-                button_weight.position.copy(target);
-                //button_weight.position.y += result.shape.halfExtents.y;
-
-                var euler = new THREE.Euler(Math.PI / 2, 0, 0);
-                var quaternion = new THREE.Quaternion();
-                quaternion.setFromEuler(euler);
-                button_weight.quaternion.copy(quaternion);
-
-                window.CANNON_WORLD.addBody(button_weight);
-            }
-
-            if (child.name.includes("camera")) {
-
-                const result = threeToCannon(child, {
-                    type: ShapeType.BOX
-                });
-
-                var body = new CANNON.Body({
-                    mass: 0,
-                    shape: result.shape,
-                    material: window.PHYSICS_MATERIAL
-                })
-
-                var target = new THREE.Vector3();
-                child.getWorldPosition(target);
-                body.position.copy(target);
-                var target = new THREE.Quaternion();
-                child.getWorldQuaternion(target);
-                body.quaternion.copy(target);
-                body.position.y += 0.8;
-                body.position.z += 0.2;
-                window.CANNON_WORLD.addBody(body);
-            }
-
-            if (child.name == "horizontal") {
-                window.horizontal.push(child)
-            } else if (child.name == "vertical") {
-                window.vertical.push(child)
-            }
-
-            if (child.name.includes("radio")) {
-
-                const result = threeToCannon(child, {
-                    type: ShapeType.BOX
-                });
-
-                var body = new CANNON.Body({
-                    mass: 5,
-                    shape: result.shape,
-                    material: PHYSICS_MATERIAL
-                })
-
-                body.allowSleep = true;
-                body.sleepSpeedLimit = 1.0;
-                body.sleepTimeLimit = 1.0;
-
-                var target = new THREE.Vector3();
-                child.getWorldPosition(target);
-                body.position.copy(target);
-                var target = new THREE.Quaternion();
-                child.getWorldQuaternion(target);
-                body.quaternion.copy(target);
-
-                child.body = body;
-                window.ITEM_GENERAL.push(child);
-
-                window.CANNON_WORLD.addBody(body);
-
-                const listener = new THREE.AudioListener();
-                window.MAIN_CAMERA.add(listener);
-
-                var audioElement = new Audio('./assets/audio/fps/radio.mp3');
-                audioElement.loop = true;
-                audioElement.play();
-
-                const positionalAudio = new THREE.PositionalAudio(listener);
-                positionalAudio.setMediaElementSource(audioElement);
-                positionalAudio.setRefDistance(0.1);
-                positionalAudio.setDirectionalCone(180, 230, 0.1);
-
-                child.add(positionalAudio);
-            }
-
-            if (child.name.includes("observation_room-")) {
-                const result = threeToCannon(child, {
-                    type: ShapeType.BOX
-                });
-
-                var OBSERVATION_ROOM = new CANNON.Body({
-                    mass: 0,
-                    shape: result.shape,
-                    material: window.PHYSICS_MATERIAL
-                })
-
-                var target = child.clone();
-                target.translateZ(-1);
-
-                OBSERVATION_ROOM.position.copy(target.position);
-
-                window.CANNON_WORLD.addBody(OBSERVATION_ROOM);
-            }
-        });
-
-        room2.traverse(child => {
-            if (child.material) {
-                if (child.material.side == 1)
-                    child.material.side = 2;
-            }
-
-            if (child.name == "corridorExit" || child.name == "corridorEnter") {
-                //child.visible = true;
-            }
-        })
 
         window.CORRIDOR_ENTER.visible = true;
         //window.CORRIDOR_EXIT.visible = true;
@@ -603,50 +463,6 @@ $("body").on('click', '#view-fps', function () {
         };*/
 
         //
-        for (var i = 0; i < window.cubes.length; i++) {
-
-            var x = 1;
-            var y = 1;
-            var z = 0.001;
-
-            window.cubes[i].material.side = 2;
-
-            if (window.cubes[i].name == "up" || window.cubes[i].name == "down") {
-                x = 1;
-                y = 0.001;
-                z = 1;
-            } else if (window.cubes[i].name == "left" || window.cubes[i].name == "right") {
-                x = 0.001;
-                y = 1;
-                z = 1;
-            }
-
-            const wall = new CANNON.Body({
-                shape: new CANNON.Box(new CANNON.Vec3(x, y, z)),
-                mass: 0,
-                material: window.PHYSICS_MATERIAL
-            })
-
-            //wall.obj = window.cubes[i];
-
-            var target = new THREE.Vector3(); // create once an reuse it
-            window.cubes[i].getWorldPosition(target);
-            wall.position.copy(target);
-
-            //wall.allowSleep = true;
-            //wall.sleepSpeedLimit = 1.0;
-            //wall.sleepTimeLimit = 1.0;
-
-            if (!target.equals(new THREE.Vector3(1, 0, 0)) && !target.equals(new THREE.Vector3(-1, 0, 0)) &&
-                !target.equals(new THREE.Vector3(0, 1, 0)) && !target.equals(new THREE.Vector3(0, -1, 0)) &&
-                !target.equals(new THREE.Vector3(0, 0, 1)) && !target.equals(new THREE.Vector3(0, 0, -1))) {
-                //window.CANNON_WORLD.addBody(wall);
-            } else {
-                //var parent = window.cubes[i].parent;
-                //parent.remove(window.cubes[i]);
-                window.cubes[i].scale.set(0, 0, 0)
-            }
-        }
 
         for (var i = 0; i < window.INTERACTIVE.length; i++) {
             window.cubes.push(window.INTERACTIVE[i])
@@ -699,14 +515,6 @@ $("body").on('click', '#view-fps', function () {
             box.position.copy(window.ITEM_BOXES[i].position)
             window.BOX_BODY.push(box);
 
-            /*box.addEventListener("sleepy", function (event) {
-                console.log("The sphere is feeling sleepy...");
-            });
-
-            box.addEventListener("sleep", function (event) {
-                console.log("The sphere fell asleep!");
-            });*/
-
         }
 
         for (var i = 0; i < window.ITEM_SPHERES.length; i++) {
@@ -729,15 +537,13 @@ $("body").on('click', '#view-fps', function () {
 
         //-------------------------
 
-        createInstances(meshesWallPortal)
-        createInstances(meshesWallNonPortal)
-        createInstances(meshesFloorPortal)
-        createInstances(meshesFloorNonPortal)
-        createInstances(meshesUpPortal)
-        createInstances(meshesUpNonPortal)
+        createInstances(meshesWallPortal, window.materialWallPortal)
+        createInstances(meshesWallNonPortal, window.materialWallNonPortal)
+        createInstances(meshesFloorPortal, window.materialFloorPortal)
+        createInstances(meshesFloorNonPortal, window.materialFloorNonPortal)
+        createInstances(meshesUpPortal, materialUpPortal)
+        createInstances(meshesUpNonPortal, materialUpNonPortal)
 
-
-        window.MAIN_SCENE.remove(room2);
         window.MAIN_SCENE.remove(window.ROOM);
 
         window.RENDERER.renderLists.dispose();
@@ -746,6 +552,14 @@ $("body").on('click', '#view-fps', function () {
         console.log(window.MAIN_SCENE)
     }, 500);
 });
+
+function getPlaneByName(array, name) {
+    return array.filter(
+        function (data) {
+            return data.name == name
+        }
+    );
+}
 
 var meshesWallPortal = [];
 var meshesWallNonPortal = [];
@@ -756,49 +570,30 @@ var meshesUpNonPortal = [];
 
 var id = 0;
 
-function createInstances(meshes) {
+function createInstances(meshes, material) {
 
     if (meshes.length == 0)
         return;
 
-    var mesh = new THREE.InstancedMesh(meshes[0].geometry.clone(), meshes[0].material, meshes.length);
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    var mesh = new THREE.InstancedMesh(geometry.clone(), material, meshes.length);
+    mesh.position.y = 10000;
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    mesh.material.side = 0;
     mesh.name = "Instanced-" + id;
     window.MAIN_SCENE.add(mesh);
 
     id++;
 
-    //window.csm.setupMaterial(mesh.material);
-
     var dummy = new THREE.Object3D();
     for (var i = 0; i < meshes.length; i++) {
 
         dummy.rotation.set(0, 0, 0);
+        dummy.position.copy(meshes[i].position);
+        dummy.rotation.copy(meshes[i].rotation);
+        dummy.updateMatrix();
 
-        var target = new THREE.Vector3();
-        meshes[i].getWorldPosition(target);
-        dummy.position.copy(target);
-
-        if (!target.equals(new THREE.Vector3(1, 0, 0)) && !target.equals(new THREE.Vector3(-1, 0, 0)) &&
-            !target.equals(new THREE.Vector3(0, 1, 0)) && !target.equals(new THREE.Vector3(0, -1, 0)) &&
-            !target.equals(new THREE.Vector3(0, 0, 1)) && !target.equals(new THREE.Vector3(0, 0, -1))) {
-
-            if (meshes[i].name == "up" || meshes[i].name == "down")
-                dummy.rotation.x = Math.PI;
-            else if (meshes[i].name == "left")
-                dummy.rotation.y = -Math.PI;
-            else if (meshes[i].name == "back")
-                dummy.rotation.y = Math.PI / 2;
-            else if (meshes[i].name == "front")
-                dummy.rotation.y = -Math.PI / 2;
-
-            dummy.updateMatrix();
-            mesh.setMatrixAt(i, dummy.matrix)
-        }
-
-        meshes[i].visible = false;
+        mesh.setMatrixAt(i, dummy.matrix);
     }
 }
 
@@ -837,7 +632,6 @@ $("body").on('click', '#back-editor', function () {
     window.STATS.container.style.display = "none";
 
     window.FPS = false;
-    window.MAIN_SCENE.remove(room2);
     window.ROOM.visible = true;
     window.GROUP_STRUCTURE.visible = false;
     window.CONTROLS.enabled = true;

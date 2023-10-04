@@ -2,28 +2,49 @@ import * as THREE from '../../build/three.module.js';
 import $ from 'jquery';
 
 var limit = false;
+var IndexArray = [];
 
 function cubeState(button) {
-
-    var toRemove = [];
 
     if (button == "plus") {
         //
         for (var i = 0; i < window.SELECTED_ID.length; i++) {
 
-            trasnlatePlane(window.SELECTED_ID[i], 1);
+            //console.log(window.planeUserData[window.SELECTED_ID[i]].position.y)
+
+            /*if (window.planeUserData[window.SELECTED_ID[i]].position.y + 2 == -9978 ||
+                window.planeUserData[window.SELECTED_ID[i]].position.y + 2 == -10018) {
+                warning();
+                return;
+            }*/
+
+            trasnlatePlane(window.SELECTED_ID[i], 1, window.planeUserData[window.SELECTED_ID[i]].portal);
 
         }
     } else if (button == "minus") {
         //
         for (var i = 0; i < window.SELECTED_ID.length; i++) {
 
-            trasnlatePlane(window.SELECTED_ID[i], -1);
+            console.log(window.planeUserData[window.SELECTED_ID[i]].position.z)
+
+            if (window.planeUserData[window.SELECTED_ID[i]].position.y - 2 == -9978 ||
+                window.planeUserData[window.SELECTED_ID[i]].position.y - 2 == -10018) {
+                warning();
+                return;
+            } else if (window.planeUserData[window.SELECTED_ID[i]].position.x == 28 ||
+                window.planeUserData[window.SELECTED_ID[i]].position.x == -12) {
+                warning();
+                return;
+            } else if (window.planeUserData[window.SELECTED_ID[i]].position.z == -14 ||
+                window.planeUserData[window.SELECTED_ID[i]].position.z == 26) {
+                warning();
+                return;
+            }
+
+            trasnlatePlane(window.SELECTED_ID[i], -1, window.planeUserData[window.SELECTED_ID[i]].portal);
 
         }
     }
-
-    //console.log(IndexArray)
 
     for (var i = 0; i < IndexArray.length; i++) {
 
@@ -55,7 +76,7 @@ function getPlaneByName(name) {
     );
 }
 
-function trasnlatePlane(id, val) {
+function trasnlatePlane(id, val, portal) {
 
     var dummy = new THREE.Object3D();
     dummy.position.copy(window.planeUserData[id].position);
@@ -72,15 +93,28 @@ function trasnlatePlane(id, val) {
 
     clone.translateZ(-val * 2);
 
-    checkSides(clone.clone(), val, id, "left");
-    checkSides(clone.clone(), val, id, "right");
-    checkSides(clone.clone(), val, id, "up");
-    checkSides(clone.clone(), val, id, "down");
+    if (window.planeUserData[id].side == "front" || window.planeUserData[id].side == "back") {
 
-    //------------------------------------------------
+        checkSides(clone.clone(), val, id, "left", portal);
+        checkSides(clone.clone(), val, id, "right", portal);
+        checkSides(clone.clone(), val, id, "up", portal);
+        checkSides(clone.clone(), val, id, "down", portal);
 
-    //console.log(frontExists)
-    //console.log(dummy.position.x + "/" + dummy.position.y + "/" + dummy.position.z)
+    } else if (window.planeUserData[id].side == "up" || window.planeUserData[id].side == "down") {
+
+        checkSides(clone.clone(), val, id, "left", portal);
+        checkSides(clone.clone(), val, id, "right", portal);
+        checkSides(clone.clone(), val, id, "front", portal);
+        checkSides(clone.clone(), val, id, "back", portal);
+
+    } else if (window.planeUserData[id].side == "left" || window.planeUserData[id].side == "right") {
+
+        checkSides(clone.clone(), val, id, "front", portal);
+        checkSides(clone.clone(), val, id, "back", portal);
+        checkSides(clone.clone(), val, id, "up", portal);
+        checkSides(clone.clone(), val, id, "down", portal);
+
+    }
 
     if (frontExists.length > 0) {
 
@@ -120,71 +154,31 @@ function trasnlatePlane(id, val) {
         window.instancedMesh.instanceMatrix.needsUpdate = true;
 
     }
-
-    //----------------------------------------------------
-
-    
 }
 
-var IndexArray = [];
-
-function checkSides(dummy, val, id, side) {
+function checkSides(dummy, val, id, side, portal) {
 
     dummy.translateZ(val);
 
     if (side == "left")
-        dummy.translateX(-1 * val);
+        dummy.rotation.set(0, Math.PI / 2, 0)
     else if (side == "right")
-        dummy.translateX(1 * val);
+        dummy.rotation.set(0, -Math.PI / 2, 0)
     else if (side == "up")
-        dummy.translateY(1 * val);
+        dummy.rotation.set(Math.PI / 2, 0, 0)
     else if (side == "down")
-        dummy.translateY(-1 * val);
+        dummy.rotation.set(-Math.PI / 2, 0, 0)
+    else if (side == "front")
+        dummy.rotation.set(0, 0, 0)
+    else if (side == "back")
+        dummy.rotation.set(0, Math.PI, 0)
 
+    dummy.translateZ(val);
     dummy.position.copy(dummy.position.round());
 
     var sideExists = getPlaneByName(dummy.position.x + "/" + dummy.position.y + "/" + dummy.position.z);
 
-    //console.log(sideExists.length)
-    //console.log(dummy.position.x + "/" + dummy.position.y + "/" + dummy.position.z)
-
     if (sideExists.length == 0) { //if there is no face create one
-
-        if (side == "left") {
-
-            if (window.planeUserData[id].side == "back")
-                dummy.rotation.y += Math.PI / 2;
-            else
-                dummy.rotation.y -= Math.PI / 2;
-
-        } else if (side == "right") {
-
-            if (window.planeUserData[id].side == "back")
-                dummy.rotation.y -= Math.PI / 2;
-            else
-                dummy.rotation.y += Math.PI / 2;
-
-        } else if (side == "up") {
-
-            if (window.planeUserData[id].side == "back")
-                dummy.rotation.x += Math.PI / 2;
-            else if (window.planeUserData[id].side == "right" ||
-                window.planeUserData[id].side == "left") {
-                dummy.rotation.set(-Math.PI / 2, 0, 0)
-            } else
-                dummy.rotation.x -= Math.PI / 2;
-
-        } else if (side == "down") {
-
-            if (window.planeUserData[id].side == "back")
-                dummy.rotation.x -= Math.PI / 2;
-            else if (window.planeUserData[id].side == "right" ||
-                window.planeUserData[id].side == "left") {
-                dummy.rotation.set(Math.PI / 2, 0, 0)
-            } else
-                dummy.rotation.x += Math.PI / 2;
-
-        }
 
         dummy.updateMatrix();
 
@@ -198,12 +192,32 @@ function checkSides(dummy, val, id, side) {
         }
 
         window.instancedMesh.setMatrixAt(idEmptyToFill, dummy.matrix);
-        window.instancedMesh.setColorAt(idEmptyToFill, new THREE.Color().setHex(0xffffff));
+
+        if (portal)
+            window.instancedMesh.setColorAt(idEmptyToFill, new THREE.Color().setHex(0xffffff));
+        else
+            window.instancedMesh.setColorAt(idEmptyToFill, new THREE.Color().setHex(0x808080));
 
         window.instancedMesh.instanceMatrix.needsUpdate = true;
         window.instancedMesh.instanceColor.needsUpdate = true;
 
         dummy.position.copy(dummy.position.round());
+
+        var direction = new THREE.Vector3();
+        dummy.getWorldDirection(direction);
+
+        if (direction.round().z == 1)
+            side = "front"
+        else if (direction.round().z == -1)
+            side = "back"
+        else if (direction.round().x == 1)
+            side = "left"
+        else if (direction.round().x == -1)
+            side = "right"
+        else if (direction.round().y == 1)
+            side = "down"
+        else if (direction.round().y == -1)
+            side = "up"
 
         window.planeUserData[idEmptyToFill] = {
             iniPos: dummy.position.clone(),
@@ -214,7 +228,8 @@ function checkSides(dummy, val, id, side) {
             position: dummy.position.clone(),
             rotation: dummy.rotation.clone(),
             exists: true,
-            id_instanced: idEmptyToFill
+            id_instanced: idEmptyToFill,
+            portal: portal
         };
 
     } else { //if there is a face delete it
@@ -234,7 +249,7 @@ function warning() {
 
 var a = 0;
 window.planeUserData = [];
-for (var i = 0; i < 3000; i++) {
+for (var i = 0; i < 1500; i++) {
     window.planeUserData.push({})
 }
 
@@ -242,7 +257,7 @@ function buildIniCubes(obj) {
 
     const geometry = new THREE.PlaneGeometry(2, 2);
 
-    window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 3000);
+    window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 1500);
     window.instancedMesh.position.y = 10000;
     window.instancedMesh.castShadow = true;
     window.instancedMesh.receiveShadow = true;
@@ -308,6 +323,21 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
                 window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0xffffff));
             }
 
+            var hasItem = false;
+            var itemName = null;
+
+            if (clone.position.equals(new THREE.Vector3(3, -9999, 12))) {
+                hasItem = true;
+                itemName = "enterDoor";
+            } else if (clone.position.equals(new THREE.Vector3(13, -9999, 0))) {
+                hasItem = true;
+                itemName = "exitDoor";
+            } else if (clone.position.equals(new THREE.Vector3(16, -9993, 7)) ||
+                clone.position.equals(new THREE.Vector3(16, -9993, 5))) {
+                hasItem = true;
+                itemName = "window";
+            }
+
             //ADD USERDATA TO ARRAY LINKED WITH THE INSTANCED ID
             clone.position.copy(clone.position.round());
             window.planeUserData[a] = {
@@ -320,7 +350,11 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
                 rotation: clone.rotation.clone(),
                 exists: true,
                 id_instanced: a,
-                portal: portal
+                portal: portal,
+                hasItem: hasItem,
+                itemName: itemName,
+                merged: false,
+                checked: false
             }
 
             a++;
