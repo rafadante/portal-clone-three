@@ -35,7 +35,7 @@ function raycastSelected(found, event, type) {
     window.instancedMesh.setColorAt(instanceId, orange);
     window.instancedMesh.instanceColor.needsUpdate = true;
 
-    console.log(window.planeUserData[instanceId].position)
+    console.log(window.planeUserData[instanceId].side)
 }
 
 //UI

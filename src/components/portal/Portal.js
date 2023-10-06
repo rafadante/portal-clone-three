@@ -20,12 +20,15 @@ class Portal extends Group {
     // hostObjects - object that this portal is on
     // ringColor - the color of the ring, portal1: orange, portal2: blue
     // portalPoints - the positions of the corners of the portals
-    constructor(position, normal, playerUpDirection, output, hostObjects, ringColor, index) {
+    constructor(position, normal, playerUpDirection, output, hostObjects, ringColor, index, portalPoints = []) {
         super()
         this.pos = position.clone()
         this.output = output
         this.hostObjects = hostObjects
         this.plane = new THREE.Plane(new Vector3(0, 1, 0), 0)
+        this.debugMeshes = new Group()
+
+        console.log(playerUpDirection)
 
         // create onb for bb transformations
         this.ty = normal.clone().normalize()
@@ -36,9 +39,23 @@ class Portal extends Group {
         this.tx = this.tz.clone().cross(this.ty)
 
         // set portal corner points
-
+        // set portal corner points
+        this.portalPoints = portalPoints;
+        if (portalPoints === undefined || portalPoints.length == 0) {
+            this.portalPoints = [this.pos.clone().add(this.tz.clone().multiplyScalar(portal_depth / 2 + 2 * portal_eps).add(this.tx.clone().multiplyScalar(portal_width / 2 + 2 * portal_eps))),
+                this.pos.clone().add(this.tz.clone().multiplyScalar(-portal_depth / 2 - 2 * portal_eps).add(this.tx.clone().multiplyScalar(portal_width / 2 + 2 * portal_eps))),
+                this.pos.clone().add(this.tz.clone().multiplyScalar(-portal_depth / 2 - 2 * portal_eps).add(this.tx.clone().multiplyScalar(-portal_width / 2 - 2 * portal_eps))),
+                this.pos.clone().add(this.tz.clone().multiplyScalar(portal_depth / 2 + 2 * portal_eps).add(this.tx.clone().multiplyScalar(-portal_width / 2 - 2 * portal_eps)))
+            ]
+        }
 
         let tRot = new THREE.Matrix4().makeBasis(this.tx, this.ty, this.tz)
+
+        // for visualization purposes
+        let xHelper = new THREE.ArrowHelper(this.tx, position, 1, 0xff0000)
+        let yHelper = new THREE.ArrowHelper(this.ty, position, 1, 0x00ff00)
+        let zHelper = new THREE.ArrowHelper(this.tz, position, 1, 0x0000ff)
+        this.debugMeshes.add(xHelper, yHelper, zHelper)
 
         this.transform = tRot.clone().setPosition(position)
         this.plane.applyMatrix4(this.transform)
@@ -86,9 +103,12 @@ class Portal extends Group {
             stencilFunc: THREE.EqualStencilFunc,
             stencilRef: 1,
             stencilFail: THREE.ReplaceStencilOp,
+            /*polygonOffset: true,
+            polygonOffsetFactor: -1*/
         });
 
         this.mesh = new THREE.Mesh(geometry, material);
+        //this.mesh.applyMatrix4(new THREE.Matrix4().makeRotationY(-Math.PI / 6))
         this.mesh.applyMatrix4(this.transform)
         this.mesh.updateMatrix()
         this.mesh.matrixAutoUpdate = true;
@@ -109,8 +129,9 @@ class Portal extends Group {
 
 
         portalShader.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
+        //portalShader.applyMatrix4(new THREE.Matrix4().makeRotationY(-Math.PI / 6))
         portalShader.applyMatrix4(this.transform)
-        portalShader.position.add(normal.clone().multiplyScalar(window.PORTAL_HEIGHT / 2 + 0.002))
+        //portalShader.position.add(normal.clone().multiplyScalar(window.PORTAL_HEIGHT / 2 + 0.002))
         portalShader.updateMatrix()
         portalShader.matrixAutoUpdate = true;
         portalShader.scale.x *= 0.5;
@@ -141,7 +162,7 @@ class Portal extends Group {
 
         console.log(window.wallName)
 
-        
+
         //this.translateZ(1)
 
         //var dir = new THREE.Vector3();
@@ -163,6 +184,11 @@ class Portal extends Group {
 
         this.CDBB = new GeneralBB(window.PORTAL_WIDTH, window.PORTAL_CDBB_HEIGHT, window.PORTAL_DEPTH, tCDBB, 0xff0000)
         this.STBB = new GeneralBB(window.PORTAL_WIDTH, window.PORTAL_CDBB_HEIGHT / 2, window.PORTAL_DEPTH, tSTBB, 0x00ff00)
+
+        this.debugMeshes.add(this.CDBB.helper)
+        this.debugMeshes.add(this.STBB.helper)
+        this.debugMeshes.visible = false;//globals.DEBUG
+        this.add(this.debugMeshes)
     }
 
     update(timeStamp) {

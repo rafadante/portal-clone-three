@@ -1,8 +1,6 @@
 import $ from 'jquery';
 import * as THREE from 'three';
 
-console.log(window.mobile)
-
 if (!window.mobile)
     $(".mobile").css("display", "none")
 

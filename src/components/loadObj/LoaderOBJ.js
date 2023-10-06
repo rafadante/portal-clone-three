@@ -166,7 +166,7 @@ function loadGun() {
             if (child.material) {
                 child.receiveShadow = true;
                 child.material.envMap = window.ENV_MAP_FPS;
-                child.material.envMapIntensity = 0.4;
+                child.material.envMapIntensity = 0.25;
             }
 
             child.renderOrder = -1;

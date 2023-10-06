@@ -156,7 +156,7 @@ window.connecting = false;
 document.getElementById("container").appendChild(window.RENDERER.domElement);
 
 init();
-$("body").on('click', '#option-community-build', function () {
+$("body").on('click', '#option-community-build, #option-single-load', function () {
     setTimeout(() => {
         init();
     }, 2000);
@@ -312,7 +312,7 @@ function raycastManager(event, type) {
 
                 window.SELECTING = true;
                 window.CONTROLS.enabled = false;
-                
+
                 if (!window.planeUserData[instanceId].selected) {
                     window.planeUserData[instanceId].selected = true;
                     window.SELECTED_SIDE = window.planeUserData[instanceId].side;
@@ -350,7 +350,17 @@ function onWindowResize() {
     window.MAIN_CAMERA.updateProjectionMatrix();
 }
 
-const cannonDebugger = new CannonDebugger(window.MAIN_SCENE, window.CANNON_WORLD)
+window.debugCol = true;
+
+const cannonDebugger = new CannonDebugger(window.MAIN_SCENE, window.CANNON_WORLD, {
+    onInit(body, mesh) {        
+        mesh.visible = false;
+        $("body").on('input', '#debug-input', function () {
+            window.debugCol = this.checked;
+            mesh.visible = this.checked;
+        })
+    }
+})
 //PÓRTAL FPS
 let clockPortal = new THREE.Clock();
 let deltaPortal = 0;
@@ -462,7 +472,9 @@ function render(time) {
         window.vertical[i].rotation.y = 0;
     }
 
-    //cannonDebugger.update();
+
+    if (window.debugCol)
+        cannonDebugger.update();
 
     window.COMPOSER.render();
     window.STATS.end();

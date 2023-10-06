@@ -42,7 +42,7 @@ const Lights = function (THREE) {
     spotLight.shadow.camera.far = 500;
     spotLight.shadow.focus = 1;
     //spotLight.shadow.bias = -0.1;//-0.0001
-    spotLight.shadow.bias = -0.0009;
+    spotLight.shadow.bias = -0.002;//-0.0009
 
     console.log(spotLight)
 

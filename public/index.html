@@ -112,11 +112,16 @@
       </div>
 
       <div id="top-menu-left">
-        <span>File</span>
-        <span>Edit</span>
+        <span id="save-level">Save</span>
+        <span id="load-level">Load</span>
         <span>Help</span>
       </div>
     </div>
+  </div>
+
+  <div id="load-level-panel">
+    <span id="close-load-level-panel">X</span>
+    <input type="file" id="input-level" />
   </div>
 
   <div id="loading-parent">
@@ -128,7 +133,7 @@
 
     <div id="back-effect"></div>
     <section class="hero">
-      <h1 class="main-title">LOADING<span>TEST LEVEL</span></h1>
+      <h1 style="font-size: 8vh;" class="main-title">LOADING <!--<span>TEST LEVEL</span>--></h1>
       <p class="introduction-text">
         Get to the exit door to validate your level, you can place portals with the mouse LEFT and RIGHT buttons.
       </p>
@@ -367,6 +372,13 @@
                 <option value="0.5">Low</option>
                 <option value="0.5">Potato</option>
               </select>
+            </div>
+          </div>
+          <!--DEBUG-->
+          <div class="options-row">
+            <span class="option-name" id="">Debug Collisions</span>
+            <div class="option-value">
+              <input id="debug-input" type="checkbox" />
             </div>
           </div>
           <!--PORTAL RECURSIOrlgN-->

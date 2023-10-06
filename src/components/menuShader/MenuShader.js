@@ -305,6 +305,10 @@ $("#back-main").css("display", "none");
 $("#settings-close").css("display", "block");
 $("#main-container").css("display", "block");
 
+//
+/*$("#blocker").css("display", "flex");
+$("#options-main").css("display", "block");*/
+
 if (!stopMenuLoop) {
     setTimeout(() => {
         var planegeometry = new THREE.PlaneGeometry(1, 1);
@@ -350,14 +354,35 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
     plane2.scale.set(scaleX, scaleY, 1);
 }
 
+window.loadedLevel = false;
+$("body").on('click', '#option-single-load', function () {
+    fetch("./levels/0.json")
+        .then(response => response.json())
+        .then(json => {
+            //console.log(json)
+            window.loadedLevel = true;
+
+            setTimeout(() => {
+                loadLevel(json);
+            }, 3000);
+            
+            startLevel();
+            //Do something with json variable
+        });
+})
+
 $("body").on('click', '#option-community-build', function () {
+    startLevel()
+});
+
+function startLevel() {
     /*$("#blocker").css("display", "none");
-    $("#ui").css("display", "block");
-    $("#container #back-effect").css("display", "none");
-    window.MAIN_SCENE.remove(plane1);
-    window.MAIN_SCENE.remove(plane2);
-    window.MAIN_SCENE.background = null;
-    stopMenuLoop = true;*/
+        $("#ui").css("display", "block");
+        $("#container #back-effect").css("display", "none");
+        window.MAIN_SCENE.remove(plane1);
+        window.MAIN_SCENE.remove(plane2);
+        window.MAIN_SCENE.background = null;
+        stopMenuLoop = true;*/
 
     $("#blocker .body").css("opacity", "0");
     $("#logo").css("opacity", "0");
@@ -393,7 +418,7 @@ $("body").on('click', '#option-community-build', function () {
             stopMenuLoop = true;
         }, 1000);
     }, 1000);
-});
+}
 
 $("body").on('click', '#option-single', function () {
     optionMenu(grid1, "SINGLE PLAYER", "#options-single");
@@ -487,4 +512,76 @@ function animate(time) {
         window.RENDERER.render(window.MAIN_SCENE, window.MAIN_CAMERA)
         requestAnimationFrame(animate);
     }
+}
+
+//
+$("body").on('click', '#load-level', function () {
+    $("#load-level-panel").css("display", "flex")
+})
+
+$("body").on('click', '#close-load-level-panel', function () {
+    $("#load-level-panel").css("display", "none")
+})
+
+$("#input-level").on('change', function (e) {
+    var file = e.target.files[0];
+    var path = (window.URL || window.webkitURL).createObjectURL(file);
+    readTextFile(path, function (text) {
+        var data = JSON.parse(text);
+        console.log(data);
+        loadLevel(data)
+    });
+})
+
+function readTextFile(file, callback) {
+    var rawFile = new XMLHttpRequest();
+    rawFile.overrideMimeType("application/json");
+    rawFile.open("GET", file, true);
+    rawFile.onreadystatechange = function () {
+        if (rawFile.readyState === 4 && rawFile.status == "200") {
+            callback(rawFile.responseText);
+        }
+    }
+    rawFile.send(null);
+}
+
+function loadLevel(data) {
+
+    window.planeUserData = data;
+    window.CUBES.remove(window.instancedMesh);
+
+    const geometry = new THREE.PlaneGeometry(2, 2);
+
+    window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 1500);
+    window.instancedMesh.position.y = 10000;
+    window.instancedMesh.castShadow = true;
+    window.instancedMesh.receiveShadow = true;
+    window.instancedMesh.name = "cube-parent";
+    window.CUBES.add(window.instancedMesh);
+
+    var clone = new THREE.Object3D();
+
+    //console.log(data.length)
+
+    for (var i = 0; i < data.length; i++) {
+
+        if (data[i].exists) {
+
+            clone.rotation.copy(data[i].rotation);
+            clone.position.copy(data[i].position);
+
+            clone.updateMatrix();
+            window.instancedMesh.setMatrixAt(i, clone.matrix);
+
+            if (data[i].portal)
+                window.instancedMesh.setColorAt(i, new THREE.Color().setHex(0xffffff));
+            else
+                window.instancedMesh.setColorAt(i, new THREE.Color().setHex(0x808080));
+
+            window.instancedMesh.instanceColor.needsUpdate = true;
+
+        }
+
+    }
+
 }

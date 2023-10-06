@@ -189,6 +189,7 @@ var moving = false;
 var wasInJump = false;
 var slipperyMaterial = new CANNON.Material();
 slipperyMaterial.friction = 0.00;
+var dynamicObjects = [];
 
 player();
 
@@ -200,7 +201,7 @@ if (!window.mobile)
 
 function player() {
     // define shape
-    let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 4, 2 / 2.1, 0.5 / 4));
+    let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 2, 2 / 2.1, 0.5 / 2));
     // let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5, 2, 0.5)); 
 
     // define the physical body attributes
@@ -255,6 +256,15 @@ function player() {
         console.log("Collided with body:", e.body);
         console.log("Contact between bodies:", e.contact);
     });*/
+
+    console.log(window.PLAYER)
+
+    dynamicObjects.push(window.PLAYER);
+
+    for (let d of dynamicObjects) {
+        d.collisionFilterGroup = window.CGROUP_DYNAMIC
+        d.collisionFilterMask = window.CGROUP_ALL
+    }
 }
 
 var controller = {
@@ -398,7 +408,7 @@ $("body").on('click', '#settings-close', function () {
         } else {
             $("#blocker").css("display", "none");
             $("#mobile-controls").css("display", "block");
-           // openFullscreen();
+            openFullscreen();
         }
 
 
@@ -528,7 +538,7 @@ $("body").on('pointerup', '#crouch', function () {
     window.PLAYER.updateMassProperties();
 })
 
-document.addEventListener('mouseup', (event) => {
+document.addEventListener('mousedown', (event) => {
 
     if (!window.mobile && document.pointerLockElement !== null)
         portalButton(event.button)
@@ -572,18 +582,26 @@ function portalButton(button) {
     if (window.FPS && (button == 2 || button == 0) && allowPlacePortals) {
         //if (document.pointerLockElement !== null) {
         // define playerUpDirection
-        let playerUpDirection = new THREE.Vector3(0, 1, 0)
-        playerUpDirection.applyQuaternion(window.MAIN_CAMERA.quaternion)
+        //let playerUpDirection = new THREE.Vector3(0, 1, 0)
+        //playerUpDirection.applyQuaternion(window.MAIN_CAMERA.quaternion)
 
         raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
-        var intersects = raycaster2.intersectObjects(window.SURFACES_TO_PLACE_PORTAL);
+        var intersects = raycaster2.intersectObject(window.instancedMesh);
+
+        if (intersects.length > 0) {
+            console.log(intersects[0])
+            console.log(window.planeUserData[intersects[0].instanceId])
+        }
+
         if (intersects.length > 0) {
 
-            if (intersects[0].object.userData.portal && intersects[0].object.parent) {
+            var userData = window.planeUserData[intersects[0].instanceId];
+
+            if (userData.portal) {
                 var obj = intersects[0].object;
                 var target = new THREE.Vector3(); // create once an reuse it
                 intersects[0].object.getWorldPosition(target);
-                window.wallName = intersects[0].object.name;
+                window.wallName = userData.name;
 
                 var direction = new THREE.Vector3(0, 1, 0).applyQuaternion(obj.quaternion);
                 var offsetVector = new THREE.Vector3(0.0 * direction.x, 0.0 * direction.y, 0.0 * direction.z);
@@ -593,7 +611,7 @@ function portalButton(button) {
                 var z = intersects[0].point.z + offsetVector.z;
 
 
-                var boxUpName = intersects[0].object.parent.position.x + "/" +
+                /*var boxUpName = intersects[0].object.parent.position.x + "/" +
                     (intersects[0].object.parent.position.y + 2) + "/" +
                     intersects[0].object.parent.position.z;
 
@@ -699,16 +717,64 @@ function portalButton(button) {
                             z = target.z + offsetVector.z;
                         }
                     }
-                }
+                }*/
 
                 //const point = intersects[0].point;
                 const point = new THREE.Vector3(x, y, z);
                 // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
-                const objectMatrix = new THREE.Matrix3().getNormalMatrix(obj.matrixWorld)
-                const normal = intersects[0].face.normal.clone().applyMatrix3(objectMatrix).normalize()
-                const depthDir = playerUpDirection.clone().projectOnPlane(normal).normalize()
+                //const objectMatrix = new THREE.Matrix3().getNormalMatrix(obj.matrixWorld)
+                //const normal = intersects[0].face.normal.clone().applyMatrix3(objectMatrix).normalize()
+                //const depthDir = playerUpDirection.clone().projectOnPlane(normal).normalize()
 
-                playerUpDirection = new THREE.Vector3(0, 1, 0)
+                //playerUpDirection = new THREE.Vector3(0, 1, 0)
+
+                // define playerUpDirection
+                let playerUpDirection = new THREE.Vector3(0, 1, 0)
+                
+
+
+                var normal;
+                if (userData.side == "front")
+                    normal = new THREE.Vector3(0, 0, 1)
+                else if (userData.side == "back")
+                    normal = new THREE.Vector3(0, 0, -1)
+                else if (userData.side == "right")
+                    normal = new THREE.Vector3(-1, 0, 0)
+                else if (userData.side == "left")
+                    normal = new THREE.Vector3(1, 0, 0)
+                else if (userData.side == "up") {
+                    //playerUpDirection = new THREE.Vector3(0, 0, 1)
+                    playerUpDirection.applyQuaternion(window.MAIN_CAMERA.quaternion)
+                    normal = new THREE.Vector3(0, -1, 0)
+                } else if (userData.side == "down") {
+                    //playerUpDirection = new THREE.Vector3(0, 0, 1)
+                    playerUpDirection.applyQuaternion(window.MAIN_CAMERA.quaternion)
+                    normal = new THREE.Vector3(0, 1, 0)
+                }
+
+                var pLocal = new THREE.Vector3(0, 0, -1);
+                var pWorld = pLocal.applyMatrix4(window.MAIN_CAMERA.matrixWorld);
+                var dir = pWorld.sub(window.MAIN_CAMERA.position).normalize();
+
+                point.add(dir.clone().multiplyScalar(-0.01));
+
+                //
+                // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
+                //const objectMatrix = new THREE.Matrix3().getNormalMatrix(intersects[0].object.matrixWorld)
+                //const normal = intersects[0].face.normal.clone().applyMatrix3(objectMatrix).normalize()
+                const depthDir = playerUpDirection.clone().projectOnPlane(normal).normalize()
+                const widthDir = depthDir.clone().cross(normal)
+                const portal_width = window.PORTAL_WIDTH
+                const portal_depth = window.PORTAL_DEPTH
+
+                let EPS = window.PORTAL_EPS * 3;
+                let portalPoints = [point.clone().add(depthDir.clone().multiplyScalar(portal_depth / 2 + EPS).add(widthDir.clone().multiplyScalar(portal_width / 2 + EPS))),
+                    point.clone().add(depthDir.clone().multiplyScalar(-portal_depth / 2 - EPS).add(widthDir.clone().multiplyScalar(portal_width / 2 + EPS))),
+                    point.clone().add(depthDir.clone().multiplyScalar(-portal_depth / 2 - EPS).add(widthDir.clone().multiplyScalar(-portal_width / 2 - EPS))),
+                    point.clone().add(depthDir.clone().multiplyScalar(portal_depth / 2 + EPS).add(widthDir.clone().multiplyScalar(-portal_width / 2 - EPS)))
+                ]
+
+                console.log(userData.body)
 
                 if (button == 0) { // left click
                     // delete the old portal this new one is replacing
@@ -721,7 +787,7 @@ function portalButton(button) {
                         document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
                     }
 
-                    createPortal(0, 1, point, normal, intersects[0].object.parent.parent, playerUpDirection)
+                    createPortal(0, 1, point, normal, userData.body, playerUpDirection, portalPoints)
                     window.GUN_BLOOM.color = new THREE.Color(0xFFDB82);
                 } else if (button == 2) { // left click
                     // delete the old portal this new one is replacing
@@ -735,7 +801,7 @@ function portalButton(button) {
                         document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
                     }
 
-                    createPortal(1, 0, point, normal, intersects[0].object.parent.parent, playerUpDirection)
+                    createPortal(1, 0, point, normal, userData.body, playerUpDirection, userData.rotation)
                     window.GUN_BLOOM.color = new THREE.Color(0x76EBFF);
                 }
             } else {
@@ -801,7 +867,7 @@ function deletePortal(portalIndex) {
 }
 
 // creates a new portal and adds it to the scene
-function createPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject, playerUpDirection) {
+function createPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject, playerUpDirection, portalPoints) {
     let color = window.PORTAL_COLORS[thisPortalIndex]
 
     window.PORTALS[thisPortalIndex] = new Portal(
@@ -811,12 +877,31 @@ function createPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObje
         window.PORTALS[otherPortalIndex],
         hostObject,
         color,
-        thisPortalIndex)
+        thisPortalIndex,
+        portalPoints)
     window.PORTALS[thisPortalIndex].mesh.scale.set(0, 0, 0);
     window.PORTALS[thisPortalIndex].portalShader.scale.set(0, 0, 0);
+    console.log(window.PORTALS[thisPortalIndex])
+
+    window.PORTALS[thisPortalIndex].hostObjects.collisionFilterGroup |= window.CGROUP_PORTAL_HOST_CDISABLE[thisPortalIndex]
+    // remove this object from the environment group
+    window.PORTALS[thisPortalIndex].hostObjects.collisionFilterGroup &= ~window.CGROUP_ENVIRONMENT
+    if (window.PORTALS[otherPortalIndex] !== null) {
+        window.PORTALS[otherPortalIndex].output = window.PORTALS[thisPortalIndex]
+    }
+
+    //window.PORTALS[thisPortalIndex].children[0].rotation.copy(rotation);
+    //window.PORTALS[thisPortalIndex].children[1].rotation.copy(rotation);
+    //window.PORTALS[thisPortalIndex].rotation.copy(rotation);
+    //window.PORTALS[thisPortalIndex].children[1].rotation.x = -Math.PI/2;
+    //window.PORTALS[thisPortalIndex].position.copy(point);
+
+    //window.PORTALS[thisPortalIndex].rotation.z = Math.PI/2;
+    //window.PORTALS[thisPortalIndex].position.copy(point);
+
     window.MAIN_SCENE.add(window.PORTALS[thisPortalIndex])
-    tweenCamera(500, window.PORTALS[thisPortalIndex].mesh.scale, new THREE.Vector3(0.5, 1, 1))
-    tweenCamera(500, window.PORTALS[thisPortalIndex].portalShader.scale, new THREE.Vector3(0.5, 1, 1))
+    tweenCamera(300, window.PORTALS[thisPortalIndex].mesh.scale, new THREE.Vector3(0.5, 1, 1))
+    tweenCamera(300, window.PORTALS[thisPortalIndex].portalShader.scale, new THREE.Vector3(0.5, 1, 1))
 
     if (window.PORTALS[otherPortalIndex] !== null) {
         window.PORTALS[otherPortalIndex].output = window.PORTALS[thisPortalIndex]
@@ -831,7 +916,7 @@ function createPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObje
     var pWorld = pLocal.applyMatrix4(window.MAIN_CAMERA.matrixWorld);
     var dir = pWorld.sub(window.MAIN_CAMERA.position).normalize();
 
-    window.PORTALS[thisPortalIndex].position.add(dir.clone().multiplyScalar(-0.02));
+    //window.PORTALS[thisPortalIndex].position.add(dir.clone().multiplyScalar(-0.02));
 }
 
 document.body.addEventListener('mousemove', (event) => { //rafa
@@ -845,6 +930,26 @@ document.body.addEventListener('mousemove', (event) => { //rafa
 
 let shouldJump = false;
 window.rotationMobile = 0.1;
+
+function updateStick(elementId, leftRightAxis, upDownAxis) {
+    const multiplier = 25;
+    const stickLeftRight = leftRightAxis * multiplier;
+    const stickUpDown = upDownAxis * multiplier;
+
+    /*const stick = document.getElementById(elementId);
+    const x = Number(stick.dataset.originalXPosition);
+    const y = Number(stick.dataset.originalYPosition);
+
+    stick.setAttribute("cx", x + stickLeftRight);
+    stick.setAttribute("cy", y + stickUpDown);*/
+
+    console.log(stickLeftRight)
+}
+
+function handleSticks(axes) {
+    updateStick("controller-b10", axes[0], axes[1]);
+    //updateStick("controller-b11", axes[2], axes[3]);
+}
 
 const updatePlayer = function (deltaTime) {
 
@@ -974,6 +1079,53 @@ const updatePlayer = function (deltaTime) {
         shouldJump = false;
 
     } else {
+
+        if (controllerIndex !== null) {
+            const gamepad = navigator.getGamepads()[controllerIndex];
+            //handleButtons(gamepad.buttons);
+            //handleSticks(gamepad.axes);
+
+            if (gamepad.axes[2] == 1) {
+                window.MAIN_CAMERA.rotation.y -= 0.03;
+            }
+
+            if (gamepad.axes[2] == -1) {
+                window.MAIN_CAMERA.rotation.y += 0.03;
+            }
+
+            if (gamepad.axes[3] == -1) {
+                window.MAIN_CAMERA.rotation.x += 0.03;
+            }
+
+            if (gamepad.axes[3] == 1) {
+                window.MAIN_CAMERA.rotation.x -= 0.03;
+            }
+
+            if (gamepad.axes[1] == -1) {
+                window.PLAYER.applyForce(forward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+                //if (!window.IN_VICTORY) {hideInstructions()}
+                moving = true;
+            }
+
+            if (gamepad.axes[1] == 1) {
+                window.PLAYER.applyForce(backward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+                //if (!window.IN_VICTORY) {hideInstructions()}
+                moving = true;
+            }
+
+            if (gamepad.axes[0] == -1) {
+                window.PLAYER.applyForce(left.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+                //if (!window.IN_VICTORY) {hideInstructions()}
+                moving = true;
+            }
+
+            if (gamepad.axes[0] == 1) {
+                window.PLAYER.applyForce(right.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+                //if (!window.IN_VICTORY) {hideInstructions()}
+                moving = true;
+            }
+        }
+
         if (controller["KeyW"].pressed && !window.COL_Z) {
             window.PLAYER.applyForce(forward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
             //if (!window.IN_VICTORY) {hideInstructions()}
@@ -1157,11 +1309,64 @@ function raycast() {
 
     var portals = [window.PORTALS[0].mesh, window.PORTALS[1].mesh];
 
-    raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
+    for (let d of dynamicObjects) {
+
+        let pos = new THREE.Vector3(d.position.x, d.position.y, d.position.z)
+        // let bb = new Box3(new Vector3().copy(d.physicsBody.aabb.lowerBound), new Vector3().copy(d.physicsBody.aabb.upperBound))
+        d.collisionFilterMask = window.CGROUP_ALL
+        if (window.PORTALS[0] === null || window.PORTALS[1] === null) {
+            continue
+        }
+        //d.meshClone.visible = false
+        let CDBB_isOverlap = false;
+
+        //console.log(pos)
+        for (let p = 0; p < window.PORTALS.length; p++) {
+
+            // collision disable, might be partially intersecting with portal
+            if (window.PORTALS[p].CDBB.containsPoint(pos)) {
+                d.collisionFilterMask &= ~window.PORTALS[p].hostObjects.collisionFilterGroup
+                //console.log(d.collisionFilterMask)
+
+            }
+
+
+
+            // should teleport
+            if (window.PORTALS[p].STBB.containsPoint(pos)) {
+                //console.log(d)
+
+                teleportPhysicalObject(d, window.PORTALS[p])
+                teleportObject3D(window.MAIN_CAMERA, window.PORTALS[p])
+
+                // fix camera rotation
+                // create a new basis with up as the up
+                // https://danielilett.com/2020-01-03-tut4-4-portal-momentum/
+                let up = new THREE.Vector3(0, 1, 0)
+                let cameraForward = new THREE.Vector3()
+                window.MAIN_CAMERA.getWorldDirection(cameraForward)
+                cameraForward.normalize()
+                let cameraRight = cameraForward.clone().cross(up).normalize()
+                let cameraUp = cameraRight.clone().cross(cameraForward).normalize()
+                let cameraMat = new THREE.Matrix4().makeBasis(cameraRight, cameraUp, cameraForward.negate())
+                window.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat)
+
+                d.collisionFilterMask |= window.PORTALS[p].hostObjects.collisionFilterGroup
+                d.collisionFilterMask &= ~window.PORTALS[1 - p].hostObjects.collisionFilterGroup
+            }
+
+        }
+
+    }
+
+    /*raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
     var intersects = raycaster2.intersectObjects(portals);
     //console.log(intersects.length)
     if (intersects && intersects.length > 0 && !teleporting) {
-        if (intersects[0].distance < 0.3) {
+
+        //console.log(intersects[0].distance)
+
+        if (intersects[0].distance < 0.1) {
 
             var pos;
 
@@ -1233,7 +1438,80 @@ function raycast() {
             teleporting = false;
             //}, 1000);
         }
-    }
+    }*/
+}
+
+// teleport a 3D object directly, returns nothing
+// Object3D includes camera, meshes
+function teleportObject3D(object, portal) {
+    let f = new THREE.Matrix4().makeScale(-1, -1, 1)
+    let m = portal.CDBB.inverse_t.clone().premultiply(f).premultiply(portal.output.CDBB.t)
+    object.applyMatrix4(m)
+}
+
+function teleportPhysicalObject(object, portal) {
+    let f = new THREE.Matrix4().makeScale(-1, -1, 1)
+    let m = portal.CDBB.inverse_t.clone().premultiply(f).premultiply(portal.output.CDBB.t)
+    //object.mesh.applyMatrix4(m)
+    let position = cannonToThreeVector3(object.position)
+    let previousPosition = cannonToThreeVector3(object.position)
+    let velocity = cannonToThreeVector3(object.velocity)
+    let force = cannonToThreeVector3(object.force)
+
+    let orientation = new THREE.Quaternion().copy(object.quaternion)
+    let mquat = new THREE.Quaternion().setFromRotationMatrix(m)
+    orientation.premultiply(mquat)
+
+    position = getTeleportedPositionalVector(position, portal)
+    previousPosition = getTeleportedPositionalVector(previousPosition, portal)
+    velocity = getTeleportedDirectionalVector(velocity, portal)
+    force = getTeleportedDirectionalVector(force, portal)
+
+    object.position.copy(position)
+    object.previousPosition.copy(previousPosition)
+    object.velocity.copy(velocity)
+    object.force.copy(force)
+    object.quaternion.copy(orientation)
+}
+
+function threeToCannonVector3(v3) {
+    return new CANNON.Vec3().copy(v3)
+}
+
+function cannonToThreeVector3(v3) {
+    return new THREE.Vector3().copy(v3)
+}
+
+// apply teleportation to the output portal to the vector
+// no side effects
+function getTeleportedPositionalVector(v, portal) {
+    let f = new THREE.Matrix4().makeScale(-1, -1, 1)
+    let m = portal.CDBB.inverse_t.clone().premultiply(f).premultiply(portal.output.CDBB.t)
+    let v4 = threeToFour(v).applyMatrix4(m)
+    return fourToThree(v4)
+}
+
+// for directional vectors, it doesn't make sense to translate them
+// we only apply the rotational component of the matrix
+function getTeleportedDirectionalVector(v, portal) {
+    let f = new THREE.Matrix4().makeScale(-1, -1, 1)
+    let it = new THREE.Matrix4()
+    it.extractRotation(portal.CDBB.inverse_t)
+    let to = new THREE.Matrix4()
+    to.extractRotation(portal.output.CDBB.t)
+
+    let m = it.clone().premultiply(f).premultiply(to)
+    let v4 = threeToFour(v).applyMatrix4(m)
+    return fourToThree(v4)
+}
+
+// convert vector3 to vector4
+function threeToFour(v) {
+    return new THREE.Vector4(v.x, v.y, v.z, 1)
+}
+
+function fourToThree(v) {
+    return new THREE.Vector3(v.x, v.y, v.z).multiplyScalar(1 / v.w)
 }
 
 function tweenCamera(duration, ini, final) {
@@ -1243,6 +1521,19 @@ function tweenCamera(duration, ini, final) {
 }
 
 var teleporting = false;
+
+let controllerIndex = null;
+
+window.addEventListener("gamepadconnected", (event) => {
+    const gamepad = event.gamepad;
+    controllerIndex = gamepad.index;
+    console.log("connected");
+});
+
+window.addEventListener("gamepaddisconnected", (event) => {
+    controllerIndex = null;
+    console.log("disconnected");
+});
 
 //
 

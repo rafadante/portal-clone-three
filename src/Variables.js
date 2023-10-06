@@ -8,7 +8,7 @@ window.fps = 60;
 var pixelRatio, shadowMap, portalsRecursive, fov;
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     window.mobile = true;
-    pixelRatio = 0.5;
+    pixelRatio = 1;
     shadowMap = true;
     portalsRecursive = 1;
     fov = 70;
@@ -277,3 +277,39 @@ window.OBSERVATION_ROOM = null;
 window.OBSERVATION_ROOM_IMG = null;
 
 window.CHECK = new THREE.TextureLoader().load('./assets/check.png');
+
+ /**********************************************************
+    * PHYSICS
+    **********************************************************/
+    // https://github.com/schteppe/cannon.js/blob/master/demos/collisionFilter.html
+    // as long as at one of the objects say that it doesn't collide with the other, then they will not collide.
+    // we don't have to set collision masks for both.
+    // rules:
+    // all dynamic objects collide with all environment objects and dynamic objects by default.
+    //    all dynamic objects have mask ALL on creation
+    //    group DYNAMIC on creation
+    // all environment objects collide with dynamic objects by default.
+    //    all environment objects have mask DYNAMIC on creation
+    //    group ENVIRONMENT on creation
+    // when dynamic object d is in bb of portal p, then d should not collide with p's host object.
+    //    on create p: set p host object group to PORTAL_HOST_CDISABLE[p]
+    //        p host object mask is still DYNAMIC
+    //    on trigger bb: set d mask to all except for PORTAL_HOST_CDISABLE[p]
+    //        d group is still DYNAMIC
+    //        d mask is its ALL & ~PORTAL_HOST_CDISABLE[p]
+    // pseudocode:
+    // on update loop:
+    // for each dynamic object d:
+    //     set mask to CGROUP_ALL
+    //     for each portal p:
+    //         if d in p's bounding box:
+    //             set mask &= ~CGROUP_PORTAL_HOST_CDISABLE[p]
+    //     no change to group.
+    // on creation of portal p:
+    //     set previous host object group back to CGROUP_ENVIRONMENT if in neither CGROUP_PORTAL_HOST_CDISABLE's
+    //     set new host object group &= CGROUP_PORTAL_HOST_CDISABLE[p]
+    //     no change to mask.
+    window.CGROUP_ENVIRONMENT = 1 << 0;
+    window.CGROUP_PORTAL_HOST_CDISABLE = [1 << 1, 1 << 2];
+    window.CGROUP_DYNAMIC = 1 << 3;
+    window.CGROUP_ALL = 0xFF;

@@ -62,6 +62,10 @@ $("body").on('click', '#view-fps', function () {
     })
 
     groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+
+    groundBody.collisionFilterGroup = window.CGROUP_ENVIRONMENT
+    groundBody.collisionFilterMask = window.CGROUP_DYNAMIC
+
     //window.CANNON_WORLD.addBody(groundBody);
 
     setTimeout(() => {
@@ -76,6 +80,7 @@ $("body").on('click', '#view-fps', function () {
         //window.ENTER_DOOR.visible = false;
 
         setTimeout(() => {
+            window.debugCol = false;
             $("#loading-parent").css("opacity", 0)
             $("#loading-parent").css("pointer-events", "none")
 
@@ -129,7 +134,12 @@ $("body").on('click', '#view-fps', function () {
 
         const matrix = new THREE.Matrix4();
 
+        var sideDown = [];
         var sideUp = [];
+        var sideFront = [];
+        var sideBack = [];
+        var sideRight = [];
+        var sideLeft = [];
 
         for (var i = 0; i < window.planeUserData.length; i++) {
 
@@ -140,15 +150,23 @@ $("body").on('click', '#view-fps', function () {
                         window.planeUserData[i].itemName != "exitDoor" ||
                         window.planeUserData[i].itemName != "window")) {
 
-
+                    if (window.planeUserData[i].side == "front")
+                        sideFront.push(window.planeUserData[i])
+                    else if (window.planeUserData[i].side == "back")
+                        sideBack.push(window.planeUserData[i])
+                    else if (window.planeUserData[i].side == "right")
+                        sideRight.push(window.planeUserData[i])
+                    else if (window.planeUserData[i].side == "left")
+                        sideLeft.push(window.planeUserData[i])
 
                     if (window.planeUserData[i].portal) {
 
                         if (window.planeUserData[i].side == "up") {
                             meshesFloorPortal.push(window.planeUserData[i])
+                            sideUp.push(window.planeUserData[i])
                         } else if (window.planeUserData[i].side == "down") {
                             meshesUpPortal.push(window.planeUserData[i])
-                            sideUp.push(window.planeUserData[i])
+                            sideDown.push(window.planeUserData[i])
                         } else {
                             meshesWallPortal.push(window.planeUserData[i]);
                         }
@@ -157,9 +175,10 @@ $("body").on('click', '#view-fps', function () {
 
                         if (window.planeUserData[i].side == "up") {
                             meshesFloorNonPortal.push(window.planeUserData[i])
+                            sideUp.push(window.planeUserData[i])
                         } else if (window.planeUserData[i].side == "down") {
                             meshesUpNonPortal.push(window.planeUserData[i])
-                            sideUp.push(window.planeUserData[i])
+                            sideDown.push(window.planeUserData[i])
                         } else {
                             meshesWallNonPortal.push(window.planeUserData[i]);
                         }
@@ -171,209 +190,13 @@ $("body").on('click', '#view-fps', function () {
 
         }
 
-        console.log(sideUp)
-        //GROUP COLUMNS
-
-        var colums = [];
-
-        for (var i = 0; i < sideUp.length; i++) {
-
-            var z = sideUp[i].position.z;
-            var row = [];
-
-            for (var j = 0; j < sideUp.length; j++) {
-
-                if (!sideUp[j].checked) {
-
-                    if (sideUp[j].position.z == z) {
-
-                        sideUp[j].position.checked = false;
-                        row.push(sideUp[j].position)
-                        sideUp[j].checked = true;
-
-                    }
-
-                }
-
-            }
-
-            if (row.length > 0) {
-                colums.push(row.sort((a, b) => a.x - b.x))
-            }
-
-        }
-
-        //TRANSFORM COLUM ARRAY IN A MATRIX
-
-        var columsNew = [];
-
-        for (var i = 0; i < colums.length; i++) {
-
-            columsNew.push([]);
-
-            for (var j = 0; j < colums[i].length; j++) {
-
-                var y = colums[i][j].y;
-                var row = [];
-
-                for (var c = 0; c < colums[i].length; c++) {
-
-                    if (!colums[i][c].checked) {
-
-                        if (colums[i][c].y == y) { //&& ((colums[i][c].x - 2) == row[row.length - 1].x)
-
-                            if (row.length > 0) {
-
-                                if (colums[i][c].x - 2 == row[row.length - 1].x) {
-
-                                    colums[i][c].checked = true;
-                                    row.push(colums[i][c])
-
-                                }else{
-                                    break;
-                                }
-
-                            } else {
-                                colums[i][c].checked = true;
-                                row.push(colums[i][c])
-                            }
-
-
-                        } else {
-                            break;
-                        }
-
-                    }
-
-                }
-
-                if (row.length > 0)
-                    columsNew[i].push(row);
-
-            }
-
-        }
-
-        console.log(colums)
-        console.log(columsNew)
-        var totalBodies = 0;
-
-        for (var i = 0; i < columsNew.length; i++) {
-
-            for (var j = 0; j < columsNew[i].length; j++) {
-
-                var shape = new CANNON.Box(new CANNON.Vec3(columsNew[i][j].length, 0.0001, 1));
-
-                var box = new CANNON.Body({
-                    mass: 0,
-                    shape: shape,
-                    material: window.PHYSICS_MATERIAL
-                })
-
-                var obj = new THREE.Object3D();
-                obj.position.copy(new THREE.Vector3(columsNew[i][j][0].x,
-                    columsNew[i][j][0].y,
-                    columsNew[i][j][0].z));
-                obj.translateY(10000);
-
-                box.position.copy(obj.position);
-
-                box.position.x += columsNew[i][j].length - 1;
-
-                window.CANNON_WORLD.addBody(box);
-                totalBodies++;
-
-            }
-
-        }
-
-        console.log(totalBodies)
-
-        //
-
-        /*for (var i = 0; i < colums.length; i++) {
-
-            var v = [];
-
-            for(var j =0; j<colums[i].length; j++){
-                v.push(colums[i][j].x)
-            }
-
-            xArray.push(v.sort())
-
-        }*/
-
-        //UP COLLIDERS
-        /*for (var i = 0; i < sideUp.length; i++) {
-
-            var mergedGroup = [];
-
-            //console.log(sideUp[i].merged)
-
-            if (!sideUp[i].merged && sideUp[i].itemName != "enterDoor") {
-
-                mergedGroup.push(sideUp[i])
-                sideUp[i].merged = true;
-
-                for (var j = 0, o = 2; j < 100; j++, o += 2) {
-
-                    if (sideUp[i].side == "left" || sideUp[i].side == "right") {
-                        var neighbour = getPlaneByName(sideUp, sideUp[i].position.x + "/" +
-                            sideUp[i].position.y + "/" +
-                            (sideUp[i].position.z + o))
-                    } else {
-                        var neighbour = getPlaneByName(sideUp, (sideUp[i].position.x + o) + "/" +
-                            sideUp[i].position.y + "/" +
-                            sideUp[i].position.z)
-                    }
-
-                    if (sideUp[i].side == "left" || sideUp[i].side == "right") {
-                        var shape = new CANNON.Box(new CANNON.Vec3(0.001, 1, mergedGroup.length));
-                    } else {
-                        var shape = new CANNON.Box(new CANNON.Vec3(mergedGroup.length, 0.001, 1));
-                    }
-
-                    //console.log(neighbour.length)
-
-                    if (neighbour.length == 0) {
-
-                        var box = new CANNON.Body({
-                            mass: 0,
-                            shape: shape,
-                            material: window.PHYSICS_MATERIAL
-                        })
-
-                        var obj = new THREE.Object3D();
-                        obj.position.copy(sideUp[i].position);
-                        obj.translateY(10000)
-
-                        box.position.copy(obj.position);
-
-                        if (sideUp[i].side == "left" || sideUp[i].side == "right")
-                            box.position.z += mergedGroup.length - 1;
-                        else
-                            box.position.x += mergedGroup.length - 1;
-
-                        if (sideUp[i].side == "back" || sideUp[i].side == "front")
-                            box.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
-
-                        window.CANNON_WORLD.addBody(box);
-
-                        console.log("ooooooooo")
-
-                        break;
-                    } else {
-
-                        //console.log(neighbour)
-                        mergedGroup.push(neighbour[0])
-                        neighbour[0].merged = true;
-
-                    }
-                }
-
-                //console.log(mergedGroup)
-            }
-        }*/
+        colliderRoom(sideDown, "down", "z", "x", "y", "x");
+        colliderRoom(sideUp, "up", "z", "x", "y", "x");
+        colliderRoom(sideFront, "front", "y", "x", "z", "x");
+        colliderRoom(sideBack, "back", "y", "x", "z", "x");
+        colliderRoom(sideRight, "right", "y", "z", "x", "z");
+        colliderRoom(sideLeft, "left", "y", "z", "x", "z");
+        console.log("TOTAL BODIES COLLIDERS: " + totalBodies);
 
         window.horizontal = [];
         window.vertical = [];
@@ -426,6 +249,9 @@ $("body").on('click', '#view-fps', function () {
         window.OBSERVATION_ROOM.getWorldQuaternion(quat);
         OBSERVATION_ROOM.quaternion.copy(quat)
 
+        OBSERVATION_ROOM.collisionFilterGroup = window.CGROUP_ENVIRONMENT
+        OBSERVATION_ROOM.collisionFilterMask = window.CGROUP_DYNAMIC
+
         window.CANNON_WORLD.addBody(OBSERVATION_ROOM);
 
         //---------------------------------------------------------
@@ -433,9 +259,6 @@ $("body").on('click', '#view-fps', function () {
         //
         var target = new THREE.Vector3(); // create once an reuse it
         window.room_light.getWorldPosition(target);
-
-
-        console.log(window.room_light)
 
         window.LIGHT_GROUP.getObjectByName("spotLightMain").position.copy(target);
         window.LIGHT_GROUP.getObjectByName("spotLightMain").translateY(-1);
@@ -451,9 +274,7 @@ $("body").on('click', '#view-fps', function () {
         window.LIGHT_GROUP.getObjectByName("spotLightMain").target = obj;
         window.MAIN_SCENE.add(window.GUN);
         window.GUN.children[0].add(window.lightningStrikeMesh, window.lightningStrikeMesh2, window.lightningStrikeMesh3);
-        window.GUN.visible = true;
-
-        console.log(window.GUN)
+        window.GUN.visible = false;
 
         /*mesh.renderOrder = zindex || 999;
         mesh.material.depthTest = false;
@@ -539,19 +360,157 @@ $("body").on('click', '#view-fps', function () {
 
         createInstances(meshesWallPortal, window.materialWallPortal)
         createInstances(meshesWallNonPortal, window.materialWallNonPortal)
-        createInstances(meshesFloorPortal, window.materialFloorPortal)
-        createInstances(meshesFloorNonPortal, window.materialFloorNonPortal)
-        createInstances(meshesUpPortal, materialUpPortal)
-        createInstances(meshesUpNonPortal, materialUpNonPortal)
+        createInstances(meshesFloorPortal, materialUpPortal)
+        createInstances(meshesFloorNonPortal, materialUpNonPortal)
+        createInstances(meshesUpPortal, window.materialFloorPortal)
+        createInstances(meshesUpNonPortal, window.materialFloorNonPortal)
 
         window.MAIN_SCENE.remove(window.ROOM);
 
         window.RENDERER.renderLists.dispose();
         window.ENTER_DOOR.children[1].visible = false;
-
-        console.log(window.MAIN_SCENE)
     }, 500);
 });
+
+var totalBodies = 0;
+
+function colliderRoom(array, side, a1, a2, a3, a4) {
+
+    //GROUP COLUMNS
+
+    var colums = [];
+
+    for (var i = 0; i < array.length; i++) {
+
+        var z = array[i].position[a1];
+        var row = [];
+
+        for (var j = 0; j < array.length; j++) {
+
+            if (!array[j].checked) {
+
+                if (array[j].position[a1] == z) {
+
+                    array[j].position.checked = false;
+                    array[j].position.i = array[j].id_instanced;
+                    row.push(array[j].position)
+                    array[j].checked = true;
+
+                }
+
+            }
+
+        }
+
+        if (row.length > 0) {
+            colums.push(row.sort((a, b) => a[a2] - b[a2]))
+        }
+
+    }
+
+    //TRANSFORM COLUM ARRAY IN A MATRIX
+
+    //console.log(colums)
+
+    var columsNew = [];
+
+    for (var i = 0; i < colums.length; i++) {
+
+        columsNew.push([]);
+
+        for (var j = 0; j < colums[i].length; j++) {
+
+            var y = colums[i][j][a3];
+            var row = [];
+
+            for (var c = 0; c < colums[i].length; c++) {
+
+                if (!colums[i][c].checked) {
+
+                    if (colums[i][c][a3] == y) { //&& ((colums[i][c].x - 2) == row[row.length - 1].x)
+
+                        if (row.length > 0) {
+
+                            if (colums[i][c][a2] - 2 == row[row.length - 1][a2]) {
+
+                                colums[i][c].checked = true;
+                                row.push(colums[i][c])
+
+                            } else {
+                                //break;
+                            }
+
+                        } else {
+                            colums[i][c].checked = true;
+                            row.push(colums[i][c])
+                        }
+
+
+                    } else {
+                        //break;
+                    }
+
+                }
+
+            }
+
+            if (row.length > 0)
+                columsNew[i].push(row);
+
+        }
+
+    }
+
+    for (var i = 0; i < columsNew.length; i++) {
+
+        for (var j = 0; j < columsNew[i].length; j++) {
+
+            var shapeDimension;
+
+            if (side == "up" || side == "down")
+                shapeDimension = new CANNON.Vec3(columsNew[i][j].length, 0.1, 1)
+            else if (side == "front" || side == "back")
+                shapeDimension = new CANNON.Vec3(columsNew[i][j].length, 1, 0.1)
+            else if (side == "right" || side == "left")
+                shapeDimension = new CANNON.Vec3(0.0001, 1, columsNew[i][j].length)
+
+            var shape = new CANNON.Box(shapeDimension);
+
+            var box = new CANNON.Body({
+                mass: 0,
+                shape: shape,
+                material: window.PHYSICS_MATERIAL
+            })
+
+            var obj = new THREE.Object3D();
+            obj.position.copy(new THREE.Vector3(columsNew[i][j][0].x,
+                columsNew[i][j][0].y,
+                columsNew[i][j][0].z));
+            obj.translateY(10000);
+
+            box.position.copy(obj.position);
+
+            box.position[a4] += columsNew[i][j].length - 1;
+
+            box.collisionFilterGroup = window.CGROUP_ENVIRONMENT
+            box.collisionFilterMask = window.CGROUP_DYNAMIC
+
+            for(var c = 0; c<columsNew[i][j].length; c++){
+                window.planeUserData[columsNew[i][j][c].i].body = box;
+            }
+
+            //window.planeUserData[columsNew[i][j][0].i].body = box;
+            //console.log(columsNew[i][j])
+            //console.log(window.planeUserData[columsNew[i][j][0].i])
+
+            window.CANNON_WORLD.addBody(box);
+            totalBodies++;
+
+        }
+
+    }
+
+}
 
 function getPlaneByName(array, name) {
     return array.filter(
@@ -618,6 +577,9 @@ function corridorCollider(parent, name, x, y, z, state) {
     parent.getObjectByName(name).getWorldQuaternion(quat)
 
     wall.quaternion.copy(quat);
+
+    wall.collisionFilterGroup = window.CGROUP_ENVIRONMENT
+    wall.collisionFilterMask = window.CGROUP_DYNAMIC
 
     window.CANNON_WORLD.addBody(wall);
 

@@ -255,37 +255,42 @@ for (var i = 0; i < 1500; i++) {
 
 function buildIniCubes(obj) {
 
-    const geometry = new THREE.PlaneGeometry(2, 2);
+    if (!window.loadedLevel) {
 
-    window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 1500);
-    window.instancedMesh.position.y = 10000;
-    window.instancedMesh.castShadow = true;
-    window.instancedMesh.receiveShadow = true;
-    window.instancedMesh.name = "cube-parent";
-    window.CUBES.add(window.instancedMesh);
+        const geometry = new THREE.PlaneGeometry(2, 2);
 
-    //GROUND
-    buildLayer(-1, -1, -10000, 'x', 'z', 'y', 6, 8, "down", new THREE.Vector3(-Math.PI / 2, 0, 0));
-    //CEILING
-    buildLayer(-1, -1, -9992, 'x', 'z', 'y', 6, 8, "up", new THREE.Vector3(Math.PI / 2, 0, 0));
-    //WALL FRONT
-    buildLayer(-1, -10001, 0, 'x', 'y', 'z', 4, 8, "front", new THREE.Vector3(0, 0, 0));
-    //WALL BACK
-    buildLayer(-1, -10001, 12, 'x', 'y', 'z', 4, 8, "back", new THREE.Vector3(0, Math.PI, 0));
-    //WALL RIGHT
-    buildLayer(-1, -10001, 16, 'z', 'y', 'x', 4, 6, "right", new THREE.Vector3(0, -Math.PI / 2, 0));
-    //WALL LEFT
-    buildLayer(-1, -10001, 0, 'z', 'y', 'x', 4, 6, "left", new THREE.Vector3(0, Math.PI / 2, 0));
+        window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 1500);
+        window.instancedMesh.position.y = 10000;
+        window.instancedMesh.castShadow = true;
+        window.instancedMesh.receiveShadow = true;
+        window.instancedMesh.name = "cube-parent";
+        window.CUBES.add(window.instancedMesh);
 
-    //console.log(window.instancedMesh);
-    //console.log(window.planeUserData);
+        //GROUND
+        buildLayer(-1, -1, -10000, 'x', 'z', 'y', 6, 8, "down", new THREE.Vector3(-Math.PI / 2, 0, 0));
+        //CEILING
+        buildLayer(-1, -1, -9992, 'x', 'z', 'y', 6, 8, "up", new THREE.Vector3(Math.PI / 2, 0, 0));
+        //WALL FRONT
+        buildLayer(-1, -10001, 0, 'x', 'y', 'z', 4, 8, "front", new THREE.Vector3(0, 0, 0));
+        //WALL BACK
+        buildLayer(-1, -10001, 12, 'x', 'y', 'z', 4, 8, "back", new THREE.Vector3(0, Math.PI, 0));
+        //WALL RIGHT
+        buildLayer(-1, -10001, 16, 'z', 'y', 'x', 4, 6, "right", new THREE.Vector3(0, -Math.PI / 2, 0));
+        //WALL LEFT
+        buildLayer(-1, -10001, 0, 'z', 'y', 'x', 4, 6, "left", new THREE.Vector3(0, Math.PI / 2, 0));
 
-    /*var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.planeUserData));
+        //console.log(window.instancedMesh);
+        //console.log(window.planeUserData);
+    }
+}
+
+$("body").on('click', '#save-level', function () {
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.planeUserData));
     var dlAnchorElem = document.createElement('a');
     dlAnchorElem.setAttribute("href", dataStr);
     dlAnchorElem.setAttribute("download", "scene.json");
-    dlAnchorElem.click();*/
-}
+    dlAnchorElem.click();
+})
 
 function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
 
@@ -308,8 +313,6 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
             clone.updateMatrix();
             window.instancedMesh.setMatrixAt(a, clone.matrix);
 
-            var target = new THREE.Vector3();
-            clone.getWorldPosition(target);
             var portal;
 
             if (clone.position.x <= 5 && clone.position.z >= 7 && clone.position.y <= -10000 + 5) {
