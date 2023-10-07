@@ -171,35 +171,11 @@ function loadGun() {
 
             child.renderOrder = -1;
 
-            if (child.name.includes("lightBloom")) {
-                child.material = gunBasic;
-                //window.SELECTED_OBJECTS_FOR_BLOOM.add(child);
-                window.GUN_BLOOM = child.material;
-
-                const light = new THREE.PointLight(0xffffff, 1, 0.1);
-                light.position.set(0, 0, 0);
-                //child.add(light);
-            }
-
-            if (child.name == "lightBloom") {
-                window.orbGun = child;
-                child.material.visible = false;
-
-                const geometry = new THREE.BoxGeometry(0.01, 0.01, 0.01);
-                const material = new THREE.MeshBasicMaterial({
-                    color: 0x00ff00
-                });
-                const cube = new THREE.Mesh(geometry, material);
-
-                var target = new THREE.Vector3(); // create once an reuse it
-                window.orbGun.getWorldPosition(target);
-                cube.position.copy(target);
-
-                window.orbGun.add(cube);
-                //window["ddd"]();
-            }
-
-            if (child.name == "cube_1")
+            if(child.name == "sphere"){
+                window.GUN_SPHERE = child;
+            }else if(child.name == "cylinder"){
+                window.GUN_CYLINDER = child;
+            }else if (child.name == "cube_1")
                 window.cube_1 = child;
             else if (child.name == "cube_2")
                 window.cube_2 = child;
@@ -213,7 +189,10 @@ function loadGun() {
         //console.log(window.holder.position)
         window.GUN.name = "GUN";
         window.MAIN_SCENE.add(window.GUN);
-        gltf.scene.position.set(0.12, -0.14, -0.13);
+
+        //gltf.scene.position.set(0.12, -0.14, -0.13);
+        gltf.scene.scale.set(0.1, 0.1, 0.1)
+        gltf.scene.position.set(0.01, -0.012, -0.011);
         loadExitDoor()
 
         const geometry = new THREE.SphereGeometry(0.01, 32, 16);

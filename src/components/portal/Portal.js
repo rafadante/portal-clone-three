@@ -28,8 +28,6 @@ class Portal extends Group {
         this.plane = new THREE.Plane(new Vector3(0, 1, 0), 0)
         this.debugMeshes = new Group()
 
-        console.log(playerUpDirection)
-
         // create onb for bb transformations
         this.ty = normal.clone().normalize()
         this.tz = playerUpDirection.clone().projectOnPlane(this.ty).normalize()
@@ -159,8 +157,6 @@ class Portal extends Group {
         //this.ringMesh.rotation.set(0,0,0);
         this.ringMesh.visible = false;
         //this.add(this.ringMesh)
-
-        console.log(window.wallName)
 
 
         //this.translateZ(1)

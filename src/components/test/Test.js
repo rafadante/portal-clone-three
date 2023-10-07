@@ -274,7 +274,12 @@ $("body").on('click', '#view-fps', function () {
         window.LIGHT_GROUP.getObjectByName("spotLightMain").target = obj;
         window.MAIN_SCENE.add(window.GUN);
         window.GUN.children[0].add(window.lightningStrikeMesh, window.lightningStrikeMesh2, window.lightningStrikeMesh3);
-        window.GUN.visible = false;
+        window.GUN.visible = true;
+
+        //window.GUN_SPHERE.material = window.materialGun;
+        //window.GUN_CYLINDER.material = window.materialGun;
+
+
 
         /*mesh.renderOrder = zindex || 999;
         mesh.material.depthTest = false;
@@ -495,7 +500,7 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
             box.collisionFilterGroup = window.CGROUP_ENVIRONMENT
             box.collisionFilterMask = window.CGROUP_DYNAMIC
 
-            for(var c = 0; c<columsNew[i][j].length; c++){
+            for (var c = 0; c < columsNew[i][j].length; c++) {
                 window.planeUserData[columsNew[i][j][c].i].body = box;
             }
 

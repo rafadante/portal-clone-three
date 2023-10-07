@@ -561,8 +561,6 @@ function loadLevel(data) {
 
     var clone = new THREE.Object3D();
 
-    //console.log(data.length)
-
     for (var i = 0; i < data.length; i++) {
 
         if (data[i].exists) {

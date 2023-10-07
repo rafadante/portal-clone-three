@@ -21,7 +21,7 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
 }
 
 //
-var camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.01, 1000);
+var camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.005, 1000);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 

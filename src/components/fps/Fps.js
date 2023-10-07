@@ -245,19 +245,10 @@ function player() {
                     }
 
                     window.PLAYER.inJump = (contactNormal.dot(upVector) <= 0.5);
-                    //console.log(window.PLAYER.inJump)
                 }
             }
         }
     })
-
-    /*window.PLAYER.addEventListener("collide", function (e) {
-        console.log("The sphere just collided with the ground!");
-        console.log("Collided with body:", e.body);
-        console.log("Contact between bodies:", e.contact);
-    });*/
-
-    console.log(window.PLAYER)
 
     dynamicObjects.push(window.PLAYER);
 
@@ -294,7 +285,7 @@ document.addEventListener('keydown', (event) => {
 
     if (event.code == "ControlLeft" && !crouched) {
 
-        console.log(window.RENDERER.info.render.calls)
+        //console.log(window.RENDERER.info.render.calls)
 
     }
 
@@ -550,7 +541,7 @@ document.getElementById("portal_l").addEventListener('pointerdown', portal_l_Tou
 
 function portal_l_Touch() {
     allowPlacePortals = true;
-    portalButton(0)
+    portalButton(0);
 }
 //RIGHT PORTAL MOBILE
 document.getElementById("portal_r").addEventListener('pointerdown', portal_r_Touch, false);
@@ -587,11 +578,6 @@ function portalButton(button) {
 
         raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
         var intersects = raycaster2.intersectObject(window.instancedMesh);
-
-        if (intersects.length > 0) {
-            console.log(intersects[0])
-            console.log(window.planeUserData[intersects[0].instanceId])
-        }
 
         if (intersects.length > 0) {
 
@@ -730,7 +716,7 @@ function portalButton(button) {
 
                 // define playerUpDirection
                 let playerUpDirection = new THREE.Vector3(0, 1, 0)
-                
+
 
 
                 var normal;
@@ -774,8 +760,6 @@ function portalButton(button) {
                     point.clone().add(depthDir.clone().multiplyScalar(portal_depth / 2 + EPS).add(widthDir.clone().multiplyScalar(-portal_width / 2 - EPS)))
                 ]
 
-                console.log(userData.body)
-
                 if (button == 0) { // left click
                     // delete the old portal this new one is replacing
                     if (window.PORTALS[0] !== null) {
@@ -788,7 +772,7 @@ function portalButton(button) {
                     }
 
                     createPortal(0, 1, point, normal, userData.body, playerUpDirection, portalPoints)
-                    window.GUN_BLOOM.color = new THREE.Color(0xFFDB82);
+                    //window.GUN_BLOOM.color = new THREE.Color(0xFFDB82);
                 } else if (button == 2) { // left click
                     // delete the old portal this new one is replacing
                     if (window.PORTALS[1] !== null) {
@@ -802,59 +786,13 @@ function portalButton(button) {
                     }
 
                     createPortal(1, 0, point, normal, userData.body, playerUpDirection, userData.rotation)
-                    window.GUN_BLOOM.color = new THREE.Color(0x76EBFF);
+                    //window.GUN_BLOOM.color = new THREE.Color(0x76EBFF);
                 }
             } else {
                 //intersects[0].object.visible = false;
             }
 
         }
-
-        /*raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
-        var intersects = raycaster2.intersectObjects(window.nonPortal);
-
-        if (intersects.length > 0) {
-            for (var i = 0; i < intersects.length; i++) {
-                if (intersects[i].object.visible && !intersects[i].object.userData.portal) {
-
-                    //
-                    var obj = intersects[i].object;
-
-                    if (button == 0) {
-                        window.particlesGunGroup2.rotation.set(0, 0, 0);
-
-                        if (obj.name == "back") {
-                            window.particlesGunGroup2.rotation.x = Math.PI / 2;
-                        } else if (obj.name == "front") {
-                            window.particlesGunGroup2.rotation.x = -Math.PI / 2;
-                        } else if (obj.name == "right") {
-                            window.particlesGunGroup2.rotation.z = Math.PI / 2;
-                        } else if (obj.name == "left") {
-                            window.particlesGunGroup2.rotation.z = -Math.PI / 2;
-                        } else if (obj.name == "down") {
-                            window.particlesGunGroup2.rotation.y = Math.PI;
-                        }
-                    } else if (button == 2) {
-                        window.particlesGunGroup2.rotation.set(0, 0, 0);
-
-                        if (obj.name == "back") {
-                            window.particlesGunGroup2.rotation.x = Math.PI / 2;
-                        } else if (obj.name == "front") {
-                            window.particlesGunGroup2.rotation.x = -Math.PI / 2;
-                        } else if (obj.name == "right") {
-                            window.particlesGunGroup2.rotation.z = Math.PI / 2;
-                        } else if (obj.name == "left") {
-                            window.particlesGunGroup2.rotation.z = -Math.PI / 2;
-                        } else if (obj.name == "down") {
-                            window.particlesGunGroup2.rotation.y = Math.PI;
-                        }
-                    }
-                    //
-                    break;
-                }
-            }
-        }*/
-        //}
     }
 }
 
@@ -881,7 +819,6 @@ function createPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObje
         portalPoints)
     window.PORTALS[thisPortalIndex].mesh.scale.set(0, 0, 0);
     window.PORTALS[thisPortalIndex].portalShader.scale.set(0, 0, 0);
-    console.log(window.PORTALS[thisPortalIndex])
 
     window.PORTALS[thisPortalIndex].hostObjects.collisionFilterGroup |= window.CGROUP_PORTAL_HOST_CDISABLE[thisPortalIndex]
     // remove this object from the environment group
@@ -930,26 +867,6 @@ document.body.addEventListener('mousemove', (event) => { //rafa
 
 let shouldJump = false;
 window.rotationMobile = 0.1;
-
-function updateStick(elementId, leftRightAxis, upDownAxis) {
-    const multiplier = 25;
-    const stickLeftRight = leftRightAxis * multiplier;
-    const stickUpDown = upDownAxis * multiplier;
-
-    /*const stick = document.getElementById(elementId);
-    const x = Number(stick.dataset.originalXPosition);
-    const y = Number(stick.dataset.originalYPosition);
-
-    stick.setAttribute("cx", x + stickLeftRight);
-    stick.setAttribute("cy", y + stickUpDown);*/
-
-    console.log(stickLeftRight)
-}
-
-function handleSticks(axes) {
-    updateStick("controller-b10", axes[0], axes[1]);
-    //updateStick("controller-b11", axes[2], axes[3]);
-}
 
 const updatePlayer = function (deltaTime) {
 
@@ -1079,51 +996,92 @@ const updatePlayer = function (deltaTime) {
         shouldJump = false;
 
     } else {
-
+        var gamepad;
         if (controllerIndex !== null) {
-            const gamepad = navigator.getGamepads()[controllerIndex];
+            gamepad = navigator.getGamepads()[controllerIndex];
             //handleButtons(gamepad.buttons);
             //handleSticks(gamepad.axes);
 
-            if (gamepad.axes[2] == 1) {
-                window.MAIN_CAMERA.rotation.y -= 0.03;
+            if (gamepad.buttons[6].value > 0) {
+
+                portalButton(0);
+
+                gamepad.vibrationActuator.playEffect("dual-rumble", {
+                    startDelay: 0,
+                    duration: 200,
+                    weakMagnitude: 1.0,
+                    strongMagnitude: 1.0,
+                });
             }
 
-            if (gamepad.axes[2] == -1) {
-                window.MAIN_CAMERA.rotation.y += 0.03;
+            if (gamepad.buttons[7].value > 0) {
+
+                portalButton(2);
+
+                gamepad.vibrationActuator.playEffect("dual-rumble", {
+                    startDelay: 0,
+                    duration: 200,
+                    weakMagnitude: 1.0,
+                    strongMagnitude: 1.0,
+                });
             }
 
-            if (gamepad.axes[3] == -1) {
-                window.MAIN_CAMERA.rotation.x += 0.03;
+            if (gamepad.axes[2] > 0.5) {
+                window.MAIN_CAMERA.rotation.y -= 0.05;
             }
 
-            if (gamepad.axes[3] == 1) {
-                window.MAIN_CAMERA.rotation.x -= 0.03;
+            if (gamepad.axes[2] < -0.5) {
+                window.MAIN_CAMERA.rotation.y += 0.05;
             }
 
-            if (gamepad.axes[1] == -1) {
+            if (gamepad.axes[3] < -0.5) {
+                window.MAIN_CAMERA.rotation.x += 0.025;
+            }
+
+            if (gamepad.axes[3] > 0.5) {
+                window.MAIN_CAMERA.rotation.x -= 0.025;
+            }
+
+            //
+            var gamepadPressed = 0;
+
+            if (gamepad.axes[1] < -0.5) {
                 window.PLAYER.applyForce(forward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
                 //if (!window.IN_VICTORY) {hideInstructions()}
                 moving = true;
+                gamepadPressed++;
+                headBobActive = true;
             }
 
-            if (gamepad.axes[1] == 1) {
+            if (gamepad.axes[1] > 0.5) {
                 window.PLAYER.applyForce(backward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
                 //if (!window.IN_VICTORY) {hideInstructions()}
                 moving = true;
+                gamepadPressed++;
+                headBobActive = true;
             }
 
-            if (gamepad.axes[0] == -1) {
+            if (gamepad.axes[0] < -0.5) {
                 window.PLAYER.applyForce(left.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
                 //if (!window.IN_VICTORY) {hideInstructions()}
                 moving = true;
+                gamepadPressed++;
+                headBobActive = true;
             }
 
-            if (gamepad.axes[0] == 1) {
+            if (gamepad.axes[0] > 0.5) {
                 window.PLAYER.applyForce(right.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
                 //if (!window.IN_VICTORY) {hideInstructions()}
                 moving = true;
+                gamepadPressed++;
+                headBobActive = true;
             }
+
+            if (gamepadPressed == 0) {
+                moving = false;
+                headBobActive = false;
+            }
+
         }
 
         if (controller["KeyW"].pressed && !window.COL_Z) {
@@ -1149,7 +1107,13 @@ const updatePlayer = function (deltaTime) {
 
         shouldJump = false;
         // handle jumping when space bar is pressed
-        if (controller["Space"].pressed && !window.PLAYER.inJump) {
+
+        if (controllerIndex !== null) {
+            if (gamepad.buttons[0].value > 0 && !window.PLAYER.inJump) {
+                shouldJump = true;
+                //if (!window.IN_VICTORY) {hideInstructions()}
+            }
+        } else if (controller["Space"].pressed && !window.PLAYER.inJump) {
             shouldJump = true;
             //if (!window.IN_VICTORY) {hideInstructions()}
         }
@@ -1177,10 +1141,14 @@ const updatePlayer = function (deltaTime) {
         window.GUN.children[0].position.x += Math.sin(headBobTimer * headBobSpeed) * headBobHeight;
     }
 
-
-    const smoothness = 0.1; // 0 to 1 only
+    //smoothness = 0.1; // 0 to 1 only
     const targetPosition = window.MAIN_CAMERA.quaternion.clone();
+
+    //if(){
     window.GUN.quaternion.slerp(targetPosition, smoothness);
+    //}else{
+    //window.GUN.rotation.copy(window.MAIN_CAMERA.rotation)
+    //}
 
     raycast();
     updateHeadBob(deltaTime);
@@ -1188,9 +1156,10 @@ const updatePlayer = function (deltaTime) {
 
 var headBobTimer = 0;
 var headBobSpeed = 3;
-var headBobHeight = 0.001;
+var headBobHeight = 0.00005;
 var headBobActive = false;
 var repositioningGUn = false;
+var smoothness = 0.1;
 
 const updateHeadBob = function (deltaTime) {
     if (headBobActive && moving) {
@@ -1221,8 +1190,6 @@ function raycast() {
             //onsole.log(intersects[0].distance)
             if (intersects[0].distance < 0.1) {
                 leveEntered = true;
-
-                console.log("entered")
 
                 setTimeout(() => {
                     window.wallCorridorEnter.position.y = 0;
@@ -1320,21 +1287,18 @@ function raycast() {
         //d.meshClone.visible = false
         let CDBB_isOverlap = false;
 
-        //console.log(pos)
+        var inArea = 0;
+
         for (let p = 0; p < window.PORTALS.length; p++) {
 
             // collision disable, might be partially intersecting with portal
             if (window.PORTALS[p].CDBB.containsPoint(pos)) {
                 d.collisionFilterMask &= ~window.PORTALS[p].hostObjects.collisionFilterGroup
-                //console.log(d.collisionFilterMask)
-
+                inArea++;
             }
-
-
 
             // should teleport
             if (window.PORTALS[p].STBB.containsPoint(pos)) {
-                //console.log(d)
 
                 teleportPhysicalObject(d, window.PORTALS[p])
                 teleportObject3D(window.MAIN_CAMERA, window.PORTALS[p])
@@ -1357,88 +1321,12 @@ function raycast() {
 
         }
 
+        if (inArea > 0)
+            smoothness = 1;
+        else
+            smoothness = 0.1;
+
     }
-
-    /*raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
-    var intersects = raycaster2.intersectObjects(portals);
-    //console.log(intersects.length)
-    if (intersects && intersects.length > 0 && !teleporting) {
-
-        //console.log(intersects[0].distance)
-
-        if (intersects[0].distance < 0.1) {
-
-            var pos;
-
-            if (intersects[0].object.userData.this == 0) {
-                pos = portals[1].position;
-            } else {
-                pos = portals[0].position;
-            }
-
-            var directionOther = new THREE.Vector3(0, 1, 0).applyQuaternion(portals[intersects[0].object.userData.other].quaternion);
-            var directionThis = new THREE.Vector3(0, 1, 0).applyQuaternion(portals[intersects[0].object.userData.this].quaternion);
-
-            var reflectedPosition = new THREE.Vector3();
-            portals[intersects[0].object.userData.this].worldToLocal(reflectedPosition.copy(window.MAIN_CAMERA.position));
-
-            if (directionOther.z == -1) {
-                reflectedPosition.x *= -1.0;
-                reflectedPosition.z *= 1.0;
-
-                if (directionThis.equals(directionOther)) {
-                    window.MAIN_CAMERA.rotation.y -= Math.PI;
-                } else {
-                    if (Math.abs(directionThis.x) == 1) {
-                        window.MAIN_CAMERA.rotation.y -= Math.PI / 2 * directionThis.x;
-                    }
-                }
-            } else if (directionOther.z == 1) {
-                reflectedPosition.x *= 1.0;
-                reflectedPosition.z *= 1.0;
-
-                if (directionThis.equals(directionOther)) {
-                    window.MAIN_CAMERA.rotation.y += Math.PI;
-                } else {
-                    if (Math.abs(directionThis.x) == 1) {
-                        window.MAIN_CAMERA.rotation.y += Math.PI / 2 * directionThis.x;
-                    }
-                }
-            } else if (directionOther.x == -1) {
-                reflectedPosition.x *= 1.0;
-                reflectedPosition.z *= 1.0;
-
-                if (directionThis.equals(directionOther)) {
-                    window.MAIN_CAMERA.rotation.y -= Math.PI;
-                } else {
-                    if (Math.abs(directionThis.z) == 1) {
-                        window.MAIN_CAMERA.rotation.y += Math.PI / 2 * directionThis.z;
-                    }
-                }
-            } else if (directionOther.x == 1) {
-                reflectedPosition.x *= 1.0;
-                reflectedPosition.z *= 1.0;
-
-                if (directionThis.equals(directionOther)) {
-                    window.MAIN_CAMERA.rotation.y += Math.PI;
-                } else {
-                    if (Math.abs(directionThis.z) == 1) {
-                        window.MAIN_CAMERA.rotation.y -= Math.PI / 2 * directionThis.z;
-                    }
-                }
-            }
-
-            portals[intersects[0].object.userData.other].localToWorld(reflectedPosition);
-            window.MAIN_CAMERA.position.copy(reflectedPosition);
-
-            window.PLAYER.position.copy(reflectedPosition)
-
-            teleporting = true;
-            //setTimeout(() => {
-            teleporting = false;
-            //}, 1000);
-        }
-    }*/
 }
 
 // teleport a 3D object directly, returns nothing

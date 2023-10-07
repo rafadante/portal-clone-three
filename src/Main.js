@@ -502,9 +502,16 @@ function animatePortal() {
     // times when it is going to be viewed by the portal
     window.RENDERER.autoClearStencil = false;
     //window.ambient.intensity = 0;
+
+    window.GUN.children[0].children[0].scale.set(1, 1, 1)
+    window.GUN.children[0].children[0].position.set(0.12, -0.14, -0.13);
+
     renderPortal2(0, 1)
     renderPortal2(1, 0)
     //window.ambient.intensity = 0.15;
+
+    window.GUN.children[0].children[0].scale.set(0.1, 0.1, 0.1)
+    window.GUN.children[0].children[0].position.set(0.01, -0.012, -0.011);
 
     if (window.PORTALS[0] === null && window.PORTALS[1] !== null) {
         window.PORTALS[1].mesh.visible = false
