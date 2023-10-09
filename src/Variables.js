@@ -8,7 +8,7 @@ window.fps = 60;
 var pixelRatio, shadowMap, portalsRecursive, fov;
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     window.mobile = true;
-    pixelRatio = 1;
+    pixelRatio = 0.5;
     shadowMap = true;
     portalsRecursive = 1;
     fov = 70;
@@ -218,20 +218,19 @@ map = new THREE.TextureLoader().load('./assets/textures/floor2/base.jpg');
 map.encoding = THREE.sRGBEncoding;
 materialFloorNonPortal.map = map;
 
-map = new THREE.TextureLoader().load('./assets/textures/floor2/ao.jpg');
-//materialFloorNonPortal.aoMap = map;
-
 map = new THREE.TextureLoader().load('./assets/textures/floor2/normal.jpg');
 materialFloorNonPortal.normalMap = map;
 
 map = new THREE.TextureLoader().load('./assets/textures/floor2/roughness.jpg');
-//materialFloorNonPortal.roughnessMap = map;
+materialFloorNonPortal.roughnessMap = map;
+
 //MATERIAL FLOOR PORTAL
 window.materialFloorPortal = materialFloorNonPortal.clone();
 
 map = new THREE.TextureLoader().load('./assets/textures/floor2/base2.jpg');
 map.encoding = THREE.sRGBEncoding;
 materialFloorPortal.map = map;
+
 //MATERIAL WALL PORTAL
 window.materialWallPortal = new THREE.MeshPhysicalMaterial({
     side: 2,
@@ -239,30 +238,20 @@ window.materialWallPortal = new THREE.MeshPhysicalMaterial({
 
 map = new THREE.TextureLoader().load('./assets/textures/wall4/base.jpg');
 map.encoding = THREE.sRGBEncoding;
-//map.colorSpace = THREE.SRGBColorSpace;
 map.flipY = true;
-map.wrapS = map.wrapT = THREE.RepeatWrapping;
-map.repeat.set(0.5, 0.5);
+//map.wrapS = map.wrapT = THREE.RepeatWrapping;
+//map.repeat.set(0.5, 0.5);
 materialWallPortal.map = map;
 
-map = new THREE.TextureLoader().load('./assets/textures/wall/2/ao.jpg');
-map.wrapS = map.wrapT = THREE.RepeatWrapping;
-map.repeat.set(2, 2);
-//map.colorSpace = THREE.SRGBColorSpace;
-//materialWallPortal.aoMap = map;
-
 map = new THREE.TextureLoader().load('./assets/textures/wall/2/normal.jpg');
-//map.encoding = THREE.sRGBEncoding;
-//map.colorSpace = THREE.SRGBColorSpace;
-map.wrapS = map.wrapT = THREE.RepeatWrapping;
-map.repeat.set(2, 2);
+//map.wrapS = map.wrapT = THREE.RepeatWrapping;
+//map.repeat.set(2, 2);
 materialWallPortal.normalMap = map;
 
 map = new THREE.TextureLoader().load('./assets/textures/wall/2/roughness.jpg');
-map.wrapS = map.wrapT = THREE.RepeatWrapping;
-map.repeat.set(2, 2);
+//map.wrapS = map.wrapT = THREE.RepeatWrapping;
+//map.repeat.set(2, 2);
 materialWallPortal.roughnessMap = map;
-
 
 //MATERIAL NON WALL PORTAL
 window.materialWallNonPortal = materialWallPortal.clone();
@@ -270,9 +259,30 @@ window.materialWallNonPortal = materialWallPortal.clone();
 map = new THREE.TextureLoader().load('./assets/textures/wall4/base3.jpg');
 map.encoding = THREE.sRGBEncoding;
 map.wrapS = map.wrapT = THREE.RepeatWrapping;
-//map.repeat.set(0.5, 0.5);
 materialWallNonPortal.map = map;
-//
+
+//MATERIAL NON PORTAL 2 
+window.materialWallNonPortal2 = new THREE.MeshPhysicalMaterial({
+    metalness: 1,
+    roughness: 0.5
+});
+map = new THREE.TextureLoader().load('./assets/textures/NonPortal/1/base.jpg');
+map.encoding = THREE.sRGBEncoding;
+window.materialWallNonPortal2.map = map;
+
+map = new THREE.TextureLoader().load('./assets/textures/NonPortal/1/normal.jpg');
+window.materialWallNonPortal2.normalMap = map;
+
+map = new THREE.TextureLoader().load('./assets/textures/NonPortal/1/metal.jpg');
+window.materialWallNonPortal2.metalnessMap = map;
+
+
+console.log(window.materialWallNonPortal2)
+
+
+
+
+//----------------------------------------------------------------------------------
 window.OBSERVATION_ROOM = null;
 window.OBSERVATION_ROOM_IMG = null;
 

@@ -201,7 +201,7 @@ if (!window.mobile)
 
 function player() {
     // define shape
-    let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 2, 2 / 2.1, 0.5 / 2));
+    let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 2, 2 / 2.3, 0.5 / 2));
     // let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5, 2, 0.5)); 
 
     // define the physical body attributes
@@ -561,6 +561,14 @@ function jumpTouch() {
     }
 }
 
+function getPlaneByName(name) {
+    return window.planeUserData.filter(
+        function (data) {
+            return data.name == name
+        }
+    );
+}
+
 function portalButton(button) {
     var id = 0,
         id2 = 1;
@@ -576,12 +584,22 @@ function portalButton(button) {
         //let playerUpDirection = new THREE.Vector3(0, 1, 0)
         //playerUpDirection.applyQuaternion(window.MAIN_CAMERA.quaternion)
 
+        //var ray_direction = new THREE.Vector3();
+        //var ray = new THREE.Raycaster(); // create once and reuse
+
+        //window.PointerControls.getDirection(ray_direction);
+        //ray.set(window.PointerControls.getObject().position, ray_direction);
+
         raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
         var intersects = raycaster2.intersectObject(window.instancedMesh);
+
+        //console.log(intersects)
 
         if (intersects.length > 0) {
 
             var userData = window.planeUserData[intersects[0].instanceId];
+
+            //console.log(intersects[0].uv)
 
             if (userData.portal) {
                 var obj = intersects[0].object;
@@ -596,128 +614,99 @@ function portalButton(button) {
                 var y = intersects[0].point.y + offsetVector.y;
                 var z = intersects[0].point.z + offsetVector.z;
 
+                //-------------------------------------------------
+                var boxUpName = userData.position.x + "/" +
+                    (userData.position.y + 2) + "/" +
+                    userData.position.z;
 
-                /*var boxUpName = intersects[0].object.parent.position.x + "/" +
-                    (intersects[0].object.parent.position.y + 2) + "/" +
-                    intersects[0].object.parent.position.z;
+                if (getPlaneByName(boxUpName).length == 0) {
+                    if (intersects[0].uv.y >= 0.5)
+                        y = userData.position.y;
+                } else {
+                    if (intersects[0].uv.y >= 0.5 && !getPlaneByName(boxUpName).portal)
+                        y = userData.position.y;
+                }
+                //-------------------------------------------------
+                var boxDownName = userData.position.x + "/" +
+                    (userData.position.y - 2) + "/" +
+                    userData.position.z;
 
-                if (!window.CUBES.getObjectByName(boxUpName)) {
-                    if (intersects[0].uv.x < 0.5) {
-                        y = target.y + offsetVector.y;
+                if (getPlaneByName(boxDownName).length == 0) {
+                    if (intersects[0].uv.y <= 0.5)
+                        y = userData.position.y;
+                } else {
+                    if (intersects[0].uv.y <= 0.5 && !getPlaneByName(boxDownName).portal)
+                        y = userData.position.y;
+                }
+                //-------------------------------------------------
+                var boxLeftName = (userData.position.x + 2) + "/" +
+                    userData.position.y + "/" +
+                    userData.position.z;
+
+                if (getPlaneByName(boxLeftName).length == 0) {
+                    if (userData.side == "front") {
+                        if (intersects[0].uv.x >= 0.75)
+                            x = userData.position.x + 0.5;
+                    } else if (userData.side == "back") {
+                        if (intersects[0].uv.x <= 0.25)
+                            x = userData.position.x + 0.5;
+                    } else {
+                        x = userData.position.x;
                     }
                 }
+                //-------------------------------------------------
+                var boxRightName = (userData.position.x - 2) + "/" +
+                    userData.position.y + "/" +
+                    userData.position.z;
 
-                var boxDownName = intersects[0].object.parent.position.x + "/" +
-                    (intersects[0].object.parent.position.y - 2) + "/" +
-                    intersects[0].object.parent.position.z;
-
-                if (!window.CUBES.getObjectByName(boxDownName)) {
-                    if (intersects[0].uv.x > 0.5) {
-                        y = target.y + offsetVector.y;
+                if (getPlaneByName(boxRightName).length == 0) {
+                    if (userData.side == "front") {
+                        if (intersects[0].uv.x <= 0.25)
+                            x = userData.position.x - 0.5;
+                    } else if (userData.side == "back") {
+                        if (intersects[0].uv.x >= 0.75)
+                            x = userData.position.x - 0.5;
+                    } else {
+                        x = userData.position.x;
                     }
                 }
+                //-------------------------------------------------
+                var boxFrontName = userData.position.x + "/" +
+                    userData.position.y + "/" +
+                    (userData.position.z + 2);
 
-                //--------
-
-                if (intersects[0].object.name == "front") {
-                    var boxLeftName = (intersects[0].object.parent.position.x + 2) + "/" +
-                        (intersects[0].object.parent.position.y) + "/" +
-                        intersects[0].object.parent.position.z;
-
-                    if (!window.CUBES.getObjectByName(boxLeftName)) {
-                        if (intersects[0].uv.y > 0.5) {
-                            x = target.x + offsetVector.x;
-                        }
-                    }
-
-                    var boxRightName = (intersects[0].object.parent.position.x - 2) + "/" +
-                        (intersects[0].object.parent.position.y) + "/" +
-                        intersects[0].object.parent.position.z;
-
-                    if (!window.CUBES.getObjectByName(boxRightName)) {
-                        if (intersects[0].uv.y < 0.5) {
-                            x = target.x + offsetVector.x;
-                        }
-                    }
-                } else if (intersects[0].object.name == "back") {
-                    var boxLeftName = (intersects[0].object.parent.position.x - 2) + "/" +
-                        (intersects[0].object.parent.position.y) + "/" +
-                        intersects[0].object.parent.position.z;
-
-                    if (!window.CUBES.getObjectByName(boxLeftName)) {
-                        if (intersects[0].uv.y > 0.5) {
-                            x = target.x + offsetVector.x;
-                        }
-                    }
-
-                    var boxRightName = (intersects[0].object.parent.position.x + 2) + "/" +
-                        (intersects[0].object.parent.position.y) + "/" +
-                        intersects[0].object.parent.position.z;
-
-                    if (!window.CUBES.getObjectByName(boxRightName)) {
-                        if (intersects[0].uv.y < 0.5) {
-                            x = target.x + offsetVector.x;
-                        }
+                if (getPlaneByName(boxFrontName).length == 0) {
+                    if (userData.side == "left") {
+                        if (intersects[0].uv.x <= 0.25)
+                            z = userData.position.z + 0.5;
+                    } else if (userData.side == "right") {
+                        if (intersects[0].uv.x >= 0.75)
+                            z = userData.position.z + 0.5;
+                    } else {
+                        z = userData.position.z;
                     }
                 }
+                //-------------------------------------------------
+                var boxBackName = userData.position.x + "/" +
+                    userData.position.y + "/" +
+                    (userData.position.z - 2);
 
-                if (intersects[0].object.name == "left") {
-
-                    var boxFrontName = (intersects[0].object.parent.position.x) + "/" +
-                        (intersects[0].object.parent.position.y) + "/" +
-                        (intersects[0].object.parent.position.z + 2);
-
-                    if (!window.CUBES.getObjectByName(boxFrontName)) {
-                        if (intersects[0].uv.y > 0.5) {
-                            z = target.z + offsetVector.z;
-                        }
+                if (getPlaneByName(boxBackName).length == 0) {
+                    if (userData.side == "left") {
+                        if (intersects[0].uv.x >= 0.75)
+                            z = userData.position.z - 0.5;
+                    } else if (userData.side == "right") {
+                        if (intersects[0].uv.x <= 0.25)
+                            z = userData.position.z - 0.5;
+                    } else {
+                        z = userData.position.z;
                     }
-
-                    var boxBackName = (intersects[0].object.parent.position.x) + "/" +
-                        (intersects[0].object.parent.position.y) + "/" +
-                        (intersects[0].object.parent.position.z - 2);
-
-                    if (!window.CUBES.getObjectByName(boxBackName)) {
-                        if (intersects[0].uv.y < 0.5) {
-                            z = target.z + offsetVector.z;
-                        }
-                    }
-                } else if (intersects[0].object.name == "right") {
-
-                    var boxFrontName = (intersects[0].object.parent.position.x) + "/" +
-                        (intersects[0].object.parent.position.y) + "/" +
-                        (intersects[0].object.parent.position.z - 2);
-
-                    if (!window.CUBES.getObjectByName(boxFrontName)) {
-                        if (intersects[0].uv.y > 0.5) {
-                            z = target.z + offsetVector.z;
-                        }
-                    }
-
-                    var boxBackName = (intersects[0].object.parent.position.x) + "/" +
-                        (intersects[0].object.parent.position.y) + "/" +
-                        (intersects[0].object.parent.position.z + 2);
-
-                    if (!window.CUBES.getObjectByName(boxBackName)) {
-                        if (intersects[0].uv.y < 0.5) {
-                            z = target.z + offsetVector.z;
-                        }
-                    }
-                }*/
-
-                //const point = intersects[0].point;
+                }
+                //-------------------------------------------------
                 const point = new THREE.Vector3(x, y, z);
                 // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
-                //const objectMatrix = new THREE.Matrix3().getNormalMatrix(obj.matrixWorld)
-                //const normal = intersects[0].face.normal.clone().applyMatrix3(objectMatrix).normalize()
-                //const depthDir = playerUpDirection.clone().projectOnPlane(normal).normalize()
-
-                //playerUpDirection = new THREE.Vector3(0, 1, 0)
-
                 // define playerUpDirection
                 let playerUpDirection = new THREE.Vector3(0, 1, 0)
-
-
 
                 var normal;
                 if (userData.side == "front")
@@ -760,33 +749,62 @@ function portalButton(button) {
                     point.clone().add(depthDir.clone().multiplyScalar(portal_depth / 2 + EPS).add(widthDir.clone().multiplyScalar(-portal_width / 2 - EPS)))
                 ]
 
+
                 if (button == 0) { // left click
-                    // delete the old portal this new one is replacing
-                    if (window.PORTALS[0] !== null) {
-                        deletePortal(0);
-                    }
+
                     if (window.PORTALS[1] === null) {
                         document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
                     } else {
                         document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
+
+                        //console.log(point.distanceTo(window.PORTALS[1].pos))
+                        //console.log(point)
+                        //console.log(window.PORTALS[0])
+                        //console.log(window.PORTALS[1])
+                        if (point.distanceTo(window.PORTALS[1].pos) < 1) {
+                            return;
+                        }
+                    }
+
+                    // delete the old portal this new one is replacing
+                    if (window.PORTALS[0] !== null) {
+                        deletePortal(0);
                     }
 
                     createPortal(0, 1, point, normal, userData.body, playerUpDirection, portalPoints)
-                    //window.GUN_BLOOM.color = new THREE.Color(0xFFDB82);
-                } else if (button == 2) { // left click
-                    // delete the old portal this new one is replacing
-                    if (window.PORTALS[1] !== null) {
-                        deletePortal(1);
+
+                    window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(1.0, 0.25, 0.0);
+                    if (window.uniformShaderPortalGunBallEnergy.iAlpha.value == 0.0) {
+                        new TWEEN.Tween(window.uniformShaderPortalGunBallEnergy.iAlpha).to({
+                            value: 0.5
+                        }, 300).start();
                     }
+                } else if (button == 2) { // left click
 
                     if (window.PORTALS[0] === null) {
                         document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
                     } else {
                         document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
+
+                        if (point.distanceTo(window.PORTALS[0].pos) < 1) {
+                            return;
+                        }
+                    }
+
+                    // delete the old portal this new one is replacing
+                    if (window.PORTALS[1] !== null) {
+                        deletePortal(1);
                     }
 
                     createPortal(1, 0, point, normal, userData.body, playerUpDirection, userData.rotation)
-                    //window.GUN_BLOOM.color = new THREE.Color(0x76EBFF);
+
+                    window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(0.0, 0.3, 1.0);
+                    if (window.uniformShaderPortalGunBallEnergy.iAlpha.value == 0.0) {
+                        new TWEEN.Tween(window.uniformShaderPortalGunBallEnergy.iAlpha).to({
+                            value: 0.5
+                        }, 300).start();
+                    }
+
                 }
             } else {
                 //intersects[0].object.visible = false;
@@ -796,10 +814,47 @@ function portalButton(button) {
     }
 }
 
+function validPortalPoint(point, normal, object) {
+
+
+    // check that no intersectable objects are directly in front of point
+    let frontPoint = point.clone().add(normal.clone().multiplyScalar(1))
+    const raycaster = new THREE.Raycaster(frontPoint, normal.clone().multiplyScalar(-1), 0, 2000);
+    let intersects = raycaster.intersectObject(this.intersectObjects);
+
+    // if there is no intersect or if there is another object in the way, then return false
+    if (intersects.length == 0 || intersects[0].object != object) {
+        return false
+    }
+
+    // have to also check if there is another face occupying the same space. The distance between the first and second intersects will be negligible
+    // but the objects will be different.
+    if (intersects.length > 1 && Math.abs(intersects[0].distance - intersects[1].distance) < 0.001 && intersects[1].object != object) {
+        return false
+    }
+
+    return true
+}
+
 // deletes the portal with index portalIndex from the scene
 function deletePortal(portalIndex) {
+    /*window.PORTALS[portalIndex].mesh.geometry.dispose();
+    window.PORTALS[portalIndex].mesh.material.dispose();
+    window.MAIN_SCENE.remove(window.PORTALS[portalIndex]);
+    window.PORTALS[portalIndex] = null;*/
+
+
     window.PORTALS[portalIndex].mesh.geometry.dispose();
     window.PORTALS[portalIndex].mesh.material.dispose();
+    if (window.PORTALS[portalIndex].hostObjects !== null) {
+        // mark this object as collideable with portal 0 bb objects
+        window.PORTALS[portalIndex].hostObjects.collisionFilterGroup &= ~window.CGROUP_PORTAL_HOST_CDISABLE[portalIndex]
+        // add back to environment group only if collideable with both portal objects
+        if (!(window.PORTALS[portalIndex].hostObjects.collisionFilterGroup & window.CGROUP_PORTAL_HOST_CDISABLE[0]) &&
+            !(window.PORTALS[portalIndex].hostObjects.collisionFilterGroup & window.CGROUP_PORTAL_HOST_CDISABLE[1])) {
+            window.PORTALS[portalIndex].hostObjects.collisionFilterGroup |= window.CGROUP_ENVIRONMENT
+        }
+    }
     window.MAIN_SCENE.remove(window.PORTALS[portalIndex]);
     window.PORTALS[portalIndex] = null
 }
@@ -870,11 +925,13 @@ window.rotationMobile = 0.1;
 
 const updatePlayer = function (deltaTime) {
 
-    var velocity = 20;
+    raycast();
+
+    var velocity = 1100;
 
     if (window.mobile) {
         //
-        velocity = 15;
+        velocity = 900;
         //if (fwdValue == 0 && bkdValue == 0 && rgtValue == 0 && lftValue == 0) {
         //horizontal rotation
 
@@ -947,7 +1004,7 @@ const updatePlayer = function (deltaTime) {
     }
 
     // apply forces in WASD directions when pressed
-    const f = velocity * window.PLAYER.mass * jumpMultiplier;
+    const f = velocity * window.PLAYER.mass * jumpMultiplier * deltaTime;
 
     // if (this.controller["KeyW"].pressed || this.controller["KeyA"].pressed || this.controller["KeyS"].pressed || this.controller["KeyD"].pressed) { 
     //     if (this.counter % 30 == 0 && !this.window.PLAYER.inJump) {
@@ -956,7 +1013,7 @@ const updatePlayer = function (deltaTime) {
     // }
 
     if (window.qwe) {
-        window.qwe.applyImpulse(forward.clone().multiplyScalar(1), window.qwe.position)
+        //window.qwe.applyImpulse(forward.clone().multiplyScalar(1), window.qwe.position)
     }
 
     if (window.mobile) {
@@ -1122,7 +1179,7 @@ const updatePlayer = function (deltaTime) {
 
         if (shouldJump) {
             window.PLAYER.inJump = true
-            window.PLAYER.applyImpulse(up.clone().multiplyScalar(f * 0.08), window.PLAYER.position)
+            window.PLAYER.applyImpulse(up.clone().multiplyScalar(f * 0.11), window.PLAYER.position)
         }
     }
 
@@ -1149,9 +1206,14 @@ const updatePlayer = function (deltaTime) {
     //}else{
     //window.GUN.rotation.copy(window.MAIN_CAMERA.rotation)
     //}
-
-    raycast();
     updateHeadBob(deltaTime);
+
+    //console.log(window.MAIN_CAMERA.position.distanceTo(window.SPAWN_POSITION))
+
+    if (window.MAIN_CAMERA.position.distanceTo(new THREE.Vector3(0, 0, 0)) > 100) {
+        window.PLAYER.position.copy(window.SPAWN_POSITION);
+        //alert("You just found a bug!")
+    }
 }
 
 var headBobTimer = 0;
@@ -1256,7 +1318,7 @@ function raycast() {
     }
 
     //
-    raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
+    /*raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
     var intersects = raycaster2.intersectObject(window.CORRIDOR_EXIT.getObjectByName("completed"));
     if (intersects.length > 0) {
         if (intersects[0].distance < 1 && !levelCompleted) {
@@ -1267,7 +1329,7 @@ function raycast() {
             $(".main-title").text("LEVEL COMPLETED AND VALIDATED")
             $(".introduction-text").text("Congratulations you completed the level, now you will be redirected to the level editor where you can make modifications, save or publish this level.");
         }
-    }
+    }*/
     //
 
     if (window.PORTALS[0] === null || window.PORTALS[1] === null) {
@@ -1293,7 +1355,8 @@ function raycast() {
 
             // collision disable, might be partially intersecting with portal
             if (window.PORTALS[p].CDBB.containsPoint(pos)) {
-                d.collisionFilterMask &= ~window.PORTALS[p].hostObjects.collisionFilterGroup
+                d.collisionFilterMask &= ~window.PORTALS[p].hostObjects.collisionFilterGroup;
+                //console.log(d.collisionFilterMask)
                 inArea++;
             }
 
@@ -1317,6 +1380,10 @@ function raycast() {
 
                 d.collisionFilterMask |= window.PORTALS[p].hostObjects.collisionFilterGroup
                 d.collisionFilterMask &= ~window.PORTALS[1 - p].hostObjects.collisionFilterGroup
+
+
+                targetRotationX = window.MAIN_CAMERA.rotation.y;
+                targetRotationY = window.MAIN_CAMERA.rotation.x;
             }
 
         }
@@ -1406,6 +1473,12 @@ function tweenCamera(duration, ini, final) {
     new TWEEN.Tween(ini).to(final, duration)
         .easing(TWEEN.Easing.Quadratic.InOut)
         .start();
+}
+
+function tweenOpacity(duration, mat, final) {
+    new TWEEN.Tween(mat).to({
+        opacity: final
+    }, duration).start();
 }
 
 var teleporting = false;

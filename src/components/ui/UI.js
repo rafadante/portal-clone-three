@@ -49,7 +49,7 @@ $('#recursive-select').on('change', function () {
 });
 
 //FPS MAIN SCENE
-window.fpsUnlocked = false;
+window.fpsUnlocked = true;
 $('#fps-select').on('change', function () {
     window.fps = $(this).val();
 

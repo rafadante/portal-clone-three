@@ -8,14 +8,10 @@ generateMeshPortalShader();
 
 var clock = new THREE.Clock();
 
-var xx = 0.1;
-
-let delta = 0;
-
 const animateShader = (time) => {
     var val = clock.getDelta();
 
-    //window.uniformShaderPortalGunBallEnergy.iTime.value += val;
+    window.uniformShaderPortalGunBallEnergy.iTime.value += val;
 
     window.uniformShaderPortal.iTime.value += val;
 };

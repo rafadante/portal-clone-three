@@ -9,26 +9,14 @@ function cubeState(button) {
     if (button == "plus") {
         //
         for (var i = 0; i < window.SELECTED_ID.length; i++) {
-
-            //console.log(window.planeUserData[window.SELECTED_ID[i]].position.y)
-
-            /*if (window.planeUserData[window.SELECTED_ID[i]].position.y + 2 == -9978 ||
-                window.planeUserData[window.SELECTED_ID[i]].position.y + 2 == -10018) {
-                warning();
-                return;
-            }*/
-
             trasnlatePlane(window.SELECTED_ID[i], 1, window.planeUserData[window.SELECTED_ID[i]].portal);
-
         }
     } else if (button == "minus") {
         //
         for (var i = 0; i < window.SELECTED_ID.length; i++) {
 
-            console.log(window.planeUserData[window.SELECTED_ID[i]].position.z)
-
-            if (window.planeUserData[window.SELECTED_ID[i]].position.y - 2 == -9978 ||
-                window.planeUserData[window.SELECTED_ID[i]].position.y - 2 == -10018) {
+            if (window.planeUserData[window.SELECTED_ID[i]].position.y - 2 == 22 ||
+                window.planeUserData[window.SELECTED_ID[i]].position.y - 2 == -16) {
                 warning();
                 return;
             } else if (window.planeUserData[window.SELECTED_ID[i]].position.x == 28 ||
@@ -42,14 +30,13 @@ function cubeState(button) {
             }
 
             trasnlatePlane(window.SELECTED_ID[i], -1, window.planeUserData[window.SELECTED_ID[i]].portal);
-
         }
     }
 
     for (var i = 0; i < IndexArray.length; i++) {
 
         var erase = new THREE.Object3D();
-        erase.position.set(0, 10000, 0);
+        erase.scale.set(0, 0, 0);
 
         erase.updateMatrix();
         window.instancedMesh.setMatrixAt(IndexArray[i], erase.matrix);
@@ -88,32 +75,25 @@ function trasnlatePlane(id, val, portal) {
     dummy.position.copy(dummy.position.round());
 
     var frontExists = getPlaneByName(dummy.position.x + "/" + dummy.position.y + "/" + dummy.position.z);
-
     var clone = dummy.clone();
 
     clone.translateZ(-val * 2);
 
     if (window.planeUserData[id].side == "front" || window.planeUserData[id].side == "back") {
-
         checkSides(clone.clone(), val, id, "left", portal);
         checkSides(clone.clone(), val, id, "right", portal);
         checkSides(clone.clone(), val, id, "up", portal);
         checkSides(clone.clone(), val, id, "down", portal);
-
     } else if (window.planeUserData[id].side == "up" || window.planeUserData[id].side == "down") {
-
         checkSides(clone.clone(), val, id, "left", portal);
         checkSides(clone.clone(), val, id, "right", portal);
         checkSides(clone.clone(), val, id, "front", portal);
         checkSides(clone.clone(), val, id, "back", portal);
-
     } else if (window.planeUserData[id].side == "left" || window.planeUserData[id].side == "right") {
-
         checkSides(clone.clone(), val, id, "front", portal);
         checkSides(clone.clone(), val, id, "back", portal);
         checkSides(clone.clone(), val, id, "up", portal);
         checkSides(clone.clone(), val, id, "down", portal);
-
     }
 
     if (frontExists.length > 0) {
@@ -122,7 +102,7 @@ function trasnlatePlane(id, val, portal) {
         window.instancedMesh.instanceColor.needsUpdate = true;
 
         var erase = new THREE.Object3D();
-        erase.position.set(0, 10000, 0);
+        erase.scale.set(0, 0, 0);
         erase.updateMatrix();
         window.instancedMesh.setMatrixAt(id, erase.matrix);
         window.planeUserData[id] = {};
@@ -131,17 +111,14 @@ function trasnlatePlane(id, val, portal) {
         window.instancedMesh.instanceColor.needsUpdate = true;
 
         //---------------------------------------
-
         var erase = new THREE.Object3D();
-        erase.position.set(0, 10000, 0);
+        erase.scale.set(0, 0, 0);
         erase.updateMatrix();
         window.instancedMesh.setMatrixAt(frontExists[0].id_instanced, erase.matrix);
         window.planeUserData[frontExists[0].id_instanced] = {};
         window.instancedMesh.instanceMatrix.needsUpdate = true;
         //
-
         limit = true;
-
     } else {
 
         window.planeUserData[id].position = dummy.position.clone();
@@ -233,10 +210,7 @@ function checkSides(dummy, val, id, side, portal) {
         };
 
     } else { //if there is a face delete it
-
-        //const index = window.planeUserData.indexOf(sideExists[0]);
         IndexArray.push(sideExists[0].id_instanced);
-
     }
 }
 
@@ -260,27 +234,31 @@ function buildIniCubes(obj) {
         const geometry = new THREE.PlaneGeometry(2, 2);
 
         window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 1500);
-        window.instancedMesh.position.y = 10000;
         window.instancedMesh.castShadow = true;
         window.instancedMesh.receiveShadow = true;
         window.instancedMesh.name = "cube-parent";
         window.CUBES.add(window.instancedMesh);
 
-        //GROUND
-        buildLayer(-1, -1, -10000, 'x', 'z', 'y', 6, 8, "down", new THREE.Vector3(-Math.PI / 2, 0, 0));
-        //CEILING
-        buildLayer(-1, -1, -9992, 'x', 'z', 'y', 6, 8, "up", new THREE.Vector3(Math.PI / 2, 0, 0));
-        //WALL FRONT
-        buildLayer(-1, -10001, 0, 'x', 'y', 'z', 4, 8, "front", new THREE.Vector3(0, 0, 0));
-        //WALL BACK
-        buildLayer(-1, -10001, 12, 'x', 'y', 'z', 4, 8, "back", new THREE.Vector3(0, Math.PI, 0));
-        //WALL RIGHT
-        buildLayer(-1, -10001, 16, 'z', 'y', 'x', 4, 6, "right", new THREE.Vector3(0, -Math.PI / 2, 0));
-        //WALL LEFT
-        buildLayer(-1, -10001, 0, 'z', 'y', 'x', 4, 6, "left", new THREE.Vector3(0, Math.PI / 2, 0));
+        var clone = new THREE.Object3D();
 
-        //console.log(window.instancedMesh);
-        //console.log(window.planeUserData);
+        for (var i = 0; i < 1500; i++) {
+            clone.scale.set(0, 0, 0);
+            clone.updateMatrix();
+            window.instancedMesh.setMatrixAt(i, clone.matrix);
+        }
+
+        //GROUND
+        buildLayer(-1, -1, 0, 'x', 'z', 'y', 6, 8, "down", new THREE.Vector3(-Math.PI / 2, 0, 0));
+        //CEILING
+        buildLayer(-1, -1, 8, 'x', 'z', 'y', 6, 8, "up", new THREE.Vector3(Math.PI / 2, 0, 0));
+        //WALL FRONT
+        buildLayer(-1, -1, 0, 'x', 'y', 'z', 4, 8, "front", new THREE.Vector3(0, 0, 0));
+        //WALL BACK
+        buildLayer(-1, -1, 12, 'x', 'y', 'z', 4, 8, "back", new THREE.Vector3(0, Math.PI, 0));
+        //WALL RIGHT
+        buildLayer(-1, -1, 16, 'z', 'y', 'x', 4, 6, "right", new THREE.Vector3(0, -Math.PI / 2, 0));
+        //WALL LEFT
+        buildLayer(-1, -1, 0, 'z', 'y', 'x', 4, 6, "left", new THREE.Vector3(0, Math.PI / 2, 0));
     }
 }
 
@@ -305,6 +283,7 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
             y += 2;
 
             clone.rotation.set(rot.x, rot.y, rot.z);
+            clone.scale.set(1, 1, 1);
 
             clone.position[x2] = x;
             clone.position[y2] = y;
@@ -315,10 +294,13 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
 
             var portal;
 
-            if (clone.position.x <= 5 && clone.position.z >= 7 && clone.position.y <= -10000 + 5) {
+            if (clone.position.x <= 5 && clone.position.z >= 7 && clone.position.y <= 5) {
                 portal = false;
                 window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0x808080));
-            } else if (clone.position.x >= 10 && clone.position.z <= 1 && clone.position.y <= -10000 + 3) {
+            } else if (clone.position.x >= 10 && clone.position.z <= 1 && clone.position.y <= 3) {
+                portal = false;
+                window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0x808080));
+            } else if (clone.position.y == 8) {
                 portal = false;
                 window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0x808080));
             } else {
@@ -329,14 +311,14 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
             var hasItem = false;
             var itemName = null;
 
-            if (clone.position.equals(new THREE.Vector3(3, -9999, 12))) {
+            if (clone.position.equals(new THREE.Vector3(3, 1, 12))) {
                 hasItem = true;
                 itemName = "enterDoor";
-            } else if (clone.position.equals(new THREE.Vector3(13, -9999, 0))) {
+            } else if (clone.position.equals(new THREE.Vector3(13, 1, 0))) {
                 hasItem = true;
                 itemName = "exitDoor";
-            } else if (clone.position.equals(new THREE.Vector3(16, -9993, 7)) ||
-                clone.position.equals(new THREE.Vector3(16, -9993, 5))) {
+            } else if (clone.position.equals(new THREE.Vector3(16, 7, 7)) ||
+                clone.position.equals(new THREE.Vector3(16, 7, 5))) {
                 hasItem = true;
                 itemName = "window";
             }
@@ -363,10 +345,7 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
             a++;
         }
 
-        if (side == "up" || side == "down")
-            y = -1;
-        else
-            y = -10001;
+        y = -1;
     }
 
     window.RENDERER.renderLists.dispose();
@@ -384,21 +363,24 @@ $("body").on('click', '#minus-portal', function () {
 })
 
 $("body").on('click', '#portalable', function () {
-    window.SELECTED.userData.portal = !window.SELECTED.userData.portal;
-    for (var i = 0; i < window.CUBE_SELECTION_ARRAY.length; i++) {
-        window.CUBE_SELECTION_ARRAY[i].selected.userData.portal = window.SELECTED.userData.portal;
+
+    if (window.SELECTED_ID.length > 0) {
+        window.planeUserData[window.SELECTED_ID[0]].portal = !window.planeUserData[window.SELECTED_ID[0]].portal;
+        console.log(window.planeUserData[window.SELECTED_ID[0]].portal);
+
+        for (var i = 0; i < window.SELECTED_ID.length; i++) {
+            window.planeUserData[window.SELECTED_ID[i]].portal = window.planeUserData[window.SELECTED_ID[0]].portal;
+
+            if (window.planeUserData[window.SELECTED_ID[i]].portal)
+                window.instancedMesh.setColorAt(window.SELECTED_ID[i], new THREE.Color(0xffffff));
+            else
+                window.instancedMesh.setColorAt(window.SELECTED_ID[i], new THREE.Color(0x808080));
+
+            window.instancedMesh.instanceColor.needsUpdate = true;
+        }
     }
 
-    if (window.SELECTED.userData.portal) {
-        for (var i = 0; i < window.CUBE_SELECTION_ARRAY.length; i++) {
-            window.CUBE_SELECTION_ARRAY[i].selected.material = window.MATERIAL_PORTAL_EDITOR;
-        }
-    } else {
-        for (var i = 0; i < window.CUBE_SELECTION_ARRAY.length; i++) {
-            window.CUBE_SELECTION_ARRAY[i].selected.material = window.MATERIAL_NON_PORTAL_EDITOR;;
-        }
-    }
-    document.querySelector('.menu').classList.remove('menu-show')
+    document.querySelector('.menu').classList.remove('menu-show');
 })
 
 window.addEventListener("contextmenu", e => e.preventDefault());

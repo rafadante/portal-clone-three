@@ -284,39 +284,44 @@ function addItem(found) {
 
         } else {
 
-            if (found[i].object.parent && found[i].object.visible && !found[i].object.userData.hasItem) {
+
+            var userData = window.planeUserData[found[i].instanceId];
+
+            console.log(userData)
+
+            if (!userData.hasItem) {
 
                 var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
 
                 if (item.userData.wall) {
-                    if (found[i].object.name == "up" || found[i].object.name == "down") {
+                    if (userData.side == "up" || userData.side == "down") {
                         break;
                     }
                 } else if (item.userData.ground) {
-                    if (found[i].object.name != "up") {
+                    if (userData.side == "up") {
                         break;
                     }
                 }
 
-                found[i].object.userData.hasItem = true;
-                found[i].object.userData.itemName = window.ITEM_HOLDED_NAME + "-" + itemCount;
-                found[i].object.item = item;
+                userData.hasItem = true;
+                userData.itemName = window.ITEM_HOLDED_NAME + "-" + itemCount;
+                userData.item = item;
 
-                var target = new THREE.Vector3(); // create once an reuse it
-                found[i].object.getWorldPosition(target);
-                item.position.copy(target);
+                //var target = new THREE.Vector3(); // create once an reuse it
+                //found[i].object.getWorldPosition(target);
+                item.position.copy(userData.position);
                 item.renderOrder = 2;
                 item.name = window.ITEM_HOLDED_NAME + "-" + itemCount;
 
-                if (found[i].object.name == "back") {
+                if (userData.side == "front") {
                     item.rotation.y = 0;
-                } else if (found[i].object.name == "right") {
+                } else if (userData.side == "right") {
                     item.rotation.y = -Math.PI / 2;
-                } else if (found[i].object.name == "front") {
+                } else if (userData.side == "back") {
                     item.rotation.y = Math.PI;
-                } else if (found[i].object.name == "left") {
+                } else if (userData.side == "left") {
                     item.rotation.y = Math.PI / 2;
-                } else if (found[i].object.name == "up") {
+                } else if (userData.side == "down") {
 
                     if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere")
                         item.translateY(1);
@@ -325,23 +330,19 @@ function addItem(found) {
                 if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere") {
 
                     var item2 = window.ITEMS.getObjectByName("dispenser").clone();
-                    item2.position.copy(target);
+                    item2.position.copy(userData.position);
                     item.dispenser = item2;
                     window.ITEMS_ADDED.add(item2);
-                    found[i].object.item2 = item2;
+                    userData.item2 = item2;
 
                     //GET CEILING SURFACE
-                    for (var x = 0, j = 0; x < 100; x++, j += 2) {
+                    for (var x = 0, j = 2; x < 100; x++, j += 2) {
 
-                        var boxTop = window.CUBES.getObjectByName(found[i].object.parent.position.x + "/" +
-                            (found[i].object.parent.position.y + j) + "/" +
-                            found[i].object.parent.position.z)
+                        var boxTop = getPlaneByName(userData.position.x + "/" + (userData.position.y + j) + "/" + userData.position.z);
 
-                        if (boxTop) {
-                            if (boxTop.getObjectByName("down").visible) {
-                                item2.translateY(j + 2);
-                                break;
-                            }
+                        if (boxTop.length > 0) {
+                            item2.translateY(j);
+                            break;
                         }
 
                     }
@@ -357,6 +358,14 @@ function addItem(found) {
 
         }
     }
+}
+
+function getPlaneByName(name) {
+    return window.planeUserData.filter(
+        function (data) {
+            return data.name == name
+        }
+    );
 }
 
 let lineFollow;
@@ -450,29 +459,25 @@ function hoverItem(found) {
         return
     }
 
-    for (var i = 0; i < found.length; i++) {
-        if (found[i].object.parent && found[i].object.visible) {
+    //var target = new THREE.Vector3();
+    //found[0].object.getWorldPosition(target);
 
-            var target = new THREE.Vector3();
-            found[i].object.getWorldPosition(target);
+    var userData = window.planeUserData[found[0].instanceId];
 
-            window.ITEM_CUBE.position.copy(target);
-            window.ITEM_CUBE.visible = true;
+    window.ITEM_CUBE.position.copy(userData.position);
+    window.ITEM_CUBE.visible = true;
 
-            var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
+    var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
 
-            if (item.userData.wall && (found[i].object.name == "up" || found[i].object.name == "down"))
-                window.ITEM_CUBE.material.color = new THREE.Color(0xfc030f)
-            else if (item.userData.ground && (found[i].object.name != "up" && found[i].object.name != "down"))
-                window.ITEM_CUBE.material.color = new THREE.Color(0xfc030f)
-            else if (found[i].object.userData.hasItem)
-                window.ITEM_CUBE.material.color = new THREE.Color(0xfc030f)
-            else
-                window.ITEM_CUBE.material.color = new THREE.Color(0x00ff00)
+    if (item.userData.wall && (userData.side == "up" || userData.side == "down"))
+        window.ITEM_CUBE.material.color = new THREE.Color(0xfc030f)
+    else if (item.userData.ground && (userData.side != "up" && userData.side != "down"))
+        window.ITEM_CUBE.material.color = new THREE.Color(0xfc030f)
+    else if (found[0].object.userData.hasItem)
+        window.ITEM_CUBE.material.color = new THREE.Color(0xfc030f)
+    else
+        window.ITEM_CUBE.material.color = new THREE.Color(0x00ff00)
 
-            break;
-        }
-    }
 }
 
 export {

@@ -14,9 +14,11 @@ void main()
 const fshader = `
 //
 uniform float iTime;
+uniform float iAlpha;
 uniform sampler2D iChannel0;
 uniform sampler2D iChannel1;
 uniform vec2 iResolution;
+uniform vec3 iColor;
 
 float height(in vec2 uv){
     float speed = 6.0;
@@ -46,16 +48,29 @@ void main()
     float waveHeight=0.4+height(uv);
     
     //vec3 color=vec3(waveHeight*0.3,waveHeight*0.5,waveHeight);
-    vec3 color=vec3(waveHeight,waveHeight*0.25,waveHeight * 0.0);
+    vec3 color=vec3(waveHeight * iColor.x,waveHeight*iColor.y,waveHeight * iColor.z);
     
-    gl_FragColor = vec4( color, 1.0 );
+    gl_FragColor = vec4( color, iAlpha );
 }
 `;
+
+//window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(1.0, 0.25, 0.0);
+//window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(0.3, 0.5, 1.0);
+
+
 
 window.uniformShaderPortalGunBallEnergy = {
     iTime: {
         type: 'f',
         value: 1.0
+    },
+    iAlpha: {
+        type: 'f',
+        value: 0.0
+    },
+    iColor: {
+        type: 'v3',
+        value: new THREE.Vector3(1.0, 0.25, 0.0)
     },
     resolution: {
         type: "v2",
@@ -78,7 +93,10 @@ window.materialGun = new THREE.ShaderMaterial({
     fragmentShader: fshader,
     side: 2,
     transparent: true,
+    opacity: 0
 });
+
+console.log(window.uniformShaderPortalGunBallEnergy)
 
 
 const sphere = new THREE.Mesh( geometry, window.materialGun );

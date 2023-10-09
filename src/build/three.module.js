@@ -17993,7 +17993,7 @@ function flatten( array, nBlocks, blockSize ) {
 
 	}
 
-	if ( nBlocks !== 0 ) {
+	/*if ( nBlocks !== 0 ) {
 
 		firstElem.toArray( r, 0 );
 
@@ -18004,7 +18004,7 @@ function flatten( array, nBlocks, blockSize ) {
 
 		}
 
-	}
+	}*/
 
 	return r;
 

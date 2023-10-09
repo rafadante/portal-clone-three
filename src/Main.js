@@ -25,11 +25,14 @@ import {
 import {
     raycastSelected
 } from './components/boxSelection/BoxSelection.js';
-import {
+/*import {
     createPortalShader,
     generateMeshPortalShader,
     animatePortalShader
-} from './components/portalShader/PortalShader.js';
+} from './components/portalShader/PortalShader.js';*/
+import {
+    animateShader
+} from "./components/shaders/AnimateShaders.js"
 import {
     updatePlayer
 } from './components/fps/Fps.js';
@@ -60,7 +63,13 @@ import {
     SMAAPreset,
     ToneMappingEffect,
     ToneMappingMode,
-    SelectiveBloomEffect
+    SelectiveBloomEffect,
+
+    ColorChannel,
+    DepthDownsamplingPass,
+    NormalPass,
+    SSAOEffect,
+    TextureEffect
 } from "postprocessing";
 import Stats from "stats-gl";
 import "./components/menuShader/MenuShader.js";
@@ -101,13 +110,52 @@ const smaaEffect = new SMAAEffect(
 
 smaaEffect.edgeDetectionMaterial.setEdgeDetectionThreshold(0.01);
 
+//
+
+const normalPass = new NormalPass(window.MAIN_SCENE, window.MAIN_CAMERA);
+const depthDownsamplingPass = new DepthDownsamplingPass({
+    normalBuffer: normalPass.texture,
+    resolutionScale: 0.5
+});
+
+const capabilities = window.RENDERER.capabilities;
+
+const normalDepthBuffer = capabilities.isWebGL2 ?
+    depthDownsamplingPass.texture : null;
+
+// Note: Thresholds and falloff correspond to camera near/far.
+// Example: worldDistance = distanceThreshold * (camera.far - camera.near)
+const ssaoEffect = new SSAOEffect(window.MAIN_CAMERA, normalPass.texture, {
+    blendFunction: BlendFunction.MULTIPLY,
+    distanceScaling: true,
+    depthAwareUpsampling: true,
+    normalDepthBuffer,
+    samples: 9,
+    rings: 7,
+    distanceThreshold: 0.005, // Render up to a distance of ~20 world units
+    distanceFalloff: 0.0025, // with an additional ~2.5 units of falloff.
+    rangeThreshold: 0.0003, // Occlusion proximity of ~0.3 world units
+    rangeFalloff: 0.0001, // with ~0.1 units of falloff.
+    luminanceInfluence: 0.7,
+    minRadiusScale: 0.33,
+    radius: 0.1,
+    intensity: 1.33,
+    bias: 0.025,
+    fade: 0.01,
+    color: null,
+    resolutionScale: 0.5
+});
+
+//
 var effectPass;
 
 if (window.mobile) {
-    effectPass = new EffectPass(window.MAIN_CAMERA, selectiveBloom, toneMappingEffect);
+    effectPass = new EffectPass(window.MAIN_CAMERA, toneMappingEffect, smaaEffect); //selectiveBloom
 } else {
-    effectPass = new EffectPass(window.MAIN_CAMERA, selectiveBloom, toneMappingEffect, smaaEffect);
+    effectPass = new EffectPass(window.MAIN_CAMERA, toneMappingEffect, smaaEffect); //selectiveBloom
 }
+
+console.log(effectPass)
 
 //this.effect = toneMappingEffect;
 window.COMPOSER.addPass(effectPass);
@@ -179,8 +227,8 @@ function init() {
     window.MAIN_SCENE.add(window.MAIN_CAMERA);
     // RENDERER
     //
-    createPortalShader(window.RENDERER);
-    generateMeshPortalShader(window.MAIN_SCENE, window.MAIN_CAMERA, window.RENDERER);
+    //createPortalShader(window.RENDERER);
+    //generateMeshPortalShader(window.MAIN_SCENE, window.MAIN_CAMERA, window.RENDERER);
     //LIGHT GROUP
     window.LIGHT_GROUP = new Lights(THREE);
     window.LIGHT_GROUP.name = "LIGHT_GROUP";
@@ -200,6 +248,7 @@ function init() {
             //
             loadCube();
             animate();
+            //window.CONTROLS.addEventListener( 'change', animate );
         })
     //LISTENER
     window.addEventListener('resize', onWindowResize);
@@ -313,12 +362,30 @@ function raycastManager(event, type) {
                 window.SELECTING = true;
                 window.CONTROLS.enabled = false;
 
-                if (!window.planeUserData[instanceId].selected) {
-                    window.planeUserData[instanceId].selected = true;
-                    window.SELECTED_SIDE = window.planeUserData[instanceId].side;
-                    raycastSelected(intersection[0], event, type)
-                }
+                //if (!window.planeUserData[instanceId].selected) {
+                window.planeUserData[instanceId].selected = true;
+                window.SELECTED_SIDE = window.planeUserData[instanceId].side;
+                raycastSelected(intersection[0], event, type)
+                //}
 
+            }
+
+
+            if (type == "up") {
+                if (intersection.length > 0)
+                    addItem(intersection);
+            }
+
+            if (window.ITEM_HOLDED_NAME) {
+
+                $("#follow").css("display", "block");
+                $("#follow").css({
+                    left: event.pageX - 25,
+                    top: event.pageY - 25
+                });
+
+                //itemUpdate(found, event, type);
+                hoverItem(intersection);
             }
 
         }
@@ -353,7 +420,7 @@ function onWindowResize() {
 window.debugCol = true;
 
 const cannonDebugger = new CannonDebugger(window.MAIN_SCENE, window.CANNON_WORLD, {
-    onInit(body, mesh) {        
+    onInit(body, mesh) {
         mesh.visible = false;
         $("body").on('input', '#debug-input', function () {
             window.debugCol = this.checked;
@@ -367,7 +434,10 @@ let deltaPortal = 0;
 let intervalPortal = 1 / 60;
 //SCENE FPS
 let clock = new THREE.Clock();
+let clock2 = new THREE.Clock();
+let clock3 = new THREE.Clock();
 let delta = 0;
+let delta2 = 0;
 window.interval = 1 / window.fps;
 
 console.log(window.STATS);
@@ -393,37 +463,52 @@ function animate(time) {
                 delta = delta % window.interval;
             }
         }
+
+        delta2 += clock3.getDelta();
+
+        if (delta2 > 1 / 60) {
+            // The draw or time dependent code are here
+            fixedUpdate();
+            delta2 = delta2 % 60;
+        }
     }
 
+
+    //if (window.FPS)
     requestAnimationFrame(animate);
 }
 
-function render(time) {
-    window.STATS.begin();
-
-    animatePortal();
-    updateRay();
-    animatePortalShader(time, window.MAIN_SCENE, window.MAIN_CAMERA, window.RENDERER);
-    updatePlayer(window.interval);
-    //itemUpdate();
-    TWEEN.update();
+function fixedUpdate() { //60 fps always for physics
+    //console.log("iiiiiiiiiiiii")
+    const deltaTime = clock2.getDelta();
+    updatePlayer(deltaTime);
 
     if (Date.now() >= timeTarget) {
 
-        const timeStep = 1 / window.fps;
+        const timeStep = (1 / 60); //window.fps
         window.CANNON_WORLD.step(timeStep)
         timeTarget += 1000 / window.PHYSICS_UPDATEPERSEC_LIMIT
         if (Date.now() >= timeTarget) {
             timeTarget = Date.now()
         }
     }
+}
+
+const STEPS_PER_FRAME = 1;
+
+function render(time) {
+    
+    window.STATS.begin();
+    animatePortal();
+    updateRay();
+    animateShader();
+    //itemUpdate();
+    TWEEN.update();
 
     if (window.initLevel) {
-
         if (window.HOLDING_ITEM) {
             var target = new THREE.Vector3(); // create once an reuse it
             window.holder.getWorldPosition(target);
-            //window.CURRENT_ITEM.position.copy(target);
 
             var x = target.x;
             var y = target.y;
@@ -432,46 +517,7 @@ function render(time) {
             window.CURRENT_ITEM.position.copy(new THREE.Vector3(x, y, z));
             window.CURRENT_ITEM.rotation.copy(window.MAIN_CAMERA.rotation);
         }
-
-        for (var i = 0; i < window.ITEM_BOXES.length; i++) {
-
-            if (window.ITEM_BOXES[i] != window.CURRENT_ITEM) {
-                window.ITEM_BOXES[i].position.copy(window.ITEM_BOXES[i].body.position);
-                window.ITEM_BOXES[i].quaternion.copy(window.ITEM_BOXES[i].body.quaternion);
-            }
-
-        }
-        for (var i = 0; i < window.ITEM_SPHERES.length; i++) {
-
-            if (window.ITEM_SPHERES[i] != window.CURRENT_ITEM) {
-                window.ITEM_SPHERES[i].position.copy(window.ITEM_SPHERES[i].body.position);
-                window.ITEM_SPHERES[i].quaternion.copy(window.ITEM_SPHERES[i].body.quaternion);
-            }
-        }
     }
-
-    for (var i = 0; i < window.ITEM_GENERAL.length; i++) {
-
-        if (window.ITEM_GENERAL[i] != window.CURRENT_ITEM) {
-            window.ITEM_GENERAL[i].position.copy(window.ITEM_GENERAL[i].body.position);
-            window.ITEM_GENERAL[i].quaternion.copy(window.ITEM_GENERAL[i].body.quaternion);
-
-            window.ITEM_GENERAL[i].translateY(-0.15);
-        }
-    }
-
-    for (var i = 0; i < window.horizontal.length; i++) {
-        window.horizontal[i].lookAt(window.GUN.position);
-        window.horizontal[i].rotation.x = Math.PI / 2;
-        window.horizontal[i].rotation.y = 0;
-    }
-
-    for (var i = 0; i < window.vertical.length; i++) {
-        window.vertical[i].lookAt(window.GUN.position);
-        window.vertical[i].rotation.z = 0;
-        window.vertical[i].rotation.y = 0;
-    }
-
 
     if (window.debugCol)
         cannonDebugger.update();
