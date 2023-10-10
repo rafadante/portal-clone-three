@@ -9,6 +9,62 @@ import {
     RectAreaLightHelper
 } from '../../jsm/helpers/RectAreaLightHelper.js';
 import $ from 'jquery';
+import JSZipUtils from 'jszip-utils';
+import {
+    unzipSync,
+    strFromU8
+} from '../../jsm/libs/fflate.module.js';
+
+
+
+async function handleZip(path, obj) {
+    await JSZipUtils.getBinaryContent(path, function (err, data) {
+        if (err) {
+            throw err;
+        }
+        const zip = unzipSync(new Uint8Array(data));
+
+        for (const path in zip) {
+
+            const file = zip[path];
+            var loader23 = new GLTFLoader();
+            loader23.parse(file.buffer, '', function (result) {
+
+                if (obj == "loadButtonCube") {
+                    loadButtonCubeManager(result.scene)
+                } else if (obj == "loadButtonSphere") {
+                    loadButtonSphereManager(result.scene)
+                } else if (obj == "loadButtonWeight") {
+                    loadButtonWeightManager(result.scene)
+                } else if (obj == "loadPedestalButton") {
+                    loadPedestalButtonManager(result.scene)
+                } else if (obj == "loadCamera") {
+                    loadCameraManager(result.scene)
+                } else if (obj == "loadRadio") {
+                    loadRadioManager(result.scene)
+                } else if (obj == "loadCorridor") {
+                    loadCorridorEnter(result.scene)
+                } else if (obj == "loadExitDoor") {
+                    loadExitDoor(result.scene)
+                } else if (obj == "loadEnterDoor") {
+                    loadEnterDoor(result.scene)
+                } else if (obj == "loadDispenser") {
+                    loadDispenserManager(result.scene)
+                } else if (obj == "loadGun") {
+                    loadGunManager(result.scene)
+                } else if (obj == "loadPortalCube") {
+                    loadPortalCubeManager(result.scene)
+                }else if (obj == "loadPortalSphere") {
+                    loadPortalSphereManager(result.scene)
+                }
+
+                
+            });
+
+        }
+    });
+}
+
 
 const manager = new THREE.LoadingManager();
 manager.onStart = function (url, itemsLoaded, itemsTotal) {
@@ -31,55 +87,20 @@ const loader = new GLTFLoader(manager).setPath('./assets');
 
 function loadCube() {
 
-    loader.load('/models/cubes/cube.glb', (gltf) => {
+    var bb = new THREE.Box3()
+    bb.setFromObject(window.CUBES);
+    bb.getCenter(window.CONTROLS.target);
 
-        gltf.scene.userData.isCube = true;
+    window.CONTROLS.target.set(window.CONTROLS.target.x + 8, window.CONTROLS.target.y + 2, window.CONTROLS.target.z + 6);
+    window.MAIN_CAMERA.position.set(-12.2, 17.4, 26.3)
+    window.CONTROLS.update();
 
-        gltf.scene.traverse(child => {
-            if (child.material) {
-                if (!window.INVERTED_MATERIAL.map) {
-                    window.INVERTED_MATERIAL.map = child.material.map;
-                }
-            }
-
-            child.userData.isCube = true;
-            child.receiveShadow = true;
-            child.castShadow = true;
-        })
-
-        window.DEFAULT_CUBE = gltf.scene;
-
-        var bb = new THREE.Box3()
-        bb.setFromObject(window.CUBES);
-        bb.getCenter(window.CONTROLS.target);
-
-        window.CONTROLS.target.set(window.CONTROLS.target.x + 8, window.CONTROLS.target.y + 2, window.CONTROLS.target.z + 6);
-        window.MAIN_CAMERA.position.set(-12.2, 17.4, 26.3)
-        window.CONTROLS.update();
-
-        loadInvertedCube();
-    });
-}
-
-function loadInvertedCube() {
-    loader.load('/models/cubes/cubeInverted.glb', (gltf) => {
-
-        gltf.scene.userData.isCube = true;
-
-        gltf.scene.traverse(child => {
-            child.userData.isCube = true;
-            child.receiveShadow = true;
-            child.castShadow = true;
-        })
-
-        window.INVERTED_CUBE = gltf.scene;
-        buildIniCubes(gltf.scene);
-        loadWindowIMG()
-    });
+    buildIniCubes();
+    loadWindowIMG()
 }
 
 function loadWindowIMG() {
-    loader.load('/models/cubes/WINDOW_IMG.glb', (gltf) => {
+    loader.load('/3ds/WINDOW_IMG.glb', (gltf) => {
 
         gltf.scene.traverse(child => {
 
@@ -112,7 +133,7 @@ function loadWindowIMG() {
 }
 
 function loadWindow() {
-    loader.load('/models/cubes/window.glb', (gltf) => {
+    loader.load('/3ds/window.glb', (gltf) => {
         gltf.scene.traverse(child => {
             if (child.name.includes("Cube")) {
                 //child.receiveShadow = true;
@@ -148,295 +169,298 @@ function loadWindow() {
 }
 
 function loadGun() {
-    var gunBasic = new THREE.MeshBasicMaterial();
-    loader.load('/models/hd_portal_gun3.glb', (gltf) => {
+    handleZip('./assets/3ds/hd_portal_gun3.zip', "loadGun");
+}
 
+function loadGunManager(scene) {
 
-        window.GUN = new THREE.Group();
-        window.GUN.visible = false;
+    window.GUN = new THREE.Group();
+    window.GUN.visible = false;
 
-        var newGroup = new THREE.Group();
+    var newGroup = new THREE.Group();
 
-        window.GUN.add(newGroup);
-        newGroup.add(gltf.scene);
+    window.GUN.add(newGroup);
+    newGroup.add(scene);
 
-        //window.GUN = gltf.scene;
+    scene.traverse(child => {
+        if (child.material) {
+            child.receiveShadow = true;
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 0.25;
+        }
 
-        gltf.scene.traverse(child => {
-            if (child.material) {
-                child.receiveShadow = true;
-                child.material.envMap = window.ENV_MAP_FPS;
-                child.material.envMapIntensity = 0.25;
-            }
+        child.renderOrder = -1;
 
-            child.renderOrder = -1;
+        if (child.name == "sphere") {
+            window.GUN_SPHERE = child;
+        } else if (child.name == "cylinder") {
+            window.GUN_CYLINDER = child;
+        } else if (child.name == "cube_1")
+            window.cube_1 = child;
+        else if (child.name == "cube_2")
+            window.cube_2 = child;
+        else if (child.name == "cube_3")
+            window.cube_3 = child;
+        //else if (child.name == "holder")
+        //    window.holder = child;
 
-            if(child.name == "sphere"){
-                window.GUN_SPHERE = child;
-            }else if(child.name == "cylinder"){
-                window.GUN_CYLINDER = child;
-            }else if (child.name == "cube_1")
-                window.cube_1 = child;
-            else if (child.name == "cube_2")
-                window.cube_2 = child;
-            else if (child.name == "cube_3")
-                window.cube_3 = child;
-            //else if (child.name == "holder")
-            //    window.holder = child;
-
-        });
-
-        //console.log(window.holder.position)
-        window.GUN.name = "GUN";
-        window.MAIN_SCENE.add(window.GUN);
-
-        //gltf.scene.position.set(0.12, -0.14, -0.13);
-        gltf.scene.scale.set(0.1, 0.1, 0.1)
-        gltf.scene.position.set(0.01, -0.012, -0.011);
-        loadExitDoor()
-
-        const geometry = new THREE.SphereGeometry(0.01, 32, 16);
-        const material = new THREE.MeshBasicMaterial({
-            color: 0xffff00,
-            visible: false
-        });
-        const sphere = new THREE.Mesh(geometry, material);
-        const sphere1 = sphere.clone();
-        const sphere2 = sphere.clone();
-        const sphere3 = sphere.clone();
-
-        var target = new THREE.Vector3(); // create once an reuse it
-        window.cube_1.getWorldPosition(target);
-        sphere1.position.copy(target)
-        window.GUN.add(sphere1)
-        window.cube_1 = sphere1;
-
-        var target = new THREE.Vector3(); // create once an reuse it
-        window.cube_2.getWorldPosition(target);
-        sphere2.position.copy(target)
-        window.GUN.add(sphere2)
-        window.cube_2 = sphere2;
-
-        var target = new THREE.Vector3(); // create once an reuse it
-        window.cube_3.getWorldPosition(target);
-        sphere3.position.copy(target)
-        window.GUN.add(sphere3)
-        window.cube_3 = sphere3;
     });
+
+    //console.log(window.holder.position)
+    window.GUN.name = "GUN";
+    window.MAIN_SCENE.add(window.GUN);
+
+    //gltf.scene.position.set(0.12, -0.14, -0.13);
+    scene.scale.set(0.1, 0.1, 0.1)
+    scene.position.set(0.01, -0.012, -0.011);
+    loadDoor()
+
+    const geometry = new THREE.SphereGeometry(0.01, 32, 16);
+    const material = new THREE.MeshBasicMaterial({
+        color: 0xffff00,
+        visible: false
+    });
+    const sphere = new THREE.Mesh(geometry, material);
+    const sphere1 = sphere.clone();
+    const sphere2 = sphere.clone();
+    const sphere3 = sphere.clone();
+
+    var target = new THREE.Vector3(); // create once an reuse it
+    window.cube_1.getWorldPosition(target);
+    sphere1.position.copy(target)
+    window.GUN.add(sphere1)
+    window.cube_1 = sphere1;
+
+    var target = new THREE.Vector3(); // create once an reuse it
+    window.cube_2.getWorldPosition(target);
+    sphere2.position.copy(target)
+    window.GUN.add(sphere2)
+    window.cube_2 = sphere2;
+
+    var target = new THREE.Vector3(); // create once an reuse it
+    window.cube_3.getWorldPosition(target);
+    sphere3.position.copy(target)
+    window.GUN.add(sphere3)
+    window.cube_3 = sphere3;
 }
 
-function loadExitDoor() {
-    loader.load('/doors/open.glb', (gltf) => {
-        //EXIT DOOR
-        gltf.scene.position.set(13, 1, -0.99)
-        gltf.scene.translateZ(1);
-        gltf.scene.name = "exitDoor";
-        window.EXIT_DOOR = gltf.scene;
-        window.MAIN_SCENE.add(gltf.scene);
-
-        gltf.scene.traverse(child => {
-
-            child.userData.wall = true;
-            child.userData.ground = false;
-            child.userData.ceiling = false;
-
-            if (child.isBone) {
-                if (child.name == "portal_door_right_04") {
-                    child.scale.set(0, 0, 0);
-                    window.exit_door_right = child;
-                } else if (child.name == "portal_door_left_06") {
-                    child.scale.set(0, 0, 0);
-                    window.exit_door_left = child;
-                }
-            }
-
-            if (child.material) {
-                child.material.envMap = window.ENV_MAP_FPS;
-                child.material.envMapIntensity = 0.5;
-            }
-        })
-        //
-        loadEnterDoor();
-    })
+function loadDoor() {
+    handleZip('./assets/3ds/open.zip', "loadExitDoor");
 }
 
-function loadEnterDoor() {
-    loader.load('/doors/open.glb', (gltf) => {
-        //ENTER DOOR
-        gltf.scene.name = "enterDoor";
-        gltf.scene.rotation.y = Math.PI;
-        gltf.scene.position.set(3, 1, 13);
-        gltf.scene.translateZ(1);
-        window.ENTER_DOOR = gltf.scene;
-        window.MAIN_SCENE.add(gltf.scene);
+function loadExitDoor(scene) {
+    //EXIT DOOR
+    var door = scene;
+    door.position.set(13, 1, -0.99)
+    door.translateZ(1);
+    door.name = "exitDoor";
+    window.EXIT_DOOR = door;
+    window.MAIN_SCENE.add(door);
 
-        //
-        const geometry = new THREE.PlaneGeometry(2, 2);
-        const material = new THREE.MeshBasicMaterial({
-            color: 0xffff00,
-            side: 2,
-            visible: false
-        });
-        const plane = new THREE.Mesh(geometry, material);
-        window.planeEnterDoor = plane;
-        gltf.scene.add(plane);
+    door.traverse(child => {
 
-        gltf.scene.traverse(child => {
+        child.userData.wall = true;
+        child.userData.ground = false;
+        child.userData.ceiling = false;
 
-            child.userData.wall = true;
-            child.userData.ground = false;
-            child.userData.ceiling = false;
-
-            if (child.isBone) {
-                if (child.name == "portal_door_right_04") {
-                    child.scale.set(0, 0, 0);
-                    window.enter_door_right = child;
-                } else if (child.name == "portal_door_left_06") {
-                    child.scale.set(0, 0, 0);
-                    window.enter_door_left = child;
-                } else if (child.name == "central_spinner_right_05") {
-                    window.enter_door_right_spinner = child;
-                } else if (child.name == "central_spinner_left_07") {
-                    window.enter_door_left_spinner = child;
-                }
+        if (child.isBone) {
+            if (child.name == "portal_door_right_04") {
+                child.scale.set(0, 0, 0);
+                window.exit_door_right = child;
+            } else if (child.name == "portal_door_left_06") {
+                child.scale.set(0, 0, 0);
+                window.exit_door_left = child;
             }
+        }
 
-            if (child.material) {
-                child.material.envMap = window.ENV_MAP_FPS;
-                child.material.envMapIntensity = 0.5;
-            }
-        })
-        //
-        gltf.scene.getObjectByName("warning").material = new THREE.MeshStandardMaterial();
-        var map = new THREE.TextureLoader().load('./assets/enter.jpg');
-        map.flipY = false;
-        map.encoding = THREE.sRGBEncoding;
-        gltf.scene.getObjectByName("warning").material.map = map;
-        //
-        loadCorridorEnter()
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 0.5;
+        }
     })
+    //
+    //loadEnterDoor(scene);
+    handleZip('./assets/3ds/open.zip', "loadEnterDoor");
 }
 
-function loadCorridorEnter() {
-    loader.load('/3ds/corridor.glb', (gltf) => {
+function loadEnterDoor(scene) {
 
-        gltf.scene.position.z = -0.99;
-        gltf.scene.visible = false;
+    var door = scene;
 
-        gltf.scene.traverse(child => {
-            if (child.material) {
-                child.material.envMap = window.ENV_MAP_FPS;
+    //ENTER DOOR
+    door.name = "enterDoor";
+    door.rotation.y = Math.PI;
+    door.position.set(3, 1, 13);
+    door.translateZ(1);
+    window.ENTER_DOOR = door;
+    window.MAIN_SCENE.add(door);
 
-                if (child.material.name == "lambert5") {
-                    child.material = new THREE.MeshBasicMaterial()
-                    window.SELECTED_OBJECTS_FOR_BLOOM.add(child);
-                }
+    //
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    const material = new THREE.MeshBasicMaterial({
+        color: 0xffff00,
+        side: 2,
+        visible: false
+    });
+    const plane = new THREE.Mesh(geometry, material);
+    window.planeEnterDoor = plane;
+    door.add(plane);
+
+    door.traverse(child => {
+
+        child.userData.wall = true;
+        child.userData.ground = false;
+        child.userData.ceiling = false;
+
+        if (child.isBone) {
+            if (child.name == "portal_door_right_04") {
+                child.scale.set(0, 0, 0);
+                window.enter_door_right = child;
+            } else if (child.name == "portal_door_left_06") {
+                child.scale.set(0, 0, 0);
+                window.enter_door_left = child;
+            } else if (child.name == "central_spinner_right_05") {
+                window.enter_door_right_spinner = child;
+            } else if (child.name == "central_spinner_left_07") {
+                window.enter_door_left_spinner = child;
             }
-        });
+        }
 
-        window.CORRIDOR_ENTER = gltf.scene.clone();
-        window.CORRIDOR_ENTER.name = "corridorEnter";
-        window.ENTER_DOOR.add(window.CORRIDOR_ENTER);
-        loadCorridorExit();
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 0.5;
+        }
     })
+    //
+    door.getObjectByName("warning").material = new THREE.MeshStandardMaterial();
+    var map = new THREE.TextureLoader().load('./assets/enter.jpg');
+    map.flipY = false;
+    map.encoding = THREE.sRGBEncoding;
+    door.getObjectByName("warning").material.map = map;
+    //
+    loadCorridor()
 }
 
-function loadCorridorExit() {
-    loader.load('/3ds/corridor.glb', (gltf) => {
+function loadCorridor() {
+    handleZip('./assets/3ds/corridor.zip', "loadCorridor");
+}
 
-        gltf.scene.position.z = -0.99;
-        gltf.scene.visible = false;
+function loadCorridorEnter(scene) {
 
-        gltf.scene.traverse(child => {
-            if (child.material) {
-                child.material.envMap = window.ENV_MAP_FPS;
+    var corridor = scene.clone();
+    corridor.position.z = -0.99;
+    corridor.visible = false;
 
-                if (child.material.name == "lambert5") {
-                    child.material = new THREE.MeshBasicMaterial()
-                    window.SELECTED_OBJECTS_FOR_BLOOM.add(child);
-                }
+    corridor.traverse(child => {
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+
+            if (child.material.name == "lambert5") {
+
+                child.material = new THREE.MeshBasicMaterial()
+                window.SELECTED_OBJECTS_FOR_BLOOM.add(child);
             }
-        });
+        }
+    });
 
-        window.CORRIDOR_EXIT = gltf.scene.clone();
-        window.CORRIDOR_EXIT.name = "corridorExit";
-        window.CORRIDOR_EXIT.getObjectByName("spawn").material = new THREE.MeshBasicMaterial({
-            transparent: true,
-            opacity: 0
-        })
-        window.CORRIDOR_EXIT.getObjectByName("spawn").name = "completed";
-        window.EXIT_DOOR.add(window.CORRIDOR_EXIT);
-        loadPortalCube()
+    window.CORRIDOR_ENTER = corridor;
+    window.CORRIDOR_ENTER.name = "corridorEnter";
+    window.ENTER_DOOR.add(window.CORRIDOR_ENTER);
+    loadCorridorExit(scene);
+}
+
+function loadCorridorExit(scene) {
+
+    var corridor = scene.clone();
+
+    corridor.position.z = -0.99;
+    corridor.visible = false;
+
+    corridor.traverse(child => {
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+
+            if (child.material.name == "lambert5") {
+                child.material = new THREE.MeshBasicMaterial()
+                window.SELECTED_OBJECTS_FOR_BLOOM.add(child);
+            }
+        }
+    });
+
+    window.CORRIDOR_EXIT = corridor;
+    window.CORRIDOR_EXIT.name = "corridorExit";
+    window.CORRIDOR_EXIT.getObjectByName("spawn").material = new THREE.MeshBasicMaterial({
+        transparent: true,
+        opacity: 0
     })
+    window.CORRIDOR_EXIT.getObjectByName("spawn").name = "completed";
+    window.EXIT_DOOR.add(window.CORRIDOR_EXIT);
+    loadPortalCube()
 }
 
 function loadPortalCube() {
-    //PORTAL CUBE
-    loader.load('/models/portal_cube.glb', (gltf) => {
-        gltf.scene.name = "cube";
-        gltf.scene.renderOrder = 3;
-        gltf.scene.userData.wall = false;
-        gltf.scene.userData.ground = true;
-        gltf.scene.userData.ceiling = false;
-        window.ITEMS.add(gltf.scene);
-        gltf.scene.traverse(child => {
-            child.receiveShadow = true;
-            child.castShadow = true;
-            if (child.material) {
-                child.material.envMap = window.ENV_MAP_FPS;
-                child.material.envMapIntensity = 0.5;
-                child.material.roughness = 0.2;
-            }
+    handleZip('./assets/3ds/portal_cube.zip', "loadPortalCube");
+}
 
-            if (child.name.includes("bloom")) {
-                //window.SELECTED_OBJECTS_FOR_BLOOM.add(child);
-            }
-        })
-        loadPortalSphere()
+function loadPortalCubeManager(scene) {
+    scene.name = "cube";
+    scene.renderOrder = 3;
+    scene.userData.wall = false;
+    scene.userData.ground = true;
+    scene.userData.ceiling = false;
+    window.ITEMS.add(scene);
+    scene.traverse(child => {
+        child.receiveShadow = true;
+        child.castShadow = true;
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 0.5;
+            child.material.roughness = 0.2;
+        }
+
+        if (child.name.includes("bloom")) {
+            //window.SELECTED_OBJECTS_FOR_BLOOM.add(child);
+        }
     })
+    loadPortalSphere()
 }
 
 function loadPortalSphere() {
-    //SPHERE
-    loader.load('/models/portal_sphere.glb', (gltf) => {
-        gltf.scene.name = "sphere";
-        gltf.scene.userData.wall = false;
-        gltf.scene.userData.ground = true;
-        gltf.scene.userData.ceiling = false;
-        window.ITEMS.add(gltf.scene);
+    handleZip('./assets/3ds/portal_sphere.zip', "loadPortalSphere");
+}
 
-        gltf.scene.traverse(child => {
-            child.receiveShadow = true;
-            child.castShadow = true;
-            if (child.material) {
-                child.material.envMap = window.ENV_MAP_FPS;
-                child.material.envMapIntensity = 0.5;
-                child.material.roughness = 0.2;
+function loadPortalSphereManager(scene) {
+    scene.name = "sphere";
+    scene.userData.wall = false;
+    scene.userData.ground = true;
+    scene.userData.ceiling = false;
+    window.ITEMS.add(scene);
 
-                //child.material.depthTest = false;
-                //child.material.transparent = true;
-            }
+    scene.traverse(child => {
+        child.receiveShadow = true;
+        child.castShadow = true;
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 0.5;
+            child.material.roughness = 0.2;
 
-            if (child.name.includes("bloom")) {
-                //window.SELECTED_OBJECTS_FOR_BLOOM.add(child);
-               // child.material.emissive = "blue"
-                //child.material.emissiveIntensity = 10
-            }
-        })
+            //child.material.depthTest = false;
+            //child.material.transparent = true;
+        }
     })
     loadHalfWindow()
 }
 
 function loadHalfWindow() {
     //HALF WINDOW IMG
-    loader.load('/models/cubes/WINDOW_HALF_IMG.glb', (gltf) => {
+    loader.load('/3ds/WINDOW_HALF_IMG.glb', (gltf) => {
         gltf.scene.name = "observation_room";
         gltf.scene.userData.wall = true;
         gltf.scene.userData.ground = false;
         gltf.scene.userData.ceiling = false;
         window.ITEMS.add(gltf.scene);
         //HALF WINDOW
-        loader.load('/models/cubes/window_half.glb', (gltf2) => {
+        loader.load('/3ds/window_half.glb', (gltf2) => {
             gltf2.scene.traverse(child => {
                 child.receiveShadow = true;
                 child.castShadow = true;
@@ -477,156 +501,169 @@ function loadHalfWindow() {
 }
 
 function loadDispenser() {
-    //DISPENSER
-    loader.load('/models/cube_dispenser.glb', (gltf) => {
-        gltf.scene.name = "dispenser";
-        gltf.scene.userData.wall = false;
-        gltf.scene.userData.ground = true;
-        gltf.scene.userData.ceiling = false;
-        window.ITEMS.add(gltf.scene);
-        gltf.scene.traverse(child => {
-            child.receiveShadow = true;
-            child.castShadow = true;
-            if (child.material) {
-                child.material.envMap = window.ENV_MAP_FPS;
-                child.material.envMapIntensity = 0.5;
-            }
-        })
+    handleZip('./assets/3ds/cube_dispenser.zip', "loadDispenser");
+}
 
-        loadPedestalButton()
+function loadDispenserManager(scene) {
+    scene.name = "dispenser";
+    scene.userData.wall = false;
+    scene.userData.ground = true;
+    scene.userData.ceiling = false;
+    window.ITEMS.add(scene);
+    scene.traverse(child => {
+        child.receiveShadow = true;
+        child.castShadow = true;
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 0.5;
+        }
     })
+
+    loadPedestalButton()
 }
 
 function loadPedestalButton() {
-    loader.load('/3ds/pedestal_button.glb', (gltf) => {
-        gltf.scene.name = "pedestal_button";
-        gltf.scene.userData.wall = false;
-        gltf.scene.userData.ground = true;
-        gltf.scene.userData.ceiling = false;
-        gltf.scene.userData.trigger = true;
-        window.ITEMS.add(gltf.scene);
-        gltf.scene.traverse(child => {
-            child.receiveShadow = true;
-            child.castShadow = true;
-            if (child.material) {
-                child.material.envMap = window.ENV_MAP_FPS;
-                child.material.envMapIntensity = 0.5;
-            }
-        })
+    handleZip('./assets/3ds/pedestal_button.zip', "loadPedestalButton");
+}
 
-        loadButtonSphere()
+function loadPedestalButtonManager(scene) {
+    scene.name = "pedestal_button";
+    scene.userData.wall = false;
+    scene.userData.ground = true;
+    scene.userData.ceiling = false;
+    scene.userData.trigger = true;
+    window.ITEMS.add(scene);
+    scene.traverse(child => {
+        child.receiveShadow = true;
+        child.castShadow = true;
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 0.5;
+        }
     })
+
+    loadButtonSphere()
 }
 
 function loadButtonSphere() {
-    loader.load('/3ds/button_sphere.glb', (gltf) => {
-        gltf.scene.name = "button_circle";
-        gltf.scene.userData.wall = false;
-        gltf.scene.userData.ground = true;
-        gltf.scene.userData.ceiling = false;
-        gltf.scene.userData.trigger = true;
-        window.ITEMS.add(gltf.scene);
-        gltf.scene.traverse(child => {
-            child.receiveShadow = true;
-            child.castShadow = true;
-            if (child.material) {
-                child.material.envMap = window.ENV_MAP_FPS;
-                child.material.envMapIntensity = 0.5;
-            }
-        })
+    handleZip('./assets/3ds/button_sphere.zip', "loadButtonSphere");
+}
 
-        loadButtonCube()
+function loadButtonSphereManager(scene) {
+    scene.name = "button_circle";
+    scene.userData.wall = false;
+    scene.userData.ground = true;
+    scene.userData.ceiling = false;
+    scene.userData.trigger = true;
+    window.ITEMS.add(scene);
+    scene.traverse(child => {
+        child.receiveShadow = true;
+        child.castShadow = true;
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 0.5;
+        }
     })
+
+    loadButtonCube()
 }
 
 function loadButtonCube() {
-    loader.load('/3ds/button_cube.glb', (gltf) => {
-        gltf.scene.name = "button_box";
-        gltf.scene.userData.wall = false;
-        gltf.scene.userData.ground = true;
-        gltf.scene.userData.ceiling = false;
-        gltf.scene.userData.trigger = true;
-        window.ITEMS.add(gltf.scene);
-        gltf.scene.traverse(child => {
-            child.receiveShadow = true;
-            child.castShadow = true;
-            if (child.material) {
-                child.material.envMap = window.ENV_MAP_FPS;
-                child.material.envMapIntensity = 0.5;
-            }
-        })
+    handleZip('./assets/3ds/button_cube.zip', "loadButtonCube");
+}
 
-        loadButtonWeight()
+function loadButtonCubeManager(scene) {
+    console.log(scene)
+    scene.name = "button_box";
+    scene.userData.wall = false;
+    scene.userData.ground = true;
+    scene.userData.ceiling = false;
+    scene.userData.trigger = true;
+    window.ITEMS.add(scene);
+    scene.traverse(child => {
+        child.receiveShadow = true;
+        child.castShadow = true;
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 0.5;
+        }
     })
+    loadButtonWeight()
 }
 
 function loadButtonWeight() {
-    loader.load('/3ds/button_weight.glb', (gltf) => {
-        gltf.scene.name = "button_weight";
-        gltf.scene.userData.wall = false;
-        gltf.scene.userData.ground = true;
-        gltf.scene.userData.ceiling = false;
-        gltf.scene.userData.trigger = true;
-        window.ITEMS.add(gltf.scene);
-        gltf.scene.traverse(child => {
-            child.receiveShadow = true;
-            child.castShadow = true;
-            if (child.material) {
-                child.material.envMap = window.ENV_MAP_FPS;
-                child.material.envMapIntensity = 0.5;
-            }
-        })
+    handleZip('./assets/3ds/button_weight.zip', "loadButtonWeight");
+}
 
-        loadCamera()
+function loadButtonWeightManager(scene) {
+    scene.name = "button_weight";
+    scene.userData.wall = false;
+    scene.userData.ground = true;
+    scene.userData.ceiling = false;
+    scene.userData.trigger = true;
+    window.ITEMS.add(scene);
+    scene.traverse(child => {
+        child.receiveShadow = true;
+        child.castShadow = true;
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 0.5;
+        }
     })
+
+    loadCamera();
 }
 
 function loadCamera() {
-    loader.load('/3ds/camera.glb', (gltf) => {
-        gltf.scene.name = "camera";
-        gltf.scene.userData.wall = true;
-        gltf.scene.userData.ground = false;
-        gltf.scene.userData.ceiling = false;
-        window.ITEMS.add(gltf.scene);
-        gltf.scene.traverse(child => {
-            child.receiveShadow = true;
-            child.castShadow = true;
-            if (child.material) {
-                child.material.envMap = window.ENV_MAP_FPS;
-                child.material.envMapIntensity = 0.5;
-                child.material.roughness = 0.2;
+    handleZip('./assets/3ds/camera.zip', "loadCamera");
+}
 
-                if (child.name == "Sphere") {
-                    child.material = new THREE.MeshBasicMaterial();
-                    child.material.roughness = 0;
-                    child.material.color = new THREE.Color(0xf70022);
-                }
+function loadCameraManager(scene) {
+    scene.name = "camera";
+    scene.userData.wall = true;
+    scene.userData.ground = false;
+    scene.userData.ceiling = false;
+    window.ITEMS.add(scene);
+    scene.traverse(child => {
+        child.receiveShadow = true;
+        child.castShadow = true;
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 0.5;
+            child.material.roughness = 0.2;
+
+            if (child.name == "Sphere") {
+                child.material = new THREE.MeshBasicMaterial();
+                child.material.roughness = 0;
+                child.material.color = new THREE.Color(0xf70022);
             }
-        })
-
-        loadRadio()
+        }
     })
+
+    loadRadio()
 }
 
 function loadRadio() {
-    loader.load('/3ds/radio.glb', (gltf) => {
-        gltf.scene.name = "radio";
-        gltf.scene.userData.wall = false;
-        gltf.scene.userData.ground = true;
-        gltf.scene.userData.ceiling = false;
-        window.ITEMS.add(gltf.scene);
-        gltf.scene.traverse(child => {
-            child.receiveShadow = true;
-            child.castShadow = true;
-            if (child.material) {
-                child.material.envMap = window.ENV_MAP_FPS;
-                child.material.envMapIntensity = 0.5;
-            }
-        })
+    handleZip('./assets/3ds/radio.zip', "loadRadio");
+}
 
-        $("#loading-parent").css("opacity", 0);
-        $("#loading-parent").css("pointer-events", "none");
+function loadRadioManager(scene) {
+    scene.name = "radio";
+    scene.userData.wall = false;
+    scene.userData.ground = true;
+    scene.userData.ceiling = false;
+    window.ITEMS.add(scene);
+    scene.traverse(child => {
+        child.receiveShadow = true;
+        child.castShadow = true;
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 0.5;
+        }
     })
+
+    $("#loading-parent").css("opacity", 0);
+    $("#loading-parent").css("pointer-events", "none");
 }
 
 export {

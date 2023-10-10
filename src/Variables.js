@@ -1,6 +1,7 @@
 /* eslint-disable */
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
+import "./components/materials/Materials.js"
 
 //
 window.paused = false;
@@ -62,8 +63,6 @@ RENDERER.localClippingEnabled = true;
 RENDERER.physicallyCorrectLights = true;
 RENDERER.domElement.id = "viewer-3d";
 //
-
-
 window.maxAnisotropy = RENDERER.capabilities.getMaxAnisotropy();
 //
 //const geometry = new THREE.PlaneGeometry(2, 2);
@@ -207,119 +206,44 @@ window.COL_Z = false
 window.COL_Z_POS = 0
 window.ITEM_CUBE = null
 
-
-//----------------------------------------------
-var map;
-
-//MATERIAL FLOOR NON PORTAL
-window.materialFloorNonPortal = new THREE.MeshPhysicalMaterial();
-
-map = new THREE.TextureLoader().load('./assets/textures/floor2/base.jpg');
-map.encoding = THREE.sRGBEncoding;
-materialFloorNonPortal.map = map;
-
-map = new THREE.TextureLoader().load('./assets/textures/floor2/normal.jpg');
-materialFloorNonPortal.normalMap = map;
-
-map = new THREE.TextureLoader().load('./assets/textures/floor2/roughness.jpg');
-materialFloorNonPortal.roughnessMap = map;
-
-//MATERIAL FLOOR PORTAL
-window.materialFloorPortal = materialFloorNonPortal.clone();
-
-map = new THREE.TextureLoader().load('./assets/textures/floor2/base2.jpg');
-map.encoding = THREE.sRGBEncoding;
-materialFloorPortal.map = map;
-
-//MATERIAL WALL PORTAL
-window.materialWallPortal = new THREE.MeshPhysicalMaterial({
-    side: 2,
-});
-
-map = new THREE.TextureLoader().load('./assets/textures/wall4/base.jpg');
-map.encoding = THREE.sRGBEncoding;
-map.flipY = true;
-//map.wrapS = map.wrapT = THREE.RepeatWrapping;
-//map.repeat.set(0.5, 0.5);
-materialWallPortal.map = map;
-
-map = new THREE.TextureLoader().load('./assets/textures/wall/2/normal.jpg');
-//map.wrapS = map.wrapT = THREE.RepeatWrapping;
-//map.repeat.set(2, 2);
-materialWallPortal.normalMap = map;
-
-map = new THREE.TextureLoader().load('./assets/textures/wall/2/roughness.jpg');
-//map.wrapS = map.wrapT = THREE.RepeatWrapping;
-//map.repeat.set(2, 2);
-materialWallPortal.roughnessMap = map;
-
-//MATERIAL NON WALL PORTAL
-window.materialWallNonPortal = materialWallPortal.clone();
-
-map = new THREE.TextureLoader().load('./assets/textures/wall4/base3.jpg');
-map.encoding = THREE.sRGBEncoding;
-map.wrapS = map.wrapT = THREE.RepeatWrapping;
-materialWallNonPortal.map = map;
-
-//MATERIAL NON PORTAL 2 
-window.materialWallNonPortal2 = new THREE.MeshPhysicalMaterial({
-    metalness: 1,
-    roughness: 0.5
-});
-map = new THREE.TextureLoader().load('./assets/textures/NonPortal/1/base.jpg');
-map.encoding = THREE.sRGBEncoding;
-window.materialWallNonPortal2.map = map;
-
-map = new THREE.TextureLoader().load('./assets/textures/NonPortal/1/normal.jpg');
-window.materialWallNonPortal2.normalMap = map;
-
-map = new THREE.TextureLoader().load('./assets/textures/NonPortal/1/metal.jpg');
-window.materialWallNonPortal2.metalnessMap = map;
-
-
-console.log(window.materialWallNonPortal2)
-
-
-
-
 //----------------------------------------------------------------------------------
+
 window.OBSERVATION_ROOM = null;
 window.OBSERVATION_ROOM_IMG = null;
-
 window.CHECK = new THREE.TextureLoader().load('./assets/check.png');
 
- /**********************************************************
-    * PHYSICS
-    **********************************************************/
-    // https://github.com/schteppe/cannon.js/blob/master/demos/collisionFilter.html
-    // as long as at one of the objects say that it doesn't collide with the other, then they will not collide.
-    // we don't have to set collision masks for both.
-    // rules:
-    // all dynamic objects collide with all environment objects and dynamic objects by default.
-    //    all dynamic objects have mask ALL on creation
-    //    group DYNAMIC on creation
-    // all environment objects collide with dynamic objects by default.
-    //    all environment objects have mask DYNAMIC on creation
-    //    group ENVIRONMENT on creation
-    // when dynamic object d is in bb of portal p, then d should not collide with p's host object.
-    //    on create p: set p host object group to PORTAL_HOST_CDISABLE[p]
-    //        p host object mask is still DYNAMIC
-    //    on trigger bb: set d mask to all except for PORTAL_HOST_CDISABLE[p]
-    //        d group is still DYNAMIC
-    //        d mask is its ALL & ~PORTAL_HOST_CDISABLE[p]
-    // pseudocode:
-    // on update loop:
-    // for each dynamic object d:
-    //     set mask to CGROUP_ALL
-    //     for each portal p:
-    //         if d in p's bounding box:
-    //             set mask &= ~CGROUP_PORTAL_HOST_CDISABLE[p]
-    //     no change to group.
-    // on creation of portal p:
-    //     set previous host object group back to CGROUP_ENVIRONMENT if in neither CGROUP_PORTAL_HOST_CDISABLE's
-    //     set new host object group &= CGROUP_PORTAL_HOST_CDISABLE[p]
-    //     no change to mask.
-    window.CGROUP_ENVIRONMENT = 1 << 0;
-    window.CGROUP_PORTAL_HOST_CDISABLE = [1 << 1, 1 << 2];
-    window.CGROUP_DYNAMIC = 1 << 3;
-    window.CGROUP_ALL = 0xFF;
+/**********************************************************
+ * PHYSICS
+ **********************************************************/
+// https://github.com/schteppe/cannon.js/blob/master/demos/collisionFilter.html
+// as long as at one of the objects say that it doesn't collide with the other, then they will not collide.
+// we don't have to set collision masks for both.
+// rules:
+// all dynamic objects collide with all environment objects and dynamic objects by default.
+//    all dynamic objects have mask ALL on creation
+//    group DYNAMIC on creation
+// all environment objects collide with dynamic objects by default.
+//    all environment objects have mask DYNAMIC on creation
+//    group ENVIRONMENT on creation
+// when dynamic object d is in bb of portal p, then d should not collide with p's host object.
+//    on create p: set p host object group to PORTAL_HOST_CDISABLE[p]
+//        p host object mask is still DYNAMIC
+//    on trigger bb: set d mask to all except for PORTAL_HOST_CDISABLE[p]
+//        d group is still DYNAMIC
+//        d mask is its ALL & ~PORTAL_HOST_CDISABLE[p]
+// pseudocode:
+// on update loop:
+// for each dynamic object d:
+//     set mask to CGROUP_ALL
+//     for each portal p:
+//         if d in p's bounding box:
+//             set mask &= ~CGROUP_PORTAL_HOST_CDISABLE[p]
+//     no change to group.
+// on creation of portal p:
+//     set previous host object group back to CGROUP_ENVIRONMENT if in neither CGROUP_PORTAL_HOST_CDISABLE's
+//     set new host object group &= CGROUP_PORTAL_HOST_CDISABLE[p]
+//     no change to mask.
+window.CGROUP_ENVIRONMENT = 1 << 0;
+window.CGROUP_PORTAL_HOST_CDISABLE = [1 << 1, 1 << 2];
+window.CGROUP_DYNAMIC = 1 << 3;
+window.CGROUP_ALL = 0xFF;

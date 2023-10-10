@@ -101,8 +101,8 @@ $("body").on('click', '#view-fps', function () {
         window.materialWallPortal.envMap = window.ENV_MAP_FPS;
         window.materialWallPortal.envMapIntensity = 0.2;
 
-        window.materialWallNonPortal2.envMap = window.ENV_MAP_FPS;
-        window.materialWallNonPortal2.envMapIntensity = 0.2;
+        window.materialWallNonPortal.envMap = window.ENV_MAP_FPS;
+        window.materialWallNonPortal.envMapIntensity = 0.2;
 
         window.materialFloorPortal.envMap = window.ENV_MAP_FPS;
         window.materialFloorPortal.envMapIntensity = 0.2;
@@ -253,7 +253,7 @@ $("body").on('click', '#view-fps', function () {
         //
 
         createInstances(meshesWallPortal, window.materialWallPortal)
-        createInstances(meshesWallNonPortal, window.materialWallNonPortal2)
+        createInstances(meshesWallNonPortal, window.materialWallNonPortal)
         createInstances(meshesFloorPortal, materialUpPortal)
         createInstances(meshesFloorNonPortal, materialUpNonPortal)
         createInstances(meshesUpPortal, window.materialFloorPortal)

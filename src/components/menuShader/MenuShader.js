@@ -226,11 +226,7 @@ const height = window.innerHeight;
 
 var background = new THREE.TextureLoader().load('./assets/loading/3.jpg');
 
-var grid1 = new THREE.TextureLoader().load('./assets/ui/grid1.jpg');
-var grid2 = new THREE.TextureLoader().load('./assets/ui/grid2.jpg');
-var grid3 = new THREE.TextureLoader().load('./assets/ui/grid3.jpg');
-var grid4 = new THREE.TextureLoader().load('./assets/ui/grid4.jpg');
-var grid5 = new THREE.TextureLoader().load('./assets/ui/grid5.jpg');
+var grid = new THREE.TextureLoader().load('./assets/ui/grid.jpg');
 
 window.tuniform = {
     iTime: {
@@ -247,7 +243,7 @@ window.tuniform = {
     },
     iChannel1: {
         type: "t",
-        value: grid1,
+        value: grid,
     },
 };
 
@@ -266,7 +262,7 @@ window.tuniform2 = {
     },
     iChannel1: {
         type: "t",
-        value: grid1,
+        value: grid,
     },
 };
 
@@ -421,24 +417,24 @@ function startLevel() {
 }
 
 $("body").on('click', '#option-single', function () {
-    optionMenu(grid1, "SINGLE PLAYER", "#options-single");
+    optionMenu(grid, "SINGLE PLAYER", "#options-single");
 });
 
 $("body").on('click', '#option-community', function () {
-    optionMenu(grid2, "COMMUNITY CHAMBERS", "#options-community");
+    optionMenu(grid, "COMMUNITY CHAMBERS", "#options-community");
 });
 
 $("body").on('click', '#option-options', function () {
     $("#back-editor").css("display", "none");
-    optionMenu(grid3, "OPTIONS", "#options-settings");
+    optionMenu(grid, "OPTIONS", "#options-settings");
 });
 
 $("body").on('click', '#option-about', function () {
-    optionMenu(grid4, "ABOUT", "#options-about");
+    optionMenu(grid, "ABOUT", "#options-about");
 });
 
 $("body").on('click', '#option-patreon', function () {
-    optionMenu(grid5, "PATREON", "#options-patreon");
+    optionMenu(grid, "PATREON", "#options-patreon");
 });
 
 function optionMenu(texture, title, id) {

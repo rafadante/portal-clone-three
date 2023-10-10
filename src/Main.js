@@ -16,10 +16,6 @@ import {
     Lights
 } from './components/lights/Lights.js';
 import {
-    contactShadowRender,
-    contactShadowInit
-} from './components/contactShadow/ContactShadow.js';
-import {
     cubeState
 } from './components/cubeManager/CubeManager.js';
 import {
@@ -221,8 +217,6 @@ function init() {
     window.MAIN_SCENE.add(window.ITEM_CUBE);
 
     console.log(window.MAIN_SCENE)
-    //
-    contactShadowInit(window.MAIN_SCENE);
     // CAMERA
     window.MAIN_SCENE.add(window.MAIN_CAMERA);
     // RENDERER
@@ -446,7 +440,6 @@ function animate(time) {
 
     if (!window.FPS) {
         window.STATS.begin();
-        //contactShadowRender(window.MAIN_SCENE, window.MAIN_CAMERA, window.RENDERER);
         //window.tuniform.iTime.value += clock.getDelta();
         window.RENDERER.render(window.MAIN_SCENE, window.MAIN_CAMERA)
         window.STATS.end();

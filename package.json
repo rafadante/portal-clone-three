@@ -11,6 +11,8 @@
     "cannon-es": "^0.20.0",
     "cannon-es-debugger": "^1.0.0",
     "jquery": "^3.7.1",
+    "jszip": "^3.10.1",
+    "jszip-utils": "^0.1.0",
     "meshline": "^3.1.6",
     "nipplejs": "^0.10.1",
     "postprocessing": "^6.33.1",
