@@ -200,7 +200,7 @@ window.connecting = false;
 document.getElementById("container").appendChild(window.RENDERER.domElement);
 
 //init();
-$("body").on('click', '#option-community-build, #option-single-load', function () {
+$("body").on('click', '#option-community-build', function () {//#option-single-load
     setTimeout(() => {
         init();
     }, 2000);
