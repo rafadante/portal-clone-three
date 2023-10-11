@@ -199,7 +199,7 @@ window.connecting = false;
 
 document.getElementById("container").appendChild(window.RENDERER.domElement);
 
-init();
+//init();
 $("body").on('click', '#option-community-build, #option-single-load', function () {
     setTimeout(() => {
         init();
@@ -219,10 +219,6 @@ function init() {
     console.log(window.MAIN_SCENE)
     // CAMERA
     window.MAIN_SCENE.add(window.MAIN_CAMERA);
-    // RENDERER
-    //
-    //createPortalShader(window.RENDERER);
-    //generateMeshPortalShader(window.MAIN_SCENE, window.MAIN_CAMERA, window.RENDERER);
     //LIGHT GROUP
     window.LIGHT_GROUP = new Lights(THREE);
     window.LIGHT_GROUP.name = "LIGHT_GROUP";
@@ -242,7 +238,6 @@ function init() {
             //
             loadCube();
             animate();
-            //window.CONTROLS.addEventListener( 'change', animate );
         })
     //LISTENER
     window.addEventListener('resize', onWindowResize);
@@ -268,17 +263,6 @@ $(document).on('keypress', function (event) {
         }
     }
 });
-
-function getIntersects(point, objects) {
-    mouse.set((point.x * 2) - 1, -(point.y * 2) + 1);
-    raycaster.setFromCamera(mouse, window.MAIN_CAMERA);
-    return raycaster.intersectObjects(objects);
-}
-
-function getMousePosition(dom, x, y) {
-    var rect = dom.getBoundingClientRect();
-    return [(x - rect.left) / rect.width, (y - rect.top) / rect.height];
-}
 
 function onDocumentMouseDown(event) {
     if (!window.FPS) {
@@ -321,18 +305,11 @@ function onDocumentMouseUp(event) {
 }
 
 const mouse2 = new THREE.Vector2(1, 1);
-const white = new THREE.Color().setHex(0xffffff);
-const orange = new THREE.Color("rgb(255, 165, 0)");
 
 function raycastManager(event, type) {
     if (!window.FPS && window.instancedMesh) {
-        //var array = getMousePosition(document.getElementById("container"), event.clientX, event.clientY);
-        //clickMouse.fromArray(array)
-
-        ///const found = getIntersects(clickMouse, window.instancedMesh, false);
 
         raycaster.setFromCamera(mouse2, window.MAIN_CAMERA);
-
         const intersection = raycaster.intersectObject(window.instancedMesh);
 
         if (intersection.length > 0) {
@@ -349,7 +326,6 @@ function raycastManager(event, type) {
                     window.planeUserData[instanceId].selected = true;
                     raycastSelected(intersection[0], event, type)
                 }
-
 
             } else if (type == "down") {
 
@@ -383,23 +359,6 @@ function raycastManager(event, type) {
             }
 
         }
-
-        /*if (intersection.length > 0) {
-
-            const instanceId = intersection[0].instanceId;
-
-            window.instancedMesh.getColorAt(instanceId, color);
-
-            if (color.equals(white)) {
-
-                console.log(window.planeUserData[instanceId])
-                window.instancedMesh.setColorAt(instanceId, color.setHex(Math.random() * 0xffffff));
-
-                window.instancedMesh.instanceColor.needsUpdate = true;
-
-            }
-
-        }*/
     }
 }
 
@@ -422,10 +381,6 @@ const cannonDebugger = new CannonDebugger(window.MAIN_SCENE, window.CANNON_WORLD
         })
     }
 })
-//PÓRTAL FPS
-let clockPortal = new THREE.Clock();
-let deltaPortal = 0;
-let intervalPortal = 1 / 60;
 //SCENE FPS
 let clock = new THREE.Clock();
 let clock2 = new THREE.Clock();
@@ -466,13 +421,10 @@ function animate(time) {
         }
     }
 
-
-    //if (window.FPS)
     requestAnimationFrame(animate);
 }
 
 function fixedUpdate() { //60 fps always for physics
-    //console.log("iiiiiiiiiiiii")
     const deltaTime = clock2.getDelta();
     updatePlayer(deltaTime);
 
@@ -490,7 +442,7 @@ function fixedUpdate() { //60 fps always for physics
 const STEPS_PER_FRAME = 1;
 
 function render(time) {
-    
+
     window.STATS.begin();
     animatePortal();
     updateRay();
@@ -507,8 +459,53 @@ function render(time) {
             var y = target.y;
             var z = target.z;
 
+
+            //window.CURRENT_ITEM_ID
+
+
+
+
+            var item = new THREE.Object3D();
+
+            item.position.copy(new THREE.Vector3(x, y, z));
             window.CURRENT_ITEM.position.copy(new THREE.Vector3(x, y, z));
-            window.CURRENT_ITEM.rotation.copy(window.MAIN_CAMERA.rotation);
+            item.rotation.copy(window.MAIN_CAMERA.rotation);
+
+            //console.log(item)
+
+            item.updateMatrix();
+            window.PORTAL_CUBE_INSTANCED.setMatrixAt(window.CURRENT_ITEM_ID, item.matrix)
+
+            window.PORTAL_CUBE_INSTANCED.instanceMatrix.needsUpdate = true;
+            window.PORTAL_CUBE_INSTANCED.computeBoundingSphere();
+        }
+
+        /*for (var i = 0; i < window.ITEM_BOXES.length; i++) {
+
+            if (window.ITEM_BOXES[i] != window.CURRENT_ITEM) {
+                window.ITEM_BOXES[i].position.copy(window.ITEM_BOXES[i].body.position);
+                window.ITEM_BOXES[i].quaternion.copy(window.ITEM_BOXES[i].body.quaternion);
+            }
+
+        }*/
+
+        for (var i = 0; i < window.PORTAL_CUBES.length; i++) {
+
+            if (window.PORTAL_CUBES[i].length != 0 &&
+                i != window.CURRENT_ITEM_ID) {
+
+                var item = new THREE.Object3D();
+
+                item.position.copy(window.PORTAL_CUBES[i].body.position);
+                item.quaternion.copy(window.PORTAL_CUBES[i].body.quaternion);
+
+                item.updateMatrix();
+                window.PORTAL_CUBE_INSTANCED.setMatrixAt(i, item.matrix)
+
+                window.PORTAL_CUBE_INSTANCED.instanceMatrix.needsUpdate = true;
+                window.PORTAL_CUBE_INSTANCED.computeBoundingSphere();
+
+            }
         }
     }
 

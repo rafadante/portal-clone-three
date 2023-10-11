@@ -54,11 +54,15 @@ async function handleZip(path, obj) {
                     loadGunManager(result.scene)
                 } else if (obj == "loadPortalCube") {
                     loadPortalCubeManager(result.scene)
-                }else if (obj == "loadPortalSphere") {
+                } else if (obj == "loadPortalSphere") {
                     loadPortalSphereManager(result.scene)
+                } else if (obj == "loadWindow") {
+                    loadWindowManager(result.scene)
+                } else if (obj == "loadWindowHalf") {
+                    loadWindowHalfManager(result.scene)
                 }
 
-                
+
             });
 
         }
@@ -133,39 +137,45 @@ function loadWindowIMG() {
 }
 
 function loadWindow() {
-    loader.load('/3ds/window.glb', (gltf) => {
-        gltf.scene.traverse(child => {
-            if (child.name.includes("Cube")) {
-                //child.receiveShadow = true;
-                child.castShadow = true;
-            }
+    handleZip('./assets/3ds/window.zip', "loadWindow");
+}
 
-            if (child.name == "room_light") {
-                const light = new THREE.PointLight(0xffffff, 50, 3);
-                var target = new THREE.Vector3(); // create once an reuse it
-                child.getWorldPosition(target);
-                light.position.copy(target);
-                light.translateY(-0.2);
-                gltf.scene.add(light);
-                window.room_light = child;
+function loadWindowManager(scene) {
+    scene.traverse(child => {
+        if (child.name.includes("Cube")) {
+            child.receiveShadow = true;
+            child.castShadow = true;
 
-                window.lightRoom = light;
-            }
+        }
 
-            if (child.name.includes("vidro")) {
-                child.renderOrder = -1;
-            }
-        })
+        if (child.name == "room_light") {
+            const light = new THREE.PointLight(0xffffff, 50, 3);
+            var target = new THREE.Vector3(); // create once an reuse it
+            child.getWorldPosition(target);
+            light.position.copy(target);
+            light.translateY(-0.2);
+            scene.add(light);
+            window.room_light = child;
 
-        gltf.scene.rotation.y = -Math.PI / 2;
-        gltf.scene.position.set(16, 6, 6);
-        gltf.scene.visible = false;
-        gltf.scene.name = "OBSERVATION_ROOM";
-        window.MAIN_SCENE.add(gltf.scene);
+            window.lightRoom = light;
+        }
 
-        window.OBSERVATION_ROOM = gltf.scene;
-        loadGun();
-    });
+        if (child.name.includes("vidro")) {
+            //child.renderOrder = -1;
+            child.material.side = 2;
+            child.material.envMap = window.ENV_MAP_FPS;
+            console.log(child)
+        }
+    })
+
+    scene.rotation.y = -Math.PI / 2;
+    scene.position.set(16, 6, 6);
+    scene.visible = false;
+    scene.name = "OBSERVATION_ROOM";
+    window.MAIN_SCENE.add(scene);
+
+    window.OBSERVATION_ROOM = scene;
+    loadGun();
 }
 
 function loadGun() {
@@ -403,25 +413,46 @@ function loadPortalCube() {
 }
 
 function loadPortalCubeManager(scene) {
-    scene.name = "cube";
-    scene.renderOrder = 3;
-    scene.userData.wall = false;
-    scene.userData.ground = true;
-    scene.userData.ceiling = false;
-    window.ITEMS.add(scene);
-    scene.traverse(child => {
-        child.receiveShadow = true;
-        child.castShadow = true;
-        if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
-            child.material.envMapIntensity = 0.5;
-            child.material.roughness = 0.2;
-        }
 
-        if (child.name.includes("bloom")) {
-            //window.SELECTED_OBJECTS_FOR_BLOOM.add(child);
-        }
-    })
+    var geometry = scene.children[0].geometry.clone();
+    geometry.computeVertexNormals();
+    geometry.scale(0.015, 0.015, 0.015);
+    //console.log(geometry)
+
+    var item = new THREE.InstancedMesh(geometry, scene.children[0].material.clone(), 20);
+    item.instanceMatrix.setUsage(THREE.DynamicDrawUsage); // will be updated every frame
+
+    var clone = new THREE.Object3D();
+
+    for (var i = 0; i < 20; i++) {
+        clone.scale.set(0, 0, 0);
+        clone.updateMatrix();
+        item.setMatrixAt(i, clone.matrix);
+    }
+
+    //item.scale.set(0.015, 0.015, 0.015)
+    //item.position.y = 10000;
+    item.name = "cube";
+    item.renderOrder = 3;
+    item.userData.clones = 0;
+    item.userData.wall = false;
+    item.userData.ground = true;
+    item.userData.ceiling = false;
+    item.receiveShadow = true;
+    item.castShadow = true;
+    item.material.envMap = window.ENV_MAP_FPS;
+    item.material.envMapIntensity = 0.5;
+    item.material.roughness = 0.2;
+    //window.ITEMS.add(item);
+    window.PORTAL_CUBE_INSTANCED = item;
+    window.INTERACTIVE.push(item);
+    window.ITEMS_ADDED.add(item);
+
+    for (var i = 0; i < 20; i++)
+        window.PORTAL_CUBES.push([]);
+
+    console.log(window.ITEMS_ADDED)
+
     loadPortalSphere()
 }
 
@@ -460,44 +491,49 @@ function loadHalfWindow() {
         gltf.scene.userData.ceiling = false;
         window.ITEMS.add(gltf.scene);
         //HALF WINDOW
-        loader.load('/3ds/window_half.glb', (gltf2) => {
-            gltf2.scene.traverse(child => {
-                child.receiveShadow = true;
-                child.castShadow = true;
-                if (child.material) {
-                    //child.material.envMap = window.ENV_MAP_FPS;
-                    //child.material.envMapIntensity = 1;
-                }
-
-                if (child.name.includes("Cube")) {
-                    //child.receiveShadow = true;
-                    child.castShadow = true;
-                }
-
-                if (child.name == "room_light") {
-                    const light = new THREE.PointLight(0xffffff, 25, 10);
-                    var target = new THREE.Vector3(); // create once an reuse it
-                    child.getWorldPosition(target);
-                    light.position.copy(target);
-                    light.translateY(-1);
-                    gltf2.scene.add(light);
-                    //console.log(light)
-                    //window.room_light = child;
-                    //window.lightRoom = light;
-                }
-
-                if (child.name.includes("vidro")) {
-                    child.renderOrder = -1;
-                }
-            })
-
-            gltf2.scene.position.y = -1;
-            gltf2.scene.visible = false;
-
-            gltf.scene.add(gltf2.scene);
-        })
+        handleZip('./assets/3ds/window_half.zip', "loadWindowHalf");
     })
     loadDispenser()
+}
+
+function loadWindowHalfManager(scene) {
+    scene.traverse(child => {
+        child.receiveShadow = true;
+        child.castShadow = true;
+        if (child.material) {
+            //child.material.envMap = window.ENV_MAP_FPS;
+            //child.material.envMapIntensity = 1;
+        }
+
+        if (child.name.includes("Cube")) {
+            //child.receiveShadow = true;
+            child.castShadow = true;
+        }
+
+        if (child.name == "room_light") {
+            const light = new THREE.PointLight(0xffffff, 25, 10);
+            var target = new THREE.Vector3(); // create once an reuse it
+            child.getWorldPosition(target);
+            light.position.copy(target);
+            light.translateY(-1);
+            scene.add(light);
+            //console.log(light)
+            //window.room_light = child;
+            //window.lightRoom = light;
+        }
+
+        if (child.name.includes("vidro")) {
+            //child.renderOrder = -1;
+            child.material.side = 2;
+            child.material.envMap = window.ENV_MAP_FPS;
+            console.log(child)
+        }
+    })
+
+    scene.position.y = -1;
+    scene.visible = false;
+
+    //window.add(scene);
 }
 
 function loadDispenser() {

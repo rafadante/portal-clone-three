@@ -98,11 +98,25 @@ $("body").on('click', '#view-fps', function () {
         var toDelete = [];
         window.ROOM.visible = false;
 
+        //------------------------------------------------------------
+
         window.materialWallPortal.envMap = window.ENV_MAP_FPS;
         window.materialWallPortal.envMapIntensity = 0.2;
 
+        window.materialWallPortal2.envMap = window.ENV_MAP_FPS;
+        window.materialWallPortal2.envMapIntensity = 0.2;
+
+        window.materialWallPortal3.envMap = window.ENV_MAP_FPS;
+        window.materialWallPortal3.envMapIntensity = 0.2;
+
         window.materialWallNonPortal.envMap = window.ENV_MAP_FPS;
         window.materialWallNonPortal.envMapIntensity = 0.2;
+
+        window.materialWallNonPortal2.envMap = window.ENV_MAP_FPS;
+        window.materialWallNonPortal2.envMapIntensity = 0.2;
+
+        window.materialWallNonPortal3.envMap = window.ENV_MAP_FPS;
+        window.materialWallNonPortal3.envMapIntensity = 0.2;
 
         window.materialFloorPortal.envMap = window.ENV_MAP_FPS;
         window.materialFloorPortal.envMapIntensity = 0.2;
@@ -115,6 +129,8 @@ $("body").on('click', '#view-fps', function () {
 
         const materialUpNonPortal = window.materialFloorNonPortal.clone();
         materialUpNonPortal.envMapIntensity = 0.8;
+
+        //-----------------------------------------------------------------
 
         window.nonPortal = [];
         window.cubes = [];
@@ -149,8 +165,14 @@ $("body").on('click', '#view-fps', function () {
                         } else if (window.planeUserData[i].side == "down") {
                             meshesUpPortal.push(window.planeUserData[i])
                             sideDown.push(window.planeUserData[i])
-                        } else
-                            meshesWallPortal.push(window.planeUserData[i]);
+                        } else {
+                            if (window.planeUserData[i].tile == 1)
+                                meshesWallPortal.push(window.planeUserData[i]);
+                            else if (window.planeUserData[i].tile == 2)
+                                meshesWallPortal2.push(window.planeUserData[i]);
+                            else if (window.planeUserData[i].tile == 3)
+                                meshesWallPortal3.push(window.planeUserData[i]);
+                        }
                     } else {
 
                         if (window.planeUserData[i].side == "up") {
@@ -159,8 +181,14 @@ $("body").on('click', '#view-fps', function () {
                         } else if (window.planeUserData[i].side == "down") {
                             meshesUpNonPortal.push(window.planeUserData[i])
                             sideDown.push(window.planeUserData[i])
-                        } else
-                            meshesWallNonPortal.push(window.planeUserData[i]);
+                        } else {
+                            if (window.planeUserData[i].tile == 1)
+                                meshesWallNonPortal.push(window.planeUserData[i]);
+                            else if (window.planeUserData[i].tile == 2)
+                                meshesWallNonPortal2.push(window.planeUserData[i]);
+                            else if (window.planeUserData[i].tile == 3)
+                                meshesWallNonPortal3.push(window.planeUserData[i]);
+                        }
                     }
                 }
             }
@@ -253,7 +281,13 @@ $("body").on('click', '#view-fps', function () {
         //
 
         createInstances(meshesWallPortal, window.materialWallPortal)
+        createInstances(meshesWallPortal2, window.materialWallPortal2)
+        createInstances(meshesWallPortal3, window.materialWallPortal3)
+
         createInstances(meshesWallNonPortal, window.materialWallNonPortal)
+        createInstances(meshesWallNonPortal2, window.materialWallNonPortal2)
+        createInstances(meshesWallNonPortal3, window.materialWallNonPortal3)
+
         createInstances(meshesFloorPortal, materialUpPortal)
         createInstances(meshesFloorNonPortal, materialUpNonPortal)
         createInstances(meshesUpPortal, window.materialFloorPortal)
@@ -262,8 +296,62 @@ $("body").on('click', '#view-fps', function () {
         window.MAIN_SCENE.remove(window.ROOM);
         window.RENDERER.renderLists.dispose();
         window.ENTER_DOOR.children[1].visible = false;
+
+        //
+        addColliderItem(window.PORTAL_CUBES)
     }, 500);
 });
+
+function addColliderItem(items) {
+
+    let PHYSICS_MATERIAL = new CANNON.Material();
+    PHYSICS_MATERIAL.friction = 0.4; //0.01
+    PHYSICS_MATERIAL.restitution = 0; //0.1
+
+    for (var i = 0; i < items.length; i++) {
+        console.log(items[i])
+        if (items[i].length != 0) {
+
+            var shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.3, 0.3));
+
+            var box = new CANNON.Body({
+                shape: shape,
+                mass: 5,
+                material: PHYSICS_MATERIAL
+            })
+
+            //box.allowSleep = true;
+            //box.sleepSpeedLimit = 1.0;
+            //box.sleepTimeLimit = 1.0;
+
+            box.position.copy(items[i].position);
+            //box.position.set(9,3,5)
+
+            //box.collisionFilterGroup = window.CGROUP_ENVIRONMENT
+            //box.collisionFilterMask = window.CGROUP_DYNAMIC
+
+            box.collisionFilterGroup = window.CGROUP_DYNAMIC
+            box.collisionFilterMask = window.CGROUP_ALL
+
+            items[i].body = box;
+            window.dynamicObjects.push(box);
+            window.BOX_BODY.push(box);
+
+            console.log(box)
+
+            //var axis = new CANNON.Vec3(1, 0, 0);
+            //var angle = Math.PI / 3;
+            //box.quaternion.setFromAxisAngle(axis, angle);
+
+            //window.ITEM_BOXES[i].position.copy(window.ITEM_BOXES[i].dispenser.position);
+            //window.ITEM_BOXES[i].translateY(-1);
+            //window.ITEM_BOXES[i].body = box;
+            //box.position.copy(window.ITEM_BOXES[i].position)
+            //window.BOX_BODY.push(box);
+
+        }
+    }
+}
 
 function colliderRoom(array, side, a1, a2, a3, a4) {
 
@@ -353,11 +441,11 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
             var shapeDimension;
 
             if (side == "up" || side == "down")
-                shapeDimension = new CANNON.Vec3(columsNew[i][j].length, 0.1, 1)
+                shapeDimension = new CANNON.Vec3(columsNew[i][j].length, 0.01, 1)
             else if (side == "front" || side == "back")
-                shapeDimension = new CANNON.Vec3(columsNew[i][j].length, 1, 0.1)
+                shapeDimension = new CANNON.Vec3(columsNew[i][j].length, 1, 0.01)
             else if (side == "right" || side == "left")
-                shapeDimension = new CANNON.Vec3(0.0001, 1, columsNew[i][j].length)
+                shapeDimension = new CANNON.Vec3(0.01, 1, columsNew[i][j].length)
 
             var shape = new CANNON.Box(shapeDimension);
 
@@ -371,6 +459,7 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
             obj.position.copy(new THREE.Vector3(columsNew[i][j][0].x,
                 columsNew[i][j][0].y,
                 columsNew[i][j][0].z));
+            //obj.translateZ(0.05);
 
             box.position.copy(obj.position);
 
@@ -401,7 +490,13 @@ function getPlaneByName(array, name) {
 }
 
 var meshesWallPortal = [];
+var meshesWallPortal2 = [];
+var meshesWallPortal3 = [];
+
 var meshesWallNonPortal = [];
+var meshesWallNonPortal2 = [];
+var meshesWallNonPortal3 = [];
+
 var meshesFloorPortal = [];
 var meshesFloorNonPortal = [];
 var meshesUpPortal = [];

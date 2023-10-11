@@ -42,6 +42,7 @@ function cubeState(button) {
         window.instancedMesh.setMatrixAt(IndexArray[i], erase.matrix);
         window.planeUserData[IndexArray[i]] = {};
         window.instancedMesh.instanceMatrix.needsUpdate = true;
+        window.instancedMesh.computeBoundingSphere();
     }
 
     if (limit) {
@@ -117,6 +118,7 @@ function trasnlatePlane(id, val, portal) {
         window.instancedMesh.setMatrixAt(frontExists[0].id_instanced, erase.matrix);
         window.planeUserData[frontExists[0].id_instanced] = {};
         window.instancedMesh.instanceMatrix.needsUpdate = true;
+        window.instancedMesh.computeBoundingSphere();
         //
         limit = true;
     } else {
@@ -129,6 +131,7 @@ function trasnlatePlane(id, val, portal) {
         window.instancedMesh.setMatrixAt(id, dummy.matrix)
 
         window.instancedMesh.instanceMatrix.needsUpdate = true;
+        window.instancedMesh.computeBoundingSphere();
 
     }
 }
@@ -177,6 +180,7 @@ function checkSides(dummy, val, id, side, portal) {
 
         window.instancedMesh.instanceMatrix.needsUpdate = true;
         window.instancedMesh.instanceColor.needsUpdate = true;
+        window.instancedMesh.computeBoundingSphere();
 
         dummy.position.copy(dummy.position.round());
 
@@ -206,7 +210,8 @@ function checkSides(dummy, val, id, side, portal) {
             rotation: dummy.rotation.clone(),
             exists: true,
             id_instanced: idEmptyToFill,
-            portal: portal
+            portal: portal,
+            tile: 1,
         };
 
     } else { //if there is a face delete it
@@ -336,6 +341,7 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
                 exists: true,
                 id_instanced: a,
                 portal: portal,
+                tile: 1,
                 hasItem: hasItem,
                 itemName: itemName,
                 merged: false,

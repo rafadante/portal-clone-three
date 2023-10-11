@@ -62,11 +62,12 @@ function checkCollision(target, dir, axis) {
 
     raycaster.set(window.MAIN_CAMERA.position, vector);
     raycaster.far = 1.2; // comment this line to have an infinite ray
-    var intersects = raycaster.intersectObjects(window.cubes);
+    var intersects = raycaster.intersectObjects(window.ITEMS_ADDED);
 
     var inter = 0;
+    
 
-    if (intersects.length == 0) {
+    /*if (intersects.length == 0) {
         none++;
     } else {
         for (let i = 0; i < intersects.length; i++) {
@@ -83,40 +84,11 @@ function checkCollision(target, dir, axis) {
                         window.COL_Y_POS = window.CURRENT_ITEM.position.y;
                     } else if (axis == "z") {
 
-                        /*if (intersects[i].object.name == "interactive") {
-
-                            // gives a bit of air control
-                            // define directions
-                            let cameraDirection = new THREE.Vector3()
-                            window.MAIN_CAMERA.getWorldDirection(cameraDirection)
-                            const up = new THREE.Vector3(0, 1, 0)
-                            const forward = cameraDirection.projectOnPlane(up).normalize()
-
-                            console.log("oooooooo")
-                            window.qwe = intersects[i].object.parent.body;*/
-
-                        //intersects[i].object.parent.body.applyImpulse(forward.clone().multiplyScalar(0.01), intersects[i].object.parent.body.position)
-
-                        // gives a bit of air control
-                        // define directions
-                        //let cameraDirection = new THREE.Vector3()
-                        //window.MAIN_CAMERA.getWorldDirection(cameraDirection)
-                        //const up = new THREE.Vector3(0, 1, 0)
-                        //const forward = cameraDirection.projectOnPlane(up).normalize()
-
-                        //window.PLAYER.applyForce(forward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
-                        //intersects[i].object.parent.body.applyForce(forward.clone().multiplyScalar(1), intersects[i].object.parent.position)
-
-                        //console.log(intersects[i].object)
-                        //intersects[i].object.parent.body.applyImpulse(impulse)
-
-                        //} else {
                         window.COL_Z = true;
                         window.COL_Z_POS = window.CURRENT_ITEM.position.z;
 
                         window.PLAYER.velocity.set(0, 0, 0);
                         window.PLAYER.angularVelocity.set(0, 0, 0);
-                        //}
 
                     } else if (axis == "x") {
                         window.COL_X = true;
@@ -148,7 +120,7 @@ function checkCollision(target, dir, axis) {
             } else if (axis == "x")
                 window.COL_X = false;
         }
-    }
+    }*/
 }
 
 var itemCount = 0;
@@ -284,14 +256,20 @@ function addItem(found) {
 
         } else {
 
-
             var userData = window.planeUserData[found[i].instanceId];
 
             console.log(userData)
 
             if (!userData.hasItem) {
 
-                var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
+                //var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
+                var instanced = window.ITEMS_ADDED.getObjectByName(window.ITEM_HOLDED_NAME);
+                var item = new THREE.Object3D();
+                item.userData = instanced.userData;
+
+                console.log(instanced)
+
+                //var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
 
                 if (item.userData.wall) {
                     if (userData.side == "up" || userData.side == "down") {
@@ -327,7 +305,7 @@ function addItem(found) {
                         item.translateY(1);
                 }
 
-                if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere") {
+                /*if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere") {
 
                     var item2 = window.ITEMS.getObjectByName("dispenser").clone();
                     item2.position.copy(userData.position);
@@ -346,13 +324,33 @@ function addItem(found) {
                         }
 
                     }
-                }
+                }*/
 
                 console.log("ggggg")
                 console.log(item)
 
-                window.ITEMS_ADDED.add(item);
+                //window.ITEMS_ADDED.add(item);
                 itemCount++;
+
+                var idInstanced;
+
+                for (var i = 0; i < 20; i++) {
+                    if (window.PORTAL_CUBES[i].length == 0) {
+                        window.PORTAL_CUBES[i] = item;
+                        idInstanced = i;
+                        break;
+                    }
+                }
+
+                item.userData.id = idInstanced;
+                item.scale.set(1, 1, 1);
+                item.updateMatrix();
+                instanced.setMatrixAt(idInstanced, item.matrix);
+                instanced.instanceMatrix.needsUpdate = true;
+                instanced.computeBoundingSphere();
+
+                console.log(window.PORTAL_CUBES);
+
                 break;
             }
 
@@ -467,7 +465,10 @@ function hoverItem(found) {
     window.ITEM_CUBE.position.copy(userData.position);
     window.ITEM_CUBE.visible = true;
 
-    var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
+    //console.log(window.ITEMS)
+    //console.log(window.ITEM_HOLDED_NAME)
+
+    /*var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
 
     if (item.userData.wall && (userData.side == "up" || userData.side == "down"))
         window.ITEM_CUBE.material.color = new THREE.Color(0xfc030f)
@@ -476,7 +477,7 @@ function hoverItem(found) {
     else if (found[0].object.userData.hasItem)
         window.ITEM_CUBE.material.color = new THREE.Color(0xfc030f)
     else
-        window.ITEM_CUBE.material.color = new THREE.Color(0x00ff00)
+        window.ITEM_CUBE.material.color = new THREE.Color(0x00ff00)*/
 
 }
 

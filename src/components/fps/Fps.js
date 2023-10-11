@@ -189,7 +189,7 @@ var moving = false;
 var wasInJump = false;
 var slipperyMaterial = new CANNON.Material();
 slipperyMaterial.friction = 0.00;
-var dynamicObjects = [];
+window.dynamicObjects = [];
 
 player();
 
@@ -250,9 +250,9 @@ function player() {
         }
     })
 
-    dynamicObjects.push(window.PLAYER);
+    window.dynamicObjects.push(window.PLAYER);
 
-    for (let d of dynamicObjects) {
+    for (let d of window.dynamicObjects) {
         d.collisionFilterGroup = window.CGROUP_DYNAMIC
         d.collisionFilterMask = window.CGROUP_ALL
     }
@@ -311,6 +311,8 @@ document.addEventListener('keydown', (event) => {
             raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
             var intersects = raycaster2.intersectObjects(window.INTERACTIVE);
 
+            console.log(intersects)
+
             if (window.HOLDING_ITEM) {
                 window.HOLDING_ITEM = false;
 
@@ -352,17 +354,27 @@ document.addEventListener('keydown', (event) => {
                 window.CANNON_WORLD.addBody(itemHolder);
 
                 window.CURRENT_ITEM = null;
+                window.CURRENT_ITEM_ID = null;
                 itemHolder = null;
                 window.COL_Z = false;
                 window.holder.position.z = -1;
             } else if (intersects.length > 0) {
                 if (intersects[0].distance < 2) {
                     window.HOLDING_ITEM = true;
-                    window.CURRENT_ITEM = intersects[0].object.parent;
+                    //window.CURRENT_ITEM = intersects[0].object.parent;
+
                     //window.CURRENT_ITEM.item = intersects[0].object;
                     //window.CURRENT_ITEM.mass = 0;
-                    itemHolder = intersects[0].object.parent.body;
-                    window.CANNON_WORLD.removeBody(intersects[0].object.parent.body);
+
+                    var instancedId = intersects[0].instanceId;
+
+                    window.CURRENT_ITEM = window.PORTAL_CUBES[instancedId];
+
+                    window.CURRENT_ITEM_ID = instancedId;
+
+
+                    itemHolder = window.PORTAL_CUBES[instancedId].body;
+                    window.CANNON_WORLD.removeBody(window.PORTAL_CUBES[instancedId].body);
                 }
             }
 
@@ -623,7 +635,7 @@ function portalButton(button) {
                     if (intersects[0].uv.y >= 0.5)
                         y = userData.position.y;
                 } else {
-                    if (intersects[0].uv.y >= 0.5 && !getPlaneByName(boxUpName).portal)
+                    if (intersects[0].uv.y >= 0.5 && !getPlaneByName(boxUpName)[0].portal)
                         y = userData.position.y;
                 }
                 //-------------------------------------------------
@@ -635,7 +647,7 @@ function portalButton(button) {
                     if (intersects[0].uv.y <= 0.5)
                         y = userData.position.y;
                 } else {
-                    if (intersects[0].uv.y <= 0.5 && !getPlaneByName(boxDownName).portal)
+                    if (intersects[0].uv.y <= 0.5 && !getPlaneByName(boxDownName)[0].portal)
                         y = userData.position.y;
                 }
                 //-------------------------------------------------
@@ -1272,6 +1284,7 @@ function raycast() {
                         setTimeout(() => {
                             //INITIATE BOX CANNON
                             for (var i = 0; i < window.BOX_BODY.length; i++) {
+                                console.log("tttttttttttttt")
                                 window.CANNON_WORLD.addBody(window.BOX_BODY[i])
                             }
                             for (var i = 0; i < window.SPHERE_BODY.length; i++) {
@@ -1338,7 +1351,8 @@ function raycast() {
 
     var portals = [window.PORTALS[0].mesh, window.PORTALS[1].mesh];
 
-    for (let d of dynamicObjects) {
+    var dd = 0;
+    for (let d of window.dynamicObjects) {
 
         let pos = new THREE.Vector3(d.position.x, d.position.y, d.position.z)
         // let bb = new Box3(new Vector3().copy(d.physicsBody.aabb.lowerBound), new Vector3().copy(d.physicsBody.aabb.upperBound))
@@ -1357,41 +1371,49 @@ function raycast() {
             if (window.PORTALS[p].CDBB.containsPoint(pos)) {
                 d.collisionFilterMask &= ~window.PORTALS[p].hostObjects.collisionFilterGroup;
                 //console.log(d.collisionFilterMask)
-                inArea++;
+
+                if (dd == 0)
+                    inArea++;
             }
 
             // should teleport
             if (window.PORTALS[p].STBB.containsPoint(pos)) {
 
-                teleportPhysicalObject(d, window.PORTALS[p])
-                teleportObject3D(window.MAIN_CAMERA, window.PORTALS[p])
+                console.log()
 
-                // fix camera rotation
-                // create a new basis with up as the up
-                // https://danielilett.com/2020-01-03-tut4-4-portal-momentum/
-                let up = new THREE.Vector3(0, 1, 0)
-                let cameraForward = new THREE.Vector3()
-                window.MAIN_CAMERA.getWorldDirection(cameraForward)
-                cameraForward.normalize()
-                let cameraRight = cameraForward.clone().cross(up).normalize()
-                let cameraUp = cameraRight.clone().cross(cameraForward).normalize()
-                let cameraMat = new THREE.Matrix4().makeBasis(cameraRight, cameraUp, cameraForward.negate())
-                window.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat)
+                teleportPhysicalObject(d, window.PORTALS[p])
+
+                if (dd == 0) {
+                    teleportObject3D(window.MAIN_CAMERA, window.PORTALS[p])
+
+                    // fix camera rotation
+                    // create a new basis with up as the up
+                    // https://danielilett.com/2020-01-03-tut4-4-portal-momentum/
+                    let up = new THREE.Vector3(0, 1, 0)
+                    let cameraForward = new THREE.Vector3()
+                    window.MAIN_CAMERA.getWorldDirection(cameraForward)
+                    cameraForward.normalize()
+                    let cameraRight = cameraForward.clone().cross(up).normalize()
+                    let cameraUp = cameraRight.clone().cross(cameraForward).normalize()
+                    let cameraMat = new THREE.Matrix4().makeBasis(cameraRight, cameraUp, cameraForward.negate())
+                    window.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat)
+
+                    targetRotationX = window.MAIN_CAMERA.rotation.y;
+                    targetRotationY = window.MAIN_CAMERA.rotation.x;
+
+                    if (inArea > 0)
+                        smoothness = 1;
+                    else
+                        smoothness = 0.1;
+                }
 
                 d.collisionFilterMask |= window.PORTALS[p].hostObjects.collisionFilterGroup
                 d.collisionFilterMask &= ~window.PORTALS[1 - p].hostObjects.collisionFilterGroup
-
-
-                targetRotationX = window.MAIN_CAMERA.rotation.y;
-                targetRotationY = window.MAIN_CAMERA.rotation.x;
             }
 
         }
 
-        if (inArea > 0)
-            smoothness = 1;
-        else
-            smoothness = 0.1;
+        dd++;
 
     }
 }

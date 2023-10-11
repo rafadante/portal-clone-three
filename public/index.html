@@ -56,7 +56,12 @@
       </div>
       <div class="body">
         <div id="items">
+
           <img
+            data-content="A dropper will come with it. If the player loses the cube the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
+            data-title="CUBE" class="item" data-name="cube" src="../assets/ui/items/cube.png" />
+            
+          <!--<img
             data-content="Can be linked to an object to form a trigger. The player can click on the button and it will activate the function that it is connected to. You can add a timer to your button through the properties menu."
             data-title="PEDESTAL BUTTON" class="item" data-name="pedestal_button"
             src="../assets/ui/items/pedestal_button.png" />
@@ -67,9 +72,6 @@
           <img data-content="Can be linked to an object to form a trigger. This button only accepts spheres."
             data-title="BUTTON SPHERE" class="item" data-name="button_circle"
             src="../assets/ui/items/button_sphere.png" />
-          <img
-            data-content="A dropper will come with it. If the player loses the cube the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
-            data-title="CUBE" class="item" data-name="cube" src="../assets/ui/items/cube.png" />
           <img
             data-content="A dropper will come with it. If the player loses the sphere the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
             data-title="SPHERE" class="item" data-name="sphere" src="../assets/ui/items/sphere.png" />
@@ -84,12 +86,12 @@
           <img
             data-content="Purely cosmetic and provide your map with additional light. Every map will start off with an observation room which cannot be removed."
             data-title="OBSERVATION ROOM" class="item" data-name="observation_room"
-            src="../assets/ui/items/observation_room.png" />
+            src="../assets/ui/items/observation_room.png" />-->
           <!--<img data-content="Purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically." data-title="LIGHT" class="item" data-name="light" src="../assets/ui/items/light.png" />-->
-          <img data-content="Purely cosmetic, it will look at the player." data-title="CAMERA" class="item"
+          <!--<img data-content="Purely cosmetic, it will look at the player." data-title="CAMERA" class="item"
             data-name="camera" src="../assets/ui/items/camera.png" />
           <img data-content="Purely cosmetic, it will play a radio music." data-title="RADIO" class="item"
-            data-name="radio" src="../assets/ui/items/radio.png" />
+            data-name="radio" src="../assets/ui/items/radio.png" />-->
         </div>
       </div>
     </div>
@@ -161,6 +163,61 @@
       </a>
     </li>
     <li class="menu-separator"></li>
+
+    <li class="menu-item menu-item-submenu">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-users"></i>
+        <span class="menu-text">Tile Portal</span>
+      </button>
+      <ul class="menu">
+        <li data-id="1" class="menu-item tile-portal">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-comment"></i>
+            <span class="menu-text">Tile 1</span>
+          </button>
+        </li>
+        <li data-id="2" class="menu-item tile-portal">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-comment"></i>
+            <span class="menu-text">Tile 2</span>
+          </button>
+        </li>
+        <li data-id="3" class="menu-item tile-portal">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-comment"></i>
+            <span class="menu-text">Tile 3</span>
+          </button>
+        </li>
+      </ul>
+    </li>
+
+    <li class="menu-item menu-item-submenu">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-users"></i>
+        <span class="menu-text">Tile Non Portal</span>
+      </button>
+      <ul class="menu">
+        <li data-id="1" class="menu-item tile-nonPortal">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-comment"></i>
+            <span class="menu-text">Tile 1</span>
+          </button>
+        </li>
+        <li data-id="2" class="menu-item tile-nonPortal">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-comment"></i>
+            <span class="menu-text">Tile 2</span>
+          </button>
+        </li>
+        <li data-id="3" class="menu-item tile-nonPortal">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-comment"></i>
+            <span class="menu-text">Tile 3</span>
+          </button>
+        </li>
+      </ul>
+    </li>
+
     <li id="plus-portal" class="menu-item noItem">
       <button type="button" class="menu-btn">
         <i class="fa fa-plus"></i>
@@ -304,7 +361,8 @@
               <br></br>
               10.13 - Deadly Goo: If the player steps in Deadly Goo they will be instantly killed.
               <br></br>
-              10.14 - Light Strips: are purely cosmetic and provide your map with additional light. You can place four of
+              10.14 - Light Strips: are purely cosmetic and provide your map with additional light. You can place four
+              of
               them on a single square and they can be placed horizontally or vertically.
               <br></br>
               10.15 - Gels: There are four types of Gels. Blue will cause the player to bounce, orange will give the

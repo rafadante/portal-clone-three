@@ -247,3 +247,6 @@ window.CGROUP_ENVIRONMENT = 1 << 0;
 window.CGROUP_PORTAL_HOST_CDISABLE = [1 << 1, 1 << 2];
 window.CGROUP_DYNAMIC = 1 << 3;
 window.CGROUP_ALL = 0xFF;
+
+//
+window.PORTAL_CUBES = [];

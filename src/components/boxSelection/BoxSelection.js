@@ -42,7 +42,7 @@ function raycastSelected(found, event, type) {
         window.instancedMesh.instanceColor.needsUpdate = true;
     }
 
-    console.log(window.planeUserData[instanceId])
+    //console.log(window.planeUserData[instanceId])
 
     //------------------------------------------------------------------
 
@@ -52,44 +52,6 @@ function raycastSelected(found, event, type) {
             window.planeUserData[instanceId].itemName != "window")
             showMenu(event.pageX, event.pageY);
     }
-
-    /*if (window.SELECTED && event.button == 2) {
-        $(".hasItem").css("display", "none");
-        $(".noItem").css("opacity", "1");
-        $(".noItem").css("pointer-events", "all");
-        $(".noItem a").css("pointer-events", "all");
-        $(".noItem button").css("pointer-events", "all");
-
-        if (window.SELECTED.userData.itemName != "exitDoor" &&
-            window.SELECTED.userData.itemName != "enterDoor" &&
-            window.SELECTED.userData.itemName != "window")
-            showMenu(event.pageX, event.pageY);
-    }
-
-    for (var i = 0; i < found.length; i++) {
-        if (found[i].object.userData.hasItem && event.button == 2 && window.SELECTED) {
-
-            console.log(window.SELECTED)
-
-            if (window.SELECTED.item.userData.trigger) {
-                $(".hasItem").css("display", "flex");
-            }
-
-            $(".noItem").css("opacity", "0.5");
-            $(".noItem").css("pointer-events", "none");
-            $(".noItem a").css("pointer-events", "none");
-            $(".noItem button").css("pointer-events", "none");
-
-            window.startItem = window.SELECTED.item;
-
-            if (found[i].object.userData.itemName != "exitDoor" &&
-                found[i].object.userData.itemName != "enterDoor" &&
-                found[i].object.userData.itemName != "window")
-                showMenu(event.pageX, event.pageY);
-
-            break;
-        }
-    }*/
 }
 
 //UI
@@ -114,7 +76,27 @@ $("body").on('click', '#delete', function () {
     }
 
     $(".menu").removeClass("menu-show");
-})
+});
+
+$("body").on('click', '.tile-nonPortal', function () {
+    for (var i = 0; i < window.SELECTED_ID.length; i++) {
+        if (!window.planeUserData[window.SELECTED_ID[i]].portal) {
+            window.planeUserData[window.SELECTED_ID[i]].tile = $(this).data("id");
+        }
+    }
+
+    $(".menu").removeClass("menu-show");
+});
+
+$("body").on('click', '.tile-portal', function () {
+    for (var i = 0; i < window.SELECTED_ID.length; i++) {
+        if (window.planeUserData[window.SELECTED_ID[i]].portal) {
+            window.planeUserData[window.SELECTED_ID[i]].tile = $(this).data("id");
+        }
+    }
+
+    $(".menu").removeClass("menu-show");
+});
 
 export {
     raycastSelected

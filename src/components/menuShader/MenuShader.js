@@ -287,9 +287,9 @@ var plane2;
 
 var transition = false;
 var transition2 = false;
-var stopMenuLoop = true;
+var stopMenuLoop = false;
 
-$("#blocker").css("display", "none");
+/*$("#blocker").css("display", "none");
 $("#ui").css("display", "block");
 $("#container #back-effect").css("display", "none");
 $("#main-container").css("display", "block");
@@ -299,11 +299,11 @@ $("#options-settings").css("display", "block");
 $("#settings-menu-title").text("OPTIONS");
 $("#back-main").css("display", "none");
 $("#settings-close").css("display", "block");
-$("#main-container").css("display", "block");
+$("#main-container").css("display", "block");*/
 
 //
-/*$("#blocker").css("display", "flex");
-$("#options-main").css("display", "block");*/
+$("#blocker").css("display", "flex");
+$("#options-main").css("display", "block");
 
 if (!stopMenuLoop) {
     setTimeout(() => {
@@ -352,7 +352,7 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
 
 window.loadedLevel = false;
 $("body").on('click', '#option-single-load', function () {
-    fetch("./levels/0.json")
+    /*fetch("./levels/0.json")
         .then(response => response.json())
         .then(json => {
             //console.log(json)
@@ -364,7 +364,7 @@ $("body").on('click', '#option-single-load', function () {
             
             startLevel();
             //Do something with json variable
-        });
+        });*/
 })
 
 $("body").on('click', '#option-community-build', function () {
