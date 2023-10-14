@@ -65,7 +65,7 @@ function checkCollision(target, dir, axis) {
     var intersects = raycaster.intersectObjects(window.ITEMS_ADDED);
 
     var inter = 0;
-    
+
 
     /*if (intersects.length == 0) {
         none++;
@@ -267,7 +267,7 @@ function addItem(found) {
                 var item = new THREE.Object3D();
                 item.userData = instanced.userData;
 
-                console.log(instanced)
+                console.log(window.ITEM_HOLDED_NAME)
 
                 //var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
 
@@ -303,6 +303,8 @@ function addItem(found) {
 
                     if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere")
                         item.translateY(1);
+                    else if (window.ITEM_HOLDED_NAME == "radio")
+                        item.translateY(0.25);
                 }
 
                 /*if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere") {
@@ -334,9 +336,9 @@ function addItem(found) {
 
                 var idInstanced;
 
-                for (var i = 0; i < 20; i++) {
-                    if (window.PORTAL_CUBES[i].length == 0) {
-                        window.PORTAL_CUBES[i] = item;
+                for (var i = 0; i < window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME].length; i++) {
+                    if (window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME][i].length == 0) {
+                        window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME][i] = item;
                         idInstanced = i;
                         break;
                     }
@@ -346,10 +348,20 @@ function addItem(found) {
                 item.scale.set(1, 1, 1);
                 item.updateMatrix();
                 instanced.setMatrixAt(idInstanced, item.matrix);
+
+                if (window.ITEM_HOLDED_NAME == "gel_gun_blue") {
+                    instanced.setColorAt(idInstanced, new THREE.Color(0x0000ff));
+                    instanced.instanceColor.needsUpdate = true;
+                } else if (window.ITEM_HOLDED_NAME == "gel_gun_orange") {
+                    instanced.setColorAt(idInstanced, new THREE.Color(0xffa500));
+                    instanced.instanceColor.needsUpdate = true;
+                } else if (window.ITEM_HOLDED_NAME == "gel_gun_white") {
+                    instanced.setColorAt(idInstanced, new THREE.Color(0xffffff));
+                    instanced.instanceColor.needsUpdate = true;
+                }
+
                 instanced.instanceMatrix.needsUpdate = true;
                 instanced.computeBoundingSphere();
-
-                console.log(window.PORTAL_CUBES);
 
                 break;
             }

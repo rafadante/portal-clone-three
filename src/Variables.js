@@ -45,10 +45,10 @@ const cube = new THREE.Mesh(geometry2, material2);
 //scene.add( cube );
 //
 var RENDERER = new THREE.WebGLRenderer({
-    antialias: true,
     alpha: true,
+
     powerPreference: "high-performance",
-    stencil: true
+    antialias: true,
 });
 console.log(window.devicePixelRatio)
 RENDERER.setPixelRatio(window.devicePixelRatio * pixelRatio);
@@ -57,8 +57,13 @@ RENDERER.outputEncoding = THREE.sRGBEncoding;
 RENDERER.outputColorSpace = THREE.SRGBColorSpace;
 RENDERER.toneMapping = THREE.ACESFilmicToneMapping;;
 RENDERER.toneMappingExposure = 0.5;
+
 RENDERER.shadowMap.enabled = shadowMap;
 RENDERER.shadowMap.type = THREE.PCFSoftShadowMap;
+//RENDERER.shadowMap.type = THREE.VSMShadowMap;
+//RENDERER.shadowMap.autoUpdate = false;
+RENDERER.shadowMap.needsUpdate = true;
+
 RENDERER.localClippingEnabled = true;
 RENDERER.physicallyCorrectLights = true;
 RENDERER.domElement.id = "viewer-3d";
@@ -249,4 +254,43 @@ window.CGROUP_DYNAMIC = 1 << 3;
 window.CGROUP_ALL = 0xFF;
 
 //
-window.PORTAL_CUBES = [];
+
+const textureLoader = new THREE.TextureLoader();
+const decalDiffuse = textureLoader.load('./assets/textures/decal/decal-diffuse.png');
+decalDiffuse.colorSpace = THREE.SRGBColorSpace;
+const decalNormal = textureLoader.load('./assets/textures/decal/decal-normal.jpg');
+
+window.decalMaterial = new THREE.MeshStandardMaterial({
+    specular: 0x444444,
+    map: decalDiffuse,
+    normalMap: decalNormal,
+    normalScale: new THREE.Vector2(1, 1),
+    shininess: 30,
+    transparent: true,
+    depthTest: true,
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -4,
+    wireframe: false,
+    color: new THREE.Color(0xffffff),
+    roughness: 0.3,
+});
+
+window.GELS = [];
+
+window.DYMANIC_ITEMS = {
+    cube: [],
+    sphere: [],
+    gel_gun_blue: [],
+    gel_gun_orange: [],
+    gel_gun_white: [],
+    pedestal_button: [],
+    radio: [],
+    button_weight: [],
+    button_box: [],
+    button_circle: []
+}
+
+window.INK_WHITE = false;
+window.INK_BLUE = false;
+window.INK_ORANGE = false;

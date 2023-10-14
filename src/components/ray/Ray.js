@@ -6,8 +6,8 @@ import {
 const rayParams1 = {
     sourceOffset: new THREE.Vector3(),
     destOffset: new THREE.Vector3(),
-    radius0: 0.0005,
-    radius1: 0.0005,
+    radius0: 0.000075,
+    radius1: 0.000075,
     minRadius: 2.5,
     maxIterations: 7,
     isEternal: true,
@@ -29,8 +29,8 @@ const rayParams1 = {
 const rayParams2 = {
     sourceOffset: new THREE.Vector3(),
     destOffset: new THREE.Vector3(),
-    radius0: 0.0005,
-    radius1: 0.0005,
+    radius0: 0.000075,
+    radius1: 0.000075,
     minRadius: 2.5,
     maxIterations: 7,
     isEternal: true,
@@ -52,8 +52,8 @@ const rayParams2 = {
 const rayParams3 = {
     sourceOffset: new THREE.Vector3(),
     destOffset: new THREE.Vector3(),
-    radius0: 0.0005,
-    radius1: 0.0005,
+    radius0: 0.000075,
+    radius1: 0.000075,
     minRadius: 2.5,
     maxIterations: 7,
     isEternal: true,
@@ -93,12 +93,15 @@ function recreateRay() {
     }));
 
     window.lightningStrikeMesh = lightningStrikeMesh;
+    window.SELECTED_OBJECTS_FOR_BLOOM.add(lightningStrikeMesh);
     lightningStrikeMesh.visible = false;
 
     window.lightningStrikeMesh2 = lightningStrikeMesh2;
+    window.SELECTED_OBJECTS_FOR_BLOOM.add(lightningStrikeMesh2);
     lightningStrikeMesh2.visible = false;
 
     window.lightningStrikeMesh3 = lightningStrikeMesh3;
+    window.SELECTED_OBJECTS_FOR_BLOOM.add(lightningStrikeMesh3);
     lightningStrikeMesh3.visible = false;
 }
 

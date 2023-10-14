@@ -14,6 +14,9 @@ import nipplejs from 'nipplejs';
 import {
     DeviceOrientationControls
 } from '../../jsm/controls/DeviceOrientationControls.js';
+import {
+    DecalGeometry
+} from '../../jsm/geometries/DecalGeometry.js';
 
 // MOBILE VARIABLES
 
@@ -197,8 +200,6 @@ if (!window.mobile)
     controlsLock();
 // added joystick + movement
 
-
-
 function player() {
     // define shape
     let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 2, 2 / 2.3, 0.5 / 2));
@@ -234,7 +235,9 @@ function player() {
     window.CANNON_WORLD.addEventListener("postStep", (e) => {
         window.PLAYER.inJump = true;
         if (window.CANNON_WORLD.contacts.length > 0) {
+
             for (let contact of window.CANNON_WORLD.contacts) {
+
                 if (contact.bi.id == window.PLAYER.id || contact.bj.id == window.PLAYER.id) {
                     if (contact.bi.id == window.PLAYER.id) {
                         // contact.ni.negate(contactNormal);
@@ -281,12 +284,12 @@ var controller = {
 
 var itemHolder = null;
 
+window.GUN_MODE = 1;
+
 document.addEventListener('keydown', (event) => {
 
     if (event.code == "ControlLeft" && !crouched) {
-
         //console.log(window.RENDERER.info.render.calls)
-
     }
 
     if (window.FPS && allowEnterFPS) {
@@ -303,15 +306,25 @@ document.addEventListener('keydown', (event) => {
             window.PLAYER.shapes[0].updateConvexPolyhedronRepresentation();
             window.PLAYER.computeAABB();
             window.PLAYER.updateMassProperties();
-
         }
 
-        if (event.code == "KeyE") {
+        //console.log(event.code)
+        if (event.code == "Digit1") {
+            window.GUN_MODE = 1;
+
+            tweenCamera(500, window.INK.position, new THREE.Vector3(window.INK.position.x,
+                0,
+                window.INK.position.z))
+        } else if (event.code == "Digit2") {
+            window.GUN_MODE = 2;
+
+            tweenCamera(500, window.INK.position, new THREE.Vector3(window.INK.position.x,
+                0.08,
+                window.INK.position.z))
+        } else if (event.code == "KeyE") {
 
             raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
             var intersects = raycaster2.intersectObjects(window.INTERACTIVE);
-
-            console.log(intersects)
 
             if (window.HOLDING_ITEM) {
                 window.HOLDING_ITEM = false;
@@ -323,10 +336,10 @@ document.addEventListener('keydown', (event) => {
                 itemHolder.initPosition.setZero();
 
                 // orientation
-                itemHolder.quaternion.set(0, 0, 0, 1);
-                itemHolder.initQuaternion.set(0, 0, 0, 1);
+                //itemHolder.quaternion.set(0, 0, 0, 1);
+                //itemHolder.initQuaternion.set(0, 0, 0, 1);
                 //body.previousQuaternion.set(0, 0, 0, 1);
-                itemHolder.interpolatedQuaternion.set(0, 0, 0, 1);
+                //itemHolder.interpolatedQuaternion.set(0, 0, 0, 1);
 
                 // Velocity
                 itemHolder.velocity.setZero();
@@ -351,6 +364,8 @@ document.addEventListener('keydown', (event) => {
                 window.PLAYER.velocity.set(0, 0, 0);
                 window.PLAYER.angularVelocity.set(0, 0, 0);
 
+                itemHolder.gelJumping = false;
+
                 window.CANNON_WORLD.addBody(itemHolder);
 
                 window.CURRENT_ITEM = null;
@@ -359,22 +374,49 @@ document.addEventListener('keydown', (event) => {
                 window.COL_Z = false;
                 window.holder.position.z = -1;
             } else if (intersects.length > 0) {
-                if (intersects[0].distance < 2) {
-                    window.HOLDING_ITEM = true;
-                    //window.CURRENT_ITEM = intersects[0].object.parent;
 
-                    //window.CURRENT_ITEM.item = intersects[0].object;
-                    //window.CURRENT_ITEM.mass = 0;
+                if (intersects[0].object.name == "gel_gun_blue" ||
+                    intersects[0].object.name == "gel_gun_orange" ||
+                    intersects[0].object.name == "gel_gun_white") {
 
-                    var instancedId = intersects[0].instanceId;
+                    if (window.GUN_MODE == 2) {
+                        for (var i = 2; i >= 0; i--) {
+                            if (!window.INK.children[i].visible) {
 
-                    window.CURRENT_ITEM = window.PORTAL_CUBES[instancedId];
+                                window.INK.children[i].visible = true;
+                                window.INK.children[i].name = intersects[0].object.name;
 
-                    window.CURRENT_ITEM_ID = instancedId;
+                                if (intersects[0].object.name == "gel_gun_blue") {
+                                    window.INK.children[i].material.color = new THREE.Color(0x0000ff)
+                                    window.INK_BLUE = true;
+                                } else if (intersects[0].object.name == "gel_gun_orange") {
+                                    window.INK.children[i].material.color = new THREE.Color(0xffa500)
+                                    window.INK_ORANGE = true;
+                                } else if (intersects[0].object.name == "gel_gun_white") {
+                                    window.INK.children[i].material.color = new THREE.Color(0xffffff)
+                                    window.INK_WHITE = true;
+                                }
 
+                                break;
+                            } else {
+                                if (window.INK.children[i].name == intersects[0].object.name)
+                                    break;
+                            }
+                        }
+                    }
+                } else {
+                    if (intersects[0].distance < 2) {
+                        window.HOLDING_ITEM = true;
+                        var instancedId = intersects[0].instanceId;
+                        var name = intersects[0].object.name;
 
-                    itemHolder = window.PORTAL_CUBES[instancedId].body;
-                    window.CANNON_WORLD.removeBody(window.PORTAL_CUBES[instancedId].body);
+                        window.CURRENT_ITEM = window.DYMANIC_ITEMS[name][instancedId];
+                        window.CURRENT_INSTANCED = window.ITEMS_ADDED.getObjectByName(name);
+                        window.CURRENT_ITEM_ID = instancedId;
+
+                        itemHolder = window.DYMANIC_ITEMS[name][instancedId].body;
+                        window.CANNON_WORLD.removeBody(window.DYMANIC_ITEMS[name][instancedId].body);
+                    }
                 }
             }
 
@@ -413,7 +455,6 @@ $("body").on('click', '#settings-close', function () {
             $("#mobile-controls").css("display", "block");
             openFullscreen();
         }
-
 
         mouseTime = performance.now();
         //
@@ -502,8 +543,6 @@ document.addEventListener('keyup', (event) => {
         //headBobActive = false;
 
         tweenCamera(500, window.GUN.children[0].position, new THREE.Vector3(0, 0, 0))
-
-
         setTimeout(() => {
             //repositioningGUn = false;
         }, 100);
@@ -567,10 +606,8 @@ document.getElementById("jump").addEventListener('pointerdown', jumpTouch, false
 
 function jumpTouch() {
     // handle jumping when space bar is pressed
-    if (!window.PLAYER.inJump) {
+    if (!window.PLAYER.inJump)
         shouldJump = true;
-        //if (!window.IN_VICTORY) {hideInstructions()}
-    }
 }
 
 function getPlaneByName(name) {
@@ -581,281 +618,335 @@ function getPlaneByName(name) {
     );
 }
 
+var gels = 0;
+var gelOrange = false;
+
 function portalButton(button) {
-    var id = 0,
-        id2 = 1;
 
-    if (button == 2) {
-        id = 1;
-        id2 = 0;
-    }
-
-    if (window.FPS && (button == 2 || button == 0) && allowPlacePortals) {
-        //if (document.pointerLockElement !== null) {
-        // define playerUpDirection
-        //let playerUpDirection = new THREE.Vector3(0, 1, 0)
-        //playerUpDirection.applyQuaternion(window.MAIN_CAMERA.quaternion)
-
-        //var ray_direction = new THREE.Vector3();
-        //var ray = new THREE.Raycaster(); // create once and reuse
-
-        //window.PointerControls.getDirection(ray_direction);
-        //ray.set(window.PointerControls.getObject().position, ray_direction);
+    if (window.FPS && (button == 2 || button == 0 || button == 1) && allowPlacePortals) {
 
         raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
         var intersects = raycaster2.intersectObject(window.instancedMesh);
-
-        //console.log(intersects)
 
         if (intersects.length > 0) {
 
             var userData = window.planeUserData[intersects[0].instanceId];
 
-            //console.log(intersects[0].uv)
+            //
 
-            if (userData.portal) {
-                var obj = intersects[0].object;
-                var target = new THREE.Vector3(); // create once an reuse it
-                intersects[0].object.getWorldPosition(target);
-                window.wallName = userData.name;
+            if (window.GUN_MODE == 2) {
 
-                var direction = new THREE.Vector3(0, 1, 0).applyQuaternion(obj.quaternion);
-                var offsetVector = new THREE.Vector3(0.0 * direction.x, 0.0 * direction.y, 0.0 * direction.z);
+                if (button == 1 && !window.INK_WHITE)
+                    return;
+                else if (button == 0 && !window.INK_ORANGE)
+                    return;
+                else if (button == 2 && !window.INK_BLUE)
+                    return;
 
-                var x = intersects[0].point.x + offsetVector.x;
-                var y = intersects[0].point.y + offsetVector.y;
-                var z = intersects[0].point.z + offsetVector.z;
+                var id;
 
-                //-------------------------------------------------
-                var boxUpName = userData.position.x + "/" +
-                    (userData.position.y + 2) + "/" +
-                    userData.position.z;
-
-                if (getPlaneByName(boxUpName).length == 0) {
-                    if (intersects[0].uv.y >= 0.5)
-                        y = userData.position.y;
-                } else {
-                    if (intersects[0].uv.y >= 0.5 && !getPlaneByName(boxUpName)[0].portal)
-                        y = userData.position.y;
-                }
-                //-------------------------------------------------
-                var boxDownName = userData.position.x + "/" +
-                    (userData.position.y - 2) + "/" +
-                    userData.position.z;
-
-                if (getPlaneByName(boxDownName).length == 0) {
-                    if (intersects[0].uv.y <= 0.5)
-                        y = userData.position.y;
-                } else {
-                    if (intersects[0].uv.y <= 0.5 && !getPlaneByName(boxDownName)[0].portal)
-                        y = userData.position.y;
-                }
-                //-------------------------------------------------
-                var boxLeftName = (userData.position.x + 2) + "/" +
-                    userData.position.y + "/" +
-                    userData.position.z;
-
-                if (getPlaneByName(boxLeftName).length == 0) {
-                    if (userData.side == "front") {
-                        if (intersects[0].uv.x >= 0.75)
-                            x = userData.position.x + 0.5;
-                    } else if (userData.side == "back") {
-                        if (intersects[0].uv.x <= 0.25)
-                            x = userData.position.x + 0.5;
-                    } else {
-                        x = userData.position.x;
+                for (var i = 0; i < window.GELS.length; i++) {
+                    if (!window.GELS[i]) {
+                        window.GELS[i] = true;
+                        id = i;
+                        break;
                     }
                 }
-                //-------------------------------------------------
-                var boxRightName = (userData.position.x - 2) + "/" +
-                    userData.position.y + "/" +
-                    userData.position.z;
 
-                if (getPlaneByName(boxRightName).length == 0) {
-                    if (userData.side == "front") {
-                        if (intersects[0].uv.x <= 0.25)
-                            x = userData.position.x - 0.5;
-                    } else if (userData.side == "back") {
-                        if (intersects[0].uv.x >= 0.75)
-                            x = userData.position.x - 0.5;
+                var gel = new THREE.Object3D();
+                gel.renderOrder = gels;
+                gels++;
+                gel.scale.set(1, 1, 1);
+                gel.position.copy(intersects[0].point);
+                gel.rotation.x = -Math.PI / 2;
+                gel.updateMatrix();
+                window.instancedMeshGel.setMatrixAt(id, gel.matrix);
+
+                if (button == 1)
+                    window.instancedMeshGel.setColorAt(id, new THREE.Color(0xffffff));
+                else if (button == 2)
+                    window.instancedMeshGel.setColorAt(id, new THREE.Color(0x0000FF));
+                else if (button == 0)
+                    window.instancedMeshGel.setColorAt(id, new THREE.Color(0xFFA500));
+
+                window.instancedMeshGel.instanceColor.needsUpdate = true;
+                window.instancedMeshGel.instanceMatrix.needsUpdate = true;
+                window.instancedMeshGel.computeBoundingSphere();
+
+                let PHYSICS_MATERIAL = new CANNON.Material();
+                PHYSICS_MATERIAL.friction = 0.01; //0.01
+                PHYSICS_MATERIAL.restitution = 0.1; //0.1
+
+                var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.01, 0.5));
+
+                var box = new CANNON.Body({
+                    shape: shape,
+                    mass: 0,
+                    material: PHYSICS_MATERIAL
+                })
+
+                box.position.copy(intersects[0].point);
+                box.collisionFilterGroup = window.CGROUP_DYNAMIC
+                box.collisionFilterMask = window.CGROUP_ALL
+                box.linearDamping = 0.01;
+
+                if (button == 1) {
+                    box.name = "gel-white";
+                } else if (button == 0) {
+                    box.name = "gel-orange";
+                } else if (button == 2) {
+                    box.name = "gel-blue";
+
+                    // When a body collides with another body, they both dispatch the "collide" event.
+                    box.addEventListener('collide', (event) => {
+
+                        if (!event.body.gelJumping) {
+
+                            var relativeVelocity = event.contact.getImpactVelocityAlongNormal();
+                            event.body.gelJumping = true;
+
+                            var holder = event.body;
+
+                            setTimeout(() => {
+                                holder.gelJumping = false;
+                            }, 1);
+
+                            //console.log(event)
+
+                            //shouldJump = true;
+                            //window.PLAYER.inJump = true
+                            event.body.velocity.set(event.body.velocity.x, 0, event.body.velocity.z);
+                            event.body.applyImpulse(new THREE.Vector3(0, 1, 0).multiplyScalar(7 * event.body.mass * Math.abs((relativeVelocity * 0.045) + 1)), event.body.position)
+                        }
+                    })
+                }
+
+                window.CANNON_WORLD.addBody(box);
+
+                window.PLAYER.addEventListener('collide', (event) => {
+                    //console.log('The sphere just collided with the ground!')
+                    //console.log('Collided with body:', event.body)
+                    //console.log('Contact between bodies:', event.contact)
+
+                    if (event.body.name == "gel-orange") {
+                        gelOrange = true;
                     } else {
-                        x = userData.position.x;
+                        gelOrange = false;
                     }
-                }
-                //-------------------------------------------------
-                var boxFrontName = userData.position.x + "/" +
-                    userData.position.y + "/" +
-                    (userData.position.z + 2);
 
-                if (getPlaneByName(boxFrontName).length == 0) {
-                    if (userData.side == "left") {
-                        if (intersects[0].uv.x <= 0.25)
-                            z = userData.position.z + 0.5;
-                    } else if (userData.side == "right") {
-                        if (intersects[0].uv.x >= 0.75)
-                            z = userData.position.z + 0.5;
+                    /*if (event.body.name == "gel-blue") {
+                        var relativeVelocity = event.contact.getImpactVelocityAlongNormal();
+                        window.PLAYER.velocity.set(window.PLAYER.velocity.x, 0, window.PLAYER.velocity.z);
+                        window.PLAYER.applyImpulse(new THREE.Vector3(0, 1, 0).multiplyScalar(7 * window.PLAYER.mass * Math.abs((relativeVelocity * 0.045) + 1)), window.PLAYER.position)
+                    }*/
+                })
+
+            } else if (window.GUN_MODE == 1) {
+
+                if (userData.portal) {
+
+                    var obj = intersects[0].object;
+                    var target = new THREE.Vector3(); // create once an reuse it
+                    intersects[0].object.getWorldPosition(target);
+                    window.wallName = userData.name;
+
+                    var direction = new THREE.Vector3(0, 1, 0).applyQuaternion(obj.quaternion);
+                    var offsetVector = new THREE.Vector3(0.0 * direction.x, 0.0 * direction.y, 0.0 * direction.z);
+
+                    var x = intersects[0].point.x + offsetVector.x;
+                    var y = intersects[0].point.y + offsetVector.y;
+                    var z = intersects[0].point.z + offsetVector.z;
+
+                    //-------------------------------------------------
+                    var boxUpName = userData.position.x + "/" +
+                        (userData.position.y + 2) + "/" +
+                        userData.position.z;
+
+                    if (getPlaneByName(boxUpName).length == 0) {
+                        if (intersects[0].uv.y >= 0.5)
+                            y = userData.position.y;
                     } else {
-                        z = userData.position.z;
+                        if (intersects[0].uv.y >= 0.5 && !getPlaneByName(boxUpName)[0].portal)
+                            y = userData.position.y;
                     }
-                }
-                //-------------------------------------------------
-                var boxBackName = userData.position.x + "/" +
-                    userData.position.y + "/" +
-                    (userData.position.z - 2);
+                    //-------------------------------------------------
+                    var boxDownName = userData.position.x + "/" +
+                        (userData.position.y - 2) + "/" +
+                        userData.position.z;
 
-                if (getPlaneByName(boxBackName).length == 0) {
-                    if (userData.side == "left") {
-                        if (intersects[0].uv.x >= 0.75)
-                            z = userData.position.z - 0.5;
-                    } else if (userData.side == "right") {
-                        if (intersects[0].uv.x <= 0.25)
-                            z = userData.position.z - 0.5;
+                    if (getPlaneByName(boxDownName).length == 0) {
+                        if (intersects[0].uv.y <= 0.5)
+                            y = userData.position.y;
                     } else {
-                        z = userData.position.z;
+                        if (intersects[0].uv.y <= 0.5 && !getPlaneByName(boxDownName)[0].portal)
+                            y = userData.position.y;
                     }
-                }
-                //-------------------------------------------------
-                const point = new THREE.Vector3(x, y, z);
-                // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
-                // define playerUpDirection
-                let playerUpDirection = new THREE.Vector3(0, 1, 0)
+                    //-------------------------------------------------
+                    var boxLeftName = (userData.position.x + 2) + "/" +
+                        userData.position.y + "/" +
+                        userData.position.z;
 
-                var normal;
-                if (userData.side == "front")
-                    normal = new THREE.Vector3(0, 0, 1)
-                else if (userData.side == "back")
-                    normal = new THREE.Vector3(0, 0, -1)
-                else if (userData.side == "right")
-                    normal = new THREE.Vector3(-1, 0, 0)
-                else if (userData.side == "left")
-                    normal = new THREE.Vector3(1, 0, 0)
-                else if (userData.side == "up") {
-                    //playerUpDirection = new THREE.Vector3(0, 0, 1)
-                    playerUpDirection.applyQuaternion(window.MAIN_CAMERA.quaternion)
-                    normal = new THREE.Vector3(0, -1, 0)
-                } else if (userData.side == "down") {
-                    //playerUpDirection = new THREE.Vector3(0, 0, 1)
-                    playerUpDirection.applyQuaternion(window.MAIN_CAMERA.quaternion)
-                    normal = new THREE.Vector3(0, 1, 0)
-                }
-
-                var pLocal = new THREE.Vector3(0, 0, -1);
-                var pWorld = pLocal.applyMatrix4(window.MAIN_CAMERA.matrixWorld);
-                var dir = pWorld.sub(window.MAIN_CAMERA.position).normalize();
-
-                point.add(dir.clone().multiplyScalar(-0.01));
-
-                //
-                // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
-                //const objectMatrix = new THREE.Matrix3().getNormalMatrix(intersects[0].object.matrixWorld)
-                //const normal = intersects[0].face.normal.clone().applyMatrix3(objectMatrix).normalize()
-                const depthDir = playerUpDirection.clone().projectOnPlane(normal).normalize()
-                const widthDir = depthDir.clone().cross(normal)
-                const portal_width = window.PORTAL_WIDTH
-                const portal_depth = window.PORTAL_DEPTH
-
-                let EPS = window.PORTAL_EPS * 3;
-                let portalPoints = [point.clone().add(depthDir.clone().multiplyScalar(portal_depth / 2 + EPS).add(widthDir.clone().multiplyScalar(portal_width / 2 + EPS))),
-                    point.clone().add(depthDir.clone().multiplyScalar(-portal_depth / 2 - EPS).add(widthDir.clone().multiplyScalar(portal_width / 2 + EPS))),
-                    point.clone().add(depthDir.clone().multiplyScalar(-portal_depth / 2 - EPS).add(widthDir.clone().multiplyScalar(-portal_width / 2 - EPS))),
-                    point.clone().add(depthDir.clone().multiplyScalar(portal_depth / 2 + EPS).add(widthDir.clone().multiplyScalar(-portal_width / 2 - EPS)))
-                ]
-
-
-                if (button == 0) { // left click
-
-                    if (window.PORTALS[1] === null) {
-                        document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
-                    } else {
-                        document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
-
-                        //console.log(point.distanceTo(window.PORTALS[1].pos))
-                        //console.log(point)
-                        //console.log(window.PORTALS[0])
-                        //console.log(window.PORTALS[1])
-                        if (point.distanceTo(window.PORTALS[1].pos) < 1) {
-                            return;
+                    if (getPlaneByName(boxLeftName).length == 0) {
+                        if (userData.side == "front") {
+                            if (intersects[0].uv.x >= 0.75)
+                                x = userData.position.x + 0.5;
+                        } else if (userData.side == "back") {
+                            if (intersects[0].uv.x <= 0.25)
+                                x = userData.position.x + 0.5;
+                        } else {
+                            x = userData.position.x;
                         }
                     }
+                    //-------------------------------------------------
+                    var boxRightName = (userData.position.x - 2) + "/" +
+                        userData.position.y + "/" +
+                        userData.position.z;
 
-                    // delete the old portal this new one is replacing
-                    if (window.PORTALS[0] !== null) {
-                        deletePortal(0);
-                    }
-
-                    createPortal(0, 1, point, normal, userData.body, playerUpDirection, portalPoints)
-
-                    window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(1.0, 0.25, 0.0);
-                    if (window.uniformShaderPortalGunBallEnergy.iAlpha.value == 0.0) {
-                        new TWEEN.Tween(window.uniformShaderPortalGunBallEnergy.iAlpha).to({
-                            value: 0.5
-                        }, 300).start();
-                    }
-                } else if (button == 2) { // left click
-
-                    if (window.PORTALS[0] === null) {
-                        document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
-                    } else {
-                        document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
-
-                        if (point.distanceTo(window.PORTALS[0].pos) < 1) {
-                            return;
+                    if (getPlaneByName(boxRightName).length == 0) {
+                        if (userData.side == "front") {
+                            if (intersects[0].uv.x <= 0.25)
+                                x = userData.position.x - 0.5;
+                        } else if (userData.side == "back") {
+                            if (intersects[0].uv.x >= 0.75)
+                                x = userData.position.x - 0.5;
+                        } else {
+                            x = userData.position.x;
                         }
                     }
+                    //-------------------------------------------------
+                    var boxFrontName = userData.position.x + "/" +
+                        userData.position.y + "/" +
+                        (userData.position.z + 2);
 
-                    // delete the old portal this new one is replacing
-                    if (window.PORTALS[1] !== null) {
-                        deletePortal(1);
+                    if (getPlaneByName(boxFrontName).length == 0) {
+                        if (userData.side == "left") {
+                            if (intersects[0].uv.x <= 0.25)
+                                z = userData.position.z + 0.5;
+                        } else if (userData.side == "right") {
+                            if (intersects[0].uv.x >= 0.75)
+                                z = userData.position.z + 0.5;
+                        } else {
+                            z = userData.position.z;
+                        }
+                    }
+                    //-------------------------------------------------
+                    var boxBackName = userData.position.x + "/" +
+                        userData.position.y + "/" +
+                        (userData.position.z - 2);
+
+                    if (getPlaneByName(boxBackName).length == 0) {
+                        if (userData.side == "left") {
+                            if (intersects[0].uv.x >= 0.75)
+                                z = userData.position.z - 0.5;
+                        } else if (userData.side == "right") {
+                            if (intersects[0].uv.x <= 0.25)
+                                z = userData.position.z - 0.5;
+                        } else {
+                            z = userData.position.z;
+                        }
+                    }
+                    //-------------------------------------------------
+                    const point = new THREE.Vector3(x, y, z);
+                    // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
+                    // define playerUpDirection
+                    let playerUpDirection = new THREE.Vector3(0, 1, 0)
+
+                    var normal;
+                    if (userData.side == "front")
+                        normal = new THREE.Vector3(0, 0, 1)
+                    else if (userData.side == "back")
+                        normal = new THREE.Vector3(0, 0, -1)
+                    else if (userData.side == "right")
+                        normal = new THREE.Vector3(-1, 0, 0)
+                    else if (userData.side == "left")
+                        normal = new THREE.Vector3(1, 0, 0)
+                    else if (userData.side == "up") {
+                        playerUpDirection.applyQuaternion(window.MAIN_CAMERA.quaternion)
+                        normal = new THREE.Vector3(0, -1, 0)
+                    } else if (userData.side == "down") {
+                        playerUpDirection.applyQuaternion(window.MAIN_CAMERA.quaternion)
+                        normal = new THREE.Vector3(0, 1, 0)
                     }
 
-                    createPortal(1, 0, point, normal, userData.body, playerUpDirection, userData.rotation)
+                    var pLocal = new THREE.Vector3(0, 0, -1);
+                    var pWorld = pLocal.applyMatrix4(window.MAIN_CAMERA.matrixWorld);
+                    var dir = pWorld.sub(window.MAIN_CAMERA.position).normalize();
 
-                    window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(0.0, 0.3, 1.0);
-                    if (window.uniformShaderPortalGunBallEnergy.iAlpha.value == 0.0) {
-                        new TWEEN.Tween(window.uniformShaderPortalGunBallEnergy.iAlpha).to({
-                            value: 0.5
-                        }, 300).start();
+                    point.add(dir.clone().multiplyScalar(-0.01));
+
+                    // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
+                    //const objectMatrix = new THREE.Matrix3().getNormalMatrix(intersects[0].object.matrixWorld)
+                    //const normal = intersects[0].face.normal.clone().applyMatrix3(objectMatrix).normalize()
+                    const depthDir = playerUpDirection.clone().projectOnPlane(normal).normalize()
+                    const widthDir = depthDir.clone().cross(normal)
+                    const portal_width = window.PORTAL_WIDTH
+                    const portal_depth = window.PORTAL_DEPTH
+
+                    let EPS = window.PORTAL_EPS * 3;
+                    let portalPoints = [point.clone().add(depthDir.clone().multiplyScalar(portal_depth / 2 + EPS).add(widthDir.clone().multiplyScalar(portal_width / 2 + EPS))),
+                        point.clone().add(depthDir.clone().multiplyScalar(-portal_depth / 2 - EPS).add(widthDir.clone().multiplyScalar(portal_width / 2 + EPS))),
+                        point.clone().add(depthDir.clone().multiplyScalar(-portal_depth / 2 - EPS).add(widthDir.clone().multiplyScalar(-portal_width / 2 - EPS))),
+                        point.clone().add(depthDir.clone().multiplyScalar(portal_depth / 2 + EPS).add(widthDir.clone().multiplyScalar(-portal_width / 2 - EPS)))
+                    ]
+
+                    if (button == 0) { // left click
+
+                        if (window.PORTALS[1] === null) {
+                            document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
+                        } else {
+                            document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
+
+                            if (point.distanceTo(window.PORTALS[1].pos) < 1)
+                                return;
+                        }
+
+                        // delete the old portal this new one is replacing
+                        if (window.PORTALS[0] !== null)
+                            deletePortal(0);
+
+                        createPortal(0, 1, point, normal, userData.body, playerUpDirection, portalPoints)
+
+                        window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(1.0, 0.25, 0.0);
+                        if (window.uniformShaderPortalGunBallEnergy.iAlpha.value == 0.0) {
+                            new TWEEN.Tween(window.uniformShaderPortalGunBallEnergy.iAlpha).to({
+                                value: 0.5
+                            }, 300).start();
+                        }
+                    } else if (button == 2) { // left click
+
+                        if (window.PORTALS[0] === null) {
+                            document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
+                        } else {
+                            document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
+
+                            if (point.distanceTo(window.PORTALS[0].pos) < 1)
+                                return;
+                        }
+
+                        // delete the old portal this new one is replacing
+                        if (window.PORTALS[1] !== null) {
+                            deletePortal(1);
+                        }
+
+                        createPortal(1, 0, point, normal, userData.body, playerUpDirection, userData.rotation)
+
+                        window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(0.0, 0.3, 1.0);
+                        if (window.uniformShaderPortalGunBallEnergy.iAlpha.value == 0.0) {
+                            new TWEEN.Tween(window.uniformShaderPortalGunBallEnergy.iAlpha).to({
+                                value: 0.5
+                            }, 300).start();
+                        }
                     }
-
+                } else {
+                    //NONPORTABLE WALL
                 }
-            } else {
-                //intersects[0].object.visible = false;
             }
-
         }
     }
 }
 
-function validPortalPoint(point, normal, object) {
-
-
-    // check that no intersectable objects are directly in front of point
-    let frontPoint = point.clone().add(normal.clone().multiplyScalar(1))
-    const raycaster = new THREE.Raycaster(frontPoint, normal.clone().multiplyScalar(-1), 0, 2000);
-    let intersects = raycaster.intersectObject(this.intersectObjects);
-
-    // if there is no intersect or if there is another object in the way, then return false
-    if (intersects.length == 0 || intersects[0].object != object) {
-        return false
-    }
-
-    // have to also check if there is another face occupying the same space. The distance between the first and second intersects will be negligible
-    // but the objects will be different.
-    if (intersects.length > 1 && Math.abs(intersects[0].distance - intersects[1].distance) < 0.001 && intersects[1].object != object) {
-        return false
-    }
-
-    return true
-}
-
 // deletes the portal with index portalIndex from the scene
 function deletePortal(portalIndex) {
-    /*window.PORTALS[portalIndex].mesh.geometry.dispose();
-    window.PORTALS[portalIndex].mesh.material.dispose();
-    window.MAIN_SCENE.remove(window.PORTALS[portalIndex]);
-    window.PORTALS[portalIndex] = null;*/
-
-
     window.PORTALS[portalIndex].mesh.geometry.dispose();
     window.PORTALS[portalIndex].mesh.material.dispose();
     if (window.PORTALS[portalIndex].hostObjects !== null) {
@@ -890,26 +981,16 @@ function createPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObje
     window.PORTALS[thisPortalIndex].hostObjects.collisionFilterGroup |= window.CGROUP_PORTAL_HOST_CDISABLE[thisPortalIndex]
     // remove this object from the environment group
     window.PORTALS[thisPortalIndex].hostObjects.collisionFilterGroup &= ~window.CGROUP_ENVIRONMENT
-    if (window.PORTALS[otherPortalIndex] !== null) {
+
+    if (window.PORTALS[otherPortalIndex] !== null)
         window.PORTALS[otherPortalIndex].output = window.PORTALS[thisPortalIndex]
-    }
-
-    //window.PORTALS[thisPortalIndex].children[0].rotation.copy(rotation);
-    //window.PORTALS[thisPortalIndex].children[1].rotation.copy(rotation);
-    //window.PORTALS[thisPortalIndex].rotation.copy(rotation);
-    //window.PORTALS[thisPortalIndex].children[1].rotation.x = -Math.PI/2;
-    //window.PORTALS[thisPortalIndex].position.copy(point);
-
-    //window.PORTALS[thisPortalIndex].rotation.z = Math.PI/2;
-    //window.PORTALS[thisPortalIndex].position.copy(point);
 
     window.MAIN_SCENE.add(window.PORTALS[thisPortalIndex])
     tweenCamera(300, window.PORTALS[thisPortalIndex].mesh.scale, new THREE.Vector3(0.5, 1, 1))
     tweenCamera(300, window.PORTALS[thisPortalIndex].portalShader.scale, new THREE.Vector3(0.5, 1, 1))
 
-    if (window.PORTALS[otherPortalIndex] !== null) {
+    if (window.PORTALS[otherPortalIndex] !== null)
         window.PORTALS[otherPortalIndex].output = window.PORTALS[thisPortalIndex]
-    }
 
     if (window.PORTALS[0] !== null && window.PORTALS[1] !== null) {
         window.PORTALS[0].portalShader.material = window.materialLeftOpened
@@ -919,18 +1000,8 @@ function createPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObje
     var pLocal = new THREE.Vector3(0, 0, -1);
     var pWorld = pLocal.applyMatrix4(window.MAIN_CAMERA.matrixWorld);
     var dir = pWorld.sub(window.MAIN_CAMERA.position).normalize();
-
     //window.PORTALS[thisPortalIndex].position.add(dir.clone().multiplyScalar(-0.02));
 }
-
-document.body.addEventListener('mousemove', (event) => { //rafa
-    if (window.FPS) {
-        //if (document.pointerLockElement === document.body) {
-        //window.MAIN_CAMERA.rotation.y -= event.movementX / 1000;
-        //window.MAIN_CAMERA.rotation.x -= event.movementY / 1000;
-        //}
-    }
-});
 
 let shouldJump = false;
 window.rotationMobile = 0.1;
@@ -944,25 +1015,12 @@ const updatePlayer = function (deltaTime) {
     if (window.mobile) {
         //
         velocity = 900;
-        //if (fwdValue == 0 && bkdValue == 0 && rgtValue == 0 && lftValue == 0) {
-        //horizontal rotation
-
-        //if (targetRotationX > 0.8) {
-        //targetRotationX += 0.1;
-        //   window.MAIN_CAMERA.rotation.y += (targetRotationX - window.MAIN_CAMERA.rotation.y) * 0.1;
-        //} else if (targetRotationX < -0.8) {
-        //targetRotationX -= 0.1;
-        //    window.MAIN_CAMERA.rotation.y += (targetRotationX - window.MAIN_CAMERA.rotation.y) * 0.1;
-        //} else {
         window.MAIN_CAMERA.rotation.y += (targetRotationX - window.MAIN_CAMERA.rotation.y) * window.rotationMobile;
-        //}
-
 
         //vertical rotation 
         finalRotationY = (targetRotationY - window.MAIN_CAMERA.rotation.x);
         if (window.MAIN_CAMERA.rotation.x <= 1 && window.MAIN_CAMERA.rotation.x >= -1) {
             window.MAIN_CAMERA.rotation.x += finalRotationY * window.rotationMobile;
-            //camera.rotation.x += (targetRotationY - camera.rotation.x) * 0.1;
         }
 
         if (window.MAIN_CAMERA.rotation.x > 1) {
@@ -977,12 +1035,10 @@ const updatePlayer = function (deltaTime) {
         } else
             blocked_bottom = false;
 
-
         if (window.gyro) {
             controlsDevice.update();
             window.MAIN_CAMERA.rotation.z = 0
         }
-
     }
 
     // gives a bit of air control
@@ -997,15 +1053,13 @@ const updatePlayer = function (deltaTime) {
 
     // physics changes while jumping
     let jumpMultiplier = 1
-    if (window.PLAYER.inJump) {
+    if (window.PLAYER.inJump)
         jumpMultiplier = 0.05
-    }
 
-    if (!window.PLAYER.inJump) {
+    if (!window.PLAYER.inJump)
         window.PLAYER.linearDamping = 0.999
-    } else {
+    else
         window.PLAYER.linearDamping = 0.01
-    }
 
     // regulates speed when multiple directions are pressed 
     //let movementDirections = controller["KeyW"].pressed + controller["KeyS"].pressed + controller["KeyA"].pressed + controller["KeyD"].pressed;
@@ -1018,39 +1072,28 @@ const updatePlayer = function (deltaTime) {
     // apply forces in WASD directions when pressed
     const f = velocity * window.PLAYER.mass * jumpMultiplier * deltaTime;
 
-    // if (this.controller["KeyW"].pressed || this.controller["KeyA"].pressed || this.controller["KeyS"].pressed || this.controller["KeyD"].pressed) { 
-    //     if (this.counter % 30 == 0 && !this.window.PLAYER.inJump) {
-    //         this.playWalkingSound()
-    //     }
-    // }
-
-    if (window.qwe) {
-        //window.qwe.applyImpulse(forward.clone().multiplyScalar(1), window.qwe.position)
-    }
+    if (gelOrange)
+        window.PLAYER.applyForce(forward.clone().multiplyScalar(f * 3), window.PLAYER.position)
 
     if (window.mobile) {
 
         if (fwdValue > 0) {
             window.PLAYER.applyForce(forward.clone().multiplyScalar(f * fwdValue), window.PLAYER.position)
-            //if (!window.IN_VICTORY) {hideInstructions()}
             moving = true;
         }
 
         if (bkdValue > 0) {
             window.PLAYER.applyForce(backward.clone().multiplyScalar(f * bkdValue), window.PLAYER.position)
-            //if (!window.IN_VICTORY) {hideInstructions()}
             moving = true;
         }
 
         if (lftValue > 0) {
             window.PLAYER.applyForce(left.clone().multiplyScalar(f * lftValue), window.PLAYER.position)
-            //if (!window.IN_VICTORY) {hideInstructions()}
             moving = true;
         }
 
         if (rgtValue > 0) {
             window.PLAYER.applyForce(right.clone().multiplyScalar(f * rgtValue), window.PLAYER.position)
-            //if (!window.IN_VICTORY) {hideInstructions()}
             moving = true;
         }
 
@@ -1068,8 +1111,6 @@ const updatePlayer = function (deltaTime) {
         var gamepad;
         if (controllerIndex !== null) {
             gamepad = navigator.getGamepads()[controllerIndex];
-            //handleButtons(gamepad.buttons);
-            //handleSticks(gamepad.axes);
 
             if (gamepad.buttons[6].value > 0) {
 
@@ -1095,28 +1136,23 @@ const updatePlayer = function (deltaTime) {
                 });
             }
 
-            if (gamepad.axes[2] > 0.5) {
+            if (gamepad.axes[2] > 0.5)
                 window.MAIN_CAMERA.rotation.y -= 0.05;
-            }
 
-            if (gamepad.axes[2] < -0.5) {
+            if (gamepad.axes[2] < -0.5)
                 window.MAIN_CAMERA.rotation.y += 0.05;
-            }
 
-            if (gamepad.axes[3] < -0.5) {
+            if (gamepad.axes[3] < -0.5)
                 window.MAIN_CAMERA.rotation.x += 0.025;
-            }
 
-            if (gamepad.axes[3] > 0.5) {
+            if (gamepad.axes[3] > 0.5)
                 window.MAIN_CAMERA.rotation.x -= 0.025;
-            }
 
             //
             var gamepadPressed = 0;
 
             if (gamepad.axes[1] < -0.5) {
                 window.PLAYER.applyForce(forward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
-                //if (!window.IN_VICTORY) {hideInstructions()}
                 moving = true;
                 gamepadPressed++;
                 headBobActive = true;
@@ -1124,7 +1160,6 @@ const updatePlayer = function (deltaTime) {
 
             if (gamepad.axes[1] > 0.5) {
                 window.PLAYER.applyForce(backward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
-                //if (!window.IN_VICTORY) {hideInstructions()}
                 moving = true;
                 gamepadPressed++;
                 headBobActive = true;
@@ -1132,7 +1167,6 @@ const updatePlayer = function (deltaTime) {
 
             if (gamepad.axes[0] < -0.5) {
                 window.PLAYER.applyForce(left.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
-                //if (!window.IN_VICTORY) {hideInstructions()}
                 moving = true;
                 gamepadPressed++;
                 headBobActive = true;
@@ -1140,7 +1174,6 @@ const updatePlayer = function (deltaTime) {
 
             if (gamepad.axes[0] > 0.5) {
                 window.PLAYER.applyForce(right.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
-                //if (!window.IN_VICTORY) {hideInstructions()}
                 moving = true;
                 gamepadPressed++;
                 headBobActive = true;
@@ -1155,22 +1188,18 @@ const updatePlayer = function (deltaTime) {
 
         if (controller["KeyW"].pressed && !window.COL_Z) {
             window.PLAYER.applyForce(forward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
-            //if (!window.IN_VICTORY) {hideInstructions()}
             moving = true;
         }
         if (controller["KeyS"].pressed) {
             window.PLAYER.applyForce(backward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
-            //if (!window.IN_VICTORY) {hideInstructions()}
             moving = true;
         }
         if (controller["KeyA"].pressed) {
             window.PLAYER.applyForce(left.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
-            //if (!window.IN_VICTORY) {hideInstructions()}
             moving = true;
         }
         if (controller["KeyD"].pressed) {
             window.PLAYER.applyForce(right.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
-            //if (!window.IN_VICTORY) {hideInstructions()}
             moving = true;
         }
 
@@ -1180,18 +1209,16 @@ const updatePlayer = function (deltaTime) {
         if (controllerIndex !== null) {
             if (gamepad.buttons[0].value > 0 && !window.PLAYER.inJump) {
                 shouldJump = true;
-                //if (!window.IN_VICTORY) {hideInstructions()}
             }
         } else if (controller["Space"].pressed && !window.PLAYER.inJump) {
             shouldJump = true;
-            //if (!window.IN_VICTORY) {hideInstructions()}
         }
         // update lastTimeStampInJump
         wasInJump = window.PLAYER.inJump;
 
         if (shouldJump) {
             window.PLAYER.inJump = true
-            window.PLAYER.applyImpulse(up.clone().multiplyScalar(f * 0.11), window.PLAYER.position)
+            window.PLAYER.applyImpulse(up.clone().multiplyScalar(f * 0.2), window.PLAYER.position)
         }
     }
 
@@ -1213,18 +1240,11 @@ const updatePlayer = function (deltaTime) {
     //smoothness = 0.1; // 0 to 1 only
     const targetPosition = window.MAIN_CAMERA.quaternion.clone();
 
-    //if(){
     window.GUN.quaternion.slerp(targetPosition, smoothness);
-    //}else{
-    //window.GUN.rotation.copy(window.MAIN_CAMERA.rotation)
-    //}
     updateHeadBob(deltaTime);
-
-    //console.log(window.MAIN_CAMERA.position.distanceTo(window.SPAWN_POSITION))
 
     if (window.MAIN_CAMERA.position.distanceTo(new THREE.Vector3(0, 0, 0)) > 100) {
         window.PLAYER.position.copy(window.SPAWN_POSITION);
-        //alert("You just found a bug!")
     }
 }
 
@@ -1241,10 +1261,6 @@ const updateHeadBob = function (deltaTime) {
         const nextStep = 1 + Math.floor(((headBobTimer + 0.0000001) * headBobSpeed) / wavLength);
         const nextStepTime = nextStep * wavLength / headBobSpeed;
         headBobTimer = Math.min(headBobTimer + deltaTime, nextStepTime);
-
-        if (headBobTimer == nextStepTime) {
-            //headBobActive = false;
-        }
     }
 }
 
@@ -1261,7 +1277,6 @@ function raycast() {
         var intersects = raycaster2.intersectObject(window.planeEnterDoor);
 
         if (intersects.length > 0) {
-            //onsole.log(intersects[0].distance)
             if (intersects[0].distance < 0.1) {
                 leveEntered = true;
 
@@ -1284,7 +1299,6 @@ function raycast() {
                         setTimeout(() => {
                             //INITIATE BOX CANNON
                             for (var i = 0; i < window.BOX_BODY.length; i++) {
-                                console.log("tttttttttttttt")
                                 window.CANNON_WORLD.addBody(window.BOX_BODY[i])
                             }
                             for (var i = 0; i < window.SPHERE_BODY.length; i++) {
@@ -1330,38 +1344,18 @@ function raycast() {
         }
     }
 
-    //
-    /*raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
-    var intersects = raycaster2.intersectObject(window.CORRIDOR_EXIT.getObjectByName("completed"));
-    if (intersects.length > 0) {
-        if (intersects[0].distance < 1 && !levelCompleted) {
-            levelCompleted = true;
-            $("#loading-parent").css("opacity", 1);
-            $("#loading-parent").css("pointer-events", "all");
-
-            $(".main-title").text("LEVEL COMPLETED AND VALIDATED")
-            $(".introduction-text").text("Congratulations you completed the level, now you will be redirected to the level editor where you can make modifications, save or publish this level.");
-        }
-    }*/
-    //
-
-    if (window.PORTALS[0] === null || window.PORTALS[1] === null) {
+    if (window.PORTALS[0] === null || window.PORTALS[1] === null)
         return
-    }
-
-    var portals = [window.PORTALS[0].mesh, window.PORTALS[1].mesh];
 
     var dd = 0;
+
     for (let d of window.dynamicObjects) {
 
         let pos = new THREE.Vector3(d.position.x, d.position.y, d.position.z)
         // let bb = new Box3(new Vector3().copy(d.physicsBody.aabb.lowerBound), new Vector3().copy(d.physicsBody.aabb.upperBound))
         d.collisionFilterMask = window.CGROUP_ALL
-        if (window.PORTALS[0] === null || window.PORTALS[1] === null) {
+        if (window.PORTALS[0] === null || window.PORTALS[1] === null)
             continue
-        }
-        //d.meshClone.visible = false
-        let CDBB_isOverlap = false;
 
         var inArea = 0;
 
@@ -1370,7 +1364,6 @@ function raycast() {
             // collision disable, might be partially intersecting with portal
             if (window.PORTALS[p].CDBB.containsPoint(pos)) {
                 d.collisionFilterMask &= ~window.PORTALS[p].hostObjects.collisionFilterGroup;
-                //console.log(d.collisionFilterMask)
 
                 if (dd == 0)
                     inArea++;
@@ -1378,8 +1371,6 @@ function raycast() {
 
             // should teleport
             if (window.PORTALS[p].STBB.containsPoint(pos)) {
-
-                console.log()
 
                 teleportPhysicalObject(d, window.PORTALS[p])
 
@@ -1414,7 +1405,6 @@ function raycast() {
         }
 
         dd++;
-
     }
 }
 
@@ -1497,14 +1487,6 @@ function tweenCamera(duration, ini, final) {
         .start();
 }
 
-function tweenOpacity(duration, mat, final) {
-    new TWEEN.Tween(mat).to({
-        opacity: final
-    }, duration).start();
-}
-
-var teleporting = false;
-
 let controllerIndex = null;
 
 window.addEventListener("gamepadconnected", (event) => {
@@ -1517,8 +1499,6 @@ window.addEventListener("gamepaddisconnected", (event) => {
     controllerIndex = null;
     console.log("disconnected");
 });
-
-//
 
 export {
     updatePlayer

@@ -287,9 +287,9 @@ var plane2;
 
 var transition = false;
 var transition2 = false;
-var stopMenuLoop = false;
+var stopMenuLoop = true;
 
-/*$("#blocker").css("display", "none");
+$("#blocker").css("display", "none");
 $("#ui").css("display", "block");
 $("#container #back-effect").css("display", "none");
 $("#main-container").css("display", "block");
@@ -299,11 +299,11 @@ $("#options-settings").css("display", "block");
 $("#settings-menu-title").text("OPTIONS");
 $("#back-main").css("display", "none");
 $("#settings-close").css("display", "block");
-$("#main-container").css("display", "block");*/
+$("#main-container").css("display", "block");
 
 //
-$("#blocker").css("display", "flex");
-$("#options-main").css("display", "block");
+/*$("#blocker").css("display", "flex");
+$("#options-main").css("display", "block");*/
 
 if (!stopMenuLoop) {
     setTimeout(() => {

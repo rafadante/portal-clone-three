@@ -15,8 +15,6 @@ import {
     strFromU8
 } from '../../jsm/libs/fflate.module.js';
 
-
-
 async function handleZip(path, obj) {
     await JSZipUtils.getBinaryContent(path, function (err, data) {
         if (err) {
@@ -30,63 +28,42 @@ async function handleZip(path, obj) {
             var loader23 = new GLTFLoader();
             loader23.parse(file.buffer, '', function (result) {
 
-                if (obj == "loadButtonCube") {
+                if (obj == "loadButtonCube")
                     loadButtonCubeManager(result.scene)
-                } else if (obj == "loadButtonSphere") {
+                else if (obj == "loadButtonSphere")
                     loadButtonSphereManager(result.scene)
-                } else if (obj == "loadButtonWeight") {
+                else if (obj == "loadButtonWeight")
                     loadButtonWeightManager(result.scene)
-                } else if (obj == "loadPedestalButton") {
+                else if (obj == "loadPedestalButton")
                     loadPedestalButtonManager(result.scene)
-                } else if (obj == "loadCamera") {
+                else if (obj == "loadCamera")
                     loadCameraManager(result.scene)
-                } else if (obj == "loadRadio") {
+                else if (obj == "loadRadio")
                     loadRadioManager(result.scene)
-                } else if (obj == "loadCorridor") {
+                else if (obj == "loadCorridor")
                     loadCorridorEnter(result.scene)
-                } else if (obj == "loadExitDoor") {
+                else if (obj == "loadExitDoor")
                     loadExitDoor(result.scene)
-                } else if (obj == "loadEnterDoor") {
+                else if (obj == "loadEnterDoor")
                     loadEnterDoor(result.scene)
-                } else if (obj == "loadDispenser") {
+                else if (obj == "loadDispenser")
                     loadDispenserManager(result.scene)
-                } else if (obj == "loadGun") {
+                else if (obj == "loadGun")
                     loadGunManager(result.scene)
-                } else if (obj == "loadPortalCube") {
+                else if (obj == "loadPortalCube")
                     loadPortalCubeManager(result.scene)
-                } else if (obj == "loadPortalSphere") {
+                else if (obj == "loadPortalSphere")
                     loadPortalSphereManager(result.scene)
-                } else if (obj == "loadWindow") {
+                else if (obj == "loadWindow")
                     loadWindowManager(result.scene)
-                } else if (obj == "loadWindowHalf") {
+                else if (obj == "loadWindowHalf")
                     loadWindowHalfManager(result.scene)
-                }
-
-
             });
-
         }
     });
 }
 
-
 const manager = new THREE.LoadingManager();
-manager.onStart = function (url, itemsLoaded, itemsTotal) {
-    //console.log('Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
-};
-
-manager.onLoad = function () {
-    //console.log('Loading complete!');
-};
-
-manager.onProgress = function (url, itemsLoaded, itemsTotal) {
-    //console.log('Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
-};
-
-manager.onError = function (url) {
-    //console.log('There was an error loading ' + url);
-};
-
 const loader = new GLTFLoader(manager).setPath('./assets');
 
 function loadCube() {
@@ -120,9 +97,8 @@ function loadWindowIMG() {
                 child.material.polygonOffsetFactor = -1;
             }
 
-            if (child.name == "side_window") {
+            if (child.name == "side_window")
                 window.side_window = child;
-            }
         })
 
         gltf.scene.rotation.y = -Math.PI / 2;
@@ -145,7 +121,6 @@ function loadWindowManager(scene) {
         if (child.name.includes("Cube")) {
             child.receiveShadow = true;
             child.castShadow = true;
-
         }
 
         if (child.name == "room_light") {
@@ -161,7 +136,6 @@ function loadWindowManager(scene) {
         }
 
         if (child.name.includes("vidro")) {
-            //child.renderOrder = -1;
             child.material.side = 2;
             child.material.envMap = window.ENV_MAP_FPS;
             console.log(child)
@@ -201,22 +175,33 @@ function loadGunManager(scene) {
 
         child.renderOrder = -1;
 
-        if (child.name == "sphere") {
+        if (child.name == "sphere")
             window.GUN_SPHERE = child;
-        } else if (child.name == "cylinder") {
+        else if (child.name == "cylinder")
             window.GUN_CYLINDER = child;
-        } else if (child.name == "cube_1")
+        else if (child.name == "cube_1")
             window.cube_1 = child;
         else if (child.name == "cube_2")
             window.cube_2 = child;
         else if (child.name == "cube_3")
             window.cube_3 = child;
-        //else if (child.name == "holder")
-        //    window.holder = child;
 
+        if (child.name == "ink") {
+            window.INK = child;
+            window.INK.position.y = 0; //0.08
+            console.log(window.INK)
+        } else if (child.name == "ink1") {
+            child.visible = false;
+            child.material = new THREE.MeshBasicMaterial();
+        } else if (child.name == "ink2") {
+            child.visible = false;
+            child.material = new THREE.MeshBasicMaterial();
+        } else if (child.name == "ink3") {
+            child.visible = false;
+            child.material = new THREE.MeshBasicMaterial();
+        }
     });
 
-    //console.log(window.holder.position)
     window.GUN.name = "GUN";
     window.MAIN_SCENE.add(window.GUN);
 
@@ -366,7 +351,6 @@ function loadCorridorEnter(scene) {
             child.material.envMap = window.ENV_MAP_FPS;
 
             if (child.material.name == "lambert5") {
-
                 child.material = new THREE.MeshBasicMaterial()
                 window.SELECTED_OBJECTS_FOR_BLOOM.add(child);
             }
@@ -382,7 +366,6 @@ function loadCorridorEnter(scene) {
 function loadCorridorExit(scene) {
 
     var corridor = scene.clone();
-
     corridor.position.z = -0.99;
     corridor.visible = false;
 
@@ -414,10 +397,19 @@ function loadPortalCube() {
 
 function loadPortalCubeManager(scene) {
 
+    var item = instancedTransform(scene, "cube", true)
+    item.userData.wall = false;
+    item.userData.ground = true;
+    item.userData.ceiling = false;
+    loadPortalSphere()
+}
+
+function instancedTransform(scene, name, interactive) {
     var geometry = scene.children[0].geometry.clone();
     geometry.computeVertexNormals();
-    geometry.scale(0.015, 0.015, 0.015);
-    //console.log(geometry)
+
+    //if (interactive)
+    //    geometry.scale(0.015, 0.015, 0.015);
 
     var item = new THREE.InstancedMesh(geometry, scene.children[0].material.clone(), 20);
     item.instanceMatrix.setUsage(THREE.DynamicDrawUsage); // will be updated every frame
@@ -430,30 +422,23 @@ function loadPortalCubeManager(scene) {
         item.setMatrixAt(i, clone.matrix);
     }
 
-    //item.scale.set(0.015, 0.015, 0.015)
-    //item.position.y = 10000;
-    item.name = "cube";
-    item.renderOrder = 3;
-    item.userData.clones = 0;
-    item.userData.wall = false;
-    item.userData.ground = true;
-    item.userData.ceiling = false;
+    item.name = name;
     item.receiveShadow = true;
     item.castShadow = true;
     item.material.envMap = window.ENV_MAP_FPS;
     item.material.envMapIntensity = 0.5;
     item.material.roughness = 0.2;
-    //window.ITEMS.add(item);
-    window.PORTAL_CUBE_INSTANCED = item;
-    window.INTERACTIVE.push(item);
-    window.ITEMS_ADDED.add(item);
+
+    if (interactive) {
+        window.INTERACTIVE.push(item);
+    }
 
     for (var i = 0; i < 20; i++)
-        window.PORTAL_CUBES.push([]);
+        window.DYMANIC_ITEMS[name].push([])
 
-    console.log(window.ITEMS_ADDED)
+    window.ITEMS_ADDED.add(item);
 
-    loadPortalSphere()
+    return item;
 }
 
 function loadPortalSphere() {
@@ -461,24 +446,10 @@ function loadPortalSphere() {
 }
 
 function loadPortalSphereManager(scene) {
-    scene.name = "sphere";
-    scene.userData.wall = false;
-    scene.userData.ground = true;
-    scene.userData.ceiling = false;
-    window.ITEMS.add(scene);
-
-    scene.traverse(child => {
-        child.receiveShadow = true;
-        child.castShadow = true;
-        if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
-            child.material.envMapIntensity = 0.5;
-            child.material.roughness = 0.2;
-
-            //child.material.depthTest = false;
-            //child.material.transparent = true;
-        }
-    })
+    var item = instancedTransform(scene, "sphere", true)
+    item.userData.wall = false;
+    item.userData.ground = true;
+    item.userData.ceiling = false;
     loadHalfWindow()
 }
 
@@ -532,7 +503,6 @@ function loadWindowHalfManager(scene) {
 
     scene.position.y = -1;
     scene.visible = false;
-
     //window.add(scene);
 }
 
@@ -563,20 +533,13 @@ function loadPedestalButton() {
 }
 
 function loadPedestalButtonManager(scene) {
-    scene.name = "pedestal_button";
-    scene.userData.wall = false;
-    scene.userData.ground = true;
-    scene.userData.ceiling = false;
-    scene.userData.trigger = true;
-    window.ITEMS.add(scene);
-    scene.traverse(child => {
-        child.receiveShadow = true;
-        child.castShadow = true;
-        if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
-            child.material.envMapIntensity = 0.5;
-        }
-    })
+
+    var item = instancedTransform(scene, "pedestal_button", false)
+
+    item.userData.wall = false;
+    item.userData.ground = true;
+    item.userData.ceiling = false;
+    item.userData.trigger = true;
 
     loadButtonSphere()
 }
@@ -586,20 +549,12 @@ function loadButtonSphere() {
 }
 
 function loadButtonSphereManager(scene) {
-    scene.name = "button_circle";
-    scene.userData.wall = false;
-    scene.userData.ground = true;
-    scene.userData.ceiling = false;
-    scene.userData.trigger = true;
-    window.ITEMS.add(scene);
-    scene.traverse(child => {
-        child.receiveShadow = true;
-        child.castShadow = true;
-        if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
-            child.material.envMapIntensity = 0.5;
-        }
-    })
+
+    var item = instancedTransform(scene, "button_circle", false)
+    item.userData.wall = false;
+    item.userData.ground = true;
+    item.userData.ceiling = false;
+    item.userData.trigger = true;
 
     loadButtonCube()
 }
@@ -609,21 +564,13 @@ function loadButtonCube() {
 }
 
 function loadButtonCubeManager(scene) {
-    console.log(scene)
-    scene.name = "button_box";
-    scene.userData.wall = false;
-    scene.userData.ground = true;
-    scene.userData.ceiling = false;
-    scene.userData.trigger = true;
-    window.ITEMS.add(scene);
-    scene.traverse(child => {
-        child.receiveShadow = true;
-        child.castShadow = true;
-        if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
-            child.material.envMapIntensity = 0.5;
-        }
-    })
+
+    var item = instancedTransform(scene, "button_box", false)
+    item.userData.wall = false;
+    item.userData.ground = true;
+    item.userData.ceiling = false;
+    item.userData.trigger = true;
+
     loadButtonWeight()
 }
 
@@ -632,20 +579,12 @@ function loadButtonWeight() {
 }
 
 function loadButtonWeightManager(scene) {
-    scene.name = "button_weight";
-    scene.userData.wall = false;
-    scene.userData.ground = true;
-    scene.userData.ceiling = false;
-    scene.userData.trigger = true;
-    window.ITEMS.add(scene);
-    scene.traverse(child => {
-        child.receiveShadow = true;
-        child.castShadow = true;
-        if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
-            child.material.envMapIntensity = 0.5;
-        }
-    })
+
+    var item = instancedTransform(scene, "button_weight", false)
+    item.userData.wall = false;
+    item.userData.ground = true;
+    item.userData.ceiling = false;
+    item.userData.trigger = true;
 
     loadCamera();
 }
@@ -684,22 +623,41 @@ function loadRadio() {
 }
 
 function loadRadioManager(scene) {
-    scene.name = "radio";
-    scene.userData.wall = false;
-    scene.userData.ground = true;
-    scene.userData.ceiling = false;
-    window.ITEMS.add(scene);
-    scene.traverse(child => {
-        child.receiveShadow = true;
-        child.castShadow = true;
-        if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
-            child.material.envMapIntensity = 0.5;
-        }
-    })
 
-    $("#loading-parent").css("opacity", 0);
-    $("#loading-parent").css("pointer-events", "none");
+    var item = instancedTransform(scene, "radio", true)
+    item.userData.wall = false;
+    item.userData.ground = true;
+    item.userData.ceiling = false;
+
+    loadGelRecharger();
+}
+
+function loadGelRecharger() {
+    loader.load('/3ds/portal_gun_recharger.glb', (gltf) => {
+
+        gltf.scene.traverse(child => {
+            if (child.material)
+                child.material.roughness = 0;
+        })
+
+        var item = instancedTransform(gltf.scene, "gel_gun_blue", true)
+        item.userData.wall = false;
+        item.userData.ground = true;
+        item.userData.ceiling = false;
+
+        var item = instancedTransform(gltf.scene, "gel_gun_orange", true)
+        item.userData.wall = false;
+        item.userData.ground = true;
+        item.userData.ceiling = false;
+
+        var item = instancedTransform(gltf.scene, "gel_gun_white", true)
+        item.userData.wall = false;
+        item.userData.ground = true;
+        item.userData.ceiling = false;
+
+        $("#loading-parent").css("opacity", 0);
+        $("#loading-parent").css("pointer-events", "none");
+    });
 }
 
 export {

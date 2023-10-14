@@ -146,7 +146,7 @@ const ssaoEffect = new SSAOEffect(window.MAIN_CAMERA, normalPass.texture, {
 var effectPass;
 
 if (window.mobile) {
-    effectPass = new EffectPass(window.MAIN_CAMERA, toneMappingEffect, smaaEffect); //selectiveBloom
+    effectPass = new EffectPass(window.MAIN_CAMERA, toneMappingEffect, smaaEffect, selectiveBloom); //selectiveBloom
 } else {
     effectPass = new EffectPass(window.MAIN_CAMERA, toneMappingEffect, smaaEffect); //selectiveBloom
 }
@@ -199,8 +199,8 @@ window.connecting = false;
 
 document.getElementById("container").appendChild(window.RENDERER.domElement);
 
-//init();
-$("body").on('click', '#option-community-build', function () {//#option-single-load
+init();
+$("body").on('click', '#option-community-build', function () { //#option-single-load
     setTimeout(() => {
         init();
     }, 2000);
@@ -238,6 +238,27 @@ function init() {
             //
             loadCube();
             animate();
+            //
+            window.decalMaterial.envMap = envMap;
+            const geometryDecal = new THREE.PlaneGeometry(2, 2);
+
+            window.instancedMeshGel = new THREE.InstancedMesh(geometryDecal.clone(), window.decalMaterial, 100);
+            //window.instancedMeshGel.rotation.x = -Math.PI/2;
+            window.instancedMeshGel.castShadow = true;
+            window.instancedMeshGel.receiveShadow = true;
+            window.instancedMeshGel.name = "gel-parent";
+            window.MAIN_SCENE.add(window.instancedMeshGel);
+
+            var clone = new THREE.Object3D();
+
+            for (var i = 0; i < 100; i++) {
+                clone.scale.set(0, 0, 0);
+                clone.rotation.x = -Math.PI / 2;
+                clone.updateMatrix();
+                window.instancedMeshGel.setMatrixAt(i, clone.matrix);
+
+                window.GELS.push(false);
+            }
         })
     //LISTENER
     window.addEventListener('resize', onWindowResize);
@@ -458,52 +479,49 @@ function render(time) {
             var x = target.x;
             var y = target.y;
             var z = target.z;
-
-
-            //window.CURRENT_ITEM_ID
-
-
-
-
             var item = new THREE.Object3D();
 
             item.position.copy(new THREE.Vector3(x, y, z));
-            window.CURRENT_ITEM.position.copy(new THREE.Vector3(x, y, z));
             item.rotation.copy(window.MAIN_CAMERA.rotation);
 
-            //console.log(item)
+            window.CURRENT_ITEM.position.copy(item.position);
+            window.CURRENT_ITEM.rotation.copy(item.rotation);
 
             item.updateMatrix();
-            window.PORTAL_CUBE_INSTANCED.setMatrixAt(window.CURRENT_ITEM_ID, item.matrix)
-
-            window.PORTAL_CUBE_INSTANCED.instanceMatrix.needsUpdate = true;
-            window.PORTAL_CUBE_INSTANCED.computeBoundingSphere();
+            window.CURRENT_INSTANCED.setMatrixAt(window.CURRENT_ITEM_ID, item.matrix)
+            window.CURRENT_INSTANCED.instanceMatrix.needsUpdate = true;
+            window.CURRENT_INSTANCED.computeBoundingSphere();
         }
 
-        /*for (var i = 0; i < window.ITEM_BOXES.length; i++) {
+        //SYNC OBJECTS WITH THE PHYSICAL WORLD
 
-            if (window.ITEM_BOXES[i] != window.CURRENT_ITEM) {
-                window.ITEM_BOXES[i].position.copy(window.ITEM_BOXES[i].body.position);
-                window.ITEM_BOXES[i].quaternion.copy(window.ITEM_BOXES[i].body.quaternion);
-            }
+        for (const property in window.DYMANIC_ITEMS) {
 
-        }*/
+            var instanced = window.ITEMS_ADDED.getObjectByName(property);
 
-        for (var i = 0; i < window.PORTAL_CUBES.length; i++) {
+            if(property == "gel_gun_blue" || property == "gel_gun_orange" || property == "gel_gun_white" 
+            || property == "pedestal_button" || property == "button_weight" || property == "button_box"
+            || property == "button_circle")
+                continue;
 
-            if (window.PORTAL_CUBES[i].length != 0 &&
-                i != window.CURRENT_ITEM_ID) {
+            for (var i = 0; i < window.DYMANIC_ITEMS[property].length; i++) {
 
-                var item = new THREE.Object3D();
+                if (window.DYMANIC_ITEMS[property][i].length != 0) {
 
-                item.position.copy(window.PORTAL_CUBES[i].body.position);
-                item.quaternion.copy(window.PORTAL_CUBES[i].body.quaternion);
+                    if (i == window.CURRENT_ITEM_ID) {
+                        if (window.CURRENT_INSTANCED.name == property)
+                            continue;
+                    }
 
-                item.updateMatrix();
-                window.PORTAL_CUBE_INSTANCED.setMatrixAt(i, item.matrix)
+                    var item = new THREE.Object3D();
+                    item.position.copy(window.DYMANIC_ITEMS[property][i].body.position);
+                    item.quaternion.copy(window.DYMANIC_ITEMS[property][i].body.quaternion);
 
-                window.PORTAL_CUBE_INSTANCED.instanceMatrix.needsUpdate = true;
-                window.PORTAL_CUBE_INSTANCED.computeBoundingSphere();
+                    item.updateMatrix();
+                    instanced.setMatrixAt(i, item.matrix)
+                    instanced.instanceMatrix.needsUpdate = true;
+                    instanced.computeBoundingSphere();
+                }
 
             }
         }

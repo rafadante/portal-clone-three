@@ -250,10 +250,6 @@ $("body").on('click', '#view-fps', function () {
 
         //
 
-        for (var i = 0; i < window.INTERACTIVE.length; i++) {
-            window.cubes.push(window.INTERACTIVE[i])
-        }
-
         //CORRIDOR ENTER COLLIDERS
         corridorCollider(window.CORRIDOR_ENTER, "down", 1, 0.001, 3.5, false);
         corridorCollider(window.CORRIDOR_ENTER, "up", 1, 0.001, 3.5, false);
@@ -298,11 +294,28 @@ $("body").on('click', '#view-fps', function () {
         window.ENTER_DOOR.children[1].visible = false;
 
         //
-        addColliderItem(window.PORTAL_CUBES)
+        addColliderItem(window.DYMANIC_ITEMS['cube'], "cube", 5)
+        addColliderItem(window.DYMANIC_ITEMS['sphere'], "sphere", 5)
+        addColliderItem(window.DYMANIC_ITEMS['gel_gun_blue'], "gel_gun_blue", 0)
+        addColliderItem(window.DYMANIC_ITEMS['gel_gun_orange'], "gel_gun_orange", 0)
+        addColliderItem(window.DYMANIC_ITEMS['gel_gun_white'], "gel_gun_white", 0)
+        addColliderItem(window.DYMANIC_ITEMS['pedestal_button'], "pedestal_button", 0)
+        addColliderItem(window.DYMANIC_ITEMS['radio'], "radio", 1)
+        addColliderItem(window.DYMANIC_ITEMS['button_weight'], "button_weight", 0)
+
+        addColliderItem(window.DYMANIC_ITEMS['button_box'], "button_box", 0, 1)
+        addColliderItem(window.DYMANIC_ITEMS['button_box'], "button_box", 0, 2)
+        addColliderItem(window.DYMANIC_ITEMS['button_box'], "button_box", 0, 3)
+        addColliderItem(window.DYMANIC_ITEMS['button_box'], "button_box", 0, 4)
+
+        addColliderItem(window.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 1)
+        addColliderItem(window.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 2)
+        addColliderItem(window.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 3)
+        addColliderItem(window.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 4)
     }, 500);
 });
 
-function addColliderItem(items) {
+function addColliderItem(items, type, mass, offset) {
 
     let PHYSICS_MATERIAL = new CANNON.Material();
     PHYSICS_MATERIAL.friction = 0.4; //0.01
@@ -312,43 +325,73 @@ function addColliderItem(items) {
         console.log(items[i])
         if (items[i].length != 0) {
 
-            var shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.3, 0.3));
+
+            if (type == "cube")
+                var shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.3, 0.3));
+            else if (type == "sphere")
+                var shape = new CANNON.Sphere(0.3);
+            else if (type == "gel_gun_blue" || type == "gel_gun_orange" || type == "gel_gun_white") {
+                var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.5, 0.1));
+                items[i].position.y += 0.5;
+            } else if (type == "pedestal_button") {
+                var shape = new CANNON.Box(new CANNON.Vec3(0.126, 0.35, 0.126));
+                items[i].position.y += 0.35;
+            } else if (type == "radio") {
+                var shape = new CANNON.Box(new CANNON.Vec3(0.11, 0.07, 0.049));
+            } else if (type == "button_weight") {
+                var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.117, 0.5));
+                items[i].position.y += 0.117;
+            } else if (type == "button_box" || type == "button_circle") {
+
+                var a1, a2;
+
+                if (type == "button_box") {
+                    a1 = 0.45;
+                    a2 = 0.9;
+                } else if (type == "button_circle") {
+                    a1 = 0.4;
+                    a2 = 0.8;
+                }
+
+                if (offset == 1) {
+                    var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.14, 0.1));
+                    items[i].position.y += 0.14;
+                    items[i].position.z += a1;
+                } else if (offset == 2) {
+                    var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.14, 0.1));
+                    items[i].position.z -= a2;
+                } else if (offset == 3) {
+                    var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.14, 0.5));
+                    items[i].position.z += a1;
+                    items[i].position.x += a1;
+                } else if (offset == 4) {
+                    var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.14, 0.5));
+                    items[i].position.x -= a2;
+                }
+            }
 
             var box = new CANNON.Body({
                 shape: shape,
-                mass: 5,
+                mass: mass,
                 material: PHYSICS_MATERIAL
             })
 
-            //box.allowSleep = true;
-            //box.sleepSpeedLimit = 1.0;
-            //box.sleepTimeLimit = 1.0;
-
             box.position.copy(items[i].position);
-            //box.position.set(9,3,5)
-
-            //box.collisionFilterGroup = window.CGROUP_ENVIRONMENT
-            //box.collisionFilterMask = window.CGROUP_DYNAMIC
-
             box.collisionFilterGroup = window.CGROUP_DYNAMIC
             box.collisionFilterMask = window.CGROUP_ALL
-
             items[i].body = box;
-            window.dynamicObjects.push(box);
-            window.BOX_BODY.push(box);
 
-            console.log(box)
+            if (mass > 0) {
+                //box.allowSleep = true;
+                //box.sleepSpeedLimit = 1.0;
+                //box.sleepTimeLimit = 1.0;
 
-            //var axis = new CANNON.Vec3(1, 0, 0);
-            //var angle = Math.PI / 3;
-            //box.quaternion.setFromAxisAngle(axis, angle);
-
-            //window.ITEM_BOXES[i].position.copy(window.ITEM_BOXES[i].dispenser.position);
-            //window.ITEM_BOXES[i].translateY(-1);
-            //window.ITEM_BOXES[i].body = box;
-            //box.position.copy(window.ITEM_BOXES[i].position)
-            //window.BOX_BODY.push(box);
-
+                window.dynamicObjects.push(box);
+                box.gelJumping = false;
+                window.BOX_BODY.push(box);
+            } else {
+                window.CANNON_WORLD.addBody(box);
+            }
         }
     }
 }
