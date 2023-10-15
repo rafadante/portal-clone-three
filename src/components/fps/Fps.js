@@ -322,110 +322,113 @@ document.addEventListener('keydown', (event) => {
                 0.08,
                 window.INK.position.z))
         } else if (event.code == "KeyE") {
-
-            raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
-            var intersects = raycaster2.intersectObjects(window.INTERACTIVE);
-
-            if (window.HOLDING_ITEM) {
-                window.HOLDING_ITEM = false;
-
-                // Position
-                itemHolder.position.setZero();
-                itemHolder.previousPosition.setZero();
-                itemHolder.interpolatedPosition.setZero();
-                itemHolder.initPosition.setZero();
-
-                // orientation
-                //itemHolder.quaternion.set(0, 0, 0, 1);
-                //itemHolder.initQuaternion.set(0, 0, 0, 1);
-                //body.previousQuaternion.set(0, 0, 0, 1);
-                //itemHolder.interpolatedQuaternion.set(0, 0, 0, 1);
-
-                // Velocity
-                itemHolder.velocity.setZero();
-                itemHolder.initVelocity.setZero();
-                itemHolder.angularVelocity.setZero();
-                itemHolder.initAngularVelocity.setZero();
-
-                // Force
-                itemHolder.force.setZero();
-                itemHolder.torque.setZero();
-
-                // Sleep state reset
-                itemHolder.sleepState = 0;
-                itemHolder.timeLastSleepy = 0;
-                itemHolder._wakeUpAfterNarrowphase = false;
-
-                //itemHolder.velocity.set(0, 0, 0);
-                //itemHolder.angularVelocity.set(0, 0, 0);
-                itemHolder.position.copy(window.CURRENT_ITEM.position);
-                itemHolder.quaternion.copy(window.CURRENT_ITEM.quaternion);
-
-                window.PLAYER.velocity.set(0, 0, 0);
-                window.PLAYER.angularVelocity.set(0, 0, 0);
-
-                itemHolder.gelJumping = false;
-
-                window.CANNON_WORLD.addBody(itemHolder);
-
-                window.CURRENT_ITEM = null;
-                window.CURRENT_ITEM_ID = null;
-                itemHolder = null;
-                window.COL_Z = false;
-                window.holder.position.z = -1;
-            } else if (intersects.length > 0) {
-
-                if (intersects[0].object.name == "gel_gun_blue" ||
-                    intersects[0].object.name == "gel_gun_orange" ||
-                    intersects[0].object.name == "gel_gun_white") {
-
-                    if (window.GUN_MODE == 2) {
-                        for (var i = 2; i >= 0; i--) {
-                            if (!window.INK.children[i].visible) {
-
-                                window.INK.children[i].visible = true;
-                                window.INK.children[i].name = intersects[0].object.name;
-
-                                if (intersects[0].object.name == "gel_gun_blue") {
-                                    window.INK.children[i].material.color = new THREE.Color(0x0000ff)
-                                    window.INK_BLUE = true;
-                                } else if (intersects[0].object.name == "gel_gun_orange") {
-                                    window.INK.children[i].material.color = new THREE.Color(0xffa500)
-                                    window.INK_ORANGE = true;
-                                } else if (intersects[0].object.name == "gel_gun_white") {
-                                    window.INK.children[i].material.color = new THREE.Color(0xffffff)
-                                    window.INK_WHITE = true;
-                                }
-
-                                break;
-                            } else {
-                                if (window.INK.children[i].name == intersects[0].object.name)
-                                    break;
-                            }
-                        }
-                    }
-                } else {
-                    if (intersects[0].distance < 2) {
-                        window.HOLDING_ITEM = true;
-                        var instancedId = intersects[0].instanceId;
-                        var name = intersects[0].object.name;
-
-                        window.CURRENT_ITEM = window.DYMANIC_ITEMS[name][instancedId];
-                        window.CURRENT_INSTANCED = window.ITEMS_ADDED.getObjectByName(name);
-                        window.CURRENT_ITEM_ID = instancedId;
-
-                        itemHolder = window.DYMANIC_ITEMS[name][instancedId].body;
-                        window.CANNON_WORLD.removeBody(window.DYMANIC_ITEMS[name][instancedId].body);
-                    }
-                }
-            }
-
-            window.lightningStrikeMesh.visible = window.HOLDING_ITEM;
-            window.lightningStrikeMesh2.visible = window.HOLDING_ITEM;
-            window.lightningStrikeMesh3.visible = window.HOLDING_ITEM;
+            interactWithItem();
         }
     }
 });
+
+function interactWithItem() {
+    raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
+    var intersects = raycaster2.intersectObjects(window.INTERACTIVE);
+
+    if (window.HOLDING_ITEM) {
+        window.HOLDING_ITEM = false;
+
+        // Position
+        itemHolder.position.setZero();
+        itemHolder.previousPosition.setZero();
+        itemHolder.interpolatedPosition.setZero();
+        itemHolder.initPosition.setZero();
+
+        // orientation
+        //itemHolder.quaternion.set(0, 0, 0, 1);
+        //itemHolder.initQuaternion.set(0, 0, 0, 1);
+        //body.previousQuaternion.set(0, 0, 0, 1);
+        //itemHolder.interpolatedQuaternion.set(0, 0, 0, 1);
+
+        // Velocity
+        itemHolder.velocity.setZero();
+        itemHolder.initVelocity.setZero();
+        itemHolder.angularVelocity.setZero();
+        itemHolder.initAngularVelocity.setZero();
+
+        // Force
+        itemHolder.force.setZero();
+        itemHolder.torque.setZero();
+
+        // Sleep state reset
+        itemHolder.sleepState = 0;
+        itemHolder.timeLastSleepy = 0;
+        itemHolder._wakeUpAfterNarrowphase = false;
+
+        //itemHolder.velocity.set(0, 0, 0);
+        //itemHolder.angularVelocity.set(0, 0, 0);
+        itemHolder.position.copy(window.CURRENT_ITEM.position);
+        itemHolder.quaternion.copy(window.CURRENT_ITEM.quaternion);
+
+        window.PLAYER.velocity.set(0, 0, 0);
+        window.PLAYER.angularVelocity.set(0, 0, 0);
+
+        itemHolder.gelJumping = false;
+
+        window.CANNON_WORLD.addBody(itemHolder);
+
+        window.CURRENT_ITEM = null;
+        window.CURRENT_ITEM_ID = null;
+        itemHolder = null;
+        window.COL_Z = false;
+        window.holder.position.z = -1;
+    } else if (intersects.length > 0) {
+
+        if (intersects[0].object.name == "gel_gun_blue" ||
+            intersects[0].object.name == "gel_gun_orange" ||
+            intersects[0].object.name == "gel_gun_white") {
+
+            if (window.GUN_MODE == 2) {
+                for (var i = 2; i >= 0; i--) {
+                    if (!window.INK.children[i].visible) {
+
+                        window.INK.children[i].visible = true;
+                        window.INK.children[i].name = intersects[0].object.name;
+
+                        if (intersects[0].object.name == "gel_gun_blue") {
+                            window.INK.children[i].material.color = new THREE.Color(0x0000ff)
+                            window.INK_BLUE = true;
+                        } else if (intersects[0].object.name == "gel_gun_orange") {
+                            window.INK.children[i].material.color = new THREE.Color(0xffa500)
+                            window.INK_ORANGE = true;
+                        } else if (intersects[0].object.name == "gel_gun_white") {
+                            window.INK.children[i].material.color = new THREE.Color(0xffffff)
+                            window.INK_WHITE = true;
+                        }
+
+                        break;
+                    } else {
+                        if (window.INK.children[i].name == intersects[0].object.name)
+                            break;
+                    }
+                }
+            }
+        } else {
+            if (intersects[0].distance < 2) {
+                window.HOLDING_ITEM = true;
+                var instancedId = intersects[0].instanceId;
+                var name = intersects[0].object.name;
+
+                window.CURRENT_ITEM = window.DYMANIC_ITEMS[name][instancedId];
+                window.CURRENT_INSTANCED = window.ITEMS_ADDED.getObjectByName(name);
+                window.CURRENT_ITEM_ID = instancedId;
+
+                itemHolder = window.DYMANIC_ITEMS[name][instancedId].body;
+                window.CANNON_WORLD.removeBody(window.DYMANIC_ITEMS[name][instancedId].body);
+            }
+        }
+    }
+
+    window.lightningStrikeMesh.visible = window.HOLDING_ITEM;
+    window.lightningStrikeMesh2.visible = window.HOLDING_ITEM;
+    window.lightningStrikeMesh3.visible = window.HOLDING_ITEM;
+}
 
 var allowPlacePortals = false;
 
@@ -658,7 +661,48 @@ function portalButton(button) {
                 gels++;
                 gel.scale.set(1, 1, 1);
                 gel.position.copy(intersects[0].point);
-                gel.rotation.x = -Math.PI / 2;
+
+                //
+
+                let PHYSICS_MATERIAL = new CANNON.Material();
+                PHYSICS_MATERIAL.friction = 0.01; //0.01
+                PHYSICS_MATERIAL.restitution = 0.1; //0.1
+
+                var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.01));
+
+                var box = new CANNON.Body({
+                    shape: shape,
+                    mass: 0,
+                    material: PHYSICS_MATERIAL
+                })
+
+                //
+
+                if (userData.side == "down") {
+                    gel.rotation.x = -Math.PI / 2;
+                    box.up = new THREE.Vector3(0, 1, 0)
+                    box.vel = new THREE.Vector3(1, 0, 1)
+                } else if (userData.side == "up") {
+                    gel.rotation.x = Math.PI / 2;
+                    box.up = new THREE.Vector3(0, -1, 0)
+                    box.vel = new THREE.Vector3(1, 0, 1)
+                } else if (userData.side == "back") {
+                    gel.rotation.y = Math.PI;
+                    box.up = new THREE.Vector3(0, 0, -1)
+                    box.vel = new THREE.Vector3(1, 1, 0)
+                } else if (userData.side == "left") {
+                    gel.rotation.y = Math.PI / 2;
+                    box.up = new THREE.Vector3(1, 0, 0)
+                    box.vel = new THREE.Vector3(0, 1, 1)
+                } else if (userData.side == "right") {
+                    gel.rotation.y = -Math.PI / 2;
+                    box.up = new THREE.Vector3(-1, 0, 0)
+                    box.vel = new THREE.Vector3(0, 1, 1)
+                } else if (userData.side == "front") {
+                    box.up = new THREE.Vector3(0, 0, 1)
+                    box.vel = new THREE.Vector3(1, 1, 0)
+                }
+
                 gel.updateMatrix();
                 window.instancedMeshGel.setMatrixAt(id, gel.matrix);
 
@@ -673,28 +717,37 @@ function portalButton(button) {
                 window.instancedMeshGel.instanceMatrix.needsUpdate = true;
                 window.instancedMeshGel.computeBoundingSphere();
 
-                let PHYSICS_MATERIAL = new CANNON.Material();
-                PHYSICS_MATERIAL.friction = 0.01; //0.01
-                PHYSICS_MATERIAL.restitution = 0.1; //0.1
-
-                var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.01, 0.5));
-
-                var box = new CANNON.Body({
-                    shape: shape,
-                    mass: 0,
-                    material: PHYSICS_MATERIAL
-                })
-
                 box.position.copy(intersects[0].point);
+                box.quaternion.copy(gel.quaternion)
                 box.collisionFilterGroup = window.CGROUP_DYNAMIC
                 box.collisionFilterMask = window.CGROUP_ALL
                 box.linearDamping = 0.01;
 
+                console.log(box)
+
                 if (button == 1) {
+                    window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(1.0, 1.0, 1.0);
+                    if (window.uniformShaderPortalGunBallEnergy.iAlpha.value == 0.0) {
+                        new TWEEN.Tween(window.uniformShaderPortalGunBallEnergy.iAlpha).to({
+                            value: 0.5
+                        }, 300).start();
+                    }
                     box.name = "gel-white";
                 } else if (button == 0) {
+                    window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(1.0, 1.0, 0.5);
+                    if (window.uniformShaderPortalGunBallEnergy.iAlpha.value == 0.0) {
+                        new TWEEN.Tween(window.uniformShaderPortalGunBallEnergy.iAlpha).to({
+                            value: 0.5
+                        }, 300).start();
+                    }
                     box.name = "gel-orange";
                 } else if (button == 2) {
+                    window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(0.0, 0.0, 1.0);
+                    if (window.uniformShaderPortalGunBallEnergy.iAlpha.value == 0.0) {
+                        new TWEEN.Tween(window.uniformShaderPortalGunBallEnergy.iAlpha).to({
+                            value: 0.5
+                        }, 300).start();
+                    }
                     box.name = "gel-blue";
 
                     // When a body collides with another body, they both dispatch the "collide" event.
@@ -709,14 +762,18 @@ function portalButton(button) {
 
                             setTimeout(() => {
                                 holder.gelJumping = false;
-                            }, 1);
+                            }, 10);
 
-                            //console.log(event)
+                            console.log(event.target.up)
+                            console.log(relativeVelocity)
+
 
                             //shouldJump = true;
                             //window.PLAYER.inJump = true
-                            event.body.velocity.set(event.body.velocity.x, 0, event.body.velocity.z);
-                            event.body.applyImpulse(new THREE.Vector3(0, 1, 0).multiplyScalar(7 * event.body.mass * Math.abs((relativeVelocity * 0.045) + 1)), event.body.position)
+                            event.body.velocity.set(event.body.velocity.x * event.target.vel.x,
+                                event.body.velocity.y * event.target.vel.y,
+                                event.body.velocity.z * event.target.vel.z);
+                            event.body.applyImpulse(event.target.up.clone().multiplyScalar(8 * event.body.mass * Math.abs((relativeVelocity * 0.045) + 1)), event.body.position)
                         }
                     })
                 }
@@ -1005,6 +1062,14 @@ function createPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObje
 
 let shouldJump = false;
 window.rotationMobile = 0.1;
+var gamepadButton1 = false;
+var gamepadButton3 = false;
+var gamepadButton5 = false;
+var gamepadButton6 = false;
+var gamepadButton7 = false;
+var gamepadButton12 = false;
+var gamepadButton15 = false;
+var vv = false;
 
 const updatePlayer = function (deltaTime) {
 
@@ -1112,7 +1177,27 @@ const updatePlayer = function (deltaTime) {
         if (controllerIndex !== null) {
             gamepad = navigator.getGamepads()[controllerIndex];
 
-            if (gamepad.buttons[6].value > 0) {
+            if (!vv)
+                console.log(gamepad.buttons)
+
+            vv = true;
+
+            if (gamepad.buttons[5].value == 1 && !gamepadButton5) {
+
+                portalButton(1);
+
+                gamepad.vibrationActuator.playEffect("dual-rumble", {
+                    startDelay: 0,
+                    duration: 200,
+                    weakMagnitude: 1.0,
+                    strongMagnitude: 1.0,
+                });
+                gamepadButton5 = true;
+            } else if (gamepad.buttons[5].value == 0) {
+                gamepadButton5 = false;
+            }
+
+            if (gamepad.buttons[6].value == 1 && !gamepadButton6) {
 
                 portalButton(0);
 
@@ -1122,9 +1207,12 @@ const updatePlayer = function (deltaTime) {
                     weakMagnitude: 1.0,
                     strongMagnitude: 1.0,
                 });
+                gamepadButton6 = true;
+            } else if (gamepad.buttons[6].value == 0) {
+                gamepadButton6 = false;
             }
 
-            if (gamepad.buttons[7].value > 0) {
+            if (gamepad.buttons[7].value == 1 && !gamepadButton7) {
 
                 portalButton(2);
 
@@ -1134,7 +1222,63 @@ const updatePlayer = function (deltaTime) {
                     weakMagnitude: 1.0,
                     strongMagnitude: 1.0,
                 });
+                gamepadButton7 = true;
+            } else if (gamepad.buttons[7].value == 0) {
+                gamepadButton7 = false;
             }
+
+            if (gamepad.buttons[3].value == 1 && !gamepadButton3) {
+
+                crouched = true;
+
+                window.PLAYER.shapes[0].halfExtents.y -= 0.25;
+                window.PLAYER.shapes[0].updateConvexPolyhedronRepresentation();
+                window.PLAYER.computeAABB();
+                window.PLAYER.updateMassProperties();
+
+                gamepadButton3 = true;
+            } else if (gamepad.buttons[3].value == 0) {
+
+                if (crouched) {
+                    window.PLAYER.shapes[0].halfExtents.y += 0.25;
+                    window.PLAYER.shapes[0].updateConvexPolyhedronRepresentation();
+                    window.PLAYER.computeAABB();
+                    window.PLAYER.updateMassProperties();
+                }
+
+                gamepadButton3 = false;
+                crouched = false;
+            }
+
+            if (gamepad.buttons[1].value == 1 && !gamepadButton1) {
+                interactWithItem();
+                gamepadButton1 = true;
+            } else if (gamepad.buttons[1].value == 0) {
+                gamepadButton1 = false;
+            }
+
+            if (gamepad.buttons[12].value == 1 && !gamepadButton12) {
+                window.GUN_MODE = 1;
+                tweenCamera(500, window.INK.position, new THREE.Vector3(window.INK.position.x,
+                    0,
+                    window.INK.position.z))
+
+                gamepadButton12 = true;
+            } else if (gamepad.buttons[12].value == 0) {
+                gamepadButton12 = false;
+            }
+
+            if (gamepad.buttons[15].value == 1 && !gamepadButton15) {
+                window.GUN_MODE = 2;
+                tweenCamera(500, window.INK.position, new THREE.Vector3(window.INK.position.x,
+                    0.08,
+                    window.INK.position.z))
+
+                gamepadButton15 = true;
+            } else if (gamepad.buttons[15].value == 0) {
+                gamepadButton15 = false;
+            }
+
 
             if (gamepad.axes[2] > 0.5)
                 window.MAIN_CAMERA.rotation.y -= 0.05;

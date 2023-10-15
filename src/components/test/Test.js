@@ -312,6 +312,11 @@ $("body").on('click', '#view-fps', function () {
         addColliderItem(window.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 2)
         addColliderItem(window.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 3)
         addColliderItem(window.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 4)
+
+        addColliderItem(window.DYMANIC_ITEMS['ramp'], "ramp", 0)
+        addColliderItem(window.DYMANIC_ITEMS['ramp_half'], "ramp_half", 0)
+        addColliderItem(window.DYMANIC_ITEMS['ramp_half2'], "ramp_half2", 0)
+        //addColliderItem(window.DYMANIC_ITEMS['dispenser'], "dispenser", 0, 4)
     }, 500);
 });
 
@@ -368,6 +373,15 @@ function addColliderItem(items, type, mass, offset) {
                     var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.14, 0.5));
                     items[i].position.x -= a2;
                 }
+            }else if (type == "dispenser") {
+                var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.7));
+                items[i].position.y += 0.77;
+            }else if (type == "ramp" || type == "ramp_half" || type == "ramp_half2") {
+                //var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.7));
+                //items[i].position.y += 0.77;
+
+                const result = threeToCannon(window.ITEMS_ADDED.getObjectByName(type), {type: ShapeType.HULL});
+                var shape = result.shape;
             }
 
             var box = new CANNON.Body({

@@ -288,9 +288,16 @@ window.DYMANIC_ITEMS = {
     radio: [],
     button_weight: [],
     button_box: [],
-    button_circle: []
+    button_circle: [],
+    dispenser: [],
+    ramp: [],
+    ramp_half: [],
+    ramp_half2: [],
 }
 
 window.INK_WHITE = false;
 window.INK_BLUE = false;
 window.INK_ORANGE = false;
+
+window.horizontal = [];
+window.vertical = [];

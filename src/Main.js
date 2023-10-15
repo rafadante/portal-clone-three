@@ -501,7 +501,8 @@ function render(time) {
 
             if(property == "gel_gun_blue" || property == "gel_gun_orange" || property == "gel_gun_white" 
             || property == "pedestal_button" || property == "button_weight" || property == "button_box"
-            || property == "button_circle")
+            || property == "button_circle" || property == "dispenser" || property == "ramp"
+            || property == "ramp_half" || property == "ramp_half2")
                 continue;
 
             for (var i = 0; i < window.DYMANIC_ITEMS[property].length; i++) {
@@ -525,6 +526,18 @@ function render(time) {
 
             }
         }
+    }
+
+    for (var i = 0; i < window.horizontal.length; i++) {
+        window.horizontal[i].lookAt(window.GUN.position);
+        window.horizontal[i].rotation.x = Math.PI / 2;
+        window.horizontal[i].rotation.y = 0;
+    }
+
+    for (var i = 0; i < window.vertical.length; i++) {
+        window.vertical[i].lookAt(window.GUN.position);
+        window.vertical[i].rotation.z = 0;
+        window.vertical[i].rotation.y = 0;
     }
 
     if (window.debugCol)

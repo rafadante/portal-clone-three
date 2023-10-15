@@ -511,7 +511,14 @@ function loadDispenser() {
 }
 
 function loadDispenserManager(scene) {
-    scene.name = "dispenser";
+
+    var item = instancedTransform(scene, "dispenser", false)
+
+    item.userData.wall = false;
+    item.userData.ground = true;
+    item.userData.ceiling = false;
+
+    /*scene.name = "dispenser";
     scene.userData.wall = false;
     scene.userData.ground = true;
     scene.userData.ceiling = false;
@@ -523,7 +530,7 @@ function loadDispenserManager(scene) {
             child.material.envMap = window.ENV_MAP_FPS;
             child.material.envMapIntensity = 0.5;
         }
-    })
+    })*/
 
     loadPedestalButton()
 }
@@ -655,10 +662,47 @@ function loadGelRecharger() {
         item.userData.ground = true;
         item.userData.ceiling = false;
 
+        loadRamp();
+    });
+}
+
+function loadRamp(){
+    loader.load('/3ds/ramp.glb', (gltf) => {
+
+        var item = instancedTransform(gltf.scene, "ramp", false)
+        item.userData.wall = false;
+        item.userData.ground = true;
+        item.userData.ceiling = false;
+
+        loadRampHalf();
+    });
+}
+
+function loadRampHalf(){
+    loader.load('/3ds/ramp_half.glb', (gltf) => {
+
+        var item = instancedTransform(gltf.scene, "ramp_half", false)
+        item.userData.wall = false;
+        item.userData.ground = true;
+        item.userData.ceiling = false;
+
+        loadRampHalf2()
+    });
+}
+
+function loadRampHalf2(){
+    loader.load('/3ds/ramp_half2.glb', (gltf) => {
+
+        var item = instancedTransform(gltf.scene, "ramp_half2", false)
+        item.userData.wall = false;
+        item.userData.ground = true;
+        item.userData.ceiling = false;
+
         $("#loading-parent").css("opacity", 0);
         $("#loading-parent").css("pointer-events", "none");
     });
 }
+
 
 export {
     loadCube

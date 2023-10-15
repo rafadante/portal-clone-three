@@ -262,14 +262,23 @@ function addItem(found) {
 
             if (!userData.hasItem) {
 
-                //var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
-                var instanced = window.ITEMS_ADDED.getObjectByName(window.ITEM_HOLDED_NAME);
-                var item = new THREE.Object3D();
-                item.userData = instanced.userData;
+                if (window.ITEM_HOLDED_NAME == "camera") {
+                    //
+                    var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
 
-                console.log(window.ITEM_HOLDED_NAME)
+                    item.traverse(child => {
+                        if (child.name == "horizontal")
+                            window.horizontal.push(child)
+                        else if (child.name == "vertical")
+                            window.vertical.push(child)
+                    })
 
-                //var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
+                } else {
+                    //
+                    var instanced = window.ITEMS_ADDED.getObjectByName(window.ITEM_HOLDED_NAME);
+                    var item = new THREE.Object3D();
+                    item.userData = instanced.userData;
+                }
 
                 if (item.userData.wall) {
                     if (userData.side == "up" || userData.side == "down") {
@@ -285,8 +294,16 @@ function addItem(found) {
                 userData.itemName = window.ITEM_HOLDED_NAME + "-" + itemCount;
                 userData.item = item;
 
-                //var target = new THREE.Vector3(); // create once an reuse it
-                //found[i].object.getWorldPosition(target);
+                if (window.ITEM_HOLDED_NAME == "camera") {
+                    //
+                    var target = new THREE.Vector3(); // create once an reuse it
+                    found[i].object.getWorldPosition(target);
+                    item.position.copy(target);
+                } else {
+                    //
+                    item.position.copy(userData.position);
+                }
+
                 item.position.copy(userData.position);
                 item.renderOrder = 2;
                 item.name = window.ITEM_HOLDED_NAME + "-" + itemCount;
@@ -307,13 +324,24 @@ function addItem(found) {
                         item.translateY(0.25);
                 }
 
-                /*if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere") {
+                if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere") {
 
-                    var item2 = window.ITEMS.getObjectByName("dispenser").clone();
-                    item2.position.copy(userData.position);
-                    item.dispenser = item2;
-                    window.ITEMS_ADDED.add(item2);
-                    userData.item2 = item2;
+                    var idInstanced;
+
+                    for (var i = 0; i < window.DYMANIC_ITEMS["dispenser"].length; i++) {
+                        if (window.DYMANIC_ITEMS["dispenser"][i].length == 0) {
+                            window.DYMANIC_ITEMS["dispenser"][i] = item;
+                            idInstanced = i;
+                            break;
+                        }
+                    }
+
+                    var instanced2 = window.ITEMS_ADDED.getObjectByName("dispenser");
+                    console.log(instanced2)
+                    var item2 = new THREE.Object3D();
+                    //item2.userData = instanced2.userData;
+                    item2.position.copy(userData.position.clone());
+                    //userData.item2 = item2;
 
                     //GET CEILING SURFACE
                     for (var x = 0, j = 2; x < 100; x++, j += 2) {
@@ -326,43 +354,53 @@ function addItem(found) {
                         }
 
                     }
-                }*/
 
-                console.log("ggggg")
-                console.log(item)
+                    console.log(idInstanced)
 
-                //window.ITEMS_ADDED.add(item);
-                itemCount++;
+                    item2.userData.id = idInstanced;
+                    item2.scale.set(1, 1, 1);
+                    item2.updateMatrix();
+                    instanced2.setMatrixAt(idInstanced, item2.matrix);
+                    instanced2.instanceMatrix.needsUpdate = true;
+                    instanced2.computeBoundingSphere();
+                }
 
-                var idInstanced;
+                if (window.ITEM_HOLDED_NAME == "camera") {
+                    //
+                    window.ITEMS_ADDED.add(item);
+                } else {
+                    //
+                    var idInstanced;
 
-                for (var i = 0; i < window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME].length; i++) {
-                    if (window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME][i].length == 0) {
-                        window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME][i] = item;
-                        idInstanced = i;
-                        break;
+                    for (var i = 0; i < window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME].length; i++) {
+                        if (window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME][i].length == 0) {
+                            window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME][i] = item;
+                            idInstanced = i;
+                            break;
+                        }
                     }
+
+                    item.userData.id = idInstanced;
+                    item.scale.set(1, 1, 1);
+                    item.updateMatrix();
+                    instanced.setMatrixAt(idInstanced, item.matrix);
+
+                    if (window.ITEM_HOLDED_NAME == "gel_gun_blue") {
+                        instanced.setColorAt(idInstanced, new THREE.Color(0x0000ff));
+                        instanced.instanceColor.needsUpdate = true;
+                    } else if (window.ITEM_HOLDED_NAME == "gel_gun_orange") {
+                        instanced.setColorAt(idInstanced, new THREE.Color(0xffa500));
+                        instanced.instanceColor.needsUpdate = true;
+                    } else if (window.ITEM_HOLDED_NAME == "gel_gun_white") {
+                        instanced.setColorAt(idInstanced, new THREE.Color(0xffffff));
+                        instanced.instanceColor.needsUpdate = true;
+                    }
+
+                    instanced.instanceMatrix.needsUpdate = true;
+                    instanced.computeBoundingSphere();
                 }
 
-                item.userData.id = idInstanced;
-                item.scale.set(1, 1, 1);
-                item.updateMatrix();
-                instanced.setMatrixAt(idInstanced, item.matrix);
-
-                if (window.ITEM_HOLDED_NAME == "gel_gun_blue") {
-                    instanced.setColorAt(idInstanced, new THREE.Color(0x0000ff));
-                    instanced.instanceColor.needsUpdate = true;
-                } else if (window.ITEM_HOLDED_NAME == "gel_gun_orange") {
-                    instanced.setColorAt(idInstanced, new THREE.Color(0xffa500));
-                    instanced.instanceColor.needsUpdate = true;
-                } else if (window.ITEM_HOLDED_NAME == "gel_gun_white") {
-                    instanced.setColorAt(idInstanced, new THREE.Color(0xffffff));
-                    instanced.instanceColor.needsUpdate = true;
-                }
-
-                instanced.instanceMatrix.needsUpdate = true;
-                instanced.computeBoundingSphere();
-
+                itemCount++;
                 break;
             }
 
