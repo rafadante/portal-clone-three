@@ -5,10 +5,14 @@ import {
     MeshLineMaterial,
     raycast
 } from 'meshline';
+import {
+    AddGoo
+} from '../goo/Goo.js';
 
 $("body").on('pointerdown', '.item', function (event) {
     event.preventDefault();
     window.ITEM_HOLDED_NAME = $(this).data("name");
+    window.BEAM_TYPE = $(this).data("beam");
     $("#follow").attr("src", $(this).attr("src"));
 });
 
@@ -132,10 +136,14 @@ const materialLine = new THREE.LineBasicMaterial({
 
 function addItem(found) {
 
+    if (window.ITEM_HOLDED_NAME == "goo") {
+        AddGoo(found);
+        return;
+    }
+
     for (var i = 0; i < found.length; i++) {
 
         if (window.connecting) {
-
 
             if (found[i].object.userData.connection) {
 
@@ -176,7 +184,7 @@ function addItem(found) {
                     map: window.CHECK,
                 });
                 const plane = new THREE.Mesh(geometryCheck, materialCheck);
-                window.SELECTED_OBJECTS_FOR_BLOOM.add(plane);
+                //window.SELECTED_OBJECTS_FOR_BLOOM.add(plane);
                 window.MAIN_SCENE.add(plane);
 
                 var target = new THREE.Vector3();
@@ -219,7 +227,7 @@ function addItem(found) {
                 })
                 const mesh = new THREE.Mesh(geometry, material)
                 mesh.raycast = raycast;
-                window.SELECTED_OBJECTS_FOR_BLOOM.add(mesh);
+                //window.SELECTED_OBJECTS_FOR_BLOOM.add(mesh);
                 window.MAIN_SCENE.add(mesh);
 
                 /*const points = [];
@@ -259,6 +267,7 @@ function addItem(found) {
             var userData = window.planeUserData[found[i].instanceId];
 
             console.log(userData)
+            console.log(window.ITEM_HOLDED_NAME)
 
             if (!userData.hasItem) {
 
@@ -282,11 +291,11 @@ function addItem(found) {
 
                 if (item.userData.wall) {
                     if (userData.side == "up" || userData.side == "down") {
-                        break;
+                        //break;
                     }
                 } else if (item.userData.ground) {
                     if (userData.side == "up") {
-                        break;
+                        //break;
                     }
                 }
 
@@ -308,8 +317,11 @@ function addItem(found) {
                 item.renderOrder = 2;
                 item.name = window.ITEM_HOLDED_NAME + "-" + itemCount;
 
+                console.log(userData.side)
+
                 if (userData.side == "front") {
                     item.rotation.y = 0;
+                    //item.rotation.x = Math.PI / 2;
                 } else if (userData.side == "right") {
                     item.rotation.y = -Math.PI / 2;
                 } else if (userData.side == "back") {
@@ -318,13 +330,17 @@ function addItem(found) {
                     item.rotation.y = Math.PI / 2;
                 } else if (userData.side == "down") {
 
-                    if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere")
+                    if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere" || window.ITEM_HOLDED_NAME == "laser_cube")
                         item.translateY(1);
                     else if (window.ITEM_HOLDED_NAME == "radio")
                         item.translateY(0.25);
+
+                    //item.rotation.x = -Math.PI / 2;
+                } else {
+                    //item.rotation.x = Math.PI / 2;
                 }
 
-                if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere") {
+                if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere" || window.ITEM_HOLDED_NAME == "laser_cube") {
 
                     var idInstanced;
 
@@ -365,6 +381,24 @@ function addItem(found) {
                     instanced2.computeBoundingSphere();
                 }
 
+                if (window.ITEM_HOLDED_NAME == "light_bridge") {
+                    //
+                    item.position.y += 1;
+                }
+
+                if (window.ITEM_HOLDED_NAME == "tractor_beam") {
+                    //
+
+                    //if (window.BEAM_TYPE == "orange")
+                    //   item.userData.beam = "orange";
+                    //else
+                    item.beam = window.BEAM_TYPE;
+
+                    console.log(item)
+
+                    console.log(window.DYMANIC_ITEMS)
+                }
+
                 if (window.ITEM_HOLDED_NAME == "camera") {
                     //
                     window.ITEMS_ADDED.add(item);
@@ -374,8 +408,10 @@ function addItem(found) {
 
                     for (var i = 0; i < window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME].length; i++) {
                         if (window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME][i].length == 0) {
+                            item.laser = false;
                             window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME][i] = item;
                             idInstanced = i;
+                            console.log("oooooooooooooo")
                             break;
                         }
                     }

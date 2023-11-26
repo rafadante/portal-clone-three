@@ -58,6 +58,21 @@ async function handleZip(path, obj) {
                     loadWindowManager(result.scene)
                 else if (obj == "loadWindowHalf")
                     loadWindowHalfManager(result.scene)
+                else if (obj == "loadStairs")
+                    loadStairsManager(result.scene)
+                else if (obj == "loadLightBridge")
+                    loadLightBridgeManager(result.scene)
+                else if (obj == "loadTractorBeam")
+                    loadTractorBeamManager(result.scene)
+                else if (obj == "loadLaserEmitter")
+                    loadLaserEmitterManager(result.scene)
+                else if (obj == "loadLaserCube")
+                    loadLaserCubeManager(result.scene)
+
+
+
+
+
             });
         }
     });
@@ -163,6 +178,9 @@ function loadGunManager(scene) {
 
     var newGroup = new THREE.Group();
 
+    console.log("7777777777777777777777777777777777")
+    console.log(window.GUN)
+
     window.GUN.add(newGroup);
     newGroup.add(scene);
 
@@ -173,7 +191,7 @@ function loadGunManager(scene) {
             child.material.envMapIntensity = 0.25;
         }
 
-        child.renderOrder = -1;
+        child.renderOrder = 10;
 
         if (child.name == "sphere")
             window.GUN_SPHERE = child;
@@ -397,14 +415,14 @@ function loadPortalCube() {
 
 function loadPortalCubeManager(scene) {
 
-    var item = instancedTransform(scene, "cube", true)
+    var item = instancedTransform(scene, "cube", true, 0.2, 0.5)
     item.userData.wall = false;
     item.userData.ground = true;
     item.userData.ceiling = false;
     loadPortalSphere()
 }
 
-function instancedTransform(scene, name, interactive) {
+function instancedTransform(scene, name, interactive, roughness, envIntensity) {
     var geometry = scene.children[0].geometry.clone();
     geometry.computeVertexNormals();
 
@@ -426,11 +444,18 @@ function instancedTransform(scene, name, interactive) {
     item.receiveShadow = true;
     item.castShadow = true;
     item.material.envMap = window.ENV_MAP_FPS;
-    item.material.envMapIntensity = 0.5;
-    item.material.roughness = 0.2;
+    item.material.envMapIntensity = envIntensity;
+    item.material.roughness = roughness;
 
     if (interactive) {
         window.INTERACTIVE.push(item);
+    }
+
+    if (name == "laser_cube") {
+        window.laser_cube = item;
+        item.material.transparent = true;
+        item.material.opacity = 0.9;
+        item.material.roughness = 0;
     }
 
     for (var i = 0; i < 20; i++)
@@ -446,7 +471,7 @@ function loadPortalSphere() {
 }
 
 function loadPortalSphereManager(scene) {
-    var item = instancedTransform(scene, "sphere", true)
+    var item = instancedTransform(scene, "sphere", true, 0.2, 0.5)
     item.userData.wall = false;
     item.userData.ground = true;
     item.userData.ceiling = false;
@@ -512,7 +537,7 @@ function loadDispenser() {
 
 function loadDispenserManager(scene) {
 
-    var item = instancedTransform(scene, "dispenser", false)
+    var item = instancedTransform(scene, "dispenser", false, 0.2, 0.5)
 
     item.userData.wall = false;
     item.userData.ground = true;
@@ -541,7 +566,7 @@ function loadPedestalButton() {
 
 function loadPedestalButtonManager(scene) {
 
-    var item = instancedTransform(scene, "pedestal_button", false)
+    var item = instancedTransform(scene, "pedestal_button", false, 0.2, 0.5)
 
     item.userData.wall = false;
     item.userData.ground = true;
@@ -557,7 +582,7 @@ function loadButtonSphere() {
 
 function loadButtonSphereManager(scene) {
 
-    var item = instancedTransform(scene, "button_circle", false)
+    var item = instancedTransform(scene, "button_circle", false, 0.2, 0.5)
     item.userData.wall = false;
     item.userData.ground = true;
     item.userData.ceiling = false;
@@ -572,7 +597,7 @@ function loadButtonCube() {
 
 function loadButtonCubeManager(scene) {
 
-    var item = instancedTransform(scene, "button_box", false)
+    var item = instancedTransform(scene, "button_box", false, 0.2, 0.5)
     item.userData.wall = false;
     item.userData.ground = true;
     item.userData.ceiling = false;
@@ -582,12 +607,12 @@ function loadButtonCubeManager(scene) {
 }
 
 function loadButtonWeight() {
-    handleZip('./assets/3ds/button_weight.zip', "loadButtonWeight");
+    handleZip('./assets/3ds/button_weight.zip', "loadButtonWeight", 0.2, 0.5);
 }
 
 function loadButtonWeightManager(scene) {
 
-    var item = instancedTransform(scene, "button_weight", false)
+    var item = instancedTransform(scene, "button_weight", false, 0.2, 0.5)
     item.userData.wall = false;
     item.userData.ground = true;
     item.userData.ceiling = false;
@@ -631,7 +656,7 @@ function loadRadio() {
 
 function loadRadioManager(scene) {
 
-    var item = instancedTransform(scene, "radio", true)
+    var item = instancedTransform(scene, "radio", true, 0.2, 0.5)
     item.userData.wall = false;
     item.userData.ground = true;
     item.userData.ceiling = false;
@@ -647,17 +672,17 @@ function loadGelRecharger() {
                 child.material.roughness = 0;
         })
 
-        var item = instancedTransform(gltf.scene, "gel_gun_blue", true)
+        var item = instancedTransform(gltf.scene, "gel_gun_blue", true, 0.1, 0.5)
         item.userData.wall = false;
         item.userData.ground = true;
         item.userData.ceiling = false;
 
-        var item = instancedTransform(gltf.scene, "gel_gun_orange", true)
+        var item = instancedTransform(gltf.scene, "gel_gun_orange", true, 0.1, 0.5)
         item.userData.wall = false;
         item.userData.ground = true;
         item.userData.ceiling = false;
 
-        var item = instancedTransform(gltf.scene, "gel_gun_white", true)
+        var item = instancedTransform(gltf.scene, "gel_gun_white", true, 0.1, 0.5)
         item.userData.wall = false;
         item.userData.ground = true;
         item.userData.ceiling = false;
@@ -666,10 +691,10 @@ function loadGelRecharger() {
     });
 }
 
-function loadRamp(){
+function loadRamp() {
     loader.load('/3ds/ramp.glb', (gltf) => {
 
-        var item = instancedTransform(gltf.scene, "ramp", false)
+        var item = instancedTransform(gltf.scene, "ramp", false, 0.5, 0.5)
         item.userData.wall = false;
         item.userData.ground = true;
         item.userData.ceiling = false;
@@ -678,10 +703,10 @@ function loadRamp(){
     });
 }
 
-function loadRampHalf(){
+function loadRampHalf() {
     loader.load('/3ds/ramp_half.glb', (gltf) => {
 
-        var item = instancedTransform(gltf.scene, "ramp_half", false)
+        var item = instancedTransform(gltf.scene, "ramp_half", false, 0.5, 0.5)
         item.userData.wall = false;
         item.userData.ground = true;
         item.userData.ceiling = false;
@@ -690,19 +715,88 @@ function loadRampHalf(){
     });
 }
 
-function loadRampHalf2(){
+function loadRampHalf2() {
     loader.load('/3ds/ramp_half2.glb', (gltf) => {
 
-        var item = instancedTransform(gltf.scene, "ramp_half2", false)
+        var item = instancedTransform(gltf.scene, "ramp_half2", false, 0.5, 0.5)
         item.userData.wall = false;
         item.userData.ground = true;
         item.userData.ceiling = false;
 
-        $("#loading-parent").css("opacity", 0);
-        $("#loading-parent").css("pointer-events", "none");
+        loadStairs();
     });
 }
 
+function loadStairs() {
+    handleZip('./assets/3ds/stairs.zip', "loadStairs");
+}
+
+function loadStairsManager(scene) {
+    var item = instancedTransform(scene, "stairs", false, 0.2, 0.5)
+    item.userData.wall = false;
+    item.userData.ground = true;
+    item.userData.ceiling = false;
+    loadLightBridge()
+}
+
+function loadLightBridge() {
+    handleZip('./assets/3ds/light_bridge.zip', "loadLightBridge");
+}
+
+function loadLightBridgeManager(scene) {
+    console.log(scene)
+
+    var item = instancedTransform(scene, "light_bridge", false, 0.2, 0.5)
+    item.userData.wall = true;
+    item.userData.ground = false;
+    item.userData.ceiling = false;
+
+    loadTractorBeam()
+}
+
+function loadTractorBeam() {
+    handleZip('./assets/3ds/tractor_beam.zip', "loadTractorBeam");
+}
+
+function loadTractorBeamManager(scene) {
+
+    var item = instancedTransform(scene, "tractor_beam", false, 0.2, 0.5)
+    item.userData.wall = true;
+    item.userData.ground = false;
+    item.userData.ceiling = true;
+
+    loadLaserEmitter()
+}
+
+function loadLaserEmitter() {
+    handleZip('./assets/3ds/laser_emitter.zip', "loadLaserEmitter");
+}
+
+function loadLaserEmitterManager(scene) {
+
+    var item = instancedTransform(scene, "laser_emitter", false, 0.2, 0.5)
+    item.userData.wall = true;
+    item.userData.ground = false;
+    item.userData.ceiling = true;
+
+    loadLaserCube()
+}
+
+function loadLaserCube() {
+    handleZip('./assets/3ds/laser_cube.zip', "loadLaserCube");
+}
+
+function loadLaserCubeManager(scene) {
+
+    var item = instancedTransform(scene, "laser_cube", true, 0.0, 0.5)
+    item.userData.wall = true;
+    item.userData.ground = false;
+    item.userData.ceiling = true;
+
+    $("#loading-parent").css("opacity", 0);
+    $("#loading-parent").css("pointer-events", "none");
+
+}
 
 export {
     loadCube

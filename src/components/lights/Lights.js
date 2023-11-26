@@ -12,7 +12,7 @@ const Lights = function (THREE) {
     lightGroup.visible = false;
 
     const light = new THREE.AmbientLight(0x404040); // soft white light
-    //lightGroup.add(light);
+    lightGroup.add(light);
 
     const ambient = new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 0.15);
     //lightGroup.add(ambient);
@@ -79,7 +79,7 @@ const Lights = function (THREE) {
 
     RectAreaLightUniformsLib.init();
 
-    const rectLight1 = new THREE.RectAreaLight(0xffffff, 0.5, 10, 14);
+    const rectLight1 = new THREE.RectAreaLight(0xffffff, 1.0, 10, 14);
     rectLight1.rotation.x = -Math.PI / 2;
     rectLight1.rotation.z = -Math.PI / 2;
     rectLight1.position.set(8, 7.99, 6);

@@ -65,13 +65,20 @@ import {
     DepthDownsamplingPass,
     NormalPass,
     SSAOEffect,
-    TextureEffect
+    TextureEffect,
+    GridEffect,
+    NoiseEffect,
+    SepiaEffect,
+    VignetteEffect
 } from "postprocessing";
 import Stats from "stats-gl";
 import "./components/menuShader/MenuShader.js";
 import {
     GUI
 } from './jsm/libs/lil-gui.module.min.js';
+import {
+    renderGoo
+} from './components/goo/Goo.js';
 //
 //
 window.SELECTED_OBJECTS_FOR_BLOOM = new Selection()
@@ -92,13 +99,15 @@ const toneMappingEffect = new ToneMappingEffect({
 });
 
 const selectiveBloom = new SelectiveBloomEffect(window.MAIN_SCENE, window.MAIN_CAMERA, {
-    intensity: 1.5,
-    luminanceThreshold: 0.0001,
-    mipmapBlur: true,
-    radius: .35
+    intensity: 1,
+    luminanceThreshold: 0.3,
+    //mipmapBlur: true,
+    radius: 0.0
 })
 
 selectiveBloom.selection = window.SELECTED_OBJECTS_FOR_BLOOM;
+
+console.log(selectiveBloom)
 
 const smaaEffect = new SMAAEffect(
     EdgeDetectionMode.DEPTH
@@ -145,10 +154,35 @@ const ssaoEffect = new SSAOEffect(window.MAIN_CAMERA, normalPass.texture, {
 //
 var effectPass;
 
+const noiseEffect = new NoiseEffect({
+    premultiply: false
+});
+const gridEffect = new GridEffect({
+    scale: 1.6
+});
+
+console.log(gridEffect)
+console.log(noiseEffect)
+
+noiseEffect.blendMode.opacity.value = 0.7;
+noiseEffect.blendMode.blendFunction = BlendFunction.REFLECT;
+
+window.sepiaEffect = new SepiaEffect();
+//window.sepiaEffect.blendMode.opacity = 0;
+//window.sepiaEffect.setIntensity(0);
+window.sepiaEffect.intensity = 0;
+console.log(window.sepiaEffect)
+
+window.vig = new VignetteEffect({
+    darkness: 0
+});
+
+console.log(window.vig)
+
 if (window.mobile) {
     effectPass = new EffectPass(window.MAIN_CAMERA, toneMappingEffect, smaaEffect, selectiveBloom); //selectiveBloom
 } else {
-    effectPass = new EffectPass(window.MAIN_CAMERA, toneMappingEffect, smaaEffect); //selectiveBloom
+    effectPass = new EffectPass(window.MAIN_CAMERA, toneMappingEffect, smaaEffect, window.vig, selectiveBloom, window.sepiaEffect); //selectiveBloom
 }
 
 console.log(effectPass)
@@ -215,6 +249,9 @@ function init() {
     window.MAIN_SCENE.add(window.ITEMS_ADDED);
     window.ROOM.add(window.CUBES);
     window.MAIN_SCENE.add(window.ITEM_CUBE);
+
+    window.GOO = new THREE.Group();
+    window.MAIN_SCENE.add(window.GOO);
 
     console.log(window.MAIN_SCENE)
     // CAMERA
@@ -414,6 +451,14 @@ console.log(window.STATS);
 
 function animate(time) {
 
+
+    if (window.skybox) {
+        //window.skybox.radius = 20;
+        //window.skybox.height = 440;
+    }
+
+    renderGoo();
+
     if (!window.FPS) {
         window.STATS.begin();
         //window.tuniform.iTime.value += clock.getDelta();
@@ -491,18 +536,38 @@ function render(time) {
             window.CURRENT_INSTANCED.setMatrixAt(window.CURRENT_ITEM_ID, item.matrix)
             window.CURRENT_INSTANCED.instanceMatrix.needsUpdate = true;
             window.CURRENT_INSTANCED.computeBoundingSphere();
+
+
+            if (recordingPosition && !window.CURRENT_ITEM.body.recall) {
+                //console.log("oooooooooooooo")
+                //if (!window.CURRENT_ITEM.body.sleeping) {
+                    window.CURRENT_ITEM.body.arrayPos.push(item.position.clone())
+                    window.CURRENT_ITEM.body.arrayRot.push(item.quaternion.clone())
+                    //console.log("iiiiiiiiiii")
+                //}
+            }
         }
 
         //SYNC OBJECTS WITH THE PHYSICAL WORLD
+
+        //
+        for (let d of window.dynamicObjects) {
+            if (d.inTractor) {
+                //d.position.y = d.inTractorPositionY;
+            } else if (d.inTractorClone) {
+                //d.position.y = d.inTractorPositionYClone;
+            }
+        }
 
         for (const property in window.DYMANIC_ITEMS) {
 
             var instanced = window.ITEMS_ADDED.getObjectByName(property);
 
-            if(property == "gel_gun_blue" || property == "gel_gun_orange" || property == "gel_gun_white" 
-            || property == "pedestal_button" || property == "button_weight" || property == "button_box"
-            || property == "button_circle" || property == "dispenser" || property == "ramp"
-            || property == "ramp_half" || property == "ramp_half2")
+            if (property == "gel_gun_blue" || property == "gel_gun_orange" || property == "gel_gun_white" ||
+                property == "pedestal_button" || property == "button_weight" || property == "button_box" ||
+                property == "button_circle" || property == "dispenser" || property == "ramp" ||
+                property == "ramp_half" || property == "ramp_half2" || property == "stairs" ||
+                property == "light_bridge" | property == "tractor_beam" || property == "laser_emitter")
                 continue;
 
             for (var i = 0; i < window.DYMANIC_ITEMS[property].length; i++) {
@@ -518,6 +583,18 @@ function render(time) {
                     item.position.copy(window.DYMANIC_ITEMS[property][i].body.position);
                     item.quaternion.copy(window.DYMANIC_ITEMS[property][i].body.quaternion);
 
+                    if (recordingPosition && !window.DYMANIC_ITEMS[property][i].body.recall) {
+                        if (!window.DYMANIC_ITEMS[property][i].body.sleeping) {
+                            window.DYMANIC_ITEMS[property][i].body.arrayPos.push(item.position.clone())
+                            window.DYMANIC_ITEMS[property][i].body.arrayRot.push(item.quaternion.clone())
+                            //console.log("iiiiiiiiiii")
+                        }
+                    }
+
+                    if (window.DYMANIC_ITEMS[property][i].body.recall) {
+                        //console.log(item.quaternion)
+                    }
+
                     item.updateMatrix();
                     instanced.setMatrixAt(i, item.matrix)
                     instanced.instanceMatrix.needsUpdate = true;
@@ -525,6 +602,13 @@ function render(time) {
                 }
 
             }
+        }
+
+        if (recordingPosition) {
+            recordingPosition = false;
+            setTimeout(() => {
+                recordingPosition = true;
+            }, 10);
         }
     }
 
@@ -546,6 +630,8 @@ function render(time) {
     window.COMPOSER.render();
     window.STATS.end();
 }
+
+var recordingPosition = true;
 
 function animatePortal() {
 
@@ -576,6 +662,8 @@ function animatePortal() {
     renderPortal2(0, 1)
     renderPortal2(1, 0)
     //window.ambient.intensity = 0.15;
+
+    window.RENDERER.autoClear = false;
 
     window.GUN.children[0].children[0].scale.set(0.1, 0.1, 0.1)
     window.GUN.children[0].children[0].position.set(0.01, -0.012, -0.011);

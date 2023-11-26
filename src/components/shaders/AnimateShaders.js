@@ -2,7 +2,10 @@ import * as THREE from '../../build/three.module.js';
 import {
     generateMeshPortalShader
 } from './Portals/Portals.js';
-import './PortalGun/PortalGunShaders.js'
+import './PortalGun/PortalGunShaders.js';
+import {
+    animateLightBridges
+} from '../lightBridges/LightBridges.js'
 
 generateMeshPortalShader();
 
@@ -14,6 +17,8 @@ const animateShader = (time) => {
     window.uniformShaderPortalGunBallEnergy.iTime.value += val;
 
     window.uniformShaderPortal.iTime.value += val;
+
+    animateLightBridges();
 };
 
 export {

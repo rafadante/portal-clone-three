@@ -5,6 +5,9 @@ import {
     threeToCannon,
     ShapeType
 } from 'three-to-cannon';
+import {
+    createLightBridges
+} from '../lightBridges/LightBridges.js'
 
 var cubesDefault = [];
 var totalBodies = 0;
@@ -317,8 +320,46 @@ $("body").on('click', '#view-fps', function () {
         addColliderItem(window.DYMANIC_ITEMS['ramp_half'], "ramp_half", 0)
         addColliderItem(window.DYMANIC_ITEMS['ramp_half2'], "ramp_half2", 0)
         //addColliderItem(window.DYMANIC_ITEMS['dispenser'], "dispenser", 0, 4)
+
+        addColliderItem(window.DYMANIC_ITEMS['stairs'], "stairs", 0)
+
+        //
+        createLightBridges('light_bridge', window.raycastLightBridge);
+        createLightBridges("tractor_beam", window.raycastTractorBeam);
+        createLightBridges("laser_emitter", window.raycastLaserEmitter);
+
+
+        window.beamLength = 0;
+
+        for (var s = 0; s < window.DYMANIC_ITEMS["tractor_beam"].length; s++) {
+            if (window.DYMANIC_ITEMS["tractor_beam"][s].length != 0)
+                window.beamLength++
+        }
+
+        window.laserLength = 0;
+
+        for (var s = 0; s < window.DYMANIC_ITEMS["laser_emitter"].length; s++) {
+            if (window.DYMANIC_ITEMS["laser_emitter"][s].length != 0)
+                window.laserLength++
+        }
+
+        console.log("Oooooooooooooooo")
+        console.log(window.DYMANIC_ITEMS['laser_cube'])
+        console.log(window.INTERACTIVE)
+
+        addColliderItem(window.DYMANIC_ITEMS['laser_cube'], "laser_cube", 5)
     }, 500);
 });
+
+window.raycastLightBridge = [];
+window.raycastTractorBeam = [];
+window.raycastLaserEmitter = [];
+
+window.lightBridgesClone = [];
+window.lightBridgesColliderClone = [];
+
+window.portalShader = [];
+
 
 function addColliderItem(items, type, mass, offset) {
 
@@ -331,7 +372,7 @@ function addColliderItem(items, type, mass, offset) {
         if (items[i].length != 0) {
 
 
-            if (type == "cube")
+            if (type == "cube" || type == "laser_cube")
                 var shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.3, 0.3));
             else if (type == "sphere")
                 var shape = new CANNON.Sphere(0.3);
@@ -373,15 +414,20 @@ function addColliderItem(items, type, mass, offset) {
                     var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.14, 0.5));
                     items[i].position.x -= a2;
                 }
-            }else if (type == "dispenser") {
+            } else if (type == "dispenser") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.7));
                 items[i].position.y += 0.77;
-            }else if (type == "ramp" || type == "ramp_half" || type == "ramp_half2") {
+            } else if (type == "ramp" || type == "ramp_half" || type == "ramp_half2" || type == "stairs") {
                 //var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.7));
                 //items[i].position.y += 0.77;
 
-                const result = threeToCannon(window.ITEMS_ADDED.getObjectByName(type), {type: ShapeType.HULL});
+                const result = threeToCannon(window.ITEMS_ADDED.getObjectByName(type), {
+                    type: ShapeType.HULL
+                });
                 var shape = result.shape;
+
+                PHYSICS_MATERIAL.friction = 0.3; //0.01
+                //PHYSICS_MATERIAL.restitution = 0.0; //0.1
             }
 
             var box = new CANNON.Body({
@@ -396,13 +442,35 @@ function addColliderItem(items, type, mass, offset) {
             items[i].body = box;
 
             if (mass > 0) {
-                //box.allowSleep = true;
-                //box.sleepSpeedLimit = 1.0;
-                //box.sleepTimeLimit = 1.0;
+                box.allowSleep = true;
+                box.sleepSpeedLimit = 1.0;
+                box.sleepTimeLimit = 1.0;
 
                 window.dynamicObjects.push(box);
                 box.gelJumping = false;
+                box.waiting = false;
                 window.BOX_BODY.push(box);
+
+                /*box.addEventListener("sleepy",function(event){
+                    console.log("The sphere is feeling sleepy...");
+                });*/
+
+                box.arrayPos = [];
+                box.arrayRot = [];
+                box.recall = false;
+
+                box.name = type;
+
+                box.addEventListener("sleep", function (event) {
+                    console.log("The sphere fell asleep!");
+                    box.sleeping = true;
+                    console.log(box)
+                });
+
+                box.addEventListener('wakeup', (event) => {
+                    console.log('The sphere woke up!')
+                    box.sleeping = false;
+                })
             } else {
                 window.CANNON_WORLD.addBody(box);
             }

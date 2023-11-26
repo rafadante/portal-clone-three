@@ -17,12 +17,12 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
     window.mobile = false;
     pixelRatio = 1;
     shadowMap = true;
-    portalsRecursive = 7;
+    portalsRecursive = 2;
     fov = 60;
 }
 
 //
-var camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.005, 1000);
+var camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.005, 200000);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 
@@ -293,6 +293,11 @@ window.DYMANIC_ITEMS = {
     ramp: [],
     ramp_half: [],
     ramp_half2: [],
+    stairs: [],
+    light_bridge: [],
+    tractor_beam: [],
+    laser_emitter: [],
+    laser_cube: []
 }
 
 window.INK_WHITE = false;

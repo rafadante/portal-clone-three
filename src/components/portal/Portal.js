@@ -117,12 +117,16 @@ class Portal extends Group {
         var portalShader;
         if (index == 0) {
             portalShader = window.leftPortalShader.clone();
+            portalShader.name = "portal-0"
             this.mesh.userData.this = 0;
             this.mesh.userData.other = 1;
+            window.portalShader[0] = portalShader;
         } else {
             portalShader = window.rightPortalShader.clone();
+            portalShader.name = "portal-1"
             this.mesh.userData.this = 1;
             this.mesh.userData.other = 0;
+            window.portalShader[1] = portalShader;
         }
 
 

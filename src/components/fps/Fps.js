@@ -17,6 +17,13 @@ import {
 import {
     DecalGeometry
 } from '../../jsm/geometries/DecalGeometry.js';
+import {
+    threeToCannon,
+    ShapeType
+} from 'three-to-cannon';
+import {
+    createLightBridgesFromPortal
+} from '../lightBridges/LightBridges.js'
 
 // MOBILE VARIABLES
 
@@ -201,6 +208,11 @@ if (!window.mobile)
 // added joystick + movement
 
 function player() {
+
+    let sphereShape = new CANNON.Sphere(0.3);
+
+    console.log(slipperyMaterial)
+    //
     // define shape
     let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 2, 2 / 2.3, 0.5 / 2));
     // let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5, 2, 0.5)); 
@@ -214,6 +226,11 @@ function player() {
     window.PLAYER.addShape(physicsShape);
     window.PLAYER.position.set(5, 5, 5);
     window.PLAYER.linearDamping = 0.9;
+    window.PLAYER.name = "player"
+
+    //window.PLAYER.addShape(sphereShape, new CANNON.Vec3(0, 0, 0));
+    //window.PLAYER.addShape(sphereShape, new CANNON.Vec3(0, 0.5 / 2, 0));
+    //window.PLAYER.addShape(sphereShape, new CANNON.Vec3(0, -0.5 / 2, 0));
 
     // keep the player upright
     window.PLAYER.angularDamping = 1
@@ -323,9 +340,293 @@ document.addEventListener('keydown', (event) => {
                 window.INK.position.z))
         } else if (event.code == "KeyE") {
             interactWithItem();
+        } else if (event.code == "KeyQ") {
+
+            if (recalling) {
+                for (var i = 0; i < timeouts.length; i++) {
+                    clearTimeout(timeouts[i]);
+                }
+                timeouts = [];
+
+                recallingItem.recall = false;
+                //recallingItem.allowSleep = true;
+                recalling = false;
+                recallingItem.arrayPos = [];
+                recallingItem.arrayRot = [];
+
+                var aa = {
+                    value: 1
+                };
+
+                new TWEEN.Tween(aa, false)
+                    .to({
+                        value: 0
+                    }, 500)
+                    .onUpdate(() => {
+                        window.sepiaEffect.intensity = aa.value;
+                        window.vig.darkness = aa.value * 0.7;
+                    })
+                    .start();
+            } else {
+
+                if (window.pickingToRecall) {
+                    window.MAIN_SCENE.remove(window.groupRecall)
+                    window.pickingToRecall = false;
+                }
+
+                var aa = {
+                    value: 0
+                };
+
+                new TWEEN.Tween(aa, false)
+                    .to({
+                        value: 1
+                    }, 500)
+                    .onUpdate(() => {
+                        window.sepiaEffect.intensity = aa.value;
+                        window.vig.darkness = aa.value * 0.7;
+                    })
+                    .start();
+
+                recall();
+            }
+        } else if (event.code == "KeyZ") {
+
+            window.pickingToRecall = !window.pickingToRecall;
+
+            if (window.pickingToRecall) {
+
+                window.groupRecall = new THREE.Group();
+                window.MAIN_SCENE.add(window.groupRecall)
+
+                for (let d of window.dynamicObjects) {
+
+                    if (d.name == "player")
+                        continue;
+
+                    var length = d.arrayPos.length;
+                    var values = parseInt(length / 5);
+                    const points = [];
+
+                    var geometry;
+
+                    if (d.name.includes("sphere"))
+                        geometry = new THREE.SphereGeometry(0.33, 32, 16);
+                    else
+                        geometry = new THREE.BoxGeometry(0.66, 0.66, 0.66);
+
+                    const material = new THREE.MeshBasicMaterial({
+                        color: 0xffff00,
+                        transparent: true,
+                        opacity: 0.5
+                    });
+
+                    for (var i = 0, j = 0; i < 7; i++, j += values) {
+
+                        if (d.arrayPos[j]) {
+
+                            points.push(d.arrayPos[j])
+                            var cube = new THREE.Mesh(geometry, material);
+                            cube.position.copy(d.arrayPos[j]);
+                            cube.quaternion.copy(d.arrayRot[j]);
+                            window.SELECTED_OBJECTS_FOR_BLOOM.add(cube);
+                            window.groupRecall.add(cube);
+
+                        }
+
+                    }
+
+
+                    points.push(d.arrayPos[length - 1])
+                    var cube = new THREE.Mesh(geometry, material);
+                    cube.position.copy(d.arrayPos[length - 1]);
+                    cube.quaternion.copy(d.arrayRot[length - 1]);
+                    window.SELECTED_OBJECTS_FOR_BLOOM.add(cube);
+                    window.groupRecall.add(cube);
+
+                    const material2 = new THREE.LineBasicMaterial({
+                        color: 0xffff00
+                    });
+
+                    console.log(material)
+
+
+                    //points.push( new THREE.Vector3( - 10, 0, 0 ) );
+                    //points.push( new THREE.Vector3( 0, 10, 0 ) );
+                    //points.push( new THREE.Vector3( 10, 0, 0 ) );
+
+                    const geometry2 = new THREE.BufferGeometry().setFromPoints(points);
+
+                    const line = new THREE.Line(geometry2, material2);
+                    window.SELECTED_OBJECTS_FOR_BLOOM.add(line);
+                    window.groupRecall.add(line);
+
+                }
+
+            } else {
+                window.MAIN_SCENE.remove(window.groupRecall)
+            }
         }
     }
 });
+
+window.pickingToRecall = false;
+
+function recall() {
+    raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
+    var intersects = raycaster2.intersectObjects(window.INTERACTIVE);
+
+    if (intersects.length > 0) {
+        var instancedId = intersects[0].instanceId;
+        var name = intersects[0].object.name;
+
+        //window.CURRENT_ITEM = window.DYMANIC_ITEMS[name][instancedId];
+        var item = window.DYMANIC_ITEMS[name][instancedId];
+        console.log(item)
+
+        if (item.body.arrayPos.length > 0) {
+
+            //item.body.allowSleep = false;
+            recallingItem = item.body;
+            item.body.recall = true;
+            recalling = true;
+            //window.CANNON_WORLD.removeBody(item.body);
+            transport(item, item.body.arrayPos.length - 1);
+
+        }
+    }
+}
+
+function tweenCamera2(duration, ini, final, item, end2) {
+    var obj = new THREE.Object3D();
+    window.MAIN_SCENE.add(obj)
+    obj.quaternion.copy(ini.clone());
+    new TWEEN.Tween(ini).to(final, duration)
+        .onUpdate((tween) => {
+            obj.quaternion.slerp(final, smoothness);
+            item.body.quaternion.copy(obj.quaternion);
+
+
+            /*var dir = new THREE.Vector3(); // create once an reuse it
+            dir.subVectors(item.body.position, end2).normalize();
+
+            let pos = new THREE.Vector3(item.body.position.x, item.body.position.y, item.body.position.z)
+            pos.add(dir.clone().multiplyScalar(0.02));
+            item.body.position.copy(pos);
+            item.body.angularVelocity.setZero();
+            item.body.velocity.setZero();*/
+
+            //const direction = new CANNON.Vec3()
+            //endPosition.vsub(startPosition, direction)
+            //const totalLength = direction.length()
+            //direction.normalize()
+        })
+        .start();
+}
+
+/*function postStepListener() {
+    // Progress is a number where 0 is at start position and 1 is at end position
+    const progress = (world.time - startTime) / tweenTime
+
+    if (progress < 1) {
+        direction.scale(progress * totalLength, offset)
+        startPosition.vadd(offset, body.position)
+    } else {
+        body.velocity.set(0, 0, 0)
+        body.position.copy(endPosition)
+        world.removeEventListener('postStep', postStepListener)
+    }
+}*/
+var timeouts = [];
+var recalling = false;
+var recallingItem;
+
+/*// Compute direction vector and get total length of the path
+        const direction = new CANNON.Vec3()
+        endPosition.vsub(startPosition, direction)
+        const totalLength = direction.length()
+        direction.normalize()*/
+
+function transport(item, i) {
+    tweenCamera(10, item.body.position, item.body.arrayPos[i])
+
+    var obj = new THREE.Object3D();
+    obj.quaternion.copy(item.body.quaternion);
+    tweenCamera2(10, obj.quaternion, item.body.arrayRot[i], item, item.body.arrayPos[i])
+    //item.body.mass = 0;
+    /*const tweenTime = 0.4;
+    const startPosition = new CANNON.Vec3(item.body.position.x, item.body.position.y, item.body.position.z);
+    const endPosition = new CANNON.Vec3(item.body.arrayPos[i].x, item.body.arrayPos[i].y, item.body.arrayPos[i].z);
+
+    // Compute direction vector and get total length of the path
+    const direction = new CANNON.Vec3()
+    endPosition.vsub(startPosition, direction)
+    const totalLength = direction.length()
+    direction.normalize()
+
+    const speed = totalLength / tweenTime
+    direction.scale(speed, item.body.velocity)
+
+    // Save the start time
+    const startTime = window.CANNON_WORLD.time;
+
+    const offset = new CANNON.Vec3()
+
+    function postStepListener() {
+        // Progress is a number where 0 is at start position and 1 is at end position
+        const progress = (window.CANNON_WORLD.time - startTime) / tweenTime
+
+        if (progress < 1) {
+            direction.scale(progress * totalLength, offset)
+            startPosition.vadd(offset, item.body.position)
+        } else {
+            item.body.mass = 5;
+            item.body.velocity.set(0, 0, 0)
+            item.body.position.copy(endPosition)
+            window.CANNON_WORLD.removeEventListener('postStep', postStepListener)
+        }
+    }
+
+    window.CANNON_WORLD.addEventListener('postStep', postStepListener)
+
+    console.log(direction);
+    console.log(totalLength)*/
+
+    if (i > 0) {
+        timeouts.push(setTimeout(() => {
+            transport(item, i -= 1)
+        }, 10))
+    } else {
+        item.body.recall = false;
+        //item.body.allowSleep = true;
+        recalling = false;
+        item.body.arrayPos = [];
+        item.body.arrayRot = [];
+
+        var aa = {
+            value: 1
+        };
+
+        new TWEEN.Tween(aa, false)
+            .to({
+                value: 0
+            }, 500)
+            .onUpdate(() => {
+                window.sepiaEffect.intensity = aa.value;
+                window.vig.darkness = aa.value * 0.7;
+            })
+            .start();
+
+
+        setTimeout(() => {
+            // Sleep state reset
+            item.body.sleepState = 0;
+            item.body.timeLastSleepy = 0;
+            item.body._wakeUpAfterNarrowphase = false;
+        }, 2000)
+
+    }
+}
 
 function interactWithItem() {
     raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
@@ -370,6 +671,12 @@ function interactWithItem() {
         window.PLAYER.angularVelocity.set(0, 0, 0);
 
         itemHolder.gelJumping = false;
+
+        itemHolder.sleeping = false;
+        itemHolder.recall = false;
+        recalling = false;
+        //itemHolder.arrayPos = [];
+        //itemHolder.arrayRot = [];
 
         window.CANNON_WORLD.addBody(itemHolder);
 
@@ -994,6 +1301,18 @@ function portalButton(button) {
                             }, 300).start();
                         }
                     }
+
+                    setTimeout(() => {
+                        if (button == 0) {
+                            createLightBridgesFromPortal(1, window.raycastLightBridge);
+                            createLightBridgesFromPortal(1, window.raycastTractorBeam);
+                            createLightBridgesFromPortal(1, window.raycastLaserEmitter);
+                        } else if (button == 2) {
+                            createLightBridgesFromPortal(0, window.raycastLightBridge);
+                            createLightBridgesFromPortal(0, window.raycastTractorBeam);
+                            createLightBridgesFromPortal(0, window.raycastLaserEmitter);
+                        }
+                    }, 300);
                 } else {
                     //NONPORTABLE WALL
                 }
@@ -1071,6 +1390,9 @@ var gamepadButton12 = false;
 var gamepadButton15 = false;
 var vv = false;
 
+
+var yyy;
+
 const updatePlayer = function (deltaTime) {
 
     raycast();
@@ -1135,7 +1457,241 @@ const updatePlayer = function (deltaTime) {
     }
 
     // apply forces in WASD directions when pressed
-    const f = velocity * window.PLAYER.mass * jumpMultiplier * deltaTime;
+
+    var mass = 50;
+
+    if (window.PLAYER.mass == 0) {
+        mass = 10;
+    }
+
+    const f = velocity * window.PLAYER.mass * jumpMultiplier * deltaTime; //window.PLAYER.mass
+    var aa = false;
+
+    for (var i = 0; i < window.laserEmitterRaycaster.length; i++) {
+        //console.log(window.laser_cube)
+        //if (window.INTERACTIVE[7]) {
+        //var intersects = window.laserEmitterRaycaster[i].intersectObjects(window.INTERACTIVE);
+        //console.log(intersects)
+        //}
+
+        var obj2 = window.laserEmitterRaycaster[i];
+
+        if (window.laserEmitterRaycaster[i].fromCube) {
+            obj2 = new THREE.Object3D();
+            obj2.position.copy(window.laserEmitterRaycaster[i].position)
+            obj2.rotation.copy(window.laserEmitterRaycaster[i].rotation)
+            //obj2.translateY(window.laserEmitterRaycaster[i].distance / 2);
+            obj2.fromCube = true;
+        }
+
+        var vector = new THREE.Vector3();
+        var raycasterLaser = new THREE.Raycaster();
+
+        vector.copy(obj2.position);
+
+        let dir = new THREE.Vector3()
+        obj2.getWorldDirection(dir)
+        dir.normalize()
+
+        raycasterLaser.set(vector, dir);
+        var intersects = raycasterLaser.intersectObject(window.laser_cube);
+
+        if (intersects.length > 0) {
+
+            var id = intersects[0].instanceId;
+
+            if (obj2.fromCube) {
+                /*for (var h = 0; h < intersects.length; h++) {
+                    if (intersects[i].instanceId != 1) {
+                        //console.log("ttttttttttttt")
+                    }
+                }*/
+            } else {
+                window.laserEmitter[i].rotation.set(0, 0, 0)
+                window.laserEmitter[i].position.set(0, 0, 0)
+
+                window.laserEmitter[i].geometry.dispose();
+                window.laserEmitter[i].geometry = new THREE.CylinderGeometry(0.02, 0.02, intersects[0].distance, 32);
+                window.laserEmitter[i].position.copy(obj2.position);
+                window.laserEmitter[i].translateZ(intersects[0].distance / 2);
+
+                window.laserEmitter[i].rotation.x = Math.PI / 2;
+
+                //----------------------------------------------------
+
+                var cube = window.DYMANIC_ITEMS["laser_cube"][intersects[0].instanceId]
+                yyy = cube;
+
+                var vector = new THREE.Vector3();
+                var raycasterLaser = new THREE.Raycaster();
+
+                vector.copy(cube.position);
+
+                let dir = new THREE.Vector3()
+                cube.getWorldDirection(dir)
+                dir.normalize()
+
+                raycasterLaser.set(vector, dir);
+                var intersects = raycasterLaser.intersectObject(window.instancedMesh);
+
+                if (intersects.length > 0) {
+                    //console.log("Iiiiiiiiiiiiiiiiiii")
+                    const geometry = new THREE.CylinderGeometry(0.02, 0.02, intersects[0].distance, 32);
+
+                    if (!cube.laser) {
+                        const plane = new THREE.Mesh(geometry, window.laserEmitter[i].material); //materialBridge
+                        window.SELECTED_OBJECTS_FOR_BLOOM.add(plane);
+                        window.MAIN_SCENE.add(plane);
+
+
+                        cube.laser = true;
+                        cube.plane = plane;
+
+
+                        //cube.fromCube = true;
+                        //window.laserEmitterRaycaster.push(cube)
+                    } else {
+                        cube.plane.rotation.set(0, 0, 0)
+                        cube.plane.position.set(0, 0, 0)
+
+                        cube.plane.geometry.dispose();
+                        cube.plane.geometry = new THREE.CylinderGeometry(0.02, 0.02, intersects[0].distance, 32);
+
+                        if (window.HOLDING_ITEM && window.CURRENT_ITEM_ID == id)
+                            cube.plane.position.copy(cube.position);
+                        else
+                            cube.plane.position.copy(cube.body.position);
+                        ///cube.plane.translateZ(intersects[0].distance / 2);
+                        //cube.plane.rotation.copy(cube.rotation);
+                        //cube.plane.translateZ(intersects[0].distance / 2);
+                        //cube.plane.rotation.x +=cube.rotation.x;
+                        //cube.plane.rotation.y = cube.rotation.y;
+                        //cube.plane.rotation.y += Math.PI / 2;
+                        cube.plane.rotation.x += Math.PI / 2;
+                        cube.plane.rotation.z = -cube.rotation.y;
+
+
+                        //cube.plane.updateMatrix();
+                        //cube.plane.geometry.applyMatrix4(cube.plane.matrix);
+                        cube.plane.distance = intersects[0].distance;
+                        cube.plane.translateY(-intersects[0].distance / 2);
+                    }
+
+                    //cube.plane.position.copy(cube.position);
+                    //cube.plane.rotation.copy(cube.rotation);
+
+                } else {
+
+                }
+            }
+
+
+        } else {
+
+            if (window.laserEmitter[i]) {
+                window.laserEmitter[i].rotation.set(0, 0, 0)
+                window.laserEmitter[i].position.set(0, 0, 0)
+
+                window.laserEmitter[i].geometry.dispose();
+                window.laserEmitter[i].geometry = new THREE.CylinderGeometry(0.02, 0.02, window.laserEmitterRaycaster[i].distance, 32);
+                window.laserEmitter[i].position.copy(window.laserEmitterRaycaster[i].position);
+                window.laserEmitter[i].translateZ(window.laserEmitterRaycaster[i].distance / 2);
+
+                window.laserEmitter[i].rotation.x = Math.PI / 2;
+            }
+
+            if (yyy) {
+                if (yyy.laser) {
+                    console.log("111111111111111")
+                    window.MAIN_SCENE.remove(yyy.plane);
+                    yyy.laser = false;
+                }
+            }
+
+        }
+    }
+
+
+    for (let d of window.dynamicObjects) {
+
+        let pos = new THREE.Vector3(d.position.x, d.position.y, d.position.z)
+
+        for (var j = 0; j < window.tractorBeam.length; j++) {
+
+            if (window.tractorBeamBoundingBox[j]) {
+
+                if (d.inTractor && d.tractor != j)
+                    continue;
+
+                if (window.tractorBeamBoundingBox[j].containsPoint(pos)) {
+
+                    var vec = new THREE.Vector3();
+                    window.tractorBeam[j].getWorldDirection(vec)
+
+                    if (!d.inTractor) {
+                        d.inTractorPositionY = d.position.clone().y;
+                        d.inTractor = true;
+                        d.tractor = j;
+                        window.tractorBeam[j].inTractor = true;
+                        aa = true;
+                        d.mass = 0;
+
+                        // Velocity
+                        d.velocity.setZero();
+                        d.initVelocity.setZero();
+                        d.angularVelocity.setZero();
+                        d.initAngularVelocity.setZero();
+
+                        // Force
+                        d.force.setZero();
+                        d.torque.setZero();
+
+                        // Sleep state reset
+                        d.sleepState = 0;
+                        d.timeLastSleepy = 0;
+                        d._wakeUpAfterNarrowphase = false;
+                        d.angularDamping = 1;
+
+                        if (!d.inArea) {
+                            var center = new THREE.Vector3((Math.abs(vec.x - 1)) * window.tractorBeam[j].position.x + (d.position.x * vec.x),
+                                (Math.abs(vec.y - 1)) * window.tractorBeam[j].position.y + (d.position.y * vec.y),
+                                (Math.abs(vec.z - 1)) * window.tractorBeam[j].position.z + (d.position.z * vec.z));
+
+                            tweenCamera(500, d.position, center)
+                        }
+                    } else {
+                        pos.add(vec.clone().multiplyScalar(0.02 * window.tractorBeamBoundingBox[j].side));
+                        d.position.copy(pos);
+                        d.angularVelocity.setZero();
+                        d.velocity.setZero();
+                    }
+
+                } else {
+                    if (d.inTractor && d.tractor == j) { //&& window.tractorBeam[j].inTractor
+                        if (d.name == "player")
+                            d.mass = 50;
+                        else
+                            d.mass = 5;
+
+                        d.inTractor = false;
+                        window.tractorBeam[j].inTractor = false;
+                        d.tractor = null;
+                    }
+                }
+            } else {
+                if (d.inTractor && d.tractor == j) { //&& window.tractorBeam[j].inTractor
+                    if (d.name == "player")
+                        d.mass = 50;
+                    else
+                        d.mass = 5;
+
+                    d.inTractor = false;
+                    window.tractorBeam[j].inTractor = false;
+                    d.tractor = null;
+                }
+            }
+        }
+    }
 
     if (gelOrange)
         window.PLAYER.applyForce(forward.clone().multiplyScalar(f * 3), window.PLAYER.position)
@@ -1330,21 +1886,51 @@ const updatePlayer = function (deltaTime) {
 
         }
 
+        var posPlayer = new THREE.Vector3(window.PLAYER.position.x, window.PLAYER.position.y, window.PLAYER.position.z)
+
         if (controller["KeyW"].pressed && !window.COL_Z) {
-            window.PLAYER.applyForce(forward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+
             moving = true;
+
+            if (window.PLAYER.mass == 0) {
+                posPlayer.add(forward.clone().multiplyScalar(0.02));
+                window.PLAYER.position.copy(posPlayer);
+            } else {
+                window.PLAYER.applyForce(forward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+            }
         }
         if (controller["KeyS"].pressed) {
-            window.PLAYER.applyForce(backward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+
             moving = true;
+
+            if (window.PLAYER.mass == 0) {
+                posPlayer.add(backward.clone().multiplyScalar(0.02));
+                window.PLAYER.position.copy(posPlayer);
+            } else {
+                window.PLAYER.applyForce(backward.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+            }
         }
         if (controller["KeyA"].pressed) {
-            window.PLAYER.applyForce(left.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+
             moving = true;
+
+            if (window.PLAYER.mass == 0) {
+                posPlayer.add(left.clone().multiplyScalar(0.02));
+                window.PLAYER.position.copy(posPlayer);
+            } else {
+                window.PLAYER.applyForce(left.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+            }
         }
         if (controller["KeyD"].pressed) {
-            window.PLAYER.applyForce(right.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+
             moving = true;
+
+            if (window.PLAYER.mass == 0) {
+                posPlayer.add(right.clone().multiplyScalar(0.02));
+                window.PLAYER.position.copy(posPlayer);
+            } else {
+                window.PLAYER.applyForce(right.clone().multiplyScalar(f * movementMultiplier), window.PLAYER.position)
+            }
         }
 
         shouldJump = false;
@@ -1496,7 +2082,7 @@ function raycast() {
     for (let d of window.dynamicObjects) {
 
         let pos = new THREE.Vector3(d.position.x, d.position.y, d.position.z)
-        // let bb = new Box3(new Vector3().copy(d.physicsBody.aabb.lowerBound), new Vector3().copy(d.physicsBody.aabb.upperBound))
+        let bb = new THREE.Box3(new THREE.Vector3().copy(d.aabb.lowerBound), new THREE.Vector3().copy(d.aabb.upperBound))
         d.collisionFilterMask = window.CGROUP_ALL
         if (window.PORTALS[0] === null || window.PORTALS[1] === null)
             continue
@@ -1508,9 +2094,12 @@ function raycast() {
             // collision disable, might be partially intersecting with portal
             if (window.PORTALS[p].CDBB.containsPoint(pos)) {
                 d.collisionFilterMask &= ~window.PORTALS[p].hostObjects.collisionFilterGroup;
+                d.inArea = true;
 
                 if (dd == 0)
                     inArea++;
+            } else {
+                d.inArea = false;
             }
 
             // should teleport
@@ -1545,7 +2134,6 @@ function raycast() {
                 d.collisionFilterMask |= window.PORTALS[p].hostObjects.collisionFilterGroup
                 d.collisionFilterMask &= ~window.PORTALS[1 - p].hostObjects.collisionFilterGroup
             }
-
         }
 
         dd++;
@@ -1627,7 +2215,7 @@ function fourToThree(v) {
 
 function tweenCamera(duration, ini, final) {
     new TWEEN.Tween(ini).to(final, duration)
-        .easing(TWEEN.Easing.Quadratic.InOut)
+        //.easing(TWEEN.Easing.Quadratic.Out)
         .start();
 }
 
