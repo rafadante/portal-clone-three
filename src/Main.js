@@ -21,11 +21,6 @@ import {
 import {
     raycastSelected
 } from './components/boxSelection/BoxSelection.js';
-/*import {
-    createPortalShader,
-    generateMeshPortalShader,
-    animatePortalShader
-} from './components/portalShader/PortalShader.js';*/
 import {
     animateShader
 } from "./components/shaders/AnimateShaders.js"
@@ -47,46 +42,32 @@ import {
     hoverItem
 } from './components/items/Items.js';
 import {
-    BloomEffect,
     EffectComposer,
     EffectPass,
     RenderPass,
     Selection,
-    BlendFunction,
     EdgeDetectionMode,
     SMAAEffect,
-    SMAAImageLoader,
-    SMAAPreset,
     ToneMappingEffect,
     ToneMappingMode,
     SelectiveBloomEffect,
-
-    ColorChannel,
-    DepthDownsamplingPass,
-    NormalPass,
-    SSAOEffect,
-    TextureEffect,
-    GridEffect,
-    NoiseEffect,
     SepiaEffect,
-    VignetteEffect
+    VignetteEffect,
+    ScanlineEffect
 } from "postprocessing";
 import Stats from "stats-gl";
 import "./components/menuShader/MenuShader.js";
 import {
-    GUI
-} from './jsm/libs/lil-gui.module.min.js';
-import {
     renderGoo
 } from './components/goo/Goo.js';
-//
-//
+import {
+    updateEvents
+} from './components/events/events.js';
+import {recallRay} from './components/recall/recall.js'
+
 window.SELECTED_OBJECTS_FOR_BLOOM = new Selection()
 window.COMPOSER = new EffectComposer(window.RENDERER);
 window.COMPOSER.addPass(new RenderPass(window.MAIN_SCENE, window.MAIN_CAMERA));
-
-//const globalBloom = new EffectPass(window.MAIN_CAMERA, new BloomEffect());
-//window.COMPOSER.addPass(globalBloom);
 
 const toneMappingEffect = new ToneMappingEffect({
     mode: ToneMappingMode.ACES_FILMIC,
@@ -107,91 +88,32 @@ const selectiveBloom = new SelectiveBloomEffect(window.MAIN_SCENE, window.MAIN_C
 
 selectiveBloom.selection = window.SELECTED_OBJECTS_FOR_BLOOM;
 
-console.log(selectiveBloom)
-
 const smaaEffect = new SMAAEffect(
     EdgeDetectionMode.DEPTH
 );
 
 smaaEffect.edgeDetectionMaterial.setEdgeDetectionThreshold(0.01);
-
-//
-
-const normalPass = new NormalPass(window.MAIN_SCENE, window.MAIN_CAMERA);
-const depthDownsamplingPass = new DepthDownsamplingPass({
-    normalBuffer: normalPass.texture,
-    resolutionScale: 0.5
-});
-
-const capabilities = window.RENDERER.capabilities;
-
-const normalDepthBuffer = capabilities.isWebGL2 ?
-    depthDownsamplingPass.texture : null;
-
-// Note: Thresholds and falloff correspond to camera near/far.
-// Example: worldDistance = distanceThreshold * (camera.far - camera.near)
-const ssaoEffect = new SSAOEffect(window.MAIN_CAMERA, normalPass.texture, {
-    blendFunction: BlendFunction.MULTIPLY,
-    distanceScaling: true,
-    depthAwareUpsampling: true,
-    normalDepthBuffer,
-    samples: 9,
-    rings: 7,
-    distanceThreshold: 0.005, // Render up to a distance of ~20 world units
-    distanceFalloff: 0.0025, // with an additional ~2.5 units of falloff.
-    rangeThreshold: 0.0003, // Occlusion proximity of ~0.3 world units
-    rangeFalloff: 0.0001, // with ~0.1 units of falloff.
-    luminanceInfluence: 0.7,
-    minRadiusScale: 0.33,
-    radius: 0.1,
-    intensity: 1.33,
-    bias: 0.025,
-    fade: 0.01,
-    color: null,
-    resolutionScale: 0.5
-});
-
-//
 var effectPass;
 
-const noiseEffect = new NoiseEffect({
-    premultiply: false
-});
-const gridEffect = new GridEffect({
-    scale: 1.6
-});
-
-console.log(gridEffect)
-console.log(noiseEffect)
-
-noiseEffect.blendMode.opacity.value = 0.7;
-noiseEffect.blendMode.blendFunction = BlendFunction.REFLECT;
-
 window.sepiaEffect = new SepiaEffect();
-//window.sepiaEffect.blendMode.opacity = 0;
-//window.sepiaEffect.setIntensity(0);
 window.sepiaEffect.intensity = 0;
-console.log(window.sepiaEffect)
+
+window.scanEffect = new ScanlineEffect();
+console.log(window.scanEffect)
 
 window.vig = new VignetteEffect({
     darkness: 0
 });
 
-console.log(window.vig)
-
-if (window.mobile) {
+if (window.mobile)
     effectPass = new EffectPass(window.MAIN_CAMERA, toneMappingEffect, smaaEffect, selectiveBloom); //selectiveBloom
-} else {
-    effectPass = new EffectPass(window.MAIN_CAMERA, toneMappingEffect, smaaEffect, window.vig, selectiveBloom, window.sepiaEffect); //selectiveBloom
-}
-
-console.log(effectPass)
+else
+    effectPass = new EffectPass(window.MAIN_CAMERA, toneMappingEffect, smaaEffect, window.vig, selectiveBloom,
+        window.sepiaEffect); //selectiveBloom
 
 //this.effect = toneMappingEffect;
 window.COMPOSER.addPass(effectPass);
 //VARIABLES
-const clickMouse = new THREE.Vector2(); // create once
-var mouse = new THREE.Vector2();
 var raycaster = new THREE.Raycaster();
 let pmremGenerator, currentRenderTarget;
 let timeTarget = 0;
@@ -199,8 +121,8 @@ var justClicked = false;
 window.buttonLeft = false;
 //
 window.CONTROLS = new OrbitControls(window.MAIN_CAMERA, window.RENDERER.domElement);
-window.CONTROLS.minDistance = 5;
-window.CONTROLS.maxDistance = 100;
+window.CONTROLS.minDistance = 0;
+//window.CONTROLS.maxDistance = 100;
 window.CONTROLS.enablePan = true;
 //
 // create a new Stats object
@@ -245,7 +167,7 @@ function init() {
     window.ROOM.name = "ROOM";
     window.ITEMS_ADDED.name = "ITEMS";
     window.CUBES.name = "CUBES";
-    window.MAIN_SCENE.add(window.ROOM);
+    //window.MAIN_SCENE.add(window.ROOM);
     window.MAIN_SCENE.add(window.ITEMS_ADDED);
     window.ROOM.add(window.CUBES);
     window.MAIN_SCENE.add(window.ITEM_CUBE);
@@ -395,9 +317,7 @@ function raycastManager(event, type) {
                 window.SELECTED_SIDE = window.planeUserData[instanceId].side;
                 raycastSelected(intersection[0], event, type)
                 //}
-
             }
-
 
             if (type == "up") {
                 if (intersection.length > 0)
@@ -443,40 +363,57 @@ const cannonDebugger = new CannonDebugger(window.MAIN_SCENE, window.CANNON_WORLD
 let clock = new THREE.Clock();
 let clock2 = new THREE.Clock();
 let clock3 = new THREE.Clock();
+let clock4 = new THREE.Clock();
+clock4.start();
 let delta = 0;
 let delta2 = 0;
 window.interval = 1 / window.fps;
 
-console.log(window.STATS);
-
 function animate(time) {
-
-
-    if (window.skybox) {
-        //window.skybox.radius = 20;
-        //window.skybox.height = 440;
-    }
-
-    renderGoo();
 
     if (!window.FPS) {
         window.STATS.begin();
-        //window.tuniform.iTime.value += clock.getDelta();
-        window.RENDERER.render(window.MAIN_SCENE, window.MAIN_CAMERA)
+        window.RENDERER.render(window.MAIN_SCENE, window.MAIN_CAMERA);
         window.STATS.end();
     } else if (!window.paused) {
 
         delta += clock.getDelta();
 
-        if (window.fpsUnlocked) {
-            render(time);
-        } else {
-            if (delta > window.interval) {
-                // The draw or time dependent code are here
+        if (!window.stopTime) {
+            if (window.fpsUnlocked) {
                 render(time);
-                delta = delta % window.interval;
+            } else {
+                if (delta > window.interval) {
+                    // The draw or time dependent code are here
+                    render(time);
+                    delta = delta % window.interval;
+                }
             }
+        } else {
+
+            animatePortal()
+            recallRay()
+
+            window.RENDERER.setRenderTarget(window.fbo);
+            window.RENDERER.clearColor();
+            window.RENDERER.clearDepth();
+
+            const deltaTime = clock4.getDelta();
+            const ellapseTime = clock4.getElapsedTime();
+
+            window.RENDERER.render(window.MAIN_SCENE, window.MAIN_CAMERA);
+
+            window["TTT"](deltaTime, ellapseTime);
+
+            window.RENDERER.setRenderTarget(null);
+            window.RENDERER.clearColor();
+            window.RENDERER.clearDepth();
+            window.RENDERER.render(window.scene2, window.MAIN_CAMERA);
+
+            //window.COMPOSER.render();
+            //window.STATS.end();
         }
+
 
         delta2 += clock3.getDelta();
 
@@ -494,7 +431,7 @@ function fixedUpdate() { //60 fps always for physics
     const deltaTime = clock2.getDelta();
     updatePlayer(deltaTime);
 
-    if (Date.now() >= timeTarget) {
+    if (Date.now() >= timeTarget && !window.stopTime) {
 
         const timeStep = (1 / 60); //window.fps
         window.CANNON_WORLD.step(timeStep)
@@ -506,14 +443,22 @@ function fixedUpdate() { //60 fps always for physics
 }
 
 const STEPS_PER_FRAME = 1;
+window.stopTime = false;
 
 function render(time) {
 
     window.STATS.begin();
-    animatePortal();
+
+    if(!bl){
+        animatePortal(); 
+        bla();
+    }
+    
     updateRay();
     animateShader();
     //itemUpdate();
+    renderGoo();
+    updateEvents();
     TWEEN.update();
 
     if (window.initLevel) {
@@ -537,27 +482,21 @@ function render(time) {
             window.CURRENT_INSTANCED.instanceMatrix.needsUpdate = true;
             window.CURRENT_INSTANCED.computeBoundingSphere();
 
-
             if (recordingPosition && !window.CURRENT_ITEM.body.recall) {
-                //console.log("oooooooooooooo")
-                //if (!window.CURRENT_ITEM.body.sleeping) {
-                    window.CURRENT_ITEM.body.arrayPos.push(item.position.clone())
-                    window.CURRENT_ITEM.body.arrayRot.push(item.quaternion.clone())
-                    //console.log("iiiiiiiiiii")
-                //}
+                window.CURRENT_ITEM.body.arrayPos.push(item.position.clone())
+                window.CURRENT_ITEM.body.arrayRot.push(item.quaternion.clone())
             }
         }
 
         //SYNC OBJECTS WITH THE PHYSICAL WORLD
 
-        //
-        for (let d of window.dynamicObjects) {
+        /*for (let d of window.dynamicObjects) {
             if (d.inTractor) {
-                //d.position.y = d.inTractorPositionY;
+                d.position.y = d.inTractorPositionY;
             } else if (d.inTractorClone) {
-                //d.position.y = d.inTractorPositionYClone;
+                d.position.y = d.inTractorPositionYClone;
             }
-        }
+        }*/
 
         for (const property in window.DYMANIC_ITEMS) {
 
@@ -583,17 +522,15 @@ function render(time) {
                     item.position.copy(window.DYMANIC_ITEMS[property][i].body.position);
                     item.quaternion.copy(window.DYMANIC_ITEMS[property][i].body.quaternion);
 
-                    if (recordingPosition && !window.DYMANIC_ITEMS[property][i].body.recall) {
-                        if (!window.DYMANIC_ITEMS[property][i].body.sleeping) {
-                            window.DYMANIC_ITEMS[property][i].body.arrayPos.push(item.position.clone())
-                            window.DYMANIC_ITEMS[property][i].body.arrayRot.push(item.quaternion.clone())
-                            //console.log("iiiiiiiiiii")
+                    if (window.DYMANIC_ITEMS[property][i].body.arrayPos) {
+                        if (recordingPosition && !window.DYMANIC_ITEMS[property][i].body.recall) {
+                            if (!window.DYMANIC_ITEMS[property][i].body.sleeping || window.DYMANIC_ITEMS[property][i].body.inTractor) {
+                                window.DYMANIC_ITEMS[property][i].body.arrayPos.push(item.position.clone())
+                                window.DYMANIC_ITEMS[property][i].body.arrayRot.push(item.quaternion.clone())
+                            }
                         }
                     }
 
-                    if (window.DYMANIC_ITEMS[property][i].body.recall) {
-                        //console.log(item.quaternion)
-                    }
 
                     item.updateMatrix();
                     instanced.setMatrixAt(i, item.matrix)
@@ -627,8 +564,29 @@ function render(time) {
     if (window.debugCol)
         cannonDebugger.update();
 
+    // finally, render to screen
+    window.RENDERER.setRenderTarget(currentRenderTarget);
+    window.RENDERER.localClippingEnabled = false
+    window.RENDERER.clippingPlanes = []
+    //window.RENDERER.render(window.MAIN_SCENE, window.MAIN_CAMERA);
     window.COMPOSER.render();
+
     window.STATS.end();
+}
+
+function tweenCamera(duration, ini, final) {
+    new TWEEN.Tween(ini).to(final, duration)
+        //.easing(TWEEN.Easing.Quadratic.Out)
+        .start();
+}
+
+var bl = false;
+
+function bla(){
+    bl = true;
+    setTimeout(() => {
+        bl = false;
+    }, 15);
 }
 
 var recordingPosition = true;
@@ -640,28 +598,16 @@ function animatePortal() {
     currentRenderTarget = window.RENDERER.getRenderTarget();
     window.RENDERER.xr.enabled = false;
 
-    // save the original camera properties
-    /*currentRenderTarget = window.RENDERER.getRenderTarget();
-    const currentXrEnabled = window.RENDERER.xr.enabled;
-    const currentShadowAutoUpdate = window.RENDERER.shadowMap.autoUpdate;
-    window.RENDERER.xr.enabled = false; // Avoid camera modification
-    window.RENDERER.shadowMap.autoUpdate = false; // Avoid re-computing shadows
-
-    window.RENDERER.autoClear = true*/
-
     // stencil optimization - only render parts of scene multiple
     window.RENDERER.autoClear = true
-    //window.RENDERER.clear()
     // times when it is going to be viewed by the portal
     window.RENDERER.autoClearStencil = false;
-    //window.ambient.intensity = 0;
 
     window.GUN.children[0].children[0].scale.set(1, 1, 1)
     window.GUN.children[0].children[0].position.set(0.12, -0.14, -0.13);
 
     renderPortal2(0, 1)
     renderPortal2(1, 0)
-    //window.ambient.intensity = 0.15;
 
     window.RENDERER.autoClear = false;
 
@@ -679,80 +625,14 @@ function animatePortal() {
         window.PORTALS[1].mesh.visible = true
     }
 
-    // finally, render to screen
-    /*window.RENDERER.setRenderTarget(currentRenderTarget);
-    window.RENDERER.localClippingEnabled = false
-    window.RENDERER.clippingPlanes = []
-    // restore the original rendering properties
-    window.RENDERER.xr.enabled = currentXrEnabled;
     window.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
-    window.RENDERER.render(window.MAIN_SCENE, window.MAIN_CAMERA)*/
-
-    window.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
-
-    // finally, render to screen
-    //window.RENDERER.setRenderTarget(null)
-    window.RENDERER.setRenderTarget(currentRenderTarget);
-    window.RENDERER.localClippingEnabled = false
-    window.RENDERER.clippingPlanes = []
-    //window.RENDERER.render(window.MAIN_SCENE, window.MAIN_CAMERA)
-    //window.COMPOSER.render()
-
-    /*window.PORTAL_TARGETS[0].dispose();
-    window.PORTAL_TARGETS[1].dispose();
-
-    window.PORTAL_TMP_TARGETS[0].dispose();
-    window.PORTAL_TMP_TARGETS[1].dispose();*/
-
-    /*window.PORTAL_TARGETS[0].dispose();
-    window.PORTAL_TARGETS[1].dispose();
-
-    window.PORTAL_TMP_TARGETS[0].dispose();
-    window.PORTAL_TMP_TARGETS[1].dispose();
-
-
-    if(window.PORTALS[0]){
-        if(window.PORTALS[0].mesh){
-            //window.PORTALS[0].mesh.material.map.dispose();
-            window.PORTALS[0].mesh.material.dispose();
-            //window.PORTALS[0].mesh.geometry.dispose();
-        }
-        
-    }
-    
-    if(window.PORTALS[1]){
-        if(window.PORTALS[1].mesh){
-           // window.PORTALS[1].mesh.material.map.dispose();
-            window.PORTALS[1].mesh.material.dispose();
-            //window.PORTALS[1].mesh.geometry.dispose();
-        }
-        
-    }
-
-    renderer.dispose()*/
-
-    //window.RENDERER.dispose()
-
-    if (!c) {
-        c = true;
-        setTimeout(() => {
-            c = false;
-            //window.RENDERER.renderLists.dispose()
-        }, 1000);
-    }
-
-
 }
-
-var c = false;
-
 
 // Render loop
 function renderPortal2(thisIndex, pairIndex) {
 
-    if (window.PORTALS[thisIndex] === null || window.PORTALS[pairIndex] === null) {
+    if (window.PORTALS[thisIndex] === null || window.PORTALS[pairIndex] === null)
         return
-    }
 
     let portalCamera = window.MAIN_CAMERA.clone()
 
@@ -766,11 +646,6 @@ function renderPortal2(thisIndex, pairIndex) {
     window.PORTALS[thisIndex].mesh.material.uniforms.wh.value = height
     window.PORTAL_TARGETS[thisIndex].setSize(width, height)
     window.PORTAL_TMP_TARGETS[thisIndex].setSize(width, height)
-
-    //window.PORTALS[thisIndex].mesh.material.stencilWrite = true
-    //window.RENDERER.clearStencil()
-    //window.RENDERER.setRenderTarget(null)
-    //window.RENDERER.render(window.PORTALS[pairIndex].mesh, window.MAIN_CAMERA)
 
     let shouldRender = new Array(window.PORTAL_RECURSION_LEVELS + 1)
     shouldRender[0] = portalIsVisibleInCamera(window.MAIN_CAMERA, window.PORTALS[thisIndex], null)
@@ -796,7 +671,7 @@ function renderPortal2(thisIndex, pairIndex) {
             continue
         }
         // necessary so that we properly render recursion (otherwise the other portal might block)
-        window.RENDERER.clippingPlanes = [window.PORTALS[pairIndex].plane.clone()]
+        //window.RENDERER.clippingPlanes = [window.PORTALS[pairIndex].plane.clone()]
         window.RENDERER.setRenderTarget(window.PORTAL_TMP_TARGETS[thisIndex])
         window.RENDERER.render(window.MAIN_SCENE, portalCamera)
 
@@ -824,7 +699,6 @@ function renderPortal2(thisIndex, pairIndex) {
         window.PORTALS[pairIndex].visible = true
     }
 
-
     window.PORTALS[thisIndex].mesh.material.stencilWrite = false
 }
 
@@ -849,3 +723,7 @@ function portalIsVisibleInCamera(camera, portal, clippingPlane) {
         (clippingPlane === null || clippingPlane.distanceToPoint(portal.mesh.position) > 0) &&
         portal.plane.distanceToPoint(camera.position) > 0;
 }
+
+export {
+    tweenCamera
+};

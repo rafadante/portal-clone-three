@@ -49,8 +49,18 @@ function raycastSelected(found, event, type) {
     if (event.button == 2) {
         if (window.planeUserData[instanceId].itemName != "exitDoor" &&
             window.planeUserData[instanceId].itemName != "enterDoor" &&
-            window.planeUserData[instanceId].itemName != "window")
+            window.planeUserData[instanceId].itemName != "window") {
+            console.log(window.SELECTED_ID)
+
+            if (window.planeUserData[instanceId].hasItem && window.planeUserData[instanceId].itemName.includes("ramp")) {
+                $("#rotate-item").css("display", "block");
+                window.SELECTED_ID.push(instanceId);
+            } else {
+                $("#rotate-item").css("display", "none");
+            }
+
             showMenu(event.pageX, event.pageY);
+        }
     }
 }
 
@@ -61,6 +71,31 @@ function showMenu(x, y) {
     menu.style.top = y + 'px';
     menu.classList.add('menu-show');
 }
+
+$("body").on('click', '#rotate-item', function () {
+    for (var i = 0; i < window.SELECTED_ID.length; i++) {
+
+        var instanced = window.ITEMS_ADDED.getObjectByName("ramp");
+        //console.log(instanced)
+
+        console.log(window.planeUserData[window.SELECTED_ID[i]])
+        //trasnlatePlane(window.SELECTED_ID[i], 1, window.planeUserData[window.SELECTED_ID[i]].portal);
+
+        var dummy = new THREE.Object3D();
+        dummy.position.copy(window.planeUserData[window.SELECTED_ID[i]].item.position);
+        dummy.rotation.copy(window.planeUserData[window.SELECTED_ID[i]].item.rotation);
+
+        dummy.rotation.y += Math.PI / 2;
+
+        dummy.updateMatrix();
+        instanced.setMatrixAt(window.planeUserData[window.SELECTED_ID[i]].item.userData.id, dummy.matrix)
+
+        instanced.instanceMatrix.needsUpdate = true;
+        instanced.computeBoundingSphere();
+
+        window.planeUserData[window.SELECTED_ID[i]].item.rotation.copy(dummy.rotation);
+    }
+});
 
 $("body").on('click', '#delete', function () {
 

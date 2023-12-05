@@ -112,6 +112,7 @@ class Portal extends Group {
         this.mesh.matrixAutoUpdate = true;
         this.matrixAutoUpdate = true;
         this.mesh.scale.x *= 0.5;
+        this.mesh.frustumCulled = false;
         this.add(this.mesh)
 
         var portalShader;
@@ -138,6 +139,7 @@ class Portal extends Group {
         portalShader.matrixAutoUpdate = true;
         portalShader.scale.x *= 0.5;
         this.portalShader = portalShader;
+        this.portalShader.frustumCulled = false;
         this.add(portalShader)
 
 
@@ -190,68 +192,83 @@ class Portal extends Group {
         this.debugMeshes.visible = false;//globals.DEBUG
         this.add(this.debugMeshes)
     }
+}
 
-    update(timeStamp) {
-        // update parent collision groups based on bb
-    }
+// teleport a 3D object directly, returns nothing
+// Object3D includes camera, meshes
+function teleportObject3D(object, portal) {
+    let f = new THREE.Matrix4().makeScale(-1, -1, 1)
+    let m = portal.CDBB.inverse_t.clone().premultiply(f).premultiply(portal.output.CDBB.t)
+    object.applyMatrix4(m)
+}
 
-    // apply teleportation to the output portal to the vector
-    // no side effects
-    getTeleportedPositionalVector(v) {
-        let f = new THREE.Matrix4().makeScale(-1, -1, 1)
-        let m = this.CDBB.inverse_t.clone().premultiply(f).premultiply(this.output.CDBB.t)
-        let v4 = util.threeToFour(v).applyMatrix4(m)
-        return util.fourToThree(v4)
-    }
+function teleportPhysicalObject(object, portal) {
+    let f = new THREE.Matrix4().makeScale(-1, -1, 1)
+    let m = portal.CDBB.inverse_t.clone().premultiply(f).premultiply(portal.output.CDBB.t)
+    //object.mesh.applyMatrix4(m)
+    let position = cannonToThreeVector3(object.position)
+    let previousPosition = cannonToThreeVector3(object.position)
+    let velocity = cannonToThreeVector3(object.velocity)
+    let force = cannonToThreeVector3(object.force)
 
-    // for directional vectors, it doesn't make sense to translate them
-    // we only apply the rotational component of the matrix
-    getTeleportedDirectionalVector(v) {
-        let f = new THREE.Matrix4().makeScale(-1, -1, 1)
-        let it = new THREE.Matrix4()
-        it.extractRotation(this.CDBB.inverse_t)
-        let to = new THREE.Matrix4()
-        to.extractRotation(this.output.CDBB.t)
+    let orientation = new THREE.Quaternion().copy(object.quaternion)
+    let mquat = new THREE.Quaternion().setFromRotationMatrix(m)
+    orientation.premultiply(mquat)
 
-        let m = it.clone().premultiply(f).premultiply(to)
-        let v4 = util.threeToFour(v).applyMatrix4(m)
-        return util.fourToThree(v4)
-    }
+    position = getTeleportedPositionalVector(position, portal)
+    previousPosition = getTeleportedPositionalVector(previousPosition, portal)
+    velocity = getTeleportedDirectionalVector(velocity, portal)
+    force = getTeleportedDirectionalVector(force, portal)
 
-    // teleport a 3D object directly, returns nothing
-    // Object3D includes camera, meshes
-    teleportObject3D(object) {
-        let f = new THREE.Matrix4().makeScale(-1, -1, 1)
-        let m = this.CDBB.inverse_t.clone().premultiply(f).premultiply(this.output.CDBB.t)
-        object.applyMatrix4(m)
-    }
+    object.position.copy(position)
+    object.previousPosition.copy(previousPosition)
+    object.velocity.copy(velocity)
+    object.force.copy(force)
+    object.quaternion.copy(orientation)
+}
 
-    teleportPhysicalObject(object) {
-        let f = new THREE.Matrix4().makeScale(-1, -1, 1)
-        let m = this.CDBB.inverse_t.clone().premultiply(f).premultiply(this.output.CDBB.t)
-        object.mesh.applyMatrix4(m)
-        let position = util.cannonToThreeVector3(object.physicsBody.position)
-        let previousPosition = util.cannonToThreeVector3(object.physicsBody.position)
-        let velocity = util.cannonToThreeVector3(object.physicsBody.velocity)
-        let force = util.cannonToThreeVector3(object.physicsBody.force)
+function threeToCannonVector3(v3) {
+    return new CANNON.Vec3().copy(v3)
+}
 
-        let orientation = new THREE.Quaternion().copy(object.physicsBody.quaternion)
-        let mquat = new THREE.Quaternion().setFromRotationMatrix(m)
-        orientation.premultiply(mquat)
+function cannonToThreeVector3(v3) {
+    return new THREE.Vector3().copy(v3)
+}
 
-        position = this.getTeleportedPositionalVector(position)
-        previousPosition = this.getTeleportedPositionalVector(previousPosition)
-        velocity = this.getTeleportedDirectionalVector(velocity)
-        force = this.getTeleportedDirectionalVector(force)
+// apply teleportation to the output portal to the vector
+// no side effects
+function getTeleportedPositionalVector(v, portal) {
+    let f = new THREE.Matrix4().makeScale(-1, -1, 1)
+    let m = portal.CDBB.inverse_t.clone().premultiply(f).premultiply(portal.output.CDBB.t)
+    let v4 = threeToFour(v).applyMatrix4(m)
+    return fourToThree(v4)
+}
 
-        object.physicsBody.position.copy(position)
-        object.physicsBody.previousPosition.copy(previousPosition)
-        object.physicsBody.velocity.copy(velocity)
-        object.physicsBody.force.copy(force)
-        object.physicsBody.quaternion.copy(orientation)
-    }
+// for directional vectors, it doesn't make sense to translate them
+// we only apply the rotational component of the matrix
+function getTeleportedDirectionalVector(v, portal) {
+    let f = new THREE.Matrix4().makeScale(-1, -1, 1)
+    let it = new THREE.Matrix4()
+    it.extractRotation(portal.CDBB.inverse_t)
+    let to = new THREE.Matrix4()
+    to.extractRotation(portal.output.CDBB.t)
+
+    let m = it.clone().premultiply(f).premultiply(to)
+    let v4 = threeToFour(v).applyMatrix4(m)
+    return fourToThree(v4)
+}
+
+// convert vector3 to vector4
+function threeToFour(v) {
+    return new THREE.Vector4(v.x, v.y, v.z, 1)
+}
+
+function fourToThree(v) {
+    return new THREE.Vector3(v.x, v.y, v.z).multiplyScalar(1 / v.w)
 }
 
 export {
-    Portal
+    Portal,
+    teleportPhysicalObject,
+    teleportObject3D
 }

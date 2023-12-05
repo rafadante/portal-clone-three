@@ -25,14 +25,6 @@ function itemUpdate() { //found, event, type
         var target = new THREE.Vector3();
         window.holder.getWorldPosition(target);
 
-        //DOWN/UP
-        //none = 0;
-        //checkCollision(target, new THREE.Vector3(0, -1, 0), "y");
-        //checkCollision(target, new THREE.Vector3(0, 1, 0), "y");
-
-        //if (none == 2)
-        //    window.COL_Y = false;
-
         //FRONT
         checkCollision(target, new THREE.Vector3(0, 0, -1), "z");
 
@@ -40,19 +32,6 @@ function itemUpdate() { //found, event, type
             window.COL_Z = false;
             window.holder.position.z = -1;
         }
-
-        /*checkCollision(target, new THREE.Vector3(0, 0, 1), "z");
-
-        if (none == 2)
-            window.COL_Z = false;*/
-
-        /*//LEFT/RIGHT
-        none = 0;
-        checkCollision(target, new THREE.Vector3(-1, 0, 0), "x");
-        checkCollision(target, new THREE.Vector3(1, 0, 0), "x");
-
-        if (none == 2)
-            window.COL_X = false;*/
     }
 }
 
@@ -67,64 +46,6 @@ function checkCollision(target, dir, axis) {
     raycaster.set(window.MAIN_CAMERA.position, vector);
     raycaster.far = 1.2; // comment this line to have an infinite ray
     var intersects = raycaster.intersectObjects(window.ITEMS_ADDED);
-
-    var inter = 0;
-
-
-    /*if (intersects.length == 0) {
-        none++;
-    } else {
-        for (let i = 0; i < intersects.length; i++) {
-            if (intersects[i].object != window.CURRENT_ITEM.children[0] && intersects[i].object.visible && intersects[i].object.parent) {
-
-                inter++;
-
-                window.holder.position.z = -(intersects[i].distance - 0.3);
-
-                if (Math.abs(window.holder.position.z) < 0.88) {
-
-                    if (axis == "y") {
-                        window.COL_Y = true;
-                        window.COL_Y_POS = window.CURRENT_ITEM.position.y;
-                    } else if (axis == "z") {
-
-                        window.COL_Z = true;
-                        window.COL_Z_POS = window.CURRENT_ITEM.position.z;
-
-                        window.PLAYER.velocity.set(0, 0, 0);
-                        window.PLAYER.angularVelocity.set(0, 0, 0);
-
-                    } else if (axis == "x") {
-                        window.COL_X = true;
-                        window.COL_X_POS = window.CURRENT_ITEM.position.x;
-
-                        window.PLAYER.velocity.set(0, 0, 0);
-                        window.PLAYER.angularVelocity.set(0, 0, 0);
-                    }
-
-                    break;
-                } else {
-                    if (axis == "y")
-                        window.COL_Y = false;
-                    else if (axis == "z") {
-                        window.COL_Z = false;
-                        window.holder.position.z = -1;
-                    } else if (axis == "x")
-                        window.COL_X = false;
-                }
-            }
-        }
-
-        if (inter == 0) {
-            if (axis == "y")
-                window.COL_Y = false;
-            else if (axis == "z") {
-                window.COL_Z = false;
-                window.holder.position.z = -1;
-            } else if (axis == "x")
-                window.COL_X = false;
-        }
-    }*/
 }
 
 var itemCount = 0;
@@ -147,34 +68,6 @@ function addItem(found) {
 
             if (found[i].object.userData.connection) {
 
-                //
-
-                /*var target = new THREE.Vector3();
-                found[i].object.getWorldPosition(target)
-                //target.y -= 1;
-
-                //
-
-                let vec1 = window.startItem.position;
-                let vec2 = target;
-
-                let size = new THREE.Vector3().subVectors(vec2, vec1);
-                let center = new THREE.Vector3().addVectors(vec1, vec2).multiplyScalar(0.5);
-
-                let planeWidth = Math.abs(size.x);
-                let planeHeight = Math.abs(size.z);
-                console.log(size)
-                let planeGeom = new THREE.PlaneGeometry(planeWidth, planeHeight, planeWidth, planeHeight);
-                let planeMat = new THREE.MeshBasicMaterial({
-                    color: "aqua",
-                    wireframe: true
-                });
-                let plane = new THREE.Mesh(planeGeom, planeMat);
-                plane.position.copy(center);
-                window.MAIN_SCENE.add(plane);*/
-
-                //
-
                 const geometryCheck = new THREE.PlaneGeometry(0.5, 0.5);
                 const materialCheck = new THREE.MeshBasicMaterial({
                     color: 0xfcba03,
@@ -184,30 +77,23 @@ function addItem(found) {
                     map: window.CHECK,
                 });
                 const plane = new THREE.Mesh(geometryCheck, materialCheck);
-                //window.SELECTED_OBJECTS_FOR_BLOOM.add(plane);
                 window.MAIN_SCENE.add(plane);
 
                 var target = new THREE.Vector3();
                 found[i].object.getWorldPosition(target)
-                //plane.position.copy(target)
 
-                if (found[i].normal.x != 0) {
+                if (found[i].normal.x != 0)
                     plane.rotation.y = Math.PI / 2;
-                }
 
                 found[i].object.userData.checks++;
 
-                if (found[i].object.userData.checks < 5) {
+                if (found[i].object.userData.checks < 5)
                     plane.position.set(found[i].normal.z * 1.3 + (target.x), 1.25 - (found[i].object.userData.checks * 0.5) + (target.y), found[i].normal.x * 1.3 + (target.z))
-                } else {
+                else
                     plane.position.set(-found[i].normal.z * 1.3 + (target.x), 1.25 - ((found[i].object.userData.checks - 4) * 0.5) + (target.y), -found[i].normal.x * 1.3 + (target.z))
-                }
-
-                //
 
                 const geometry = new MeshLineGeometry()
                 const points = [];
-
                 points.push(window.startItem.position.x, window.startItem.position.y, window.startItem.position.z);
                 points.push(plane.position.x, plane.position.y, plane.position.z);
 
@@ -225,27 +111,10 @@ function addItem(found) {
                     lineWidth: 0.1,
                     repeat: new THREE.Vector2(50, 1)
                 })
+
                 const mesh = new THREE.Mesh(geometry, material)
                 mesh.raycast = raycast;
-                //window.SELECTED_OBJECTS_FOR_BLOOM.add(mesh);
                 window.MAIN_SCENE.add(mesh);
-
-                /*const points = [];
-                points.push(window.startItem.position);
-
-                var target = new THREE.Vector3();
-                found[i].object.getWorldPosition(target)
-
-                target.x -= 1;
-
-                points.push(target);
-
-                const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-                const line = new THREE.Line(geometry, materialLine);
-
-                window.SELECTED_OBJECTS_FOR_BLOOM.add(line);
-                window.MAIN_SCENE.add(line);*/
 
                 window.connecting = false;
 
@@ -259,20 +128,14 @@ function addItem(found) {
                 count = 0;
 
                 break;
-
             }
-
         } else {
 
             var userData = window.planeUserData[found[i].instanceId];
 
-            console.log(userData)
-            console.log(window.ITEM_HOLDED_NAME)
-
             if (!userData.hasItem) {
 
                 if (window.ITEM_HOLDED_NAME == "camera") {
-                    //
                     var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
 
                     item.traverse(child => {
@@ -281,9 +144,7 @@ function addItem(found) {
                         else if (child.name == "vertical")
                             window.vertical.push(child)
                     })
-
                 } else {
-                    //
                     var instanced = window.ITEMS_ADDED.getObjectByName(window.ITEM_HOLDED_NAME);
                     var item = new THREE.Object3D();
                     item.userData = instanced.userData;
@@ -304,20 +165,16 @@ function addItem(found) {
                 userData.item = item;
 
                 if (window.ITEM_HOLDED_NAME == "camera") {
-                    //
                     var target = new THREE.Vector3(); // create once an reuse it
                     found[i].object.getWorldPosition(target);
                     item.position.copy(target);
                 } else {
-                    //
                     item.position.copy(userData.position);
                 }
 
                 item.position.copy(userData.position);
                 item.renderOrder = 2;
                 item.name = window.ITEM_HOLDED_NAME + "-" + itemCount;
-
-                console.log(userData.side)
 
                 if (userData.side == "front") {
                     item.rotation.y = 0;
@@ -329,15 +186,11 @@ function addItem(found) {
                 } else if (userData.side == "left") {
                     item.rotation.y = Math.PI / 2;
                 } else if (userData.side == "down") {
-
                     if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere" || window.ITEM_HOLDED_NAME == "laser_cube")
-                        item.translateY(1);
+                        item.translateY(3);
                     else if (window.ITEM_HOLDED_NAME == "radio")
                         item.translateY(0.25);
-
-                    //item.rotation.x = -Math.PI / 2;
                 } else {
-                    //item.rotation.x = Math.PI / 2;
                 }
 
                 if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere" || window.ITEM_HOLDED_NAME == "laser_cube") {
@@ -368,10 +221,7 @@ function addItem(found) {
                             item2.translateY(j);
                             break;
                         }
-
                     }
-
-                    console.log(idInstanced)
 
                     item2.userData.id = idInstanced;
                     item2.scale.set(1, 1, 1);
@@ -381,29 +231,15 @@ function addItem(found) {
                     instanced2.computeBoundingSphere();
                 }
 
-                if (window.ITEM_HOLDED_NAME == "light_bridge") {
-                    //
+                if (window.ITEM_HOLDED_NAME == "light_bridge")
                     item.position.y += 1;
-                }
 
-                if (window.ITEM_HOLDED_NAME == "tractor_beam") {
-                    //
-
-                    //if (window.BEAM_TYPE == "orange")
-                    //   item.userData.beam = "orange";
-                    //else
+                if (window.ITEM_HOLDED_NAME == "tractor_beam")
                     item.beam = window.BEAM_TYPE;
 
-                    console.log(item)
-
-                    console.log(window.DYMANIC_ITEMS)
-                }
-
                 if (window.ITEM_HOLDED_NAME == "camera") {
-                    //
                     window.ITEMS_ADDED.add(item);
                 } else {
-                    //
                     var idInstanced;
 
                     for (var i = 0; i < window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME].length; i++) {
@@ -411,7 +247,6 @@ function addItem(found) {
                             item.laser = false;
                             window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME][i] = item;
                             idInstanced = i;
-                            console.log("oooooooooooooo")
                             break;
                         }
                     }
@@ -473,7 +308,6 @@ document.addEventListener('keydown', (event) => {
         window.MATERIAL_NON_PORTAL_EDITOR.transparent = false;
 
         count = 0;
-
     }
 })
 
@@ -499,7 +333,7 @@ $("body").on('click', '#conection', function (event) {
 
     isDrawStart = true;
     addPoint(window.SELECTED.parent.position.x, window.SELECTED.parent.position.y - 1, window.SELECTED.parent.position.z);
-    addPoint(window.SELECTED.parent.position.x, window.SELECTED.parent.position.y - 1, window.SELECTED.parent.position.z);
+    //addPoint(window.SELECTED.parent.position.x, window.SELECTED.parent.position.y - 1, window.SELECTED.parent.position.z);
 })
 
 function addPoint(x, y, z) {
@@ -543,32 +377,118 @@ function hoverItem(found) {
         return
     }
 
-    //var target = new THREE.Vector3();
-    //found[0].object.getWorldPosition(target);
-
     var userData = window.planeUserData[found[0].instanceId];
 
     window.ITEM_CUBE.position.copy(userData.position);
     window.ITEM_CUBE.visible = true;
+}
 
-    //console.log(window.ITEMS)
-    //console.log(window.ITEM_HOLDED_NAME)
+var itemHolder = null;
+var coords = new THREE.Vector3();
+var raycaster2 = new THREE.Raycaster();
 
-    /*var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
+function interactWithItem() {
+    raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
+    var intersects = raycaster2.intersectObjects(window.INTERACTIVE);
 
-    if (item.userData.wall && (userData.side == "up" || userData.side == "down"))
-        window.ITEM_CUBE.material.color = new THREE.Color(0xfc030f)
-    else if (item.userData.ground && (userData.side != "up" && userData.side != "down"))
-        window.ITEM_CUBE.material.color = new THREE.Color(0xfc030f)
-    else if (found[0].object.userData.hasItem)
-        window.ITEM_CUBE.material.color = new THREE.Color(0xfc030f)
-    else
-        window.ITEM_CUBE.material.color = new THREE.Color(0x00ff00)*/
+    if (window.HOLDING_ITEM) {
+        window.HOLDING_ITEM = false;
 
+        // Position
+        itemHolder.position.setZero();
+        itemHolder.previousPosition.setZero();
+        itemHolder.interpolatedPosition.setZero();
+        itemHolder.initPosition.setZero();
+
+        // Velocity
+        itemHolder.velocity.setZero();
+        itemHolder.initVelocity.setZero();
+        itemHolder.angularVelocity.setZero();
+        itemHolder.initAngularVelocity.setZero();
+
+        // Force
+        itemHolder.force.setZero();
+        itemHolder.torque.setZero();
+
+        // Sleep state reset
+        itemHolder.sleepState = 0;
+        itemHolder.timeLastSleepy = 0;
+        itemHolder._wakeUpAfterNarrowphase = false;
+
+        itemHolder.position.copy(window.CURRENT_ITEM.position);
+        itemHolder.quaternion.copy(window.CURRENT_ITEM.quaternion);
+
+        window.PLAYER.velocity.set(0, 0, 0);
+        window.PLAYER.angularVelocity.set(0, 0, 0);
+
+        itemHolder.gelJumping = false;
+
+        itemHolder.sleeping = false;
+        itemHolder.recall = false;
+        window.recalling = false;
+
+        window.CANNON_WORLD.addBody(itemHolder);
+
+        window.CURRENT_ITEM = null;
+        window.CURRENT_ITEM_ID = null;
+        itemHolder = null;
+        window.COL_Z = false;
+        window.holder.position.z = -1;
+    } else if (intersects.length > 0) {
+
+        if (intersects[0].object.name == "gel_gun_blue" ||
+            intersects[0].object.name == "gel_gun_orange" ||
+            intersects[0].object.name == "gel_gun_white") {
+
+            if (window.GUN_MODE == 2) {
+                for (var i = 2; i >= 0; i--) {
+                    if (!window.INK.children[i].visible) {
+
+                        window.INK.children[i].visible = true;
+                        window.INK.children[i].name = intersects[0].object.name;
+
+                        if (intersects[0].object.name == "gel_gun_blue") {
+                            window.INK.children[i].material.color = new THREE.Color(0x0000ff)
+                            window.INK_BLUE = true;
+                        } else if (intersects[0].object.name == "gel_gun_orange") {
+                            window.INK.children[i].material.color = new THREE.Color(0xffa500)
+                            window.INK_ORANGE = true;
+                        } else if (intersects[0].object.name == "gel_gun_white") {
+                            window.INK.children[i].material.color = new THREE.Color(0xffffff)
+                            window.INK_WHITE = true;
+                        }
+
+                        break;
+                    } else {
+                        if (window.INK.children[i].name == intersects[0].object.name)
+                            break;
+                    }
+                }
+            }
+        } else {
+            if (intersects[0].distance < 2) {
+                window.HOLDING_ITEM = true;
+                var instancedId = intersects[0].instanceId;
+                var name = intersects[0].object.name;
+
+                window.CURRENT_ITEM = window.DYMANIC_ITEMS[name][instancedId];
+                window.CURRENT_INSTANCED = window.ITEMS_ADDED.getObjectByName(name);
+                window.CURRENT_ITEM_ID = instancedId;
+
+                itemHolder = window.DYMANIC_ITEMS[name][instancedId].body;
+                window.CANNON_WORLD.removeBody(window.DYMANIC_ITEMS[name][instancedId].body);
+            }
+        }
+    }
+
+    window.lightningStrikeMesh.visible = window.HOLDING_ITEM;
+    window.lightningStrikeMesh2.visible = window.HOLDING_ITEM;
+    window.lightningStrikeMesh3.visible = window.HOLDING_ITEM;
 }
 
 export {
     itemUpdate,
     addItem,
-    hoverItem
+    hoverItem,
+    interactWithItem
 };

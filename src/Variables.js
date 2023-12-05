@@ -9,8 +9,8 @@ window.fps = 60;
 var pixelRatio, shadowMap, portalsRecursive, fov;
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     window.mobile = true;
-    pixelRatio = 0.5;
-    shadowMap = true;
+    pixelRatio = 0.4;
+    shadowMap = false;
     portalsRecursive = 1;
     fov = 70;
 } else {
@@ -22,7 +22,7 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
 }
 
 //
-var camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.005, 200000);
+var camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.005, 0);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 
@@ -50,13 +50,15 @@ var RENDERER = new THREE.WebGLRenderer({
     powerPreference: "high-performance",
     antialias: true,
 });
-console.log(window.devicePixelRatio)
+
 RENDERER.setPixelRatio(window.devicePixelRatio * pixelRatio);
 RENDERER.setSize(window.innerWidth, window.innerHeight);
 RENDERER.outputEncoding = THREE.sRGBEncoding;
 RENDERER.outputColorSpace = THREE.SRGBColorSpace;
 RENDERER.toneMapping = THREE.ACESFilmicToneMapping;;
-RENDERER.toneMappingExposure = 0.5;
+RENDERER.toneMappingExposure = 0.6;
+
+//RENDERER.setClearColor(0x3a3a3a, 1);
 
 RENDERER.shadowMap.enabled = shadowMap;
 RENDERER.shadowMap.type = THREE.PCFSoftShadowMap;

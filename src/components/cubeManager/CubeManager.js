@@ -239,6 +239,7 @@ function buildIniCubes(obj) {
         const geometry = new THREE.PlaneGeometry(2, 2);
 
         window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 1500);
+        window.instancedMesh.frustumCulled = false;
         window.instancedMesh.castShadow = true;
         window.instancedMesh.receiveShadow = true;
         window.instancedMesh.name = "cube-parent";

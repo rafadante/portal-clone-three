@@ -110,3 +110,39 @@ $("body").on('input', '#opacity-val-range', function () {
     $("#opacity-val-number").val($(this).val());
     $("#mobile-controls").css("opacity", $(this).val());
 })
+
+//BACK FROM EDITOR
+$("body").on('click', '#back-editor', function () {
+
+    window.STATS.container.style.display = "none";
+    window.FPS = false;
+    window.ROOM.visible = true;
+    window.GROUP_STRUCTURE.visible = false;
+    window.CONTROLS.enabled = true;
+    window.MAIN_SCENE.environment = window.ENV_MAP_FPS;
+    window.LIGHT_GROUP.visible = false;
+
+    $("#ui").css("display", "block");
+    $(".img").removeClass("image");
+    $("#mobile-controls").css("display", "none");
+
+    var bb = new THREE.Box3()
+    bb.setFromObject(window.ROOM);
+    bb.getCenter(window.CONTROLS.target);
+
+    window.CONTROLS.target.set(window.CONTROLS.target.x + 0, window.CONTROLS.target.y + 0, window.CONTROLS.target.z + 0);
+    window.MAIN_CAMERA.position.set(-4.2, 13, 22.5)
+    window.CONTROLS.update();
+    $("#blocker").css("display", "none");
+    $("#blocker").css("pointer-events", "none");
+    $("#reticle").css("display", "none");
+    window.MAIN_CAMERA.remove(window.GUN);
+
+    if (window.PORTALS.length == 1) {
+        window.MAIN_SCENE.remove(window.PORTALS[0]);
+    } else if (window.PORTALS.length == 2) {
+        window.MAIN_SCENE.remove(window.PORTALS[1]);
+        window.MAIN_SCENE.remove(window.PORTALS[0]);
+    }
+    window.PORTALS = [null, null];
+});

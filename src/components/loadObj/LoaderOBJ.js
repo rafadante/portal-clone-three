@@ -28,6 +28,10 @@ async function handleZip(path, obj) {
             var loader23 = new GLTFLoader();
             loader23.parse(file.buffer, '', function (result) {
 
+                result.scene.traverse(child => {
+                    child.frustumCulled = false;
+                })
+
                 if (obj == "loadButtonCube")
                     loadButtonCubeManager(result.scene)
                 else if (obj == "loadButtonSphere")
@@ -153,7 +157,6 @@ function loadWindowManager(scene) {
         if (child.name.includes("vidro")) {
             child.material.side = 2;
             child.material.envMap = window.ENV_MAP_FPS;
-            console.log(child)
         }
     })
 
@@ -177,9 +180,6 @@ function loadGunManager(scene) {
     window.GUN.visible = false;
 
     var newGroup = new THREE.Group();
-
-    console.log("7777777777777777777777777777777777")
-    console.log(window.GUN)
 
     window.GUN.add(newGroup);
     newGroup.add(scene);
@@ -207,7 +207,6 @@ function loadGunManager(scene) {
         if (child.name == "ink") {
             window.INK = child;
             window.INK.position.y = 0; //0.08
-            console.log(window.INK)
         } else if (child.name == "ink1") {
             child.visible = false;
             child.material = new THREE.MeshBasicMaterial();
@@ -446,6 +445,7 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity) {
     item.material.envMap = window.ENV_MAP_FPS;
     item.material.envMapIntensity = envIntensity;
     item.material.roughness = roughness;
+    item.frustumCulled = false;
 
     if (interactive) {
         window.INTERACTIVE.push(item);
@@ -513,16 +513,12 @@ function loadWindowHalfManager(scene) {
             light.position.copy(target);
             light.translateY(-1);
             scene.add(light);
-            //console.log(light)
-            //window.room_light = child;
-            //window.lightRoom = light;
         }
 
         if (child.name.includes("vidro")) {
             //child.renderOrder = -1;
             child.material.side = 2;
             child.material.envMap = window.ENV_MAP_FPS;
-            console.log(child)
         }
     })
 
@@ -744,8 +740,6 @@ function loadLightBridge() {
 }
 
 function loadLightBridgeManager(scene) {
-    console.log(scene)
-
     var item = instancedTransform(scene, "light_bridge", false, 0.2, 0.5)
     item.userData.wall = true;
     item.userData.ground = false;

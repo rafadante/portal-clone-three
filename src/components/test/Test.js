@@ -7,21 +7,38 @@ import {
 } from 'three-to-cannon';
 import {
     createLightBridges
-} from '../lightBridges/LightBridges.js'
-
+} from '../lightBridges/LightBridges.js';
+//
+window.raycastLightBridge = [];
+window.raycastTractorBeam = [];
+window.raycastLaserEmitter = [];
+window.lightBridgesClone = [];
+window.lightBridgesColliderClone = [];
+window.portalShader = [];
+window.beamLength = 0;
+window.laserLength = 0;
+//
 var cubesDefault = [];
 var totalBodies = 0;
+var meshesWallPortal = [];
+var meshesWallPortal2 = [];
+var meshesWallPortal3 = [];
+var meshesWallNonPortal = [];
+var meshesWallNonPortal2 = [];
+var meshesWallNonPortal3 = [];
+var meshesFloorPortal = [];
+var meshesFloorNonPortal = [];
+var meshesUpPortal = [];
+var meshesUpNonPortal = [];
+var id = 0;
 
 $("#arrow-menu").click(function () {
     if ($("#side-bar-left").css("left") == "0px") {
         $("#side-bar-left").css("left", "-300px");
-
         $("#arrow-menu i").addClass("fa-chevron-right")
         $("#arrow-menu i").removeClass("fa-chevron-left")
     } else {
         $("#side-bar-left").css("left", "0px");
-
-
         $("#arrow-menu i").removeClass("fa-chevron-right")
         $("#arrow-menu i").addClass("fa-chevron-left")
     }
@@ -40,7 +57,6 @@ $(".item").mouseleave(function () {
 $("body").on('click', '#view-fps', function () {
 
     window.ITEM_CUBE.visible = false;
-
     window.spotLight.intensity = 0;
     window.lightRoom.intensity = 0;
 
@@ -91,14 +107,12 @@ $("body").on('click', '#view-fps', function () {
         }
 
         window.CUBE_SELECTION_ARRAY = [];
-
         window.CONTROLS.enabled = false;
         $("#ui").css("display", "none");
         $("#reticle").css("display", "flex");
         $("#blocker").css("display", "block");
         $("#blocker").css("pointer-events", "all");
 
-        var toDelete = [];
         window.ROOM.visible = false;
 
         //------------------------------------------------------------
@@ -161,7 +175,6 @@ $("body").on('click', '#view-fps', function () {
                         sideLeft.push(window.planeUserData[i])
 
                     if (window.planeUserData[i].portal) {
-
                         if (window.planeUserData[i].side == "up") {
                             meshesFloorPortal.push(window.planeUserData[i])
                             sideUp.push(window.planeUserData[i])
@@ -177,7 +190,6 @@ $("body").on('click', '#view-fps', function () {
                                 meshesWallPortal3.push(window.planeUserData[i]);
                         }
                     } else {
-
                         if (window.planeUserData[i].side == "up") {
                             meshesFloorNonPortal.push(window.planeUserData[i])
                             sideUp.push(window.planeUserData[i])
@@ -211,24 +223,16 @@ $("body").on('click', '#view-fps', function () {
 
         window.CORRIDOR_ENTER.visible = true;
         //window.CORRIDOR_EXIT.visible = true;
-
         window.FPS = true;
-
         window.MAIN_SCENE.environment = null;
         window.LIGHT_GROUP.visible = true;
-
         window.STATS.container.style.display = "block";
-
         window.OBSERVATION_ROOM.visible = true;
         window.MAIN_SCENE.getObjectByName("window").visible = false;
-
         //--------------------------------------------------------------------------
-
         window.OBSERVATION_ROOM.position.copy(window.OBSERVATION_ROOM_IMG.position);
         window.OBSERVATION_ROOM.rotation.copy(window.OBSERVATION_ROOM_IMG.rotation);
-
         //---------------------------------------------------------
-
         var target = new THREE.Vector3(); // create once an reuse it
         window.room_light.getWorldPosition(target);
 
@@ -247,11 +251,8 @@ $("body").on('click', '#view-fps', function () {
         window.MAIN_SCENE.add(window.GUN);
         window.GUN.children[0].add(window.lightningStrikeMesh, window.lightningStrikeMesh2, window.lightningStrikeMesh3);
         window.GUN.visible = true;
-
         window.GUN_SPHERE.material = window.materialGun;
         window.GUN_CYLINDER.material = window.materialGun;
-
-        //
 
         //CORRIDOR ENTER COLLIDERS
         corridorCollider(window.CORRIDOR_ENTER, "down", 1, 0.001, 3.5, false);
@@ -278,7 +279,6 @@ $("body").on('click', '#view-fps', function () {
         window.MAIN_CAMERA.rotation.z = 0;
 
         //
-
         createInstances(meshesWallPortal, window.materialWallPortal)
         createInstances(meshesWallPortal2, window.materialWallPortal2)
         createInstances(meshesWallPortal3, window.materialWallPortal3)
@@ -296,9 +296,8 @@ $("body").on('click', '#view-fps', function () {
         window.RENDERER.renderLists.dispose();
         window.ENTER_DOOR.children[1].visible = false;
 
-        //
         addColliderItem(window.DYMANIC_ITEMS['cube'], "cube", 5)
-        addColliderItem(window.DYMANIC_ITEMS['sphere'], "sphere", 5)
+        addColliderItem(window.DYMANIC_ITEMS["sphere"], "sphere", 5)
         addColliderItem(window.DYMANIC_ITEMS['gel_gun_blue'], "gel_gun_blue", 0)
         addColliderItem(window.DYMANIC_ITEMS['gel_gun_orange'], "gel_gun_orange", 0)
         addColliderItem(window.DYMANIC_ITEMS['gel_gun_white'], "gel_gun_white", 0)
@@ -322,44 +321,51 @@ $("body").on('click', '#view-fps', function () {
         //addColliderItem(window.DYMANIC_ITEMS['dispenser'], "dispenser", 0, 4)
 
         addColliderItem(window.DYMANIC_ITEMS['stairs'], "stairs", 0)
+        addColliderItem(window.DYMANIC_ITEMS['laser_cube'], "laser_cube", 5)
 
-        //
+        /*var items = Object.keys(window.DYMANIC_ITEMS);
+        console.log(items)
+
+        for (var i = 0; i < items.length; i++) {
+            
+            if (items[i] == "radio") {
+                addColliderItem(window.DYMANIC_ITEMS[items[i]], items[i], 1)
+            } else if (items[i] == "cube" || items[i] == "sphere") {
+                console.log(items[i])
+                //console.log(window.DYMANIC_ITEMS[items[i]])
+                addColliderItem(window.DYMANIC_ITEMS[items[i].toString()], items[i].toString(), 5)
+           } else if (items[i] == "button_box" || items[i] == "button_circle" || items[i] == "laser_cube") {
+                for (var j = 1; j < 5; j++)
+                    addColliderItem(window.DYMANIC_ITEMS[items[i]], items[i], 0, j)
+            } else
+                addColliderItem(window.DYMANIC_ITEMS[items[i]], items[i], 0)
+        }*/
+
         createLightBridges('light_bridge', window.raycastLightBridge);
         createLightBridges("tractor_beam", window.raycastTractorBeam);
         createLightBridges("laser_emitter", window.raycastLaserEmitter);
-
-
-        window.beamLength = 0;
 
         for (var s = 0; s < window.DYMANIC_ITEMS["tractor_beam"].length; s++) {
             if (window.DYMANIC_ITEMS["tractor_beam"][s].length != 0)
                 window.beamLength++
         }
 
-        window.laserLength = 0;
-
         for (var s = 0; s < window.DYMANIC_ITEMS["laser_emitter"].length; s++) {
             if (window.DYMANIC_ITEMS["laser_emitter"][s].length != 0)
                 window.laserLength++
         }
 
-        console.log("Oooooooooooooooo")
-        console.log(window.DYMANIC_ITEMS['laser_cube'])
-        console.log(window.INTERACTIVE)
+        //window["POST"]();
 
-        addColliderItem(window.DYMANIC_ITEMS['laser_cube'], "laser_cube", 5)
+        
+        //window.ITEMS_ADDED.getObjectByName("ramp").material = window.materialFloorPortal;
+
+        
+        window.MAIN_SCENE.traverse(child => {
+            child.frustumCulled = false;
+        })
     }, 500);
 });
-
-window.raycastLightBridge = [];
-window.raycastTractorBeam = [];
-window.raycastLaserEmitter = [];
-
-window.lightBridgesClone = [];
-window.lightBridgesColliderClone = [];
-
-window.portalShader = [];
-
 
 function addColliderItem(items, type, mass, offset) {
 
@@ -368,9 +374,7 @@ function addColliderItem(items, type, mass, offset) {
     PHYSICS_MATERIAL.restitution = 0; //0.1
 
     for (var i = 0; i < items.length; i++) {
-        console.log(items[i])
         if (items[i].length != 0) {
-
 
             if (type == "cube" || type == "laser_cube")
                 var shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.3, 0.3));
@@ -418,16 +422,11 @@ function addColliderItem(items, type, mass, offset) {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.7));
                 items[i].position.y += 0.77;
             } else if (type == "ramp" || type == "ramp_half" || type == "ramp_half2" || type == "stairs") {
-                //var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.7));
-                //items[i].position.y += 0.77;
-
                 const result = threeToCannon(window.ITEMS_ADDED.getObjectByName(type), {
                     type: ShapeType.HULL
                 });
                 var shape = result.shape;
-
                 PHYSICS_MATERIAL.friction = 0.3; //0.01
-                //PHYSICS_MATERIAL.restitution = 0.0; //0.1
             }
 
             var box = new CANNON.Body({
@@ -437,6 +436,7 @@ function addColliderItem(items, type, mass, offset) {
             })
 
             box.position.copy(items[i].position);
+            box.quaternion.copy(items[i].quaternion);
             box.collisionFilterGroup = window.CGROUP_DYNAMIC
             box.collisionFilterMask = window.CGROUP_ALL
             items[i].body = box;
@@ -451,24 +451,19 @@ function addColliderItem(items, type, mass, offset) {
                 box.waiting = false;
                 window.BOX_BODY.push(box);
 
-                /*box.addEventListener("sleepy",function(event){
-                    console.log("The sphere is feeling sleepy...");
-                });*/
-
                 box.arrayPos = [];
                 box.arrayRot = [];
                 box.recall = false;
-
                 box.name = type;
 
                 box.addEventListener("sleep", function (event) {
-                    console.log("The sphere fell asleep!");
+                    //console.log("The sphere fell asleep!");
                     box.sleeping = true;
-                    console.log(box)
+                    //console.log(box)
                 });
 
                 box.addEventListener('wakeup', (event) => {
-                    console.log('The sphere woke up!')
+                    //console.log('The sphere woke up!')
                     box.sleeping = false;
                 })
             } else {
@@ -481,7 +476,6 @@ function addColliderItem(items, type, mass, offset) {
 function colliderRoom(array, side, a1, a2, a3, a4) {
 
     //GROUP COLUMNS
-
     var colums = [];
 
     for (var i = 0; i < array.length; i++) {
@@ -490,29 +484,21 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
         var row = [];
 
         for (var j = 0; j < array.length; j++) {
-
             if (!array[j].checked) {
-
                 if (array[j].position[a1] == z) {
-
                     array[j].position.checked = false;
                     array[j].position.i = array[j].id_instanced;
                     row.push(array[j].position)
                     array[j].checked = true;
-
                 }
-
             }
-
         }
 
-        if (row.length > 0) {
+        if (row.length > 0)
             colums.push(row.sort((a, b) => a[a2] - b[a2]))
-        }
     }
 
     //TRANSFORM COLUM ARRAY IN A MATRIX
-
     var columsNew = [];
 
     for (var i = 0; i < colums.length; i++) {
@@ -525,37 +511,23 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
             var row = [];
 
             for (var c = 0; c < colums[i].length; c++) {
-
                 if (!colums[i][c].checked) {
-
                     if (colums[i][c][a3] == y) { //&& ((colums[i][c].x - 2) == row[row.length - 1].x)
-
                         if (row.length > 0) {
-
                             if (colums[i][c][a2] - 2 == row[row.length - 1][a2]) {
-
                                 colums[i][c].checked = true;
                                 row.push(colums[i][c])
-
-                            } else {
-                                //break;
                             }
-
                         } else {
                             colums[i][c].checked = true;
                             row.push(colums[i][c])
                         }
-
-
-                    } else {
-                        //break;
                     }
                 }
             }
 
             if (row.length > 0)
                 columsNew[i].push(row);
-
         }
     }
 
@@ -573,7 +545,6 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
                 shapeDimension = new CANNON.Vec3(0.01, 1, columsNew[i][j].length)
 
             var shape = new CANNON.Box(shapeDimension);
-
             var box = new CANNON.Body({
                 mass: 0,
                 shape: shape,
@@ -584,50 +555,20 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
             obj.position.copy(new THREE.Vector3(columsNew[i][j][0].x,
                 columsNew[i][j][0].y,
                 columsNew[i][j][0].z));
-            //obj.translateZ(0.05);
 
             box.position.copy(obj.position);
-
             box.position[a4] += columsNew[i][j].length - 1;
-
             box.collisionFilterGroup = window.CGROUP_ENVIRONMENT
             box.collisionFilterMask = window.CGROUP_DYNAMIC
 
-            for (var c = 0; c < columsNew[i][j].length; c++) {
+            for (var c = 0; c < columsNew[i][j].length; c++)
                 window.planeUserData[columsNew[i][j][c].i].body = box;
-            }
 
             window.CANNON_WORLD.addBody(box);
             totalBodies++;
-
         }
-
     }
-
 }
-
-function getPlaneByName(array, name) {
-    return array.filter(
-        function (data) {
-            return data.name == name
-        }
-    );
-}
-
-var meshesWallPortal = [];
-var meshesWallPortal2 = [];
-var meshesWallPortal3 = [];
-
-var meshesWallNonPortal = [];
-var meshesWallNonPortal2 = [];
-var meshesWallNonPortal3 = [];
-
-var meshesFloorPortal = [];
-var meshesFloorNonPortal = [];
-var meshesUpPortal = [];
-var meshesUpNonPortal = [];
-
-var id = 0;
 
 function createInstances(meshes, material) {
 
@@ -639,6 +580,7 @@ function createInstances(meshes, material) {
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     mesh.name = "Instanced-" + id;
+    mesh.frustumCulled = false;
     window.MAIN_SCENE.add(mesh);
     id++;
 
@@ -679,10 +621,8 @@ function corridorCollider(parent, name, x, y, z, state) {
     parent.getObjectByName(name).getWorldQuaternion(quat)
 
     wall.quaternion.copy(quat);
-
     wall.collisionFilterGroup = window.CGROUP_ENVIRONMENT
     wall.collisionFilterMask = window.CGROUP_DYNAMIC
-
     window.CANNON_WORLD.addBody(wall);
 
     if (name == "front" && parent == window.CORRIDOR_ENTER)
@@ -690,39 +630,3 @@ function corridorCollider(parent, name, x, y, z, state) {
     else if (name == "front" && parent == window.CORRIDOR_EXIT)
         window.wallCorridorExit = wall;
 }
-
-$("body").on('click', '#back-editor', function () {
-
-    window.STATS.container.style.display = "none";
-
-    window.FPS = false;
-    window.ROOM.visible = true;
-    window.GROUP_STRUCTURE.visible = false;
-    window.CONTROLS.enabled = true;
-    window.MAIN_SCENE.environment = window.ENV_MAP_FPS;
-    window.LIGHT_GROUP.visible = false;
-
-    $("#ui").css("display", "block");
-    $(".img").removeClass("image");
-    $("#mobile-controls").css("display", "none");
-
-    var bb = new THREE.Box3()
-    bb.setFromObject(window.ROOM);
-    bb.getCenter(window.CONTROLS.target);
-
-    window.CONTROLS.target.set(window.CONTROLS.target.x + 0, window.CONTROLS.target.y + 0, window.CONTROLS.target.z + 0);
-    window.MAIN_CAMERA.position.set(-4.2, 13, 22.5)
-    window.CONTROLS.update();
-    $("#blocker").css("display", "none");
-    $("#blocker").css("pointer-events", "none");
-    $("#reticle").css("display", "none");
-    window.MAIN_CAMERA.remove(window.GUN);
-
-    if (window.PORTALS.length == 1) {
-        window.MAIN_SCENE.remove(window.PORTALS[0]);
-    } else if (window.PORTALS.length == 2) {
-        window.MAIN_SCENE.remove(window.PORTALS[1]);
-        window.MAIN_SCENE.remove(window.PORTALS[0]);
-    }
-    window.PORTALS = [null, null];
-});

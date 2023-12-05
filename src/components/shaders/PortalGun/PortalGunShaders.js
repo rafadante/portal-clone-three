@@ -96,8 +96,5 @@ window.materialGun = new THREE.ShaderMaterial({
     opacity: 0
 });
 
-console.log(window.uniformShaderPortalGunBallEnergy)
-
-
 const sphere = new THREE.Mesh( geometry, window.materialGun );
 //window.MAIN_SCENE.add(sphere);
