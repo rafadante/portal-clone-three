@@ -423,6 +423,13 @@ function deletePortal(portalIndex) {
 
 // creates a new portal and adds it to the scene
 function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject, playerUpDirection, portalPoints) {
+    
+    console.log(point)
+    console.log(normal)
+    console.log(hostObject)
+    console.log(playerUpDirection)
+    console.log(portalPoints)
+    
     let color = window.PORTAL_COLORS[thisPortalIndex]
 
     window.PORTALS[thisPortalIndex] = new Portal(
@@ -479,5 +486,6 @@ function getPlaneByName(name) {
 
 export {
     portalButton,
-    deletePortal
+    deletePortal,
+    newPortal
 }

@@ -11,6 +11,10 @@ import {
 import {
     animate
 } from '../../Main.js';
+import {
+    newPortal,
+    deletePortal
+} from '../portal/CreatePortal.js';
 //
 window.raycastLightBridge = [];
 window.raycastTractorBeam = [];
@@ -361,6 +365,22 @@ function viewFPS() {
                 console.log(rectLight)
             }
         }
+
+        var vec = new THREE.Vector3(0,0,0);
+        var obj = new THREE.Object3D();
+
+        setTimeout(() => {
+            newPortal(0, 1, new THREE.Vector3(3,1,0), new THREE.Vector3(0,0,1), obj, new THREE.Vector3(0,1,0), vec)
+            newPortal(1, 0, new THREE.Vector3(5.6,1,0), new THREE.Vector3(0,0,1), obj, new THREE.Vector3(0,1,0), vec)
+            setTimeout(() => {
+                deletePortal(0);
+                deletePortal(1);
+            }, 1000);
+        }, 1000);
+
+
+
+
     }, 500);
 };
 
@@ -382,7 +402,7 @@ function addColliderItem(items, type, mass, offset) {
                     type: ShapeType.BOX
                 });
                 var shape = result.shape;
-            
+
 
                 var vec = new THREE.Vector3();
                 items[i].children[1].getWorldPosition(vec)
