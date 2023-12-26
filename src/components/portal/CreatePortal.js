@@ -1,7 +1,7 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import {
     TWEEN
-} from '../../jsm/Tween.js';
+} from '../../Tween.js';
 import {
     createLightBridgesFromPortal
 } from '../lightBridges/LightBridges.js';
@@ -12,8 +12,11 @@ import {
     Portal
 } from '../portal/Portal.js';
 import * as CANNON from 'cannon';
+import {
+    MeshBVH
+} from 'three-mesh-bvh';
 
-var gels = 0;
+window.gels = 0;
 var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
 
@@ -51,8 +54,8 @@ function portalButton(button) {
                 }
 
                 var gel = new THREE.Object3D();
-                gel.renderOrder = gels;
-                gels++;
+                gel.renderOrder = window.gels;
+                window.gels++;
                 gel.scale.set(1, 1, 1);
                 gel.position.copy(intersects[0].point);
 
@@ -398,6 +401,11 @@ function portalButton(button) {
 
 // deletes the portal with index portalIndex from the scene
 function deletePortal(portalIndex) {
+
+    if (window.PORTALS[portalIndex] === null) {
+        return;
+    }
+
     window.PORTALS[portalIndex].mesh.geometry.dispose();
     window.PORTALS[portalIndex].mesh.material.dispose();
     if (window.PORTALS[portalIndex].hostObjects !== null) {
@@ -429,6 +437,13 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
     window.PORTALS[thisPortalIndex].mesh.scale.set(0, 0, 0);
     window.PORTALS[thisPortalIndex].portalShader.scale.set(0, 0, 0);
 
+    // Build the BVH
+    window.PORTALS[thisPortalIndex].bvh = new MeshBVH(window.PORTALS[thisPortalIndex].mesh.geometry);
+
+    console.log(window.PORTALS[thisPortalIndex].bvh)
+
+    window.PORTALS[thisPortalIndex].hostObjects.portal = true;
+
     window.PORTALS[thisPortalIndex].hostObjects.collisionFilterGroup |= window.CGROUP_PORTAL_HOST_CDISABLE[thisPortalIndex]
     // remove this object from the environment group
     window.PORTALS[thisPortalIndex].hostObjects.collisionFilterGroup &= ~window.CGROUP_ENVIRONMENT
@@ -451,7 +466,7 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
     var pLocal = new THREE.Vector3(0, 0, -1);
     var pWorld = pLocal.applyMatrix4(window.MAIN_CAMERA.matrixWorld);
     var dir = pWorld.sub(window.MAIN_CAMERA.position).normalize();
-    //window.PORTALS[thisPortalIndex].position.add(dir.clone().multiplyScalar(-0.02));
+    //window.PORTALS[thisPortalIndex].position.add(dir.clone().multiplyScalar(-0.2));
 }
 
 function getPlaneByName(name) {
@@ -463,5 +478,6 @@ function getPlaneByName(name) {
 }
 
 export {
-    portalButton
+    portalButton,
+    deletePortal
 }

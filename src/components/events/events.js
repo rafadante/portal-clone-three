@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import {
     tweenCamera
 } from '../../Main.js';
@@ -6,6 +6,10 @@ import {
     teleportPhysicalObject,
     teleportObject3D
 } from '../portal/Portal.js';
+import * as CANNON from 'cannon';
+import {
+    deletePortal
+} from '../portal/CreatePortal.js';
 
 var leveEntered = false;
 var coords = new THREE.Vector3();
@@ -16,11 +20,139 @@ function updateEvents() {
     levelEnteredFunction();
     tractorBeam();
     laser();
+
+    for (let d of window.dynamicObjects) {
+
+        let pos = new THREE.Vector3(d.position.x, d.position.y, d.position.z)
+
+        if (pos.distanceTo(new THREE.Vector3(0, 0, 0)) > 100) {
+            if (!d.repawning)
+                respawn(d);
+        }
+
+        for (var j = 0; j < window.gooBoxes.length; j++) {
+
+            if (window.gooBoxes[j].containsPoint(pos)) {
+
+                if (!d.repawning) {
+
+                    if (d.name == "player")
+                        document.getElementById("death-screen").style.opacity = 1;
+
+                    respawn(d);
+                }
+            }
+        }
+
+        for (let trigger of window.TRIGGER) {
+            if (trigger && d.name != "player" && !exit && !d.placed) {
+                if (trigger.containsPoint(pos)) {
+
+
+                    var goal = window.planeUserData[trigger.id];
+                    goal.circle.material.color = new THREE.Color(0xfcba03);
+                    goal.check.material.color = new THREE.Color(0xfcba03);
+                    goal.check.material.map = window.CHECK;
+
+                    d.placed = true;
+                    d.goal = goal;
+                    //d.mass = 0;
+
+                    //
+
+                    console.log(goal)
+
+                    if (goal.trigger.itemName.includes("door")) {
+                        console.log("55555555555555")
+                        const doorLeft = goal.trigger.item.getObjectByName("door_left");
+                        const doorRight = goal.trigger.item.getObjectByName("door_right");
+
+                        var obj = goal.trigger.item.clone();
+                        obj.translateZ(-2);
+                        obj.translateY(1);
+                        window.PLAYER.spawnPosition = obj.position.clone();
+                        console.log(window.PLAYER.spawnPosition)
+
+                        setTimeout(() => {
+                            doorLeft.position.z -= 0.1;
+                            doorRight.position.z -= 0.1;
+                            window.CANNON_WORLD.removeBody(goal.trigger.item.body);
+                            tweenCamera(1000, doorLeft.position, new THREE.Vector3(doorLeft.position.x - 1, doorLeft.position.y, doorLeft.position.z))
+                            tweenCamera(1000, doorRight.position, new THREE.Vector3(doorRight.position.x + 1, doorRight.position.y, doorRight.position.z))
+
+                            deletePortal(0);
+                            deletePortal(1);
+
+
+                            /*setTimeout(() => {
+                                window.CANNON_WORLD.addBody(goal.trigger.item.body);
+                                tweenCamera(1000, doorLeft.position, new THREE.Vector3(doorLeft.position.x + 1, doorLeft.position.y, doorLeft.position.z))
+                                tweenCamera(1000, doorRight.position, new THREE.Vector3(doorRight.position.x - 1, doorRight.position.y, doorRight.position.z))
+                            }, 10000);*/
+                        }, 1000);
+
+                    } else {
+                        exit = true;
+                        setTimeout(() => {
+                            tweenCamera(500, window.exit_door_right_spinner.rotation, new THREE.Vector3(Math.PI,
+                                window.exit_door_right_spinner.rotation.y,
+                                window.exit_door_right_spinner.rotation.z))
+
+                            tweenCamera(500, window.exit_door_left_spinner.rotation, new THREE.Vector3(Math.PI,
+                                window.exit_door_left_spinner.rotation.y,
+                                window.exit_door_left_spinner.rotation.z))
+
+                            window.CORRIDOR_EXIT.visible = true;
+
+                            window.exit_door_right.position.z = -5;
+                            tweenCamera(1000, window.exit_door_right.position, new THREE.Vector3(window.exit_door_right.position.x + 60, window.exit_door_right.position.y, window.exit_door_right.position.z))
+
+                            window.exit_door_left.position.z = -5;
+                            tweenCamera(1000, window.exit_door_left.position, new THREE.Vector3(window.exit_door_right.position.x + 60, window.exit_door_left.position.y, window.exit_door_left.position.z))
+                        }, 1000);
+                    }
+                }
+            }
+        }
+    }
+}
+
+var exit = false;
+
+function respawn(d) {
+    d.repawning = true;
+    setTimeout(() => {
+
+        d.repawning = false;
+
+        // Velocity
+        d.velocity.setZero();
+        d.initVelocity.setZero();
+        d.angularVelocity.setZero();
+        d.initAngularVelocity.setZero();
+
+        // Force
+        d.force.setZero();
+        d.torque.setZero();
+
+        d.position.copy(d.spawnPosition);
+
+        if (d.name != "player") {
+            if (d.state == "once") {
+                d.mass = 0;
+            } else {
+                d.mass = 5;
+            }
+        } else {
+            document.getElementById("death-screen").style.opacity = 0;
+        }
+    }, 3000);
+
 }
 
 var yyy;
 
-function laser(){
+function laser() {
     for (var i = 0; i < window.laserEmitterRaycaster.length; i++) {
         //console.log(window.laser_cube)
         //if (window.INTERACTIVE[7]) {
@@ -94,7 +226,6 @@ function laser(){
 
                     if (!cube.laser) {
                         const plane = new THREE.Mesh(geometry, window.laserEmitter[i].material); //materialBridge
-                        window.SELECTED_OBJECTS_FOR_BLOOM.add(plane);
                         window.MAIN_SCENE.add(plane);
 
 
@@ -166,13 +297,124 @@ function laser(){
     }
 }
 
+var launch = false;
+
 function tractorBeam() {
 
     var aa = false;
+    var hh = 0;
 
     for (let d of window.dynamicObjects) {
 
-        let pos = new THREE.Vector3(d.position.x, d.position.y, d.position.z)
+        let pos = new THREE.Vector3(d.position.x, d.position.y - 1, d.position.z)
+
+        hh++;
+
+        for (var j = 0; j < window.faithBox.length; j++) {
+
+            if (window.faithBox[j].containsPoint(pos)) {
+
+                if (!launch) {
+                    launch = true;
+
+                    setTimeout(() => {
+                        launch = false;
+                    }, 50);
+
+                    console.log(j);
+
+                    var ff = window.faithBox2[j];
+
+                    tweenCamera(200, ff.rotation, new THREE.Vector3(Math.PI * 0.7, 0, 0))
+                    setTimeout(() => {
+                        tweenCamera(200, ff.rotation, new THREE.Vector3(Math.PI / 2, 0, 0))
+                    }, 200);
+
+                    console.log(d)
+
+                    //const strength = 500
+                    //const dt = 1 / 60
+
+                    //const impulse = new CANNON.Vec3(-strength * dt, 0, 0)
+                    //d.applyImpulse(impulse)
+
+                    // Velocity
+                    d.velocity.setZero();
+                    d.initVelocity.setZero();
+                    d.angularVelocity.setZero();
+                    d.initAngularVelocity.setZero();
+
+                    // Force
+                    d.force.setZero();
+                    d.torque.setZero();
+
+                    var up;
+                    var f;
+
+                    if (j == 1) {
+                        up = new THREE.Vector3(0, 1, -0.5);
+
+                        if (hh == 1)
+                            f = 3500;
+                        else
+                            f = 280; //3500
+                    } else if (j == 0) {
+
+
+                        up = new THREE.Vector3(0, 1, 0.5);
+
+                        if (hh == 1)
+                            f = 3500;
+                        else
+                            f = 280; //3500
+                    } else if (j == 2) {
+                        up = new THREE.Vector3(0.5, 1, 0);
+
+                        if (hh == 1)
+                            f = 3500 //2800;
+                        else
+                            f = 280; //3500 
+                    }
+
+
+
+                    d.applyImpulse(up.clone().multiplyScalar(f * 0.25), d.position)
+
+                    const impulse = up.clone().multiplyScalar(f * 0.25);
+
+                    // Assuming sphereBody is your Cannon.js body
+
+                    // Get the current position and velocity
+                    const initialPosition = new CANNON.Vec3().copy(new THREE.Vector3(3, 0, 7));
+                    const initialVelocity = new CANNON.Vec3().copy(d.velocity);
+
+                    // Assume force is the impulse applied over time (F = impulse / dt)
+                    const force = impulse.clone();
+                    const dt = window.CANNON_WORLD.dt; // world is your Cannon.js World object
+
+                    // Calculate acceleration (a = F / m)
+                    const acceleration = new CANNON.Vec3().copy(force).scale(1 / d.mass);
+
+                    console.log(acceleration)
+
+                    // Calculate displacement (s = ut + (1/2)at^2)
+                    const displacement = new CANNON.Vec3();
+                    displacement.copy(initialVelocity).scale(dt).vadd(acceleration.scale(0.5 * dt * dt));
+
+                    console.log(displacement)
+                    console.log(initialVelocity)
+
+                    // Calculate final position
+                    const finalPosition = new CANNON.Vec3();
+                    finalPosition.copy(initialPosition).vadd(displacement);
+
+                    console.log(finalPosition)
+                }
+                //console.log("oooooooooooooooo")
+            }
+        }
+
+        pos.y += 1;
 
         for (var j = 0; j < window.tractorBeam.length; j++) {
 
@@ -213,15 +455,17 @@ function tractorBeam() {
                         }
                     } else {
 
-                        if (d.recall) {
+                        /*if (d.recall) {
                             //console.log("kkkkkkkkkkkkkk")
                             continue;
-                        }
+                        }*/
 
-                        pos.add(vec.clone().multiplyScalar(0.02 * window.tractorBeamBoundingBox[j].side));
+                        pos.add(vec.clone().multiplyScalar(0.02)); //* window.tractorBeamBoundingBox[j].side
                         d.position.copy(pos);
                         d.angularVelocity.setZero();
                         d.velocity.setZero();
+
+
                     }
 
                 } else {
@@ -252,6 +496,65 @@ function tractorBeam() {
     }
 }
 
+
+// Function to apply impulse to follow trajectory through points
+function applyImpulseToFollowTrajectory(start, middle, end, body) {
+    // Calculate initial velocity to reach the middle point
+    const g = 9.82; // gravitational acceleration
+    const d1 = middle.y - start.y;
+    const v1 = Math.sqrt(2 * g * d1);
+
+    // Calculate the time to reach the middle point
+    const t1 = v1 / g;
+
+    // Calculate the distance to the end point from the middle point
+    const d2 = end.distanceTo(new THREE.Vector3(middle.x, middle.y, middle.z));
+
+    // Calculate the final velocity for the end point
+    const v2 = Math.sqrt(2 * g * d2);
+
+    // Calculate the total time of flight
+    const totalTime = t1 + v2 / g;
+
+    // Calculate the average velocity
+    const averageVelocity = d2 / totalTime;
+
+    // Calculate the direction vectors
+    const direction1 = new THREE.Vector3();
+    //middle.sub(start).normalize();
+    direction1.subVectors(start, middle).normalize();
+
+    const direction2 = new THREE.Vector3();
+    //end.sub(middle).normalize();
+    direction2.subVectors(middle, end).normalize();
+
+    // Calculate the total impulse needed
+    const impulseMagnitude = averageVelocity * body.mass * 5;
+    const impulse = new CANNON.Vec3();
+    impulse.x = direction1.x + direction2.x;
+    impulse.y = direction1.y - direction2.y;
+    impulse.z = direction1.z + direction2.z;
+
+
+    impulse.y *= -2;
+    impulse.z *= -1;
+    console.log(direction1)
+    console.log(direction2)
+    console.log(impulseMagnitude)
+
+    //impulse.normalize().scale(impulseMagnitude, impulse);
+
+    impulse.normalize();
+    impulse.scale(impulseMagnitude, impulse);
+
+    console.log(impulse)
+
+
+
+    // Apply the impulse to the Cannon.js body
+    body.applyImpulse(impulse, body.position);
+}
+
 function portalCollision() {
 
     if (window.PORTALS[0] === null || window.PORTALS[1] === null)
@@ -262,6 +565,7 @@ function portalCollision() {
     for (let d of window.dynamicObjects) {
 
         let pos = new THREE.Vector3(d.position.x, d.position.y, d.position.z)
+
         d.collisionFilterMask = window.CGROUP_ALL
         if (window.PORTALS[0] === null || window.PORTALS[1] === null)
             continue
@@ -275,6 +579,8 @@ function portalCollision() {
                 d.collisionFilterMask &= ~window.PORTALS[p].hostObjects.collisionFilterGroup;
                 d.inArea = true;
 
+                //console.log("0000000000000")
+
                 if (dd == 0)
                     inArea++;
             } else
@@ -282,6 +588,8 @@ function portalCollision() {
 
             // should teleport
             if (window.PORTALS[p].STBB.containsPoint(pos)) {
+
+                //console.log("1111111111")
 
                 teleportPhysicalObject(d, window.PORTALS[p])
 
@@ -343,14 +651,18 @@ function levelEnteredFunction() {
 
                         setTimeout(() => {
                             //INITIATE BOX CANNON
-                            console.log("ppppppppppp")
+
                             for (var i = 0; i < window.BOX_BODY.length; i++) {
-                                window.CANNON_WORLD.addBody(window.BOX_BODY[i])
+
+                                if (window.BOX_BODY[i].state == "open")
+                                    window.BOX_BODY[i].mass = 5;
+                                //window.CANNON_WORLD.addBody(window.BOX_BODY[i])
                             }
                             for (var i = 0; i < window.SPHERE_BODY.length; i++) {
-                                window.CANNON_WORLD.addBody(window.SPHERE_BODY[i])
+                                window.SPHERE_BODY[i].mass = 5;
+                                //window.CANNON_WORLD.addBody(window.SPHERE_BODY[i])
                             }
-                            window.initLevel = true;
+                            //window.initLevel = true;
 
                             setTimeout(() => {
                                 for (var i = 0; i < window.DISPENSER_COVERS.length; i++)
@@ -361,6 +673,8 @@ function levelEnteredFunction() {
                 }, 1000);
 
                 setTimeout(() => {
+
+
 
                     window.enter_door_right.position.z = -4;
                     tweenCamera(1000, window.enter_door_right.position, new THREE.Vector3(-65, window.enter_door_right.position.y, window.enter_door_right.position.z))

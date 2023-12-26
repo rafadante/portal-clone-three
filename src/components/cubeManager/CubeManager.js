@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import $ from 'jquery';
 
 var limit = false;
@@ -228,7 +228,7 @@ function warning() {
 
 var a = 0;
 window.planeUserData = [];
-for (var i = 0; i < 1500; i++) {
+for (var i = 0; i < 3000; i++) {
     window.planeUserData.push({})
 }
 
@@ -238,7 +238,7 @@ function buildIniCubes(obj) {
 
         const geometry = new THREE.PlaneGeometry(2, 2);
 
-        window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 1500);
+        window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 3000);
         window.instancedMesh.frustumCulled = false;
         window.instancedMesh.castShadow = true;
         window.instancedMesh.receiveShadow = true;
@@ -247,29 +247,58 @@ function buildIniCubes(obj) {
 
         var clone = new THREE.Object3D();
 
-        for (var i = 0; i < 1500; i++) {
+        for (var i = 0; i < 3000; i++) {
             clone.scale.set(0, 0, 0);
             clone.updateMatrix();
             window.instancedMesh.setMatrixAt(i, clone.matrix);
         }
 
         //GROUND
-        buildLayer(-1, -1, 0, 'x', 'z', 'y', 6, 8, "down", new THREE.Vector3(-Math.PI / 2, 0, 0));
+        buildLayer(-1, -1, 0, 'x', 'z', 'y', 6, 10, "down", new THREE.Vector3(-Math.PI / 2, 0, 0));
         //CEILING
-        buildLayer(-1, -1, 8, 'x', 'z', 'y', 6, 8, "up", new THREE.Vector3(Math.PI / 2, 0, 0));
+        buildLayer(-1, -1, 8, 'x', 'z', 'y', 6, 10, "up", new THREE.Vector3(Math.PI / 2, 0, 0));
         //WALL FRONT
-        buildLayer(-1, -1, 0, 'x', 'y', 'z', 4, 8, "front", new THREE.Vector3(0, 0, 0));
+        buildLayer(-1, -1, 0, 'x', 'y', 'z', 4, 10, "front", new THREE.Vector3(0, 0, 0));
         //WALL BACK
-        buildLayer(-1, -1, 12, 'x', 'y', 'z', 4, 8, "back", new THREE.Vector3(0, Math.PI, 0));
+        buildLayer(-1, -1, 12, 'x', 'y', 'z', 4, 10, "back", new THREE.Vector3(0, Math.PI, 0));
         //WALL RIGHT
-        buildLayer(-1, -1, 16, 'z', 'y', 'x', 4, 6, "right", new THREE.Vector3(0, -Math.PI / 2, 0));
+        buildLayer(-1, -1, 20, 'z', 'y', 'x', 4, 6, "right", new THREE.Vector3(0, -Math.PI / 2, 0));
         //WALL LEFT
         buildLayer(-1, -1, 0, 'z', 'y', 'x', 4, 6, "left", new THREE.Vector3(0, Math.PI / 2, 0));
     }
 }
 
 $("body").on('click', '#save-level', function () {
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.planeUserData));
+
+    var data = [];
+    var clone = [];
+
+    for (var i = 0; i < window.planeUserData.length; i++) {
+        if (window.planeUserData[i].item) {
+            var obj = new THREE.Object3D();
+            obj.position.copy(window.planeUserData[i].item.position);
+            obj.rotation.copy(window.planeUserData[i].item.rotation);
+            obj.planeInstancedId = window.planeUserData[i].item.planeInstancedId;
+            obj.userData = window.planeUserData[i].item.userData;
+            window.planeUserData[i].item = obj;
+        }
+
+        if (window.planeUserData[i].trigger) {
+            console.log(window.planeUserData[i]);
+            var obj = new THREE.Object3D();
+            obj.position.copy(window.planeUserData[i].trigger.position);
+            obj.rotation.copy(window.planeUserData[i].trigger.rotation);
+            obj.id_instanced = window.planeUserData[i].trigger.id_instanced;
+            // obj.userData = window.planeUserData[i].trigger.userData;
+            window.planeUserData[i].trigger = window.planeUserData[i].trigger.id_instanced;
+        }
+    }
+
+
+    data.push(window.planeUserData)
+    data.push(window.GOO_PLANES)
+
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
     var dlAnchorElem = document.createElement('a');
     dlAnchorElem.setAttribute("href", dataStr);
     dlAnchorElem.setAttribute("download", "scene.json");
@@ -277,6 +306,8 @@ $("body").on('click', '#save-level', function () {
 })
 
 function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
+
+    var yo = y;
 
     var clone = new THREE.Object3D();
 
@@ -310,8 +341,12 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
                 portal = false;
                 window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0x808080));
             } else {
-                portal = true;
-                window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0xffffff));
+                //portal = true;
+                //window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0xffffff));
+
+
+                portal = false;
+                window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0x808080));
             }
 
             var hasItem = false;
@@ -323,8 +358,8 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
             } else if (clone.position.equals(new THREE.Vector3(13, 1, 0))) {
                 hasItem = true;
                 itemName = "exitDoor";
-            } else if (clone.position.equals(new THREE.Vector3(16, 7, 7)) ||
-                clone.position.equals(new THREE.Vector3(16, 7, 5))) {
+            } else if (clone.position.equals(new THREE.Vector3(20, 7, 7)) ||
+                clone.position.equals(new THREE.Vector3(20, 7, 5))) {
                 hasItem = true;
                 itemName = "window";
             }
@@ -352,7 +387,7 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
             a++;
         }
 
-        y = -1;
+        y = yo;
     }
 
     window.RENDERER.renderLists.dispose();

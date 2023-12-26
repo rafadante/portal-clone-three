@@ -146,3 +146,25 @@ $("body").on('click', '#back-editor', function () {
     }
     window.PORTALS = [null, null];
 });
+
+$("#arrow-menu").click(function () {
+    if ($("#side-bar-left").css("left") == "0px") {
+        $("#side-bar-left").css("left", "-350px");
+        $("#arrow-menu i").addClass("fa-chevron-right")
+        $("#arrow-menu i").removeClass("fa-chevron-left")
+    } else {
+        $("#side-bar-left").css("left", "0px");
+        $("#arrow-menu i").removeClass("fa-chevron-right")
+        $("#arrow-menu i").addClass("fa-chevron-left")
+    }
+});
+
+$(".item").mouseenter(function () {
+    $("#info-box").css("opacity", 1)
+    $("#info-title").text($(this).data("title"))
+    $("#info-content").text($(this).data("content"))
+})
+
+$(".item").mouseleave(function () {
+    $("#info-box").css("opacity", 0)
+})

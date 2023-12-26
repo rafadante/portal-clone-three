@@ -1,7 +1,7 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import {
     LightningStrike
-} from '../../jsm/geometries/LightningStrike.js';
+} from '../../LightningStrike.js';
 
 const rayParams1 = {
     sourceOffset: new THREE.Vector3(),
@@ -93,15 +93,12 @@ function recreateRay() {
     }));
 
     window.lightningStrikeMesh = lightningStrikeMesh;
-    window.SELECTED_OBJECTS_FOR_BLOOM.add(lightningStrikeMesh);
     lightningStrikeMesh.visible = false;
 
     window.lightningStrikeMesh2 = lightningStrikeMesh2;
-    window.SELECTED_OBJECTS_FOR_BLOOM.add(lightningStrikeMesh2);
     lightningStrikeMesh2.visible = false;
 
     window.lightningStrikeMesh3 = lightningStrikeMesh3;
-    window.SELECTED_OBJECTS_FOR_BLOOM.add(lightningStrikeMesh3);
     lightningStrikeMesh3.visible = false;
 }
 

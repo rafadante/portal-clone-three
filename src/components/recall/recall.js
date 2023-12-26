@@ -1,7 +1,7 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import {
     TWEEN
-} from '../../jsm/Tween.js';
+} from '../../Tween.js';
 import {
     MeshLineGeometry,
     MeshLineMaterial,
@@ -111,8 +111,8 @@ function transport(item, i) {
                 value: 0
             }, 500)
             .onUpdate(() => {
-                window.sepiaEffect.intensity = aa.value;
-                window.vig.darkness = aa.value * 0.7;
+                //window.sepiaEffect.intensity = aa.value;
+                //window.vig.darkness = aa.value * 0.7;
             })
             .start();
 
@@ -195,7 +195,6 @@ function KeyZ() {
                 var cube = new THREE.Mesh(geometry, material);
                 cube.position.copy(newArray[j]);
                 cube.quaternion.copy(newArrayRot[j]);
-                window.SELECTED_OBJECTS_FOR_BLOOM.add(cube);
                 console.log(cube)
                 g.add(cube);
             }
@@ -205,7 +204,6 @@ function KeyZ() {
             var cube = new THREE.Mesh(geometry, material);
             cube.position.copy(d.arrayPos[d.arrayPos.length - 1]);
             cube.quaternion.copy(d.arrayRot[d.arrayPos.length - 1]);
-            window.SELECTED_OBJECTS_FOR_BLOOM.add(cube);
             g.add(cube);
 
             console.log(cube)
@@ -233,7 +231,6 @@ function KeyZ() {
             console.log(material2)
 
             const line = new THREE.Mesh(geometry2, material2)
-            window.SELECTED_OBJECTS_FOR_BLOOM.add(line);
             g.add(line);
 
             g.visible = false;
@@ -279,8 +276,8 @@ function KeyQ() {
                 value: 0
             }, 500)
             .onUpdate(() => {
-                window.sepiaEffect.intensity = aa.value;
-                window.vig.darkness = aa.value * 0.7;
+                //window.sepiaEffect.intensity = aa.value;
+                //window.vig.darkness = aa.value * 0.7;
             })
             .start();
     } else {
@@ -299,8 +296,8 @@ function KeyQ() {
                 value: 1
             }, 500)
             .onUpdate(() => {
-                window.sepiaEffect.intensity = aa.value;
-                window.vig.darkness = aa.value * 0.7;
+                //window.sepiaEffect.intensity = aa.value;
+                //window.vig.darkness = aa.value * 0.7;
             })
             .start();
 
@@ -377,8 +374,8 @@ function customMaterial(tex, depth) {
                     0.0, -window.PLAYER.position.z)
             },
         },
-
-        vertexShader: `#version 300 es
+        glslVersion: THREE.GLSL3,
+        vertexShader: `
         in vec2 position;
 		in vec2 uv;
 
@@ -389,7 +386,7 @@ function customMaterial(tex, depth) {
             gl_Position = vec4( position, 0.0, 1.0 );
         }`,
 
-        fragmentShader: `#version 300 es
+        fragmentShader: `
         precision mediump float;
         
         uniform mediump mat4 viewMatrix;

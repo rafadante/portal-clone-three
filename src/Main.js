@@ -2,16 +2,16 @@ import $ from 'jquery';
 import "./Variables.js";
 import "./components/ui/UI.js";
 import * as physics from './Physics.js';
-import * as THREE from './build/three.module.js';
+import * as THREE from 'three';
 import {
     OrbitControls
-} from './jsm/controls/OrbitControls.js';
+} from 'three/addons/controls/OrbitControls.js';
 import {
     RGBELoader
-} from './jsm/loaders/RGBELoader.js';
+} from 'three/addons/loaders/RGBELoader.js';
 import {
     TWEEN
-} from './jsm/Tween.js';
+} from './Tween.js';
 import {
     Lights
 } from './components/lights/Lights.js';
@@ -41,20 +41,6 @@ import {
     addItem,
     hoverItem
 } from './components/items/Items.js';
-import {
-    EffectComposer,
-    EffectPass,
-    RenderPass,
-    Selection,
-    EdgeDetectionMode,
-    SMAAEffect,
-    ToneMappingEffect,
-    ToneMappingMode,
-    SelectiveBloomEffect,
-    SepiaEffect,
-    VignetteEffect,
-    ScanlineEffect
-} from "postprocessing";
 import Stats from "stats-gl";
 import "./components/menuShader/MenuShader.js";
 import {
@@ -63,56 +49,16 @@ import {
 import {
     updateEvents
 } from './components/events/events.js';
-import {recallRay} from './components/recall/recall.js'
+import {
+    recallRay
+} from './components/recall/recall.js';
+import {
+    loadMaterials
+} from "./components/materials/Materials.js";
+import {
+    RoomEnvironment
+} from 'three/addons/environments/RoomEnvironment.js';
 
-window.SELECTED_OBJECTS_FOR_BLOOM = new Selection()
-window.COMPOSER = new EffectComposer(window.RENDERER);
-window.COMPOSER.addPass(new RenderPass(window.MAIN_SCENE, window.MAIN_CAMERA));
-
-const toneMappingEffect = new ToneMappingEffect({
-    mode: ToneMappingMode.ACES_FILMIC,
-    resolution: 256,
-    whitePoint: 16.0,
-    middleGrey: 0.6,
-    minLuminance: 0.01,
-    averageLuminance: 0.01,
-    adaptationRate: 1.0
-});
-
-const selectiveBloom = new SelectiveBloomEffect(window.MAIN_SCENE, window.MAIN_CAMERA, {
-    intensity: 1,
-    luminanceThreshold: 0.3,
-    //mipmapBlur: true,
-    radius: 0.0
-})
-
-selectiveBloom.selection = window.SELECTED_OBJECTS_FOR_BLOOM;
-
-const smaaEffect = new SMAAEffect(
-    EdgeDetectionMode.DEPTH
-);
-
-smaaEffect.edgeDetectionMaterial.setEdgeDetectionThreshold(0.01);
-var effectPass;
-
-window.sepiaEffect = new SepiaEffect();
-window.sepiaEffect.intensity = 0;
-
-window.scanEffect = new ScanlineEffect();
-console.log(window.scanEffect)
-
-window.vig = new VignetteEffect({
-    darkness: 0
-});
-
-if (window.mobile)
-    effectPass = new EffectPass(window.MAIN_CAMERA, toneMappingEffect, smaaEffect, selectiveBloom); //selectiveBloom
-else
-    effectPass = new EffectPass(window.MAIN_CAMERA, toneMappingEffect, smaaEffect, window.vig, selectiveBloom,
-        window.sepiaEffect); //selectiveBloom
-
-//this.effect = toneMappingEffect;
-window.COMPOSER.addPass(effectPass);
 //VARIABLES
 var raycaster = new THREE.Raycaster();
 let pmremGenerator, currentRenderTarget;
@@ -124,6 +70,10 @@ window.CONTROLS = new OrbitControls(window.MAIN_CAMERA, window.RENDERER.domEleme
 window.CONTROLS.minDistance = 0;
 //window.CONTROLS.maxDistance = 100;
 window.CONTROLS.enablePan = true;
+window.CONTROLS.addEventListener('change', function () {
+    if (!window.FPS)
+        animate();
+});
 //
 // create a new Stats object
 let mainContainer = document.createElement('div');
@@ -155,19 +105,22 @@ window.connecting = false;
 
 document.getElementById("container").appendChild(window.RENDERER.domElement);
 
-init();
-$("body").on('click', '#option-community-build', function () { //#option-single-load
+//init();
+$("body").on('click', '#option-community-build, #option-single-load', function () { //
     setTimeout(() => {
         init();
     }, 2000);
 });
+//
+window.HOLDER = new THREE.Object3D();
+window.MAIN_SCENE.add(window.HOLDER);
 //
 function init() {
     // SCENE
     window.ROOM.name = "ROOM";
     window.ITEMS_ADDED.name = "ITEMS";
     window.CUBES.name = "CUBES";
-    //window.MAIN_SCENE.add(window.ROOM);
+    window.MAIN_SCENE.add(window.ROOM);
     window.MAIN_SCENE.add(window.ITEMS_ADDED);
     window.ROOM.add(window.CUBES);
     window.MAIN_SCENE.add(window.ITEM_CUBE);
@@ -184,41 +137,53 @@ function init() {
     window.MAIN_SCENE.add(window.LIGHT_GROUP);
     //HDR
     pmremGenerator = new THREE.PMREMGenerator(window.RENDERER);
-    pmremGenerator.compileEquirectangularShader();
+    //pmremGenerator.compileEquirectangularShader();
 
-    new RGBELoader()
-        .setPath('./assets/')
-        .load("hdr/photo_studio_01_1k.hdr", function (texture2) {
-            var envMap = pmremGenerator.fromEquirectangular(texture2).texture;
-            window.ENV_MAP_FPS = envMap;
-            window.MAIN_SCENE.environment = envMap;
-            texture2.dispose();
-            pmremGenerator.dispose();
-            //
-            loadCube();
-            animate();
-            //
-            window.decalMaterial.envMap = envMap;
-            const geometryDecal = new THREE.PlaneGeometry(2, 2);
+    //new RGBELoader()
+    //    .setPath('./assets/')
+    //    .load("hdr/photo_studio_01_1k.hdr", function (texture2) {
 
-            window.instancedMeshGel = new THREE.InstancedMesh(geometryDecal.clone(), window.decalMaterial, 100);
-            //window.instancedMeshGel.rotation.x = -Math.PI/2;
-            window.instancedMeshGel.castShadow = true;
-            window.instancedMeshGel.receiveShadow = true;
-            window.instancedMeshGel.name = "gel-parent";
-            window.MAIN_SCENE.add(window.instancedMeshGel);
 
-            var clone = new THREE.Object3D();
+    //
+    const environment = new RoomEnvironment(window.RENDERER);
 
-            for (var i = 0; i < 100; i++) {
-                clone.scale.set(0, 0, 0);
-                clone.rotation.x = -Math.PI / 2;
-                clone.updateMatrix();
-                window.instancedMeshGel.setMatrixAt(i, clone.matrix);
 
-                window.GELS.push(false);
-            }
-        })
+
+    var envMap = pmremGenerator.fromScene(environment).texture;
+    window.MAIN_SCENE.environment = envMap
+    window.ENV_MAP_FPS = envMap;
+
+    //
+
+    envMap.dispose();
+    pmremGenerator.dispose();
+    //
+    loadCube();
+    //
+    window.decalMaterial.envMap = envMap;
+    const geometryDecal = new THREE.PlaneGeometry(2, 2);
+
+    window.instancedMeshGel = new THREE.InstancedMesh(geometryDecal.clone(), window.decalMaterial, 100);
+    //window.instancedMeshGel.rotation.x = -Math.PI/2;
+    window.instancedMeshGel.castShadow = true;
+    window.instancedMeshGel.receiveShadow = true;
+    window.instancedMeshGel.frustumCulled = false;
+    window.instancedMeshGel.name = "gel-parent";
+    window.MAIN_SCENE.add(window.instancedMeshGel);
+
+    var clone = new THREE.Object3D();
+
+    for (var i = 0; i < 100; i++) {
+        clone.scale.set(0, 0, 0);
+        clone.rotation.x = -Math.PI / 2;
+        clone.updateMatrix();
+        window.instancedMeshGel.setMatrixAt(i, clone.matrix);
+
+        window.GELS.push(false);
+    }
+
+    loadMaterials();
+    //    })
     //LISTENER
     window.addEventListener('resize', onWindowResize);
     document.getElementById("container").addEventListener('pointerdown', onDocumentMouseDown, false);
@@ -241,12 +206,14 @@ $(document).on('keypress', function (event) {
                 justClicked = false;
             }, 100);
         }
+        animate();
     }
 });
 
 function onDocumentMouseDown(event) {
     if (!window.FPS) {
         raycastManager(event, "down");
+        animate();
     }
 }
 
@@ -256,6 +223,7 @@ function onDocumentMouseMove(event) {
         mouse2.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
         raycastManager(event, "move");
+        animate()
     }
 }
 
@@ -281,6 +249,8 @@ function onDocumentMouseUp(event) {
         } else {
             window.ITEM_CUBE.visible = false;
         }
+
+        animate();
     }
 }
 
@@ -301,11 +271,13 @@ function raycastManager(event, type) {
 
             if (type == "move" && window.SELECTING) {
 
-                if (!window.planeUserData[instanceId].selected &&
+                /*if (!window.planeUserData[instanceId].selected &&
                     window.planeUserData[instanceId].side == window.SELECTED_SIDE) {
                     window.planeUserData[instanceId].selected = true;
                     raycastSelected(intersection[0], event, type)
-                }
+                }*/
+
+                raycastSelected(intersection[0], event, type)
 
             } else if (type == "down") {
 
@@ -321,7 +293,7 @@ function raycastManager(event, type) {
 
             if (type == "up") {
                 if (intersection.length > 0)
-                    addItem(intersection);
+                    addItem(intersection, false);
             }
 
             if (window.ITEM_HOLDED_NAME) {
@@ -342,7 +314,6 @@ function raycastManager(event, type) {
 
 function onWindowResize() {
     window.RENDERER.setSize(window.innerWidth, window.innerHeight);
-    window.COMPOSER.setSize(window.innerWidth, window.innerHeight);
 
     window.MAIN_CAMERA.aspect = window.innerWidth / window.innerHeight;
     window.MAIN_CAMERA.updateProjectionMatrix();
@@ -367,14 +338,18 @@ let clock4 = new THREE.Clock();
 clock4.start();
 let delta = 0;
 let delta2 = 0;
-window.interval = 1 / window.fps;
+window.interval = 1 / 60;//window.fps
 
 function animate(time) {
 
+    if (window.FPS) {
+        requestAnimationFrame(animate);
+    }
+
     if (!window.FPS) {
-        window.STATS.begin();
+        //window.STATS.begin();
         window.RENDERER.render(window.MAIN_SCENE, window.MAIN_CAMERA);
-        window.STATS.end();
+        //window.STATS.end();
     } else if (!window.paused) {
 
         delta += clock.getDelta();
@@ -409,8 +384,6 @@ function animate(time) {
             window.RENDERER.clearColor();
             window.RENDERER.clearDepth();
             window.RENDERER.render(window.scene2, window.MAIN_CAMERA);
-
-            //window.COMPOSER.render();
             //window.STATS.end();
         }
 
@@ -424,7 +397,7 @@ function animate(time) {
         }
     }
 
-    requestAnimationFrame(animate);
+
 }
 
 function fixedUpdate() { //60 fps always for physics
@@ -449,11 +422,11 @@ function render(time) {
 
     window.STATS.begin();
 
-    if(!bl){
-        animatePortal(); 
-        bla();
-    }
-    
+    //if(!bl){
+    animatePortal();
+    //    bla();
+    //}
+
     updateRay();
     animateShader();
     //itemUpdate();
@@ -461,7 +434,7 @@ function render(time) {
     updateEvents();
     TWEEN.update();
 
-    if (window.initLevel) {
+    if (!window.initLevel) {
         if (window.HOLDING_ITEM) {
             var target = new THREE.Vector3(); // create once an reuse it
             window.holder.getWorldPosition(target);
@@ -506,7 +479,8 @@ function render(time) {
                 property == "pedestal_button" || property == "button_weight" || property == "button_box" ||
                 property == "button_circle" || property == "dispenser" || property == "ramp" ||
                 property == "ramp_half" || property == "ramp_half2" || property == "stairs" ||
-                property == "light_bridge" | property == "tractor_beam" || property == "laser_emitter")
+                property == "light_bridge" | property == "tractor_beam" || property == "laser_emitter" ||
+                property == "door" || property == "light" || property == "stripe")
                 continue;
 
             for (var i = 0; i < window.DYMANIC_ITEMS[property].length; i++) {
@@ -541,6 +515,11 @@ function render(time) {
             }
         }
 
+        if (window.gelBall) {
+            window.gelBall.position.copy(window.gelBallBody.position);
+            window.gelBall.quaternion.copy(window.gelBallBody.quaternion);
+        }
+
         if (recordingPosition) {
             recordingPosition = false;
             setTimeout(() => {
@@ -568,8 +547,7 @@ function render(time) {
     window.RENDERER.setRenderTarget(currentRenderTarget);
     window.RENDERER.localClippingEnabled = false
     window.RENDERER.clippingPlanes = []
-    //window.RENDERER.render(window.MAIN_SCENE, window.MAIN_CAMERA);
-    window.COMPOSER.render();
+    window.RENDERER.render(window.MAIN_SCENE, window.MAIN_CAMERA);
 
     window.STATS.end();
 }
@@ -582,7 +560,7 @@ function tweenCamera(duration, ini, final) {
 
 var bl = false;
 
-function bla(){
+function bla() {
     bl = true;
     setTimeout(() => {
         bl = false;
@@ -671,7 +649,7 @@ function renderPortal2(thisIndex, pairIndex) {
             continue
         }
         // necessary so that we properly render recursion (otherwise the other portal might block)
-        //window.RENDERER.clippingPlanes = [window.PORTALS[pairIndex].plane.clone()]
+        window.RENDERER.clippingPlanes = [window.PORTALS[pairIndex].plane.clone()]
         window.RENDERER.setRenderTarget(window.PORTAL_TMP_TARGETS[thisIndex])
         window.RENDERER.render(window.MAIN_SCENE, portalCamera)
 
@@ -710,10 +688,14 @@ function teleportObject3D(obj1, obj2) {
     obj2.applyMatrix4(m)
 }
 
+let frustum = new THREE.Frustum();
+
 function portalIsVisibleInCamera(camera, portal, clippingPlane) {
+
+
     camera.updateMatrix();
     camera.updateMatrixWorld();
-    let frustum = new THREE.Frustum();
+    
     frustum.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
 
     // in frustum,
@@ -722,8 +704,10 @@ function portalIsVisibleInCamera(camera, portal, clippingPlane) {
     return frustum.intersectsObject(portal.mesh) &&
         (clippingPlane === null || clippingPlane.distanceToPoint(portal.mesh.position) > 0) &&
         portal.plane.distanceToPoint(camera.position) > 0;
+        //&& portal.plane.distanceToPoint(camera.position) < 4;
 }
 
 export {
-    tweenCamera
+    tweenCamera,
+    animate
 };

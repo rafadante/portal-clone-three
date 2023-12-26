@@ -1,66 +1,167 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
-const AddGoo = function (found) {
+window.GOO_PLANES = [];
 
-    console.log("1111111111")
-    //console.log(found)
+const AddGoo = function (found, loading) {
 
-    for (var i = 0; i < found.length; i++) {
+    if (!loading) {
+        for (var i = 0; i < found.length; i++) {
 
-        var userData = window.planeUserData[found[i].instanceId];
-        //console.log(userData);
+            var userData = window.planeUserData[found[i].instanceId];
+            //console.log(userData);
 
-        if (userData.side != "down") {
-            continue;
-        } else {
+            if (userData.side != "down") {
+                continue;
+            } else {
 
-            /*var box1 = getPlaneByName((userData.position.x + 1) + "/" + (userData.position.y + 1) + "/" + userData.position.z);
-            var box2 = getPlaneByName((userData.position.x - 1) + "/" + (userData.position.y + 1) + "/" + userData.position.z);
+                /*var box1 = getPlaneByName((userData.position.x + 1) + "/" + (userData.position.y + 1) + "/" + userData.position.z);
+                var box2 = getPlaneByName((userData.position.x - 1) + "/" + (userData.position.y + 1) + "/" + userData.position.z);
+    
+                var box3 = getPlaneByName(userData.position.x + "/" + (userData.position.y + 1) + "/" + (userData.position.z + 1));
+                var box4 = getPlaneByName(userData.position.x + "/" + (userData.position.y + 1) + "/" + (userData.position.z - 1));
+    
+                console.log(box1)
+                console.log(box2)
+                console.log(box3)
+                console.log(box4)*/
 
-            var box3 = getPlaneByName(userData.position.x + "/" + (userData.position.y + 1) + "/" + (userData.position.z + 1));
-            var box4 = getPlaneByName(userData.position.x + "/" + (userData.position.y + 1) + "/" + (userData.position.z - 1));
+                /*for (var x = 0; x < 2; x++) {
+    
+                    
+    
+                    for (var z = 0; z < 2; z++) {
+    
+    
+                    }
+    
+                }*/
 
-            console.log(box1)
-            console.log(box2)
-            console.log(box3)
-            console.log(box4)*/
+                goo = [];
 
-            /*for (var x = 0; x < 2; x++) {
+                if (!userData.hasGoo)
+                    checkSides(userData)
+            }
 
-                
-
-                for (var z = 0; z < 2; z++) {
-
-
-                }
-
-            }*/
-
-            goo = [];
-
-            if (!userData.hasGoo)
-                checkSides(userData)
         }
 
+        /*console.log(goo)
+    
+        const geometry = new THREE.PlaneGeometry(2, 2);
+        const plane = new THREE.Mesh(geometry, material);
+        plane.rotation.x = -Math.PI / 2;
+    
+        for (var i = 0; i < goo.length; i++) {
+            var clone = plane.clone();
+            clone.position.copy(goo[i]);
+            clone.translateZ(1.8);
+            window.GOO.add(clone);
+        }*/
+
+        //
+        
+        /*var mesh = new THREE.InstancedMesh(geometry.clone(), material, goo.length);
+        mesh.receiveShadow = true;
+        mesh.frustumCulled = false;
+        window.GOO.add(mesh);
+    
+        for (var i = 0; i < goo.length; i++) {
+    
+            var dummy = new THREE.Object3D();
+    
+            dummy.rotation.set(0, 0, 0);
+            dummy.rotation.x = -Math.PI / 2;
+    
+            dummy.position.copy(goo[i]);
+            dummy.translateZ(1.8);
+            dummy.updateMatrix();
+    
+            console.log(dummy.position)
+    
+            mesh.setMatrixAt(i, dummy.matrix);
+        }
+        mesh.instanceMatrix.needsUpdate = true;
+        mesh.computeBoundingSphere();*/
+
+        //------------------------
+
+        /*goo = [
+            new THREE.Vector3(7,0,5),
+            new THREE.Vector3(7,0,7),
+            new THREE.Vector3(7,0,3)]*/
+    }else{
+        goo = found;
     }
+
+
 
     console.log(goo)
 
-    const geometry = new THREE.BoxGeometry(2, 2, 1.8);
-    const plane = new THREE.Mesh(geometry, material);
-    plane.rotation.x = -Math.PI / 2;
-    //scene.add(plane);
-    console.log(material)
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    const geometries = [];
+    const matrix = new THREE.Matrix4();
 
-    for (var i = 0; i < goo.length; i++) {
+    window.GOO_PLANES.push(goo)
 
-        var clone = plane.clone();
-        clone.position.copy(goo[i]);
-        //clone.translateZ(1.8);
-        clone.translateZ(0.9);
-        window.GOO.add(clone);
+    for (let i = 0; i < goo.length; i++) {
+
+        var dummy = new THREE.Object3D();
+
+        dummy.rotation.set(0, 0, 0);
+        dummy.rotation.x = -Math.PI / 2;
+
+        dummy.position.copy(goo[i]);
+        dummy.translateZ(1.8);
+        dummy.updateMatrix();
+
+        matrix.compose(dummy.position, dummy.quaternion, dummy.scale);
+        //randomizeMatrix(matrix);
+
+        const instanceGeometry = geometry.clone();
+        instanceGeometry.applyMatrix4(matrix);
+
+        geometries.push(instanceGeometry);
+
     }
+
+    const mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries);
+
+    var mesh = new THREE.Mesh(mergedGeometry, material);
+
+    window.GOO.add(mesh);
+
+    var bb = new THREE.Box3(); // for re-use
+    bb.setFromObject(mesh);
+    bb.max.y += 0.2;
+
+    console.log(bb)
+
+    window.gooBoxes.push(bb);
 };
+
+window.gooBoxes = [];
+
+const randomizeMatrix = function () {
+
+    const position = new THREE.Vector3();
+    const quaternion = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
+
+    return function (matrix) {
+
+        position.x = Math.random() * 40 - 20;
+        position.y = Math.random() * 40 - 20;
+        position.z = Math.random() * 40 - 20;
+
+        quaternion.random();
+
+        scale.x = scale.y = scale.z = Math.random() * 1;
+
+        matrix.compose(position, quaternion, scale);
+
+    };
+
+}();
 
 var goo = [];
 
@@ -138,109 +239,122 @@ function getPlaneByName(name) {
     );
 }
 
-const vshader = `
-uniform vec2 uvScale;
-			varying vec2 vUv;
+// Vertex Shader
+const vertexShader = `
+varying vec2 vUv;
+uniform float iTime;
 
-			void main()
-			{
+void main() {
+    //vUv = uv;
+    vUv = vec2(position.x,position.z)*0.5;
+    
+    // Add a sine wave displacement to the y-coordinate of the position
+    vec3 displacedPosition = position;
+    displacedPosition.y += sin(position.x * 5.0 + iTime) * 0.02; // Adjust the frequency and amplitude as needed
 
-				vUv = uvScale * uv;
-				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-				gl_Position = projectionMatrix * mvPosition;
-
-			}
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(displacedPosition, 1.0);
+}
 `;
 
-const fshader = `
-uniform sampler2D iChannel0;
-uniform sampler2D iChannel1;
-uniform float time;
-uniform vec2 resolution;
+// Fragment Shader
+const fragmentShader = `
+#define PI 3.141592654
 
-float noise(in vec3 x)
-{
-    vec3 p = floor(x);
-    vec3 f = fract(x);
-	f = smoothstep(0.0, 1.0, f);
-	
-	vec2 uv = (p.xy + vec2(37.0, 17.0) * p.z) + f.xy;
-	vec2 rg = texture(iChannel1, (uv + 0.5) / 256.0, -100.0).yx;
-	return mix(rg.x, rg.y, f.z) * 2.0 - 1.0;
-}
-
-vec2 swirl(in vec2 p)
-{
-	return vec2(noise(vec3(p.xy, .9)), noise(vec3(p.yx, .9)));
-}
-
+uniform float iTime;
 varying vec2 vUv;
 
-void main()
-{
-	vec2 fragCoord = vUv * resolution;
-    vec4 col = vec4(1.0, 0.9, 0.0, 1.0);
+vec2 rot(vec2 p, float a) {
+    float c = cos(a * 15.83);
+    float s = sin(a * 15.83);
+    return p * mat2(s, c, c, -s);
+}
 
-    for(int i = 0; i < 3; i++) 
-		col += texture(iChannel0, fragCoord + 0.01 * swirl(9.66 * fragCoord + time * 0.33)) * col * col;
+void mainImage(out vec4 o, in vec2 uv) {
+    uv = vUv;
+    uv = vec2(.125, .75) + (uv - vec2(.125, .75)) * .03; // Adjust the offset
+    float T = iTime * .25;
 
-    gl_FragColor = col * 0.066;
+    vec3 c = clamp(1. - .7 * vec3(
+        length(uv - vec2(.1, 0)),
+        length(uv - vec2(.9, 0)),
+        length(uv - vec2(.5, 1))
+    ), 0., 1.) * 2. - 1.;
+
+    vec3 c0 = vec3(0);
+    float w0 = 0.;
+    const float N = 20.;
+
+    for (float i = 0.; i < N; i++) {
+    float wt = (i * i / N / N - .2) * .3;
+    float wp = 0.5 + (i + 1.) * (i + 1.5) * 0.001;
+    float wb = .05 + i / N * 0.1;
+    c.zx = rot(c.zx, 1.6 + T * 0.65 * wt + (uv.x + .7) * 23. * wp);
+    c.xy = rot(c.xy, c.z * c.x * wb + 1.7 + T * wt + (uv.y + 1.1) * 15. * wp);
+    c.yz = rot(c.yz, c.x * c.y * wb + 2.4 - T * 0.79 * wt + (uv.x + uv.y * (fract(i / 2.) - 0.25) * 4.) * 17. * wp);
+    c.zx = rot(c.zx, c.y * c.z * wb + 1.6 - T * 0.65 * wt + (uv.x + .7) * 23. * wp);
+    c.xy = rot(c.xy, c.z * c.x * wb + 1.7 - T * wt + (uv.y + 1.1) * 15. * wp);
+    float w = (1.5 - i / N);
+    c0 += c * w;
+    w0 += w;
+    }
+
+     c0 = c0 / w0 * 2.0 + 0.5;
+
+    // Adjust the values to achieve a brown color and reduce colorfulness
+    c0 *= vec3(0.4, 0.2, 0.1);
+    //c0 += pow(length(sin(c0 * PI * 4.0)) / sqrt(3.0) * 1.0, 20.0) * (0.3 + 0.7 * c0);;
+
+    o = vec4(c0, 1.0);
+}
+
+void main() {
+    vec4 color;
+    mainImage(color, vUv);
+    gl_FragColor = color;
+
+    #include <tonemapping_fragment>
+    #include <encodings_fragment>
 }
 `;
 
-const textureLoader = new THREE.TextureLoader();
-
-const cloudTexture = textureLoader.load('./assets/textures/lava/lavatile2.jpg');
-const lavaTexture = textureLoader.load('./assets/textures/lava/1.png');
-
-lavaTexture.colorSpace = THREE.SRGBColorSpace;
-
-cloudTexture.wrapS = cloudTexture.wrapT = THREE.RepeatWrapping;
-lavaTexture.wrapS = lavaTexture.wrapT = THREE.RepeatWrapping;
-
 var uniforms = {
-    
-    resolution: {
-        type: "v2",
-        value: new THREE.Vector2(2, 2)
-    },
-    'fogDensity': {
-        value: 0.0
-    },
-    'fogColor': {
-        value: new THREE.Vector3(0, 0, 0)
-    },
-    'time': {
-        value: 0.0
-    },
-    'uvScale': {
-        value: new THREE.Vector2(0.5, 0.5)
-    },
-    'iChannel0': {
-        value: cloudTexture
-    },
-    'iChannel1': {
-        value: lavaTexture
+    iTime: {
+        value: 0
     }
-
 };
 
 const material = new THREE.ShaderMaterial({
 
     uniforms: uniforms,
-    vertexShader: vshader,
-    fragmentShader: fshader
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    side: 2
 
 });
 
-var clock = new THREE.Clock();
+console.log(material)
 
-function renderGoo(){
+var clock = new THREE.Clock();
+var clock2 = new THREE.Clock();
+var delta = 0;
+const interval = 1 / 20;
+
+function renderGoo() {
+    delta += clock2.getDelta();
+
+    if (delta > interval) {
+        // The draw or time dependent code are here
+        renderGoo2();
+        delta = delta % interval;
+    }
+}
+
+function renderGoo2() {
     //const delta = 5 * clock.getDelta();
     //uniforms[ 'time' ].value += 0.2 * delta;
 
-    uniforms[ 'time' ].value += clock.getDelta();
-    
+    uniforms['iTime'].value += clock.getDelta();
+
     //window.uniformsBridge[ 'iTime' ].value += clock.getDelta();
 }
 

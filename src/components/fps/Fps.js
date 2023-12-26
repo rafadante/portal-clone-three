@@ -1,13 +1,13 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import {
     PointerLockControls
-} from '../../jsm/controls/PointerLockControls.js';
+} from '../../PointerLockControls.js';
 import $ from 'jquery';
 import * as CANNON from 'cannon';
 import nipplejs from 'nipplejs';
-import {
+/*import {
     DeviceOrientationControls
-} from '../../jsm/controls/DeviceOrientationControls.js';
+} from 'three/addons/controls/DeviceOrientationControls.js';*/
 import {
     KeyQ,
     KeyZ
@@ -21,6 +21,9 @@ import {
 import {
     interactWithItem
 } from '../items/Items.js'
+import {
+    TWEEN
+} from '../../Tween.js';
 
 //
 let shouldJump = false;
@@ -88,7 +91,7 @@ let rgtValue = 0;
 let lftValue = 0;
 
 if (window.mobile) {
-    var controlsDevice = new DeviceOrientationControls(window.MAIN_CAMERA);
+    //var controlsDevice = new DeviceOrientationControls(window.MAIN_CAMERA);
     window.targetRotationX = 0;
     var targetRotationOnMouseDownX = 0;
     window.targetRotationY = 0;
@@ -215,6 +218,8 @@ if (!window.mobile)
     controlsLock();
 // added joystick + movement
 
+var upVector;
+
 function player() {
 
     let sphereShape = new CANNON.Sphere(0.3);
@@ -246,7 +251,7 @@ function player() {
     // so need to check contacts to detect if grounded or not
     // https://github.com/schteppe/cannon.js/issues/313
 
-    let upVector = new CANNON.Vec3(0, 1, 0);
+    upVector = new CANNON.Vec3(0, 1, 0);
     let contactNormal = new CANNON.Vec3(0, 0, 0);
 
     window.CANNON_WORLD.addEventListener("postStep", (e) => {
@@ -278,18 +283,17 @@ function player() {
     }
 }
 
+var ss = 0;
+
 document.addEventListener('keydown', (event) => {
 
     //if (event.code == "ControlLeft" && !crouched)
-    //console.log(window.RENDERER.info.render.calls)
 
     if (window.FPS && allowEnterFPS) {
         if (controller[event.code])
             controller[event.code].pressed = true;
 
         headBobActive = true;
-
-
 
         if (event.code == "ControlLeft" && !crouched) {
             crouched = true;
@@ -382,6 +386,8 @@ function controlsLock() {
     window.PointerControls = new PointerLockControls(window.MAIN_CAMERA, document.body);
     window.PointerControls.pointerSpeed = 0.5;
 
+    console.log(window.PointerControls)
+
     window.PointerControls.addEventListener('lock', function () {
         document.getElementById('blocker').style.display = 'none';
 
@@ -433,9 +439,111 @@ $("body").on('pointerup', '#crouch', function () {
     Crouch(0.25);
 })
 
+function tweenBBB(duration, ini, final) {
+
+    var obj = new THREE.Object3D();
+    window.MAIN_SCENE.add(obj)
+    obj.quaternion.copy(ini.clone());
+
+    new TWEEN.Tween(ini).to(final, duration)
+        .onUpdate((tween) => {
+
+            obj.quaternion.slerp(final, 0.1);
+            window.MAIN_CAMERA.quaternion.copy(obj.quaternion);
+            window.PLAYER.quaternion.copy(obj.quaternion);
+        })
+
+    var aa = {
+        value: 0
+    };
+
+    new TWEEN.Tween(aa, false)
+        .to({
+            value: 1
+        }, 1000)
+        .onUpdate(() => {
+            obj.quaternion.slerp(final, 0.1);
+            window.MAIN_CAMERA.quaternion.copy(obj.quaternion);
+            window.PLAYER.quaternion.copy(obj.quaternion);
+            //window.sepiaEffect.intensity = aa.value;
+            //window.vig.darkness = aa.value * 0.7;
+        })
+        .start();
+}
+
 document.addEventListener('mousedown', (event) => {
     if (!window.mobile && document.pointerLockElement !== null)
         portalButton(event.button)
+
+    /*if (event.button == 2 && window.FPS && allowEnterFPS) {
+        if (ss == 0) {
+
+            var dd = 0;
+            for (let d of window.dynamicObjects) {
+                if (dd > 0)
+                    d.mass = 0;
+
+                dd++
+            }
+
+            //PAREDE
+
+            window.CANNON_WORLD.gravity.set(0, 0, -9.8);
+
+            var axis = new CANNON.Vec3(1, 0, 0);
+            var angle = Math.PI / 2;
+
+            var obj = new THREE.Object3D();
+            window.MAIN_SCENE.add(obj)
+            obj.quaternion.setFromAxisAngle(axis, angle);
+
+            tweenBBB(10000, window.MAIN_CAMERA.quaternion, obj.quaternion)
+
+            upVector = new CANNON.Vec3(0, 0, 1);
+            up = new THREE.Vector3(0, 0, 1)
+            window.PointerControls.maxPolarAngle = 0;
+            window.PointerControls._euler = new THREE.Euler(0, 0, 0, 'XZY');
+        } else if (ss == 1) {
+            //TET0
+
+            window.CANNON_WORLD.gravity.set(0, 9.8, 0);
+
+            var axis = new CANNON.Vec3(1, 0, 0);
+            var angle = -Math.PI;
+
+            var obj = new THREE.Object3D();
+            window.MAIN_SCENE.add(obj)
+            obj.quaternion.setFromAxisAngle(axis, angle);
+
+            tweenBBB(10000, window.MAIN_CAMERA.quaternion, obj.quaternion)
+
+            upVector = new CANNON.Vec3(0, -1, 0);
+            up = new THREE.Vector3(0, -1, 0)
+            window.dir = -1;
+
+            window.PointerControls.maxPolarAngle = Math.PI;
+            window.PointerControls._euler = new THREE.Euler(0, 0, 0, 'YXZ');
+        } else if (ss == 2) {
+            //TET0
+
+            window.CANNON_WORLD.gravity.set(0, -9.8, 0);
+
+            var axis = new CANNON.Vec3(1, 0, 0);
+            var angle = 0;
+
+            var obj = new THREE.Object3D();
+            window.MAIN_SCENE.add(obj)
+            obj.quaternion.setFromAxisAngle(axis, angle);
+
+            tweenBBB(10000, window.MAIN_CAMERA.quaternion, obj.quaternion)
+
+            upVector = new CANNON.Vec3(0, 1, 0);
+            up = new THREE.Vector3(0, 1, 0)
+            window.dir = 1;
+        }
+
+        ss++;
+    }*/
 });
 
 //LEFT PORTAL MOBILE
@@ -462,6 +570,7 @@ function jumpTouch() {
 }
 
 var vv = false;
+var up = new THREE.Vector3(0, 1, 0)
 
 const updatePlayer = function (deltaTime) {
 
@@ -490,7 +599,7 @@ const updatePlayer = function (deltaTime) {
             blocked_bottom = false;
 
         if (window.gyro) {
-            controlsDevice.update();
+            //controlsDevice.update();
             window.MAIN_CAMERA.rotation.z = 0
         }
     }
@@ -499,7 +608,7 @@ const updatePlayer = function (deltaTime) {
     // define directions
     let cameraDirection = new THREE.Vector3()
     window.MAIN_CAMERA.getWorldDirection(cameraDirection)
-    const up = new THREE.Vector3(0, 1, 0)
+
     const forward = cameraDirection.projectOnPlane(up).normalize()
     const backward = forward.clone().negate()
     const left = up.clone().cross(forward).normalize()
@@ -639,10 +748,12 @@ const updatePlayer = function (deltaTime) {
 
             if (shouldJump) {
                 window.PLAYER.inJump = true
-                window.PLAYER.applyImpulse(up.clone().multiplyScalar(f * 0.2), window.PLAYER.position)
+                window.PLAYER.applyImpulse(up.clone().multiplyScalar(f * 0.14), window.PLAYER.position)
             }
         }
     }
+
+    //window.MAIN_CAMERA.rotation.multiplyScalar(-1);
 
     // always look where the camera points
     window.PLAYER.quaternion.copy(window.MAIN_CAMERA.quaternion)
@@ -652,17 +763,21 @@ const updatePlayer = function (deltaTime) {
 
     // set camera position to be at player
     window.MAIN_CAMERA.position.copy(window.PLAYER.position)
-    window.GUN.position.copy(window.MAIN_CAMERA.position);
+    //window.GUN.position.copy(window.MAIN_CAMERA.position);
 
     if (moving)
         window.GUN.children[0].position.x += Math.sin(headBobTimer * headBobSpeed) * headBobHeight;
 
-    const targetPosition = window.MAIN_CAMERA.quaternion.clone();
-    window.GUN.quaternion.slerp(targetPosition, window.smoothness);
+    //const targetPosition = window.MAIN_CAMERA.quaternion.clone();
+    //window.GUN.quaternion.slerp(window.GUN.quaternion, window.smoothness);
+    //window.GUN.quaternion.copy(window.MAIN_CAMERA.quaternion);
     updateHeadBob(deltaTime);
 
-    if (window.MAIN_CAMERA.position.distanceTo(new THREE.Vector3(0, 0, 0)) > 100)
-        window.PLAYER.position.copy(window.SPAWN_POSITION);
+    if (window.MAIN_CAMERA.position.distanceTo(new THREE.Vector3(0, 0, 0)) > 100) {
+        var obj = window.ENTER_DOOR.clone();
+        obj.translateZ(1);
+        window.PLAYER.position.copy(obj.position);
+    }
 }
 
 function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
@@ -740,6 +855,434 @@ window.addEventListener("gamepadconnected", (event) => {
 window.addEventListener("gamepaddisconnected", (event) => {
     controllerIndex = null;
     console.log("disconnected");
+});
+
+var vv = false;
+var destroyed = false;
+var cc = false;
+var tt = 0;
+
+function bbb() {
+
+}
+
+window['createBlueGel'] = function () {
+
+    destroyed = false;
+
+    for (var i = 0; i < window.DYMANIC_ITEMS['dispenser'].length; i++) {
+        if (window.DYMANIC_ITEMS['dispenser'][i].length != 0) {
+
+            if (!vv) {
+                let PHYSICS_MATERIAL = new CANNON.Material();
+                PHYSICS_MATERIAL.friction = 0; //0.01
+                PHYSICS_MATERIAL.restitution = 0; //0.1
+
+                var shape = new CANNON.Sphere(0.3);
+                window.gelBallBody = new CANNON.Body({
+                    shape: shape,
+                    mass: 100,
+                    material: PHYSICS_MATERIAL
+                })
+
+                window.dynamicObjects[1] = window.gelBallBody;
+
+                const geometry = new THREE.IcosahedronGeometry(20, 4);
+                const material = new THREE.MeshBasicMaterial({
+                    color: 0x0000FF
+                });
+                window.gelBall = new THREE.Mesh(geometry, mat);
+                window.MAIN_SCENE.add(window.gelBall);
+
+                window.gelBall.scale.set(0.015, 0.015, 0.015)
+
+                window.gelBallBody.collisionFilterGroup = window.CGROUP_DYNAMIC
+                window.gelBallBody.collisionFilterMask = window.CGROUP_ENVIRONMENT
+                window.gelBallBody.gel = true;
+
+                console.log("ppppppppppppppp");
+                window.CANNON_WORLD.addBody(window.gelBallBody);
+            } else {
+                // Velocity
+                window.gelBallBody.velocity.setZero();
+                window.gelBallBody.initVelocity.setZero();
+                window.gelBallBody.angularVelocity.setZero();
+                window.gelBallBody.initAngularVelocity.setZero();
+
+                // Force
+                window.gelBallBody.force.setZero();
+                window.gelBallBody.torque.setZero();
+            }
+
+            var pos = window.DYMANIC_ITEMS['dispenser'][i].position.clone();
+            pos.y -= 0.5;
+            window.gelBallBody.position.copy(pos);
+            window.gelBall.position.copy(pos);
+
+            window.gelBall.visible = true;
+
+            if (!vv) {
+                window.gelBallBody.addEventListener('collide', (event) => {
+
+                    if (event.target.inArea) {
+                        console.log("11111111111")
+                    } else if (event.body.room && !cc) {
+
+                        cc = true;
+
+                        console.log(event)
+
+                        createGel(event.target.position);
+                        window.gelBall.visible = false;
+
+                        setTimeout(() => {
+                            window['createBlueGel']();
+
+                            setTimeout(() => {
+                                cc = false;
+                            }, 10);
+                        }, 2000);
+                    }
+                })
+            }
+
+        }
+    }
+
+    vv = true;
+}
+
+function createGel(pos) {
+
+    console.log(pos)
+
+    var id;
+
+    for (var i = 0; i < window.GELS.length; i++) {
+        if (!window.GELS[i]) {
+            window.GELS[i] = true;
+            id = i;
+            break;
+        }
+    }
+
+    var gel = new THREE.Object3D();
+    //gel.renderOrder = window.gels;
+    window.gels++;
+    gel.scale.set(2, 2, 2);
+    //pos.y -= 0.15;
+    gel.position.copy(pos);
+
+    //
+
+    let PHYSICS_MATERIAL = new CANNON.Material();
+    PHYSICS_MATERIAL.friction = 0.01; //0.01
+    PHYSICS_MATERIAL.restitution = 0.1; //0.1
+
+    var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.01));
+
+    var box = new CANNON.Body({
+        shape: shape,
+        mass: 0,
+        material: PHYSICS_MATERIAL
+    })
+
+
+    //
+
+
+    gel.rotation.x = -Math.PI / 2;
+    box.up = new THREE.Vector3(0, 1, 0)
+    box.vel = new THREE.Vector3(1, 0, 1)
+
+
+    gel.updateMatrix();
+    window.instancedMeshGel.setMatrixAt(id, gel.matrix);
+
+
+    window.instancedMeshGel.setColorAt(id, new THREE.Color(0x0000FF));
+
+    window.instancedMeshGel.instanceColor.needsUpdate = true;
+    window.instancedMeshGel.instanceMatrix.needsUpdate = true;
+    window.instancedMeshGel.computeBoundingSphere();
+
+    box.position.copy(pos);
+    box.quaternion.copy(gel.quaternion)
+    box.collisionFilterGroup = window.CGROUP_DYNAMIC
+    box.collisionFilterMask = window.CGROUP_ALL
+    box.linearDamping = 0.01;
+
+
+    window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(0.0, 0.0, 1.0);
+    if (window.uniformShaderPortalGunBallEnergy.iAlpha.value == 0.0) {
+        new TWEEN.Tween(window.uniformShaderPortalGunBallEnergy.iAlpha).to({
+            value: 0.5
+        }, 300).start();
+    }
+    box.name = "gel-blue";
+
+    // When a body collides with another body, they both dispatch the "collide" event.
+    box.addEventListener('collide', (event) => {
+
+        if (event.body.gel) {
+            console.log("9999999999999")
+            return;
+        }
+
+        if (!event.body.gelJumping) {
+
+            var relativeVelocity = event.contact.getImpactVelocityAlongNormal();
+            event.body.gelJumping = true;
+
+            var holder = event.body;
+
+            setTimeout(() => {
+                holder.gelJumping = false;
+            }, 10);
+
+
+            //shouldJump = true;
+            //window.PLAYER.inJump = true
+            event.body.velocity.set(event.body.velocity.x * event.target.vel.x,
+                event.body.velocity.y * event.target.vel.y,
+                event.body.velocity.z * event.target.vel.z);
+            event.body.applyImpulse(event.target.up.clone().multiplyScalar(8 * event.body.mass * Math.abs((relativeVelocity * 0.045) + 1)), event.body.position)
+        }
+    })
+
+    window.CANNON_WORLD.addBody(box);
+
+    window.PLAYER.addEventListener('collide', (event) => {
+        if (event.body.name == "gel-orange") {
+            window.gelOrange = true;
+        } else {
+            window.gelOrange = false;
+        }
+    })
+}
+
+const vshader = `
+// Include the Ashima code here!
+
+varying vec2 vUv;
+varying float noise;
+uniform float time;
+  
+  vec3 mod289(vec3 x)
+{
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 mod289(vec4 x)
+{
+  return x - floor(x * (1.0 / 289.0)) * 289.0;
+}
+
+vec4 permute(vec4 x)
+{
+  return mod289(((x*34.0)+1.0)*x);
+}
+
+vec4 taylorInvSqrt(vec4 r)
+{
+  return 1.79284291400159 - 0.85373472095314 * r;
+}
+
+vec3 fade(vec3 t) {
+  return t*t*t*(t*(t*6.0-15.0)+10.0);
+}
+
+// Classic Perlin noise
+float cnoise(vec3 P)
+{
+  vec3 Pi0 = floor(P); // Integer part for indexing
+  vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
+  Pi0 = mod289(Pi0);
+  Pi1 = mod289(Pi1);
+  vec3 Pf0 = fract(P); // Fractional part for interpolation
+  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
+  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+  vec4 iy = vec4(Pi0.yy, Pi1.yy);
+  vec4 iz0 = Pi0.zzzz;
+  vec4 iz1 = Pi1.zzzz;
+
+  vec4 ixy = permute(permute(ix) + iy);
+  vec4 ixy0 = permute(ixy + iz0);
+  vec4 ixy1 = permute(ixy + iz1);
+
+  vec4 gx0 = ixy0 * (1.0 / 7.0);
+  vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+  gx0 = fract(gx0);
+  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
+  vec4 sz0 = step(gz0, vec4(0.0));
+  gx0 -= sz0 * (step(0.0, gx0) - 0.5);
+  gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+
+  vec4 gx1 = ixy1 * (1.0 / 7.0);
+  vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+  gx1 = fract(gx1);
+  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
+  vec4 sz1 = step(gz1, vec4(0.0));
+  gx1 -= sz1 * (step(0.0, gx1) - 0.5);
+  gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+
+  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
+  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
+  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
+  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
+  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
+  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
+  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
+  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
+
+  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+  g000 *= norm0.x;
+  g010 *= norm0.y;
+  g100 *= norm0.z;
+  g110 *= norm0.w;
+  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+  g001 *= norm1.x;
+  g011 *= norm1.y;
+  g101 *= norm1.z;
+  g111 *= norm1.w;
+
+  float n000 = dot(g000, Pf0);
+  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
+  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
+  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
+  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
+  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
+  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
+  float n111 = dot(g111, Pf1);
+
+  vec3 fade_xyz = fade(Pf0);
+  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
+  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
+  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
+  return 2.2 * n_xyz;
+}
+
+// Classic Perlin noise, periodic variant
+float pnoise(vec3 P, vec3 rep)
+{
+  vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period
+  vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period
+  Pi0 = mod289(Pi0);
+  Pi1 = mod289(Pi1);
+  vec3 Pf0 = fract(P); // Fractional part for interpolation
+  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
+  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
+  vec4 iy = vec4(Pi0.yy, Pi1.yy);
+  vec4 iz0 = Pi0.zzzz;
+  vec4 iz1 = Pi1.zzzz;
+
+  vec4 ixy = permute(permute(ix) + iy);
+  vec4 ixy0 = permute(ixy + iz0);
+  vec4 ixy1 = permute(ixy + iz1);
+
+  vec4 gx0 = ixy0 * (1.0 / 7.0);
+  vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+  gx0 = fract(gx0);
+  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
+  vec4 sz0 = step(gz0, vec4(0.0));
+  gx0 -= sz0 * (step(0.0, gx0) - 0.5);
+  gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+
+  vec4 gx1 = ixy1 * (1.0 / 7.0);
+  vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+  gx1 = fract(gx1);
+  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
+  vec4 sz1 = step(gz1, vec4(0.0));
+  gx1 -= sz1 * (step(0.0, gx1) - 0.5);
+  gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+
+  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
+  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
+  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
+  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
+  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
+  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
+  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
+  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
+
+  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
+  g000 *= norm0.x;
+  g010 *= norm0.y;
+  g100 *= norm0.z;
+  g110 *= norm0.w;
+  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
+  g001 *= norm1.x;
+  g011 *= norm1.y;
+  g101 *= norm1.z;
+  g111 *= norm1.w;
+
+  float n000 = dot(g000, Pf0);
+  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
+  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
+  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
+  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
+  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
+  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
+  float n111 = dot(g111, Pf1);
+
+  vec3 fade_xyz = fade(Pf0);
+  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
+  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
+  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
+  return 2.2 * n_xyz;
+}
+
+float turbulence( vec3 p ) {
+    float w = 100.0;
+    float t = -.5;
+    for (float f = 1.0 ; f <= 10.0 ; f++ ){
+        float power = pow( 2.0, f );
+        t += abs( pnoise( vec3( power * p ), vec3( 10.0, 10.0, 10.0 ) ) / power );
+    }
+    return t;
+}
+
+void main() {
+
+    vUv = uv;
+
+    // add time to the noise parameters so it's animated
+    noise = 10.0 *  -.10 * turbulence( .5 * normal + time );
+    float b = 5.0 * pnoise( 0.05 * position + vec3( 2.0 * time ), vec3( 100.0 ) );
+    float displacement = - noise + b;
+    
+    vec3 newPosition = position + normal * displacement;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+
+}
+
+`;
+
+const fshader = `
+varying vec2 vUv;
+varying float noise;
+
+void main() {
+
+    // compose the colour using the UV coordinate
+    // and modulate it with the noise like ambient occlusion
+    vec3 color = vec3(0.0, 0.0, vUv.y * (1.0 - 0.0 * noise));
+    gl_FragColor = vec4( color.rgb, 1.0 );
+}
+
+`;
+
+window.uniformsgEL = {
+    time: { // float initialized to 0
+        type: "f",
+        value: 0.0
+    }
+}
+
+var mat = new THREE.ShaderMaterial({
+    uniforms: window.uniformsgEL,
+    vertexShader: vshader,
+    fragmentShader: fshader,
 });
 
 export {

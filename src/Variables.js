@@ -17,12 +17,12 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
     window.mobile = false;
     pixelRatio = 1;
     shadowMap = true;
-    portalsRecursive = 2;
+    portalsRecursive = 1;
     fov = 60;
 }
 
 //
-var camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.005, 0);
+var camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.005, 500);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 
@@ -46,17 +46,19 @@ const cube = new THREE.Mesh(geometry2, material2);
 //
 var RENDERER = new THREE.WebGLRenderer({
     alpha: true,
-
+    //localClippingEnabled: false,
     powerPreference: "high-performance",
     antialias: true,
 });
 
 RENDERER.setPixelRatio(window.devicePixelRatio * pixelRatio);
 RENDERER.setSize(window.innerWidth, window.innerHeight);
-RENDERER.outputEncoding = THREE.sRGBEncoding;
+//RENDERER.outputEncoding = THREE.sRGBEncoding;
 RENDERER.outputColorSpace = THREE.SRGBColorSpace;
 RENDERER.toneMapping = THREE.ACESFilmicToneMapping;;
 RENDERER.toneMappingExposure = 0.6;
+
+console.log(RENDERER)
 
 //RENDERER.setClearColor(0x3a3a3a, 1);
 
@@ -66,7 +68,7 @@ RENDERER.shadowMap.type = THREE.PCFSoftShadowMap;
 //RENDERER.shadowMap.autoUpdate = false;
 RENDERER.shadowMap.needsUpdate = true;
 
-RENDERER.localClippingEnabled = true;
+//RENDERER.localClippingEnabled = true;
 RENDERER.physicallyCorrectLights = true;
 RENDERER.domElement.id = "viewer-3d";
 //
@@ -218,6 +220,7 @@ window.ITEM_CUBE = null
 window.OBSERVATION_ROOM = null;
 window.OBSERVATION_ROOM_IMG = null;
 window.CHECK = new THREE.TextureLoader().load('./assets/check.png');
+window.CLOSE = new THREE.TextureLoader().load('./assets/close.png');
 
 /**********************************************************
  * PHYSICS
@@ -299,7 +302,12 @@ window.DYMANIC_ITEMS = {
     light_bridge: [],
     tractor_beam: [],
     laser_emitter: [],
-    laser_cube: []
+    laser_cube: [],
+    faith_plate: [],
+    door: [],
+    light: [],
+    lightEmissive: [],
+    stripe: []
 }
 
 window.INK_WHITE = false;
@@ -308,3 +316,5 @@ window.INK_ORANGE = false;
 
 window.horizontal = [];
 window.vertical = [];
+
+window.ENV_INTENSITY = 0.15;

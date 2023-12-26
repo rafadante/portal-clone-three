@@ -1,19 +1,25 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import {
     GLTFLoader
-} from '../../jsm/loaders/GLTFLoader.js';
+} from 'three/addons/loaders/GLTFLoader.js';
 import {
     buildIniCubes
 } from '../cubeManager/CubeManager.js';
 import {
     RectAreaLightHelper
-} from '../../jsm/helpers/RectAreaLightHelper.js';
+} from 'three/addons/helpers/RectAreaLightHelper.js';
 import $ from 'jquery';
 import JSZipUtils from 'jszip-utils';
 import {
     unzipSync,
     strFromU8
-} from '../../jsm/libs/fflate.module.js';
+} from 'three/addons/libs/fflate.module.js';
+import {
+    animate
+} from '../../Main.js';
+import {
+    loadLevelJSON
+} from '../menuShader/MenuShader.js';
 
 async function handleZip(path, obj) {
     await JSZipUtils.getBinaryContent(path, function (err, data) {
@@ -72,9 +78,16 @@ async function handleZip(path, obj) {
                     loadLaserEmitterManager(result.scene)
                 else if (obj == "loadLaserCube")
                     loadLaserCubeManager(result.scene)
-
-
-
+                else if (obj == "loadFaithPlate")
+                    loadFaithPlateManager(result.scene)
+                else if (obj == "loadDoorNormal")
+                    loadDoorNormalManager(result.scene)
+                else if (obj == "loadLight")
+                    loadLightManager(result.scene)
+                else if (obj == "loadLightEmissive")
+                    loadLightEmissiveManager(result.scene)
+                else if (obj == "loadLightStripe")
+                    loadLightStripeManager(result.scene)
 
 
             });
@@ -121,7 +134,7 @@ function loadWindowIMG() {
         })
 
         gltf.scene.rotation.y = -Math.PI / 2;
-        gltf.scene.position.set(16, 7, 7);
+        gltf.scene.position.set(20, 7, 7);
         gltf.scene.translateY(-1)
         gltf.scene.translateX(-1)
         gltf.scene.name = "window";
@@ -136,6 +149,35 @@ function loadWindow() {
 }
 
 function loadWindowManager(scene) {
+
+    console.log("11111111111111")
+
+    var material = new THREE.MeshStandardMaterial();
+
+    material.envMap = window.ENV_MAP_FPS;
+
+    var map = new THREE.TextureLoader().load('./assets/textures/window/Glass_Blocks_001a_Base_Color.jpg');
+    map.encoding = THREE.sRGBEncoding;
+    material.map = map;
+
+    var map = new THREE.TextureLoader().load('./assets/textures/window/Glass_Blocks_001a_Normal.jpg');
+    //map.encoding = THREE.sRGBEncoding;
+    material.normalMap = map;
+
+    var map = new THREE.TextureLoader().load('./assets/textures/window/Glass_Blocks_001a_Roughness.jpg');
+    //map.encoding = THREE.sRGBEncoding;
+    material.roughnessMap = map;
+
+    var map = new THREE.TextureLoader().load('./assets/textures/window/Glass_Blocks_001a_ambientOcclusion.jpg');
+    //map.encoding = THREE.sRGBEncoding;
+    material.aoMap = map;
+
+    var map = new THREE.TextureLoader().load('./assets/textures/window/Glass_Blocks_001a_Glass.jpg');
+    //map.encoding = THREE.sRGBEncoding;
+    material.alphaMap = map;
+
+    console.log(material)
+
     scene.traverse(child => {
         if (child.name.includes("Cube")) {
             child.receiveShadow = true;
@@ -148,7 +190,7 @@ function loadWindowManager(scene) {
             child.getWorldPosition(target);
             light.position.copy(target);
             light.translateY(-0.2);
-            scene.add(light);
+            //scene.add(light);
             window.room_light = child;
 
             window.lightRoom = light;
@@ -157,6 +199,10 @@ function loadWindowManager(scene) {
         if (child.name.includes("vidro")) {
             child.material.side = 2;
             child.material.envMap = window.ENV_MAP_FPS;
+        }
+
+        if (child.name.includes("window")) {
+            child.material = material;
         }
     })
 
@@ -268,6 +314,7 @@ function loadExitDoor(scene) {
     door.name = "exitDoor";
     window.EXIT_DOOR = door;
     window.MAIN_SCENE.add(door);
+    window.planeExitDoor = door;
 
     door.traverse(child => {
 
@@ -282,6 +329,10 @@ function loadExitDoor(scene) {
             } else if (child.name == "portal_door_left_06") {
                 child.scale.set(0, 0, 0);
                 window.exit_door_left = child;
+            } else if (child.name == "central_spinner_right_05") {
+                window.exit_door_right_spinner = child;
+            } else if (child.name == "central_spinner_left_07") {
+                window.exit_door_left_spinner = child;
             }
         }
 
@@ -369,7 +420,6 @@ function loadCorridorEnter(scene) {
 
             if (child.material.name == "lambert5") {
                 child.material = new THREE.MeshBasicMaterial()
-                window.SELECTED_OBJECTS_FOR_BLOOM.add(child);
             }
         }
     });
@@ -392,7 +442,6 @@ function loadCorridorExit(scene) {
 
             if (child.material.name == "lambert5") {
                 child.material = new THREE.MeshBasicMaterial()
-                window.SELECTED_OBJECTS_FOR_BLOOM.add(child);
             }
         }
     });
@@ -562,7 +611,7 @@ function loadPedestalButton() {
 
 function loadPedestalButtonManager(scene) {
 
-    var item = instancedTransform(scene, "pedestal_button", false, 0.2, 0.5)
+    var item = instancedTransform(scene, "pedestal_button", true, 0.2, 0.5)
 
     item.userData.wall = false;
     item.userData.ground = true;
@@ -787,8 +836,100 @@ function loadLaserCubeManager(scene) {
     item.userData.ground = false;
     item.userData.ceiling = true;
 
-    $("#loading-parent").css("opacity", 0);
-    $("#loading-parent").css("pointer-events", "none");
+    loadFaithPlate()
+}
+
+function loadFaithPlate() {
+    handleZip('./assets/3ds/faith_plate.zip', "loadFaithPlate");
+}
+
+function loadFaithPlateManager(scene) {
+    scene.name = "faith_plate";
+    scene.userData.wall = false;
+    scene.userData.ground = true;
+    scene.userData.ceiling = true;
+    window.ITEMS.add(scene);
+    scene.traverse(child => {
+        child.receiveShadow = true;
+        child.castShadow = true;
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 1;
+            child.material.roughness = 0.2;
+        }
+    })
+
+    loadDoorNormal();
+}
+
+function loadDoorNormal() {
+    handleZip('./assets/3ds/door.zip', "loadDoorNormal");
+}
+
+window.DOORS = [];
+
+function loadDoorNormalManager(scene) {
+    scene.name = "door";
+    scene.userData.wall = false;
+    scene.userData.ground = true;
+    scene.userData.ceiling = false;
+    window.ITEMS.add(scene);
+    scene.traverse(child => {
+        child.receiveShadow = true;
+        child.castShadow = true;
+        if (child.material) {
+            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMapIntensity = 0.5;
+            child.material.roughness = 0.2;
+        }
+    })
+
+    loadLight()
+}
+
+function loadLight() {
+    handleZip('./assets/3ds/light.zip', "loadLight");
+}
+
+function loadLightManager(scene) {
+    var item = instancedTransform(scene, "light", false, 0, 1)
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
+
+    loadLightEmissive()
+}
+
+function loadLightEmissive() {
+    handleZip('./assets/3ds/lightEmissive.zip', "loadLightEmissive");
+}
+
+function loadLightEmissiveManager(scene) {
+    var item = instancedTransform(scene, "lightEmissive", false, 0, 1)
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
+
+    loadLightStripe()
+}
+
+function loadLightStripe() {
+    handleZip('./assets/3ds/stripe.zip', "loadLightStripe");
+}
+
+function loadLightStripeManager(scene) {
+    var item = instancedTransform(scene, "stripe", false, 0, 1)
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
+
+    if (window.loadedLevel) {
+        loadLevelJSON()
+    } else {
+        $("#loading-parent").css("opacity", 0);
+        $("#loading-parent").css("pointer-events", "none");
+    }
+    animate();
 
 }
 

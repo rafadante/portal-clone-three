@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import {
     GeneralBB
 } from '../generalBB/GeneralBB.js'
@@ -9,7 +9,8 @@ import {
     MeshStandardMaterial,
     PlaneGeometry,
     Vector3
-} from '../../build/three.module.js';
+} from 'three';
+
 
 
 class Portal extends Group {
@@ -55,6 +56,8 @@ class Portal extends Group {
         let zHelper = new THREE.ArrowHelper(this.tz, position, 1, 0x0000ff)
         this.debugMeshes.add(xHelper, yHelper, zHelper)
 
+        console.log(this)
+
         this.transform = tRot.clone().setPosition(position)
         this.plane.applyMatrix4(this.transform)
         this.plane.translate(normal.clone().multiplyScalar(0.0001));
@@ -74,6 +77,8 @@ class Portal extends Group {
         uniform float wh;
         void main() {
             gl_FragColor = texture2D(texture1, gl_FragCoord.xy / vec2(ww, wh));
+            #include <tonemapping_fragment>
+            #include <encodings_fragment>
         }
         `
 
@@ -189,7 +194,7 @@ class Portal extends Group {
 
         this.debugMeshes.add(this.CDBB.helper)
         this.debugMeshes.add(this.STBB.helper)
-        this.debugMeshes.visible = false;//globals.DEBUG
+        this.debugMeshes.visible = false; //globals.DEBUG
         this.add(this.debugMeshes)
     }
 }

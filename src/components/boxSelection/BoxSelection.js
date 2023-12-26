@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import $ from 'jquery';
 
 window.itemSelected = false;
@@ -8,6 +8,14 @@ const orange = new THREE.Color("rgb(255, 165, 0)");
 window.SELECTED_ID = [];
 window.SELECTED_COLOR = [];
 window.SELECTED_SIDE = null;
+window.SELECTED_MATRIX = [];
+
+var initialPosition = null;
+var planeSelection = null;
+
+window.SELECTED_ID_ORANGE = [];
+var dir;
+var currentID = null;
 
 function raycastSelected(found, event, type) {
 
@@ -33,35 +41,125 @@ function raycastSelected(found, event, type) {
 
     }
 
-    if (!window.planeUserData[instanceId].hasItem) {
-        window.SELECTED_ID.push(instanceId);
-        window.instancedMesh.getColorAt(instanceId, color);
-        window.SELECTED_COLOR.push(color.clone());
+    /*if (window.connecting) {
+        window.connecting = false;
 
-        window.instancedMesh.setColorAt(instanceId, orange);
+        window.MATERIAL_PORTAL_EDITOR.opacity = 1;
+        window.MATERIAL_NON_PORTAL_EDITOR.opacity = 1;
+        window.MATERIAL_PORTAL_EDITOR.transparent = false;
+        window.MATERIAL_NON_PORTAL_EDITOR.transparent = false;
+
+        return;
+    }*/
+
+    if (currentID != instanceId) { //!window.planeUserData[instanceId].hasItem
+
+        currentID = instanceId;
+
+        for (var i = 0; i < window.SELECTED_ID_ORANGE.length; i++) {
+            if (window.SELECTED_ID_ORANGE[i].portal)
+                window.instancedMesh.setColorAt(window.SELECTED_ID_ORANGE[i].id_instanced, new THREE.Color(0xffffff));
+            else
+                window.instancedMesh.setColorAt(window.SELECTED_ID_ORANGE[i].id_instanced, new THREE.Color(0x808080));
+        }
+
+        window.SELECTED_ID_ORANGE = [];
+
+        if (window.SELECTED_ID.length == 0) {
+           // console.log(window.planeUserData)
+            //console.log(instanceId)
+           // console.log(window.planeUserData[instanceId])
+            initialPosition = window.planeUserData[instanceId].position;
+            window.SELECTED_ID.push(instanceId);
+            window.instancedMesh.setColorAt(window.planeUserData[instanceId].id_instanced, orange);
+        } else {
+
+            window.SELECTED_ID = [];
+
+            let vec1 = initialPosition;
+            let vec2 = window.planeUserData[instanceId].position;
+
+            var xDir = Math.sign(vec1.x - vec2.x) * (-1);
+            var yDir = Math.sign(vec1.y - vec2.y) * (-1);
+            var zDir = Math.sign(vec1.z - vec2.z) * (-1);
+
+            let size = new THREE.Vector3().subVectors(vec2, vec1);
+            let center = new THREE.Vector3().addVectors(vec1, vec2).multiplyScalar(0.5);
+
+            let planeWidth = Math.abs(size.x);
+            let planeHeight = Math.abs(size.y);
+            let planeDepth = Math.abs(size.z);
+
+            let planeGeom = new THREE.BoxGeometry(planeWidth, planeHeight, planeDepth);
+            let planeMat = new THREE.MeshBasicMaterial({
+                color: new THREE.Color("rgb(0, 0, 255)")
+            });
+            var planeSelection = new THREE.Mesh(planeGeom, planeMat);
+            planeSelection.position.copy(center);
+
+            var direction = new THREE.Vector3();
+            planeSelection.getWorldDirection(direction);
+            direction = new THREE.Vector3(Math.abs(direction.x - 1), Math.abs(direction.y - 1), Math.abs(direction.z - 1))
+            //xDir *= direction.x;
+            //yDir *= direction.y;
+            //zDir *= direction.z;
+
+            for (var w = 0, i = 0; w <= planeWidth / 2; w++, i += 2) {
+
+                for (var h = 0, j = 0; h <= planeHeight / 2; h++, j += 2) {
+
+                    for (var d = 0, k = 0; d <= planeDepth / 2; d++, k += 2) {
+
+                        var plane = getPlaneByName((vec1.x + (i * xDir)) + "/" + (vec1.y + (j * yDir)) + "/" + (vec1.z + (k * zDir)));
+
+                        if (plane[0]) {
+                            window.instancedMesh.setColorAt(plane[0].id_instanced, orange);
+                            window.SELECTED_ID_ORANGE.push(plane[0]);
+                            window.SELECTED_ID.push(plane[0].id_instanced);
+                        }
+                    }
+                }
+            }
+        }
+
         window.instancedMesh.instanceColor.needsUpdate = true;
     }
 
     //console.log(window.planeUserData[instanceId])
 
-    //------------------------------------------------------------------
-
     if (event.button == 2) {
         if (window.planeUserData[instanceId].itemName != "exitDoor" &&
             window.planeUserData[instanceId].itemName != "enterDoor" &&
             window.planeUserData[instanceId].itemName != "window") {
-            console.log(window.SELECTED_ID)
 
-            if (window.planeUserData[instanceId].hasItem && window.planeUserData[instanceId].itemName.includes("ramp")) {
+            if (window.planeUserData[instanceId].hasItem &&
+                (window.planeUserData[instanceId].itemName.includes("sphere") ||
+                    window.planeUserData[instanceId].itemName.includes("cube") ||
+                    window.planeUserData[instanceId].itemName.includes("laser_cube"))) {
+                $("#dispenser-state").css("display", "block");
+            } else {
+                $("#dispenser-state").css("display", "none");
+            }
+
+            if (window.planeUserData[instanceId].hasItem && window.planeUserData[instanceId].itemName.includes("door")) {
                 $("#rotate-item").css("display", "block");
-                window.SELECTED_ID.push(instanceId);
             } else {
                 $("#rotate-item").css("display", "none");
             }
 
+            window.SELECTED_ID.push(instanceId);
+
             showMenu(event.pageX, event.pageY);
         }
     }
+}
+
+function getPlaneByName(name) {
+    return window.planeUserData.filter(
+        function (data) {
+            return data.name == name
+        }
+    );
 }
 
 //UI
@@ -73,13 +171,11 @@ function showMenu(x, y) {
 }
 
 $("body").on('click', '#rotate-item', function () {
-    for (var i = 0; i < window.SELECTED_ID.length; i++) {
+    /*for (var i = 0; i < window.SELECTED_ID.length; i++) {
 
-        var instanced = window.ITEMS_ADDED.getObjectByName("ramp");
-        //console.log(instanced)
+        var instanced = window.ITEMS_ADDED.getObjectByName("door");
 
-        console.log(window.planeUserData[window.SELECTED_ID[i]])
-        //trasnlatePlane(window.SELECTED_ID[i], 1, window.planeUserData[window.SELECTED_ID[i]].portal);
+        console.log(instanced)
 
         var dummy = new THREE.Object3D();
         dummy.position.copy(window.planeUserData[window.SELECTED_ID[i]].item.position);
@@ -94,7 +190,14 @@ $("body").on('click', '#rotate-item', function () {
         instanced.computeBoundingSphere();
 
         window.planeUserData[window.SELECTED_ID[i]].item.rotation.copy(dummy.rotation);
-    }
+    }*/
+
+    console.log(window.planeUserData[window.SELECTED_ID[0]])
+    console.log(window.ITEMS_ADDED)
+
+    var door = window.ITEMS_ADDED.getObjectByName(window.planeUserData[window.SELECTED_ID[0]].itemName);
+    door.rotation.y += Math.PI / 2;
+    console.log(door)
 });
 
 $("body").on('click', '#delete', function () {
@@ -131,6 +234,29 @@ $("body").on('click', '.tile-portal', function () {
     }
 
     $(".menu").removeClass("menu-show");
+});
+
+$("body").on('click', '#dispenser-state', function () {
+
+    for (var i = 0; i < window.SELECTED_ID.length; i++) {
+
+        window.planeUserData[window.SELECTED_ID[i]].item.hasDispenser = !window.planeUserData[window.SELECTED_ID[i]].item.hasDispenser;
+
+        var instanced = window.ITEMS_ADDED.getObjectByName("dispenser");
+        var item = new THREE.Object3D();
+        item.position.copy(window.planeUserData[window.SELECTED_ID[i]].item.dispenserPosition);
+
+        if (window.planeUserData[window.SELECTED_ID[i]].item.hasDispenser) {
+            item.scale.set(1, 1, 1);
+        } else {
+            item.scale.set(0, 0, 0);
+        }
+
+        item.updateMatrix();
+        instanced.setMatrixAt(window.planeUserData[window.SELECTED_ID[i]].item.dispenserID, item.matrix);
+        instanced.instanceMatrix.needsUpdate = true;
+        instanced.computeBoundingSphere();
+    }
 });
 
 export {

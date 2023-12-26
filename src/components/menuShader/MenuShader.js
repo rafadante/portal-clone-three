@@ -1,5 +1,13 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import $ from 'jquery';
+import {
+    addItem,
+    findPath
+} from '../items/Items';
+import {
+    AddGoo
+} from '../goo/Goo';
+import { viewFPS } from '../test/Test';
 
 const vshader = `
 varying vec2 vUv; 
@@ -287,9 +295,9 @@ var plane2;
 
 var transition = false;
 var transition2 = false;
-var stopMenuLoop = true;
+var stopMenuLoop = false;
 
-$("#blocker").css("display", "none");
+/*$("#blocker").css("display", "none");
 $("#ui").css("display", "block");
 $("#container #back-effect").css("display", "none");
 $("#main-container").css("display", "block");
@@ -299,11 +307,13 @@ $("#options-settings").css("display", "block");
 $("#settings-menu-title").text("OPTIONS");
 $("#back-main").css("display", "none");
 $("#settings-close").css("display", "block");
-$("#main-container").css("display", "block");
+$("#main-container").css("display", "block");*/
 
 //
-/*$("#blocker").css("display", "flex");
-$("#options-main").css("display", "block");*/
+$("#blocker").css("display", "flex");
+$("#options-main").css("display", "block");
+$("#loading-parent").css("opacity", "0");
+$("#loading-parent").css("pointer-events", "none");
 
 if (!stopMenuLoop) {
     setTimeout(() => {
@@ -351,21 +361,39 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
 }
 
 window.loadedLevel = false;
+var level;
 $("body").on('click', '#option-single-load', function () {
-    /*fetch("./levels/0.json")
+    fetch("./levels/1.json")
         .then(response => response.json())
         .then(json => {
-            //console.log(json)
+            console.log(json)
+            level = json;
             window.loadedLevel = true;
 
-            setTimeout(() => {
-                loadLevel(json);
-            }, 3000);
-            
             startLevel();
+
+            /*setTimeout(() => {
+                loadLevel(json[0]);
+
+                for (var i = 0; i < json[1].length; i++) {
+                    AddGoo(json[1][i], true);
+                }
+            }, 3000);*/
+
+
             //Do something with json variable
-        });*/
+        });
 })
+
+function loadLevelJSON() {
+    loadLevel(level[0]);
+
+    for (var i = 0; i < level[1].length; i++) {
+        AddGoo(level[1][i], true);
+    }
+
+    viewFPS();
+}
 
 $("body").on('click', '#option-community-build', function () {
     startLevel()
@@ -394,6 +422,7 @@ function startLevel() {
 
     setTimeout(() => {
         $("#loading-parent").css("opacity", "1");
+        $("#loading-parent").css("pointer-events", "all");
 
         setTimeout(() => {
             $("#blocker").css("display", "none");
@@ -524,8 +553,14 @@ $("#input-level").on('change', function (e) {
     var path = (window.URL || window.webkitURL).createObjectURL(file);
     readTextFile(path, function (text) {
         var data = JSON.parse(text);
+
         console.log(data);
-        loadLevel(data)
+
+        loadLevel(data[0])
+
+        for (var i = 0; i < data[1].length; i++) {
+            AddGoo(data[1][i], true);
+        }
     });
 })
 
@@ -548,8 +583,8 @@ function loadLevel(data) {
 
     const geometry = new THREE.PlaneGeometry(2, 2);
 
-    window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 1500);
-    window.instancedMesh.position.y = 10000;
+    window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 3000);
+    //window.instancedMesh.position.y = 10000;
     window.instancedMesh.castShadow = true;
     window.instancedMesh.receiveShadow = true;
     window.instancedMesh.name = "cube-parent";
@@ -557,15 +592,26 @@ function loadLevel(data) {
 
     var clone = new THREE.Object3D();
 
+    for (var i = 0; i < 3000; i++) {
+        clone.scale.set(0, 0, 0);
+        clone.updateMatrix();
+        window.instancedMesh.setMatrixAt(i, clone.matrix);
+    }
+
+    var triggers = [];
+
     for (var i = 0; i < data.length; i++) {
 
         if (data[i].exists) {
 
             clone.rotation.copy(data[i].rotation);
             clone.position.copy(data[i].position);
+            clone.scale.set(1, 1, 1);
 
             clone.updateMatrix();
             window.instancedMesh.setMatrixAt(i, clone.matrix);
+
+            //window.planeUserData[i] = data[i];
 
             if (data[i].portal)
                 window.instancedMesh.setColorAt(i, new THREE.Color().setHex(0xffffff));
@@ -574,8 +620,56 @@ function loadLevel(data) {
 
             window.instancedMesh.instanceColor.needsUpdate = true;
 
+            if (data[i].hasItem) {
+
+                if (data[i].itemName.split('-')[0] != "exitDoor" &&
+                    data[i].itemName.split('-')[0] != "enterDoor" &&
+                    data[i].itemName.split('-')[0] != "window" &&
+                    data[i].itemName.split('-')[0] != "dispenser") {
+
+                    const state = data[i].state;
+
+                    console.log(data[i])
+
+                    addItem(window.planeUserData[i], true)
+
+                    window.planeUserData[i].state = state;
+
+                    //console.log(data[i].trigger)
+                    if (data[i].trigger) {
+                        console.log("111111111111")
+                        triggers.push(window.planeUserData[i]);
+                    }
+                }
+
+            }
         }
 
     }
 
+    for (var i = 0; i < triggers.length; i++) {
+
+        console.log(triggers[i])
+        const id = triggers[i].id_instanced;
+
+        window.startItem = window.planeUserData[id];
+        window.startItem.instanceId = id;
+        window.startItem.trigger = window.planeUserData[triggers[i].trigger];
+        console.log(window.startItem)
+        if (window.startItem.itemName.includes("pedestal_button"))
+            window.startItem.trigger.item.item.state = window.startItem.state;
+        window.startItem.trigger.instanceId = window.startItem.trigger.id_instanced;
+        window.startItem.normal = window.startItem.normal;
+        window.startItem.trigger.normal = window.startItem.normal;
+
+        console.log(window.planeUserData[id].trigger)
+        findPath(window.planeUserData[id].position, window.planeUserData[id].trigger.position, window.planeUserData[id].trigger)
+    }
+
+    //
+
+}
+
+export {
+    loadLevelJSON
 }

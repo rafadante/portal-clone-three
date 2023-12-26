@@ -1,9 +1,9 @@
 /* eslint-disable */
 
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import {
     Box3
-} from '../../build/three.module.js';
+} from 'three';
 
 class GeneralBB {
     // width, depth, height numbers

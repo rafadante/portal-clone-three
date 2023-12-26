@@ -105,8 +105,8 @@ function postColorMaterial(tex) {
       uniforms: {
         texColor: { type: "sampler2D", value: tex },
       },
-  
-      vertexShader: `#version 300 es
+      glslVersion: THREE.GLSL3,
+      vertexShader: `
           in vec2 position;
           in vec2 uv;
   
@@ -121,7 +121,7 @@ function postColorMaterial(tex) {
               gl_Position = vec4( position, 0.0, 1.0 );
           }`,
   
-      fragmentShader: `#version 300 es
+      fragmentShader: `
           precision mediump float;
           
           uniform sampler2D texColor;

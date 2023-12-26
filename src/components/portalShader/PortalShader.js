@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 var width = window.innerWidth,
     height = window.innerHeight,
@@ -113,6 +113,8 @@ void main( )
 
     gl_FragColor = vec4(mix(vec3(1, 0.2, 0),vec3(color, pow(max(color,0.),2.)*0.4, pow(max(color,0.),3.)*0.15),color),1.0);
 
+    #include <tonemapping_fragment>
+            #include <encodings_fragment>
 }
 `;
 
@@ -181,7 +183,8 @@ void main( )
     gl_FragColor = vec4(pow(max(color,0.),3.)*0.15, pow(max(color,0.),2.)*0.4, color, y);
 
     gl_FragColor = vec4(mix(vec3(1, 0.2, 0),vec3(color, pow(max(color,0.),2.)*0.4, pow(max(color,0.),3.)*0.15),color),y);
-
+    #include <tonemapping_fragment>
+    #include <encodings_fragment>
 }
 `;
 
@@ -260,7 +263,8 @@ void main( )
     //gl_FragColor = vec4(pow(max(color,0.),3.)*0.15, pow(max(color,0.),2.)*0.4, color, y);
 
     gl_FragColor = vec4(mix(vec3(0, 0.2, 1),vec3(pow(max(color,0.),3.)*0.15, pow(max(color,0.),2.)*0.4, color),color),1.0);
-
+    #include <tonemapping_fragment>
+    #include <encodings_fragment>
 }
 `;
 
@@ -329,7 +333,8 @@ void main( )
     //gl_FragColor = vec4(pow(max(color,0.),3.)*0.15, pow(max(color,0.),2.)*0.4, color, y);
 
     gl_FragColor = vec4(mix(vec3(0, 0.2, 1),vec3(pow(max(color,0.),3.)*0.15, pow(max(color,0.),2.)*0.4, color),color),y);
-
+    #include <tonemapping_fragment>
+    #include <encodings_fragment>
 }
 `;
 

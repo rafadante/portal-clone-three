@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import {
     threeToCannon,
@@ -208,7 +208,6 @@ function createLightBridges(item, rayItem) {
 
             if (item == "laser_emitter") {
                 plane.translateY(-0.6)
-                window.SELECTED_OBJECTS_FOR_BLOOM.add(plane);
             }
 
             const result = threeToCannon(plane, {
@@ -378,7 +377,6 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
             if (rayItem[g].name == "laser_emitter") {
                 plane.translateY(0.6)
-                window.SELECTED_OBJECTS_FOR_BLOOM.add(plane);
             }
 
             let PHYSICS_MATERIAL = new CANNON.Material();

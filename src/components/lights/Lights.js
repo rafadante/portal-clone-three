@@ -1,10 +1,7 @@
-import * as THREE from '../../build/three.module.js';
-import {
-    RectAreaLightHelper
-} from '../../jsm/helpers/RectAreaLightHelper.js';
+import * as THREE from 'three';
 import {
     RectAreaLightUniformsLib
-} from '../../jsm/lights/RectAreaLightUniformsLib.js';
+} from 'three/addons/lights/RectAreaLightUniformsLib.js';
 
 const Lights = function (THREE) {
 
@@ -22,7 +19,7 @@ const Lights = function (THREE) {
     var spotLight = new THREE.SpotLight(0xffffff, 20);
     spotLight.name = "spotLightMain";
     //spotLight.position.set(16, 15, 12);
-    spotLight.position.set(18, 7.5, 6);
+    spotLight.position.set(22, 7.5, 6);
     spotLight.angle = Math.PI / 2.25;
     spotLight.penumbra = 1;
     spotLight.decay = 1; //2
@@ -34,8 +31,8 @@ const Lights = function (THREE) {
         spotLight.shadow.mapSize.width = 512;
         spotLight.shadow.mapSize.height = 512;
     }else{
-        spotLight.shadow.mapSize.width = 4096;
-        spotLight.shadow.mapSize.height = 4096;
+        spotLight.shadow.mapSize.width = 2048;
+        spotLight.shadow.mapSize.height = 2048;
     }
     
     spotLight.shadow.camera.near = 1;
@@ -81,7 +78,7 @@ const Lights = function (THREE) {
     rectLight1.rotation.x = -Math.PI / 2;
     rectLight1.rotation.z = -Math.PI / 2;
     rectLight1.position.set(8, 7.99, 6);
-    lightGroup.add(rectLight1);
+    //lightGroup.add(rectLight1);
 
     //lightGroup.add(new RectAreaLightHelper(rectLight1));
 

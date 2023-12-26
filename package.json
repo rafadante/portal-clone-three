@@ -22,9 +22,11 @@
     "react-scripts": "5.0.1",
     "sass": "^1.68.0",
     "stats-gl": "^1.0.5",
-    "three": "^0.150.0",
+    "three": "^0.159.0",
     "three-joystick": "^1.0.2",
+    "three-mesh-bvh": "^0.6.8",
     "three-nebula": "^10.0.3",
+    "three-pathfinding": "^1.2.0",
     "three-to-cannon": "^4.3.0",
     "threejs-meshline": "^2.0.12",
     "web-vitals": "^2.1.4"
