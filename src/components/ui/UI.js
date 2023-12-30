@@ -1,7 +1,8 @@
 import $ from 'jquery';
 import * as THREE from 'three';
+import { GLOBALS } from '../../Globals.js';
 
-if (!window.mobile)
+if (!GLOBALS.MOBILE)
     $(".mobile").css("display", "none")
 
 
@@ -40,38 +41,34 @@ $("body").on('input', '#option-stats', function () {
 
 //SHADOW
 $("body").on('input', '#option-shadow', function () {
-    window.RENDERER.shadowMap.enabled = !this.checked;
+    GLOBALS.RENDERER.shadowMap.enabled = !this.checked;
 })
 
 //RECURSIVE PORTALS
 $('#recursive-select').on('change', function () {
-    window.PORTAL_RECURSION_LEVELS = $(this).val();
+    GLOBALS.PORTAL_RECURSION_LEVELS = $(this).val();
 });
 
 //FPS MAIN SCENE
-window.fpsUnlocked = true;
 $('#fps-select').on('change', function () {
-    window.fps = $(this).val();
+    GLOBALS.FPS_MODE = $(this).val();
 
-    if (window.fps == "unlocked") {
-        window.fps = window.unlockedFPS;
-        window.fpsUnlocked = true;
+    if (GLOBALS.FPS_MODE == "unlocked") {
+        GLOBALS.FPS_MODE = window.unlockedFPS;
+        GLOBALS.FPS_UNLOCKED = true;
     } else {
-        window.fpsUnlocked = false;
+        GLOBALS.FPS_UNLOCKED = false;
     }
 
 
-    window.interval = 1 / window.fps;
+    GLOBALS.INTERVAL = 1 / GLOBALS.FPS_MODE;
 });
 
 //RESOLUTION
 $('#resolution-select').on('change', function () {
-    window.RENDERER.setPixelRatio(window.devicePixelRatio * $(this).val());
-    //window.MAIN_CAMERA.updateProjectionMatrix();
-    //window.MAIN_SCENE.updateWorldMatrix(false, true);
-
-    //window.PORTAL_TARGETS = [new THREE.WebGLRenderTarget(1, 1), new THREE.WebGLRenderTarget(1, 1)]
-    //window.PORTAL_TMP_TARGETS = [new THREE.WebGLRenderTarget(1, 1), new THREE.WebGLRenderTarget(1, 1)]
+    GLOBALS.RENDERER.setPixelRatio(window.devicePixelRatio * $(this).val());
+    //GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
+    //GLOBALS.SCENE.updateWorldMatrix(false, true);
 });
 
 //SHADOW RESOLUTION
@@ -86,16 +83,16 @@ $('#shadows-resolution-select').on('change', function () {
 //FOV
 $('#fov-val-range').on('input', function () {
     $("#fov-val-number").val($(this).val());
-    window.MAIN_CAMERA.fov = $(this).val();
-    window.MAIN_CAMERA.updateProjectionMatrix();
+    GLOBALS.MAIN_CAMERA.fov = $(this).val();
+    GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
 });
 
 //MOUSE
 $('#mouse-val-range').on('input', function () {
     $("#mouse-val-number").val($(this).val());
 
-    if (!window.mobile)
-        window.PointerControls.pointerSpeed = $(this).val();
+    if (!GLOBALS.MOBILE)
+        GLOBALS.POINTER_CONTROLS.pointerSpeed = $(this).val();
     //else
     //    window.rotationMobile = $(this).val() * 0.1;
 });
@@ -114,37 +111,36 @@ $("body").on('input', '#opacity-val-range', function () {
 //BACK FROM EDITOR
 $("body").on('click', '#back-editor', function () {
 
-    window.STATS.container.style.display = "none";
-    window.FPS = false;
-    window.ROOM.visible = true;
-    window.GROUP_STRUCTURE.visible = false;
-    window.CONTROLS.enabled = true;
-    window.MAIN_SCENE.environment = window.ENV_MAP_FPS;
-    window.LIGHT_GROUP.visible = false;
+    GLOBALS.STATS.container.style.display = "none";
+    GLOBALS.FPS_MODE = false;
+    GLOBALS.ROOM.visible = true;
+    GLOBALS.CONTROLS.enabled = true;
+    GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;
+    GLOBALS.LIGHT_GROUP.visible = false;
 
     $("#ui").css("display", "block");
     $(".img").removeClass("image");
     $("#mobile-controls").css("display", "none");
 
     var bb = new THREE.Box3()
-    bb.setFromObject(window.ROOM);
-    bb.getCenter(window.CONTROLS.target);
+    bb.setFromObject(GLOBALS.ROOM);
+    bb.getCenter(GLOBALS.CONTROLS.target);
 
-    window.CONTROLS.target.set(window.CONTROLS.target.x + 0, window.CONTROLS.target.y + 0, window.CONTROLS.target.z + 0);
-    window.MAIN_CAMERA.position.set(-4.2, 13, 22.5)
-    window.CONTROLS.update();
+    GLOBALS.CONTROLS.target.set(GLOBALS.CONTROLS.target.x + 0, GLOBALS.CONTROLS.target.y + 0, GLOBALS.CONTROLS.target.z + 0);
+    GLOBALS.MAIN_CAMERA.position.set(-4.2, 13, 22.5)
+    GLOBALS.CONTROLS.update();
     $("#blocker").css("display", "none");
     $("#blocker").css("pointer-events", "none");
     $("#reticle").css("display", "none");
-    window.MAIN_CAMERA.remove(window.GUN);
+    GLOBALS.MAIN_CAMERA.remove(GLOBALS.GUN);
 
-    if (window.PORTALS.length == 1) {
-        window.MAIN_SCENE.remove(window.PORTALS[0]);
-    } else if (window.PORTALS.length == 2) {
-        window.MAIN_SCENE.remove(window.PORTALS[1]);
-        window.MAIN_SCENE.remove(window.PORTALS[0]);
+    if (GLOBALS.PORTALS.length == 1) {
+        GLOBALS.SCENE.remove(GLOBALS.PORTALS[0]);
+    } else if (GLOBALS.PORTALS.length == 2) {
+        GLOBALS.SCENE.remove(GLOBALS.PORTALS[1]);
+        GLOBALS.SCENE.remove(GLOBALS.PORTALS[0]);
     }
-    window.PORTALS = [null, null];
+    GLOBALS.PORTALS = [null, null];
 });
 
 $("#arrow-menu").click(function () {

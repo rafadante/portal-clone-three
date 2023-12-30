@@ -15,6 +15,9 @@ import {
     newPortal,
     deletePortal
 } from '../portal/CreatePortal.js';
+import {
+    GLOBALS
+} from '../../Globals.js';
 //
 window.raycastLightBridge = [];
 window.raycastTractorBeam = [];
@@ -23,7 +26,6 @@ window.lightBridgesClone = [];
 window.lightBridgesColliderClone = [];
 window.portalShader = [];
 window.beamLength = 0;
-window.laserLength = 0;
 //
 var totalBodies = 0;
 var meshesWallPortal = [];
@@ -34,8 +36,6 @@ var meshesUpPortal = [];
 var meshesUpNonPortal = [];
 var id = 0;
 
-window.nonPortal = [];
-window.cubes = [];
 var sideDown = [];
 var sideUp = [];
 var sideFront = [];
@@ -49,14 +49,12 @@ $("body").on('click', '#view-fps', function () {
 
 function viewFPS() {
 
-    window.ITEM_CUBE.visible = false;
+    GLOBALS.ITEM_CUBE.visible = false;
     window.spotLight.intensity = 0;
-    window.lightRoom.intensity = 0;
 
-    var obj = window.ENTER_DOOR.clone();
+    var obj = GLOBALS.ENTER_DOOR.clone();
     obj.translateZ(1);
-    window.PLAYER.spawnPosition = obj.position.clone();
-    console.log(window.PLAYER.spawnPosition)
+    GLOBALS.PLAYER.spawnPosition = obj.position.clone();
 
     $("#loading-parent").css("opacity", 1)
     $("#loading-parent").css("pointer-events", "all")
@@ -65,11 +63,14 @@ function viewFPS() {
 
     setTimeout(() => {
 
+        //
+        window.EXIT_ROOM.visible = true;
+
         // DOORS SCALE
-        window.enter_door_right.scale.set(1, 1, 1);
-        window.enter_door_left.scale.set(1, 1, 1);
-        window.exit_door_right.scale.set(1, 1, 1);
-        window.exit_door_left.scale.set(1, 1, 1);
+        GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").scale.set(1, 1, 1);
+        GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").scale.set(1, 1, 1);
+        GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").scale.set(1, 1, 1);
+        GLOBALS.EXIT_DOOR.getObjectByName("portal_door_left_06").scale.set(1, 1, 1);
 
         window.planeExitDoor.getObjectByName("warning").visible = false;
 
@@ -82,47 +83,47 @@ function viewFPS() {
             $("#loading-parent").css("opacity", 0)
             $("#loading-parent").css("pointer-events", "none")
 
-            if (window.mobile)
+            if (GLOBALS.MOBILE)
                 $("#mobile-controls").css("display", "block");
         }, 5000);
 
-        window.CONTROLS.enabled = false;
-        window.ROOM.visible = false;
+        GLOBALS.CONTROLS.enabled = false;
+        GLOBALS.ROOM.visible = false;
 
         //SEPARETE MESHS FOR INSTANCING
-        for (var i = 0; i < window.planeUserData.length; i++) {
-            if (window.planeUserData[i].exists) {
-                if (window.planeUserData[i].itemName != "enterDoor" &&
-                    window.planeUserData[i].itemName != "exitDoor") {
+        for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
+            if (GLOBALS.PLANE_USER_DATA[i].exists) {
+                if (GLOBALS.PLANE_USER_DATA[i].itemName != "enterDoor" &&
+                    GLOBALS.PLANE_USER_DATA[i].itemName != "exitDoor") {
 
-                    if (window.planeUserData[i].side == "front")
-                        sideFront.push(window.planeUserData[i])
-                    else if (window.planeUserData[i].side == "back")
-                        sideBack.push(window.planeUserData[i])
-                    else if (window.planeUserData[i].side == "right")
-                        sideRight.push(window.planeUserData[i])
-                    else if (window.planeUserData[i].side == "left")
-                        sideLeft.push(window.planeUserData[i])
+                    if (GLOBALS.PLANE_USER_DATA[i].side == "front")
+                        sideFront.push(GLOBALS.PLANE_USER_DATA[i])
+                    else if (GLOBALS.PLANE_USER_DATA[i].side == "back")
+                        sideBack.push(GLOBALS.PLANE_USER_DATA[i])
+                    else if (GLOBALS.PLANE_USER_DATA[i].side == "right")
+                        sideRight.push(GLOBALS.PLANE_USER_DATA[i])
+                    else if (GLOBALS.PLANE_USER_DATA[i].side == "left")
+                        sideLeft.push(GLOBALS.PLANE_USER_DATA[i])
 
-                    if (window.planeUserData[i].portal) {
-                        if (window.planeUserData[i].side == "up") {
-                            sideUp.push(window.planeUserData[i])
-                            meshesFloorPortal.push(window.planeUserData[i]);
-                        } else if (window.planeUserData[i].side == "down") {
-                            sideDown.push(window.planeUserData[i])
-                            meshesUpPortal.push(window.planeUserData[i]);
+                    if (GLOBALS.PLANE_USER_DATA[i].portal) {
+                        if (GLOBALS.PLANE_USER_DATA[i].side == "up") {
+                            sideUp.push(GLOBALS.PLANE_USER_DATA[i])
+                            meshesFloorPortal.push(GLOBALS.PLANE_USER_DATA[i]);
+                        } else if (GLOBALS.PLANE_USER_DATA[i].side == "down") {
+                            sideDown.push(GLOBALS.PLANE_USER_DATA[i])
+                            meshesUpPortal.push(GLOBALS.PLANE_USER_DATA[i]);
                         } else {
-                            meshesWallPortal.push(window.planeUserData[i]);
+                            meshesWallPortal.push(GLOBALS.PLANE_USER_DATA[i]);
                         }
                     } else {
-                        if (window.planeUserData[i].side == "up") {
-                            meshesFloorNonPortal.push(window.planeUserData[i])
-                            sideUp.push(window.planeUserData[i])
-                        } else if (window.planeUserData[i].side == "down") {
-                            meshesUpNonPortal.push(window.planeUserData[i])
-                            sideDown.push(window.planeUserData[i])
+                        if (GLOBALS.PLANE_USER_DATA[i].side == "up") {
+                            meshesFloorNonPortal.push(GLOBALS.PLANE_USER_DATA[i])
+                            sideUp.push(GLOBALS.PLANE_USER_DATA[i])
+                        } else if (GLOBALS.PLANE_USER_DATA[i].side == "down") {
+                            meshesUpNonPortal.push(GLOBALS.PLANE_USER_DATA[i])
+                            sideDown.push(GLOBALS.PLANE_USER_DATA[i])
                         } else {
-                            meshesWallNonPortal.push(window.planeUserData[i]);
+                            meshesWallNonPortal.push(GLOBALS.PLANE_USER_DATA[i]);
                         }
                     }
                 }
@@ -137,61 +138,54 @@ function viewFPS() {
         colliderRoom(sideLeft, "left", "y", "z", "x", "z");
         console.log("TOTAL BODIES COLLIDERS: " + totalBodies);
 
-        window.CORRIDOR_ENTER.visible = true;
-        window.MAIN_SCENE.environment = null;
-        window.LIGHT_GROUP.visible = true;
-        window.STATS.container.style.display = "block";
-        window.OBSERVATION_ROOM.visible = true;
-        window.MAIN_SCENE.getObjectByName("window").visible = false;
+        GLOBALS.CORRIDOR_ENTER.visible = true;
+        GLOBALS.SCENE.environment = null;
+        GLOBALS.LIGHT_GROUP.visible = true;
+        GLOBALS.STATS.container.style.display = "block";
+        GLOBALS.OBSERVATION_ROOM.visible = true;
+        GLOBALS.SCENE.getObjectByName("window").visible = false;
         //--------------------------------------------------------------------------
-        window.OBSERVATION_ROOM.position.copy(window.OBSERVATION_ROOM_IMG.position);
-        window.OBSERVATION_ROOM.rotation.copy(window.OBSERVATION_ROOM_IMG.rotation);
+        GLOBALS.OBSERVATION_ROOM.position.copy(GLOBALS.OBSERVATION_ROOM_IMG.position);
+        GLOBALS.OBSERVATION_ROOM.rotation.copy(GLOBALS.OBSERVATION_ROOM_IMG.rotation);
         //---------------------------------------------------------
         var target = new THREE.Vector3(); // create once an reuse it
         window.room_light.getWorldPosition(target);
 
-        window.LIGHT_GROUP.getObjectByName("spotLightMain").position.copy(target);
-        window.LIGHT_GROUP.getObjectByName("spotLightMain").translateY(-1);
-        window.LIGHT_GROUP.getObjectByName("spotLightMain").translateX(-0.5);
+        GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").position.copy(target);
+        GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").translateY(-1);
+        GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").translateX(-0.5);
 
         var target = new THREE.Vector3(); // create once an reuse it
-        window.OBSERVATION_ROOM_IMG.getObjectByName("target_light").getWorldPosition(target);
+        GLOBALS.OBSERVATION_ROOM_IMG.getObjectByName("target_light").getWorldPosition(target);
 
         var obj = new THREE.Object3D();
         obj.position.copy(target);
-        window.MAIN_SCENE.add(obj);
+        GLOBALS.SCENE.add(obj);
 
-        window.LIGHT_GROUP.getObjectByName("spotLightMain").target = obj;
-        window.MAIN_SCENE.add(window.GUN);
-        window.GUN.children[0].add(window.lightningStrikeMesh, window.lightningStrikeMesh2, window.lightningStrikeMesh3);
-        window.GUN.visible = true;
-        window.GUN_SPHERE.material = window.materialGun;
-        window.GUN_CYLINDER.material = window.materialGun;
-        window.MAIN_CAMERA.add(window.GUN)
+        GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").target = obj;
+        GLOBALS.SCENE.add(GLOBALS.GUN);
+        GLOBALS.GUN.children[0].add(GLOBALS.LIGHTNIN_STRIKE_1,
+            GLOBALS.LIGHTNIN_STRIKE_2, GLOBALS.LIGHTNIN_STRIKE_3);
+        GLOBALS.GUN.visible = true;
+        GLOBALS.GUN_SPHERE.material = window.materialGun;
+        GLOBALS.GUN_CYLINDER.material = window.materialGun;
+        GLOBALS.MAIN_CAMERA.add(GLOBALS.GUN)
 
         //CORRIDOR ENTER COLLIDERS
-        corridorCollider(window.CORRIDOR_ENTER, "down", 1, 0.001, 3.5, false);
-        corridorCollider(window.CORRIDOR_ENTER, "up", 1, 0.001, 3.5, false);
-        corridorCollider(window.CORRIDOR_ENTER, "left", 0.001, 1, 3.5, false);
-        corridorCollider(window.CORRIDOR_ENTER, "right", 0.001, 1, 3.5, false);
-        corridorCollider(window.CORRIDOR_ENTER, "back", 1.5, 1.5, 0.001, true);
-        corridorCollider(window.CORRIDOR_ENTER, "front", 1, 1, 0.001, false);
-        //CORRIDOR EXIT COLLIDERS
-        corridorCollider(window.CORRIDOR_EXIT, "down", 1, 0.001, 3.5, false);
-        corridorCollider(window.CORRIDOR_EXIT, "up", 1, 0.001, 3.5, false);
-        corridorCollider(window.CORRIDOR_EXIT, "left", 0.001, 1, 3.5, false);
-        corridorCollider(window.CORRIDOR_EXIT, "right", 0.001, 1, 3.5, false);
-        corridorCollider(window.CORRIDOR_EXIT, "back", 1.5, 1.5, 0.001, true);
-        corridorCollider(window.CORRIDOR_EXIT, "front", 1, 1, 0.001, false);
+        corridorColliderNames(true);
+
+        var bb = new THREE.Box3(); // for re-use
+        bb.setFromObject(window.elevatorTrigger);
+        window.elevatorTrigger = bb;
         //
         var target = new THREE.Vector3(); // create once an reuse it
-        window.CORRIDOR_ENTER.getObjectByName("spawn").getWorldPosition(target);
+        GLOBALS.CORRIDOR_ENTER.getObjectByName("spawn").getWorldPosition(target);
 
-        window.PLAYER.position.copy(target)
+        GLOBALS.PLAYER.position.copy(target)
 
-        window.MAIN_CAMERA.rotation.x = 0;
-        window.MAIN_CAMERA.rotation.y = window.MAIN_SCENE.getObjectByName("enterDoor").rotation.y + Math.PI;
-        window.MAIN_CAMERA.rotation.z = 0;
+        GLOBALS.MAIN_CAMERA.rotation.x = 0;
+        GLOBALS.MAIN_CAMERA.rotation.y = GLOBALS.SCENE.getObjectByName("enterDoor").rotation.y + Math.PI;
+        GLOBALS.MAIN_CAMERA.rotation.z = 0;
 
         //
         createInstances(meshesWallPortal, window.materialWallPortal)
@@ -201,70 +195,60 @@ function viewFPS() {
         createInstances(meshesUpPortal, window.materialFloorPortal)
         createInstances(meshesUpNonPortal, window.materialFloorNonPortal)
 
-        window.MAIN_SCENE.remove(window.ROOM);
-        window.RENDERER.renderLists.dispose();
-        window.ENTER_DOOR.children[1].visible = false;
+        GLOBALS.SCENE.remove(GLOBALS.ROOM);
+        GLOBALS.RENDERER.renderLists.dispose();
+        GLOBALS.ENTER_DOOR.children[1].visible = false;
 
-        addColliderItem(window.DYMANIC_ITEMS['cube'], "cube", 5)
-        addColliderItem(window.DYMANIC_ITEMS["sphere"], "sphere", 5)
-        addColliderItem(window.DYMANIC_ITEMS['gel_gun_blue'], "gel_gun_blue", 0)
-        addColliderItem(window.DYMANIC_ITEMS['gel_gun_orange'], "gel_gun_orange", 0)
-        addColliderItem(window.DYMANIC_ITEMS['gel_gun_white'], "gel_gun_white", 0)
-        addColliderItem(window.DYMANIC_ITEMS['pedestal_button'], "pedestal_button", 0)
-        addColliderItem(window.DYMANIC_ITEMS['radio'], "radio", 1)
-        addColliderItem(window.DYMANIC_ITEMS['button_weight'], "button_weight", 0)
-        addColliderItem(window.DYMANIC_ITEMS['button_box'], "button_box", 0, 1)
-        addColliderItem(window.DYMANIC_ITEMS['button_box'], "button_box", 0, 2)
-        addColliderItem(window.DYMANIC_ITEMS['button_box'], "button_box", 0, 3)
-        addColliderItem(window.DYMANIC_ITEMS['button_box'], "button_box", 0, 4)
-        addColliderItem(window.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 1)
-        addColliderItem(window.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 2)
-        addColliderItem(window.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 3)
-        addColliderItem(window.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 4)
-        addColliderItem(window.DYMANIC_ITEMS['ramp'], "ramp", 0)
-        addColliderItem(window.DYMANIC_ITEMS['ramp_half'], "ramp_half", 0)
-        addColliderItem(window.DYMANIC_ITEMS['ramp_half2'], "ramp_half2", 0)
-        addColliderItem(window.DYMANIC_ITEMS['stairs'], "stairs", 0)
-        addColliderItem(window.DYMANIC_ITEMS['laser_cube'], "laser_cube", 5)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['cube'], "cube", 5)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS["sphere"], "sphere", 5)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['gel_gun_blue'], "gel_gun_blue", 0)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['gel_gun_orange'], "gel_gun_orange", 0)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['gel_gun_white'], "gel_gun_white", 0)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['pedestal_button'], "pedestal_button", 0)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['radio'], "radio", 1)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['button_weight'], "button_weight", 0)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['button_box'], "button_box", 0, 1)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['button_box'], "button_box", 0, 2)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['button_box'], "button_box", 0, 3)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['button_box'], "button_box", 0, 4)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 1)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 2)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 3)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 4)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['ramp'], "ramp", 0)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['ramp_half'], "ramp_half", 0)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['ramp_half2'], "ramp_half2", 0)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['stairs'], "stairs", 0)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['laser_cube'], "laser_cube", 5)
         addColliderItem(window.DOORS, "door", 0)
-        console.log("888888888888888")
-        console.log(window.DOORS)
         //
         createLightBridges('light_bridge', window.raycastLightBridge);
         createLightBridges("tractor_beam", window.raycastTractorBeam);
         createLightBridges("laser_emitter", window.raycastLaserEmitter);
 
-        for (var s = 0; s < window.DYMANIC_ITEMS["tractor_beam"].length; s++) {
-            if (window.DYMANIC_ITEMS["tractor_beam"][s].length != 0)
+        for (var s = 0; s < GLOBALS.DYMANIC_ITEMS["tractor_beam"].length; s++) {
+            if (GLOBALS.DYMANIC_ITEMS["tractor_beam"][s].length != 0)
                 window.beamLength++
         }
 
-        for (var s = 0; s < window.DYMANIC_ITEMS["laser_emitter"].length; s++) {
-            if (window.DYMANIC_ITEMS["laser_emitter"][s].length != 0)
-                window.laserLength++
+        for (var s = 0; s < GLOBALS.DYMANIC_ITEMS["laser_emitter"].length; s++) {
+            if (GLOBALS.DYMANIC_ITEMS["laser_emitter"][s].length != 0)
+                GLOBALS.LASER_EMITTER_LENGTH++
         }
 
-        window.MAIN_SCENE.traverse(child => {
+        GLOBALS.SCENE.traverse(child => {
             child.frustumCulled = false;
         })
 
-        console.log(window.DYMANIC_ITEMS)
-
-        window.FPS = true;
+        GLOBALS.FPS_MODE = true;
         animate();
 
-        //window['createBlueGel'] ()
-
-        console.log("4444444444444444")
-        console.log(window.DYMANIC_ITEMS['light'])
-
-        var instanced = window.ITEMS_ADDED.getObjectByName("lightEmissive");
+        var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("lightEmissive");
         instanced.material.emissive = new THREE.Color(0xffffff)
         instanced.material.emissiveIntensity = 100
-        console.log(instanced)
 
-        for (var i = 0; i < window.DYMANIC_ITEMS['stripe'].length; i++) {
-            if (window.DYMANIC_ITEMS['stripe'][i].id) {
+        for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['stripe'].length; i++) {
+            if (GLOBALS.DYMANIC_ITEMS['stripe'][i].id) {
                 const geometry = new THREE.PlaneGeometry(1, 1);
                 const material = new THREE.MeshStandardMaterial({
                     side: THREE.DoubleSide,
@@ -272,35 +256,32 @@ function viewFPS() {
                     emissiveIntensity: 100
                 });
                 const plane = new THREE.Mesh(geometry, material);
-                plane.position.copy(window.DYMANIC_ITEMS['stripe'][i].position);
-                plane.rotation.copy(window.DYMANIC_ITEMS['stripe'][i].rotation);
+                plane.position.copy(GLOBALS.DYMANIC_ITEMS['stripe'][i].position);
+                plane.rotation.copy(GLOBALS.DYMANIC_ITEMS['stripe'][i].rotation);
                 plane.scale.set(0.2, 2, 2)
                 plane.translateZ(0.025);
-                window.MAIN_SCENE.add(plane);
-                console.log(plane)
+                GLOBALS.SCENE.add(plane);
             }
         }
 
-        for (var i = 0; i < window.DYMANIC_ITEMS['light'].length; i++) {
+        for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['light'].length; i++) {
 
-            if (window.DYMANIC_ITEMS['light'][i].id) {
+            if (GLOBALS.DYMANIC_ITEMS['light'][i].id) {
 
-                console.log("55555555555555555")
-                var planeInstanced = window.planeUserData[window.DYMANIC_ITEMS['light'][i].planeInstancedId];
-                console.log(planeInstanced)
+                var planeInstanced = GLOBALS.PLANE_USER_DATA[GLOBALS.DYMANIC_ITEMS['light'][i].planeInstancedId];
 
                 const rectLight = new THREE.RectAreaLight(0xffffff, 2, 5, 5);
-                rectLight.position.copy(window.DYMANIC_ITEMS['light'][i].position);
-                rectLight.rotation.copy(window.DYMANIC_ITEMS['light'][i].rotation);
+                rectLight.position.copy(GLOBALS.DYMANIC_ITEMS['light'][i].position);
+                rectLight.rotation.copy(GLOBALS.DYMANIC_ITEMS['light'][i].rotation);
                 rectLight.translateZ(0.025);
                 rectLight.rotation.x *= -1;
                 rectLight.rotation.y *= -1;
                 rectLight.rotation.z *= -1;
-                //window.MAIN_SCENE.add(rectLight);
+                //GLOBALS.SCENE.add(rectLight);
 
                 var lightEmissive = new THREE.Object3D();
-                lightEmissive.position.copy(window.DYMANIC_ITEMS['light'][i].position);
-                lightEmissive.rotation.copy(window.DYMANIC_ITEMS['light'][i].rotation);
+                lightEmissive.position.copy(GLOBALS.DYMANIC_ITEMS['light'][i].position);
+                lightEmissive.rotation.copy(GLOBALS.DYMANIC_ITEMS['light'][i].rotation);
                 lightEmissive.updateMatrix();
                 instanced.setMatrixAt(i, lightEmissive.matrix);
                 instanced.instanceMatrix.needsUpdate = true;
@@ -310,8 +291,8 @@ function viewFPS() {
                 spotLight.distance = 0;
                 spotLight.decay = 2;
                 spotLight.penumbra = 1;
-                spotLight.position.copy(window.DYMANIC_ITEMS['light'][i].position);
-                spotLight.rotation.copy(window.DYMANIC_ITEMS['light'][i].rotation);
+                spotLight.position.copy(GLOBALS.DYMANIC_ITEMS['light'][i].position);
+                spotLight.rotation.copy(GLOBALS.DYMANIC_ITEMS['light'][i].rotation);
                 spotLight.translateY(0.3);
                 spotLight.angle = Math.PI / 2;
                 //spotLight.rotation.x *= -1;
@@ -325,24 +306,15 @@ function viewFPS() {
                 spotLight.shadow.focus = 1;
 
                 var dir = new THREE.Vector3();
-                window.DYMANIC_ITEMS['light'][i].getWorldDirection(dir);
-                console.log(dir)
+                GLOBALS.DYMANIC_ITEMS['light'][i].getWorldDirection(dir);
 
                 spotLight.target.position.set(spotLight.position.x + (dir.x * 10),
                     spotLight.position.y + (dir.z * 10),
                     spotLight.position.z + (dir.y * 10));
 
-                window.MAIN_SCENE.add(spotLight);
+                GLOBALS.SCENE.add(spotLight);
                 var lightHelper = new THREE.SpotLightHelper(spotLight);
-                //window.MAIN_SCENE.add(lightHelper);
-
-                //
-
-
-
-                console.log(spotLight)
-
-
+                //GLOBALS.SCENE.add(lightHelper);
 
                 //
                 const geometry = new THREE.PlaneGeometry(1, 1);
@@ -352,33 +324,33 @@ function viewFPS() {
                     emissiveIntensity: 100
                 });
                 const plane = new THREE.Mesh(geometry, material);
-                plane.position.copy(window.DYMANIC_ITEMS['light'][i].position);
-                plane.rotation.copy(window.DYMANIC_ITEMS['light'][i].rotation);
+                plane.position.copy(GLOBALS.DYMANIC_ITEMS['light'][i].position);
+                plane.rotation.copy(GLOBALS.DYMANIC_ITEMS['light'][i].rotation);
                 plane.scale.set(0.2, 2, 2)
                 plane.translateZ(0.025);
                 //plane.rotation.x *= -1;
                 //plane.rotation.y *= -1;
                 //plane.rotation.z *= -1;
-                //window.MAIN_SCENE.add(plane);
-
-                console.log(plane)
-                console.log(rectLight)
+                //GLOBALS.SCENE.add(plane);
             }
         }
 
-        var vec = new THREE.Vector3(0,0,0);
+        window['createBlueGel']()
+        window['createOrangeGel']()
+
+
+        var vec = new THREE.Vector3(0, 0, 0);
         var obj = new THREE.Object3D();
 
         setTimeout(() => {
-            newPortal(0, 1, new THREE.Vector3(3,1,0), new THREE.Vector3(0,0,1), obj, new THREE.Vector3(0,1,0), vec)
-            newPortal(1, 0, new THREE.Vector3(5.6,1,0), new THREE.Vector3(0,0,1), obj, new THREE.Vector3(0,1,0), vec)
+            newPortal(0, 1, new THREE.Vector3(3, 1, 0), new THREE.Vector3(0, 0, 1), obj, new THREE.Vector3(0, 1, 0), vec)
+            newPortal(1, 0, new THREE.Vector3(5.6, 1, 0), new THREE.Vector3(0, 0, 1), obj, new THREE.Vector3(0, 1, 0), vec)
             setTimeout(() => {
                 deletePortal(0);
                 deletePortal(1);
+                window.EXIT_ROOM.visible = false;
             }, 1000);
         }, 1000);
-
-
 
 
     }, 500);
@@ -457,7 +429,7 @@ function addColliderItem(items, type, mass, offset) {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.7));
                 items[i].position.y += 0.77;
             } else if (type == "ramp" || type == "ramp_half" || type == "ramp_half2" || type == "stairs") {
-                const result = threeToCannon(window.ITEMS_ADDED.getObjectByName(type), {
+                const result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), {
                     type: ShapeType.HULL
                 });
                 var shape = result.shape;
@@ -472,14 +444,13 @@ function addColliderItem(items, type, mass, offset) {
 
             box.position.copy(pos);
             box.quaternion.copy(rot);
-            box.collisionFilterGroup = window.CGROUP_DYNAMIC
-            box.collisionFilterMask = window.CGROUP_ALL
+            box.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC
+            box.collisionFilterMask = GLOBALS.CGROUP_ALL
             items[i].body = box;
             box.state = items[i].state;
-            console.log(items[i])
 
 
-            //window.planeUserData[items[i].planeInstancedId].state = box.state;
+            //GLOBALS.PLANE_USER_DATA[items[i].planeInstancedId].state = box.state;
 
             box.updateMassProperties()
 
@@ -496,16 +467,15 @@ function addColliderItem(items, type, mass, offset) {
                 }
 
                 box.spawnPosition = items[i].position.clone();
-                console.log(items[i])
                 box.allowSleep = true;
                 box.sleepSpeedLimit = 1.0;
                 box.sleepTimeLimit = 1.0;
                 box.mass = 0;
 
-                window.dynamicObjects.push(box);
+                GLOBALS.DYNAMIC_OBJECTS.push(box);
                 box.gelJumping = false;
                 box.waiting = false;
-                window.BOX_BODY.push(box);
+                GLOBALS.BOX_BODY.push(box);
 
                 box.arrayPos = [];
                 box.arrayRot = [];
@@ -523,7 +493,7 @@ function addColliderItem(items, type, mass, offset) {
 
             }
 
-            window.CANNON_WORLD.addBody(box);
+            GLOBALS.CANNON_WORLD.addBody(box);
         }
     }
 }
@@ -603,7 +573,7 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
             var box = new CANNON.Body({
                 mass: 0,
                 shape: shape,
-                material: window.PHYSICS_MATERIAL
+                material: GLOBALS.PHYSICS_MATERIAL
             })
 
             var obj = new THREE.Object3D();
@@ -613,14 +583,14 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
 
             box.position.copy(obj.position);
             box.position[a4] += columsNew[i][j].length - 1;
-            box.collisionFilterGroup = window.CGROUP_ENVIRONMENT
-            box.collisionFilterMask = window.CGROUP_DYNAMIC
+            box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
+            box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC
             box.room = true;
 
             for (var c = 0; c < columsNew[i][j].length; c++)
-                window.planeUserData[columsNew[i][j][c].i].body = box;
+                GLOBALS.PLANE_USER_DATA[columsNew[i][j][c].i].body = box;
 
-            window.CANNON_WORLD.addBody(box);
+            GLOBALS.CANNON_WORLD.addBody(box);
             totalBodies++;
         }
     }
@@ -637,7 +607,7 @@ function createInstances(meshes, material) {
     mesh.receiveShadow = true;
     mesh.name = "Instanced-" + id;
     mesh.frustumCulled = false;
-    window.MAIN_SCENE.add(mesh);
+    GLOBALS.SCENE.add(mesh);
     id++;
 
     for (var i = 0; i < meshes.length; i++) {
@@ -656,6 +626,30 @@ function createInstances(meshes, material) {
     }
 }
 
+var corridor_colliders = [];
+
+function corridorColliderNames(first) {
+
+    if (!first) {
+        for (var i = 0; i < corridor_colliders.length; i++) {
+            //GLOBALS.CANNON_WORLD.removeBody(corridor_colliders[i])
+        }
+
+        corridor_colliders = [];
+    } else {
+        corridorCollider(GLOBALS.CORRIDOR_ENTER, "back", 1.5, 1.5, 0.001, true);
+    }
+
+    corridorCollider(GLOBALS.CORRIDOR_ENTER, "down", 1, 0.001, 3.5, false);
+    corridorCollider(GLOBALS.CORRIDOR_ENTER, "up", 1, 0.001, 3.5, false);
+    corridorCollider(GLOBALS.CORRIDOR_ENTER, "left", 0.001, 1, 3.5, false);
+    corridorCollider(GLOBALS.CORRIDOR_ENTER, "right", 0.001, 1, 3.5, false);
+    corridorCollider(GLOBALS.CORRIDOR_ENTER, "front", 1, 1, 0.001, false);
+
+    if (!first)
+        window.wallCorridorEnter.position.y = 0;
+}
+
 function corridorCollider(parent, name, x, y, z, state) {
     var target = new THREE.Vector3(); // create once an reuse it
     parent.getObjectByName(name).material.visible = state;
@@ -668,7 +662,7 @@ function corridorCollider(parent, name, x, y, z, state) {
     var wall = new CANNON.Body({
         shape: result.shape,
         mass: 0,
-        material: window.PHYSICS_MATERIAL
+        material: GLOBALS.PHYSICS_MATERIAL
     })
 
     wall.position.copy(target);
@@ -677,16 +671,81 @@ function corridorCollider(parent, name, x, y, z, state) {
     parent.getObjectByName(name).getWorldQuaternion(quat)
 
     wall.quaternion.copy(quat);
-    wall.collisionFilterGroup = window.CGROUP_ENVIRONMENT
-    wall.collisionFilterMask = window.CGROUP_DYNAMIC
-    window.CANNON_WORLD.addBody(wall);
+    wall.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
+    wall.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC
+    GLOBALS.CANNON_WORLD.addBody(wall);
 
-    if (name == "front" && parent == window.CORRIDOR_ENTER)
+    if (name == "front")
         window.wallCorridorEnter = wall;
-    else if (name == "front" && parent == window.CORRIDOR_EXIT)
-        window.wallCorridorExit = wall;
+
+    corridor_colliders.push(wall)
+}
+
+function exitRoomCollider() {
+
+    window.corridorBackPosition.visible = false;
+    var posExitRoom = new THREE.Vector3();
+    window.corridorBackPosition.getWorldPosition(posExitRoom)
+    window.EXIT_ROOM.position.copy(posExitRoom)
+    window.EXIT_ROOM.position.y -= 1;
+
+
+    for (var i = 0; i < window.EXIT_ROOM_COLLIDERS.length; i++) {
+
+        const result = threeToCannon(window.EXIT_ROOM_COLLIDERS[i], {
+            type: ShapeType.BOX
+        });
+
+        var wall = new CANNON.Body({
+            shape: result.shape,
+            mass: 0,
+            material: GLOBALS.PHYSICS_MATERIAL
+        })
+
+        var pos = new THREE.Vector3();
+        window.EXIT_ROOM_COLLIDERS[i].getWorldPosition(pos);
+        wall.position.copy(pos)
+
+        var rot = new THREE.Quaternion();
+        window.EXIT_ROOM_COLLIDERS[i].getWorldQuaternion(rot);
+        wall.quaternion.copy(rot)
+
+        wall.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
+        wall.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC
+
+        GLOBALS.CANNON_WORLD.addBody(wall);
+    }
+}
+
+function elevatorCollider() {
+
+    const result = threeToCannon(window.elevatorDoor, {
+        type: ShapeType.BOX
+    });
+
+    var wall = new CANNON.Body({
+        shape: result.shape,
+        mass: 0,
+        material: GLOBALS.PHYSICS_MATERIAL
+    })
+
+    var pos = new THREE.Vector3();
+    window.elevatorDoor.getWorldPosition(pos);
+    wall.position.copy(pos)
+
+    var rot = new THREE.Quaternion();
+    window.elevatorDoor.getWorldQuaternion(rot);
+    wall.quaternion.copy(rot)
+
+    wall.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
+    wall.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC
+
+    GLOBALS.CANNON_WORLD.addBody(wall);
 }
 
 export {
-    viewFPS
+    viewFPS,
+    elevatorCollider,
+    exitRoomCollider,
+    corridorColliderNames
 }

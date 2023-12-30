@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import $ from 'jquery';
+import { GLOBALS } from '../../Globals.js';
 
 var limit = false;
 var IndexArray = [];
@@ -8,28 +9,28 @@ function cubeState(button) {
 
     if (button == "plus") {
         //
-        for (var i = 0; i < window.SELECTED_ID.length; i++) {
-            trasnlatePlane(window.SELECTED_ID[i], 1, window.planeUserData[window.SELECTED_ID[i]].portal);
+        for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
+            trasnlatePlane(GLOBALS.SELECTED_ID[i], 1, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal);
         }
     } else if (button == "minus") {
         //
-        for (var i = 0; i < window.SELECTED_ID.length; i++) {
+        for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
 
-            if (window.planeUserData[window.SELECTED_ID[i]].position.y - 2 == 22 ||
-                window.planeUserData[window.SELECTED_ID[i]].position.y - 2 == -16) {
+            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == 22 ||
+                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == -16) {
                 warning();
                 return;
-            } else if (window.planeUserData[window.SELECTED_ID[i]].position.x == 28 ||
-                window.planeUserData[window.SELECTED_ID[i]].position.x == -12) {
+            } else if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.x == 28 ||
+                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.x == -12) {
                 warning();
                 return;
-            } else if (window.planeUserData[window.SELECTED_ID[i]].position.z == -14 ||
-                window.planeUserData[window.SELECTED_ID[i]].position.z == 26) {
+            } else if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.z == -14 ||
+                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.z == 26) {
                 warning();
                 return;
             }
 
-            trasnlatePlane(window.SELECTED_ID[i], -1, window.planeUserData[window.SELECTED_ID[i]].portal);
+            trasnlatePlane(GLOBALS.SELECTED_ID[i], -1, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal);
         }
     }
 
@@ -39,25 +40,35 @@ function cubeState(button) {
         erase.scale.set(0, 0, 0);
 
         erase.updateMatrix();
-        window.instancedMesh.setMatrixAt(IndexArray[i], erase.matrix);
-        window.planeUserData[IndexArray[i]] = {};
-        window.instancedMesh.instanceMatrix.needsUpdate = true;
-        window.instancedMesh.computeBoundingSphere();
+        GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(IndexArray[i], erase.matrix);
+        GLOBALS.PLANE_USER_DATA[IndexArray[i]] = {};
+        GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
+        GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
+
+        GLOBALS.BUDGET += 1;
     }
 
     if (limit) {
-        window.SELECTED_SIDE = null;
-        window.SELECTING = false;
-        window.SELECTED_ID = [];
-        window.SELECTED_COLOR = [];
+        GLOBALS.SELECTED_SIDE = null;
+        GLOBALS.SELECTING = false;
+        GLOBALS.SELECTED_ID = [];
+        GLOBALS.SELECTED_COLOR = [];
     }
 
     IndexArray = [];
     limit = false;
+
+    $("#budget").text("BUDGET: " + GLOBALS.BUDGET);
+
+    if (GLOBALS.BUDGET < 900 && GLOBALS.BUDGET >= 300) {
+        $("#budget").css("background-color", "yellow");
+    } else if (GLOBALS.BUDGET < 300) {
+        $("#budget").css("background-color", "red");
+    }
 }
 
 function getPlaneByName(name) {
-    return window.planeUserData.filter(
+    return GLOBALS.PLANE_USER_DATA.filter(
         function (data) {
             return data.name == name
         }
@@ -67,8 +78,8 @@ function getPlaneByName(name) {
 function trasnlatePlane(id, val, portal) {
 
     var dummy = new THREE.Object3D();
-    dummy.position.copy(window.planeUserData[id].position);
-    dummy.rotation.copy(window.planeUserData[id].rotation);
+    dummy.position.copy(GLOBALS.PLANE_USER_DATA[id].position);
+    dummy.rotation.copy(GLOBALS.PLANE_USER_DATA[id].rotation);
 
     //-----------------------------------------------------
 
@@ -80,17 +91,17 @@ function trasnlatePlane(id, val, portal) {
 
     clone.translateZ(-val * 2);
 
-    if (window.planeUserData[id].side == "front" || window.planeUserData[id].side == "back") {
+    if (GLOBALS.PLANE_USER_DATA[id].side == "front" || GLOBALS.PLANE_USER_DATA[id].side == "back") {
         checkSides(clone.clone(), val, id, "left", portal);
         checkSides(clone.clone(), val, id, "right", portal);
         checkSides(clone.clone(), val, id, "up", portal);
         checkSides(clone.clone(), val, id, "down", portal);
-    } else if (window.planeUserData[id].side == "up" || window.planeUserData[id].side == "down") {
+    } else if (GLOBALS.PLANE_USER_DATA[id].side == "up" || GLOBALS.PLANE_USER_DATA[id].side == "down") {
         checkSides(clone.clone(), val, id, "left", portal);
         checkSides(clone.clone(), val, id, "right", portal);
         checkSides(clone.clone(), val, id, "front", portal);
         checkSides(clone.clone(), val, id, "back", portal);
-    } else if (window.planeUserData[id].side == "left" || window.planeUserData[id].side == "right") {
+    } else if (GLOBALS.PLANE_USER_DATA[id].side == "left" || GLOBALS.PLANE_USER_DATA[id].side == "right") {
         checkSides(clone.clone(), val, id, "front", portal);
         checkSides(clone.clone(), val, id, "back", portal);
         checkSides(clone.clone(), val, id, "up", portal);
@@ -99,39 +110,41 @@ function trasnlatePlane(id, val, portal) {
 
     if (frontExists.length > 0) {
 
-        window.instancedMesh.setColorAt(id, new THREE.Color(0xffffff));
-        window.instancedMesh.instanceColor.needsUpdate = true;
+        GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(id, new THREE.Color(0xffffff));
+        GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
         var erase = new THREE.Object3D();
         erase.scale.set(0, 0, 0);
         erase.updateMatrix();
-        window.instancedMesh.setMatrixAt(id, erase.matrix);
-        window.planeUserData[id] = {};
+        GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(id, erase.matrix);
+        GLOBALS.PLANE_USER_DATA[id] = {};
 
-        window.instancedMesh.setColorAt(frontExists[0].id_instanced, new THREE.Color(0xffffff));
-        window.instancedMesh.instanceColor.needsUpdate = true;
+        GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(frontExists[0].id_instanced, new THREE.Color(0xffffff));
+        GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
         //---------------------------------------
         var erase = new THREE.Object3D();
         erase.scale.set(0, 0, 0);
         erase.updateMatrix();
-        window.instancedMesh.setMatrixAt(frontExists[0].id_instanced, erase.matrix);
-        window.planeUserData[frontExists[0].id_instanced] = {};
-        window.instancedMesh.instanceMatrix.needsUpdate = true;
-        window.instancedMesh.computeBoundingSphere();
+        GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(frontExists[0].id_instanced, erase.matrix);
+        GLOBALS.PLANE_USER_DATA[frontExists[0].id_instanced] = {};
+        GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
+        GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
         //
         limit = true;
+
+        GLOBALS.BUDGET += 2;
     } else {
 
-        window.planeUserData[id].position = dummy.position.clone();
-        window.planeUserData[id].rotation = dummy.rotation.clone();
-        window.planeUserData[id].name = dummy.position.x + "/" + dummy.position.y + "/" + dummy.position.z;
+        GLOBALS.PLANE_USER_DATA[id].position = dummy.position.clone();
+        GLOBALS.PLANE_USER_DATA[id].rotation = dummy.rotation.clone();
+        GLOBALS.PLANE_USER_DATA[id].name = dummy.position.x + "/" + dummy.position.y + "/" + dummy.position.z;
 
         dummy.updateMatrix();
-        window.instancedMesh.setMatrixAt(id, dummy.matrix)
+        GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(id, dummy.matrix)
 
-        window.instancedMesh.instanceMatrix.needsUpdate = true;
-        window.instancedMesh.computeBoundingSphere();
+        GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
+        GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
 
     }
 }
@@ -164,23 +177,23 @@ function checkSides(dummy, val, id, side, portal) {
 
         // GET EMPTY ARRAY
         var idEmptyToFill;
-        for (var i = 0; i < window.planeUserData.length; i++) {
-            if (!window.planeUserData[i].exists) {
+        for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
+            if (!GLOBALS.PLANE_USER_DATA[i].exists) {
                 idEmptyToFill = i;
                 break;
             }
         }
 
-        window.instancedMesh.setMatrixAt(idEmptyToFill, dummy.matrix);
+        GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(idEmptyToFill, dummy.matrix);
 
         if (portal)
-            window.instancedMesh.setColorAt(idEmptyToFill, new THREE.Color().setHex(0xffffff));
+            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(idEmptyToFill, new THREE.Color().setHex(0xffffff));
         else
-            window.instancedMesh.setColorAt(idEmptyToFill, new THREE.Color().setHex(0x808080));
+            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(idEmptyToFill, new THREE.Color().setHex(0x808080));
 
-        window.instancedMesh.instanceMatrix.needsUpdate = true;
-        window.instancedMesh.instanceColor.needsUpdate = true;
-        window.instancedMesh.computeBoundingSphere();
+        GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
+        GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+        GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
 
         dummy.position.copy(dummy.position.round());
 
@@ -200,7 +213,7 @@ function checkSides(dummy, val, id, side, portal) {
         else if (direction.round().y == -1)
             side = "up"
 
-        window.planeUserData[idEmptyToFill] = {
+        GLOBALS.PLANE_USER_DATA[idEmptyToFill] = {
             iniPos: dummy.position.clone(),
             base: true,
             side: side,
@@ -214,6 +227,8 @@ function checkSides(dummy, val, id, side, portal) {
             tile: 1,
         };
 
+        GLOBALS.BUDGET -= 1;
+
     } else { //if there is a face delete it
         IndexArray.push(sideExists[0].id_instanced);
     }
@@ -223,34 +238,34 @@ function warning() {
     $("#warning").css("opacity", 1);
     setTimeout(() => {
         $("#warning").css("opacity", 0);
-    }, 3000);
+    }, 2000);
 }
 
 var a = 0;
-window.planeUserData = [];
-for (var i = 0; i < 3000; i++) {
-    window.planeUserData.push({})
+GLOBALS.PLANE_USER_DATA = [];
+for (var i = 0; i < GLOBALS.BUDGET; i++) {
+    GLOBALS.PLANE_USER_DATA.push({})
 }
 
 function buildIniCubes(obj) {
 
-    if (!window.loadedLevel) {
+    if (!GLOBALS.LOADED_LEVEL) {
 
         const geometry = new THREE.PlaneGeometry(2, 2);
 
-        window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 3000);
-        window.instancedMesh.frustumCulled = false;
-        window.instancedMesh.castShadow = true;
-        window.instancedMesh.receiveShadow = true;
-        window.instancedMesh.name = "cube-parent";
-        window.CUBES.add(window.instancedMesh);
+        GLOBALS.PLANE_LEVEL_INSTANCED = new THREE.InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
+        GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = false;
+        GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = true;
+        GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = true;
+        GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
+        GLOBALS.CUBES.add(GLOBALS.PLANE_LEVEL_INSTANCED);
 
         var clone = new THREE.Object3D();
 
-        for (var i = 0; i < 3000; i++) {
+        for (var i = 0; i < GLOBALS.BUDGET; i++) {
             clone.scale.set(0, 0, 0);
             clone.updateMatrix();
-            window.instancedMesh.setMatrixAt(i, clone.matrix);
+            GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(i, clone.matrix);
         }
 
         //GROUND
@@ -265,6 +280,8 @@ function buildIniCubes(obj) {
         buildLayer(-1, -1, 20, 'z', 'y', 'x', 4, 6, "right", new THREE.Vector3(0, -Math.PI / 2, 0));
         //WALL LEFT
         buildLayer(-1, -1, 0, 'z', 'y', 'x', 4, 6, "left", new THREE.Vector3(0, Math.PI / 2, 0));
+
+        $("#budget").text("BUDGET: " + GLOBALS.BUDGET);
     }
 }
 
@@ -273,30 +290,30 @@ $("body").on('click', '#save-level', function () {
     var data = [];
     var clone = [];
 
-    for (var i = 0; i < window.planeUserData.length; i++) {
-        if (window.planeUserData[i].item) {
+    for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
+        if (GLOBALS.PLANE_USER_DATA[i].item) {
             var obj = new THREE.Object3D();
-            obj.position.copy(window.planeUserData[i].item.position);
-            obj.rotation.copy(window.planeUserData[i].item.rotation);
-            obj.planeInstancedId = window.planeUserData[i].item.planeInstancedId;
-            obj.userData = window.planeUserData[i].item.userData;
-            window.planeUserData[i].item = obj;
+            obj.position.copy(GLOBALS.PLANE_USER_DATA[i].item.position);
+            obj.rotation.copy(GLOBALS.PLANE_USER_DATA[i].item.rotation);
+            obj.planeInstancedId = GLOBALS.PLANE_USER_DATA[i].item.planeInstancedId;
+            obj.userData = GLOBALS.PLANE_USER_DATA[i].item.userData;
+            GLOBALS.PLANE_USER_DATA[i].item = obj;
         }
 
-        if (window.planeUserData[i].trigger) {
-            console.log(window.planeUserData[i]);
+        if (GLOBALS.PLANE_USER_DATA[i].trigger) {
+            console.log(GLOBALS.PLANE_USER_DATA[i]);
             var obj = new THREE.Object3D();
-            obj.position.copy(window.planeUserData[i].trigger.position);
-            obj.rotation.copy(window.planeUserData[i].trigger.rotation);
-            obj.id_instanced = window.planeUserData[i].trigger.id_instanced;
-            // obj.userData = window.planeUserData[i].trigger.userData;
-            window.planeUserData[i].trigger = window.planeUserData[i].trigger.id_instanced;
+            obj.position.copy(GLOBALS.PLANE_USER_DATA[i].trigger.position);
+            obj.rotation.copy(GLOBALS.PLANE_USER_DATA[i].trigger.rotation);
+            obj.id_instanced = GLOBALS.PLANE_USER_DATA[i].trigger.id_instanced;
+            // obj.userData = GLOBALS.PLANE_USER_DATA[i].trigger.userData;
+            GLOBALS.PLANE_USER_DATA[i].trigger = GLOBALS.PLANE_USER_DATA[i].trigger.id_instanced;
         }
     }
 
 
-    data.push(window.planeUserData)
-    data.push(window.GOO_PLANES)
+    data.push(GLOBALS.PLANE_USER_DATA)
+    data.push(GLOBALS.GOO_PLANES)
 
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
     var dlAnchorElem = document.createElement('a');
@@ -327,26 +344,22 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
             clone.position[z2] = z;
 
             clone.updateMatrix();
-            window.instancedMesh.setMatrixAt(a, clone.matrix);
+            GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(a, clone.matrix);
 
             var portal;
 
             if (clone.position.x <= 5 && clone.position.z >= 7 && clone.position.y <= 5) {
                 portal = false;
-                window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0x808080));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new THREE.Color().setHex(0x808080));
             } else if (clone.position.x >= 10 && clone.position.z <= 1 && clone.position.y <= 3) {
                 portal = false;
-                window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0x808080));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new THREE.Color().setHex(0x808080));
             } else if (clone.position.y == 8) {
                 portal = false;
-                window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0x808080));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new THREE.Color().setHex(0x808080));
             } else {
-                //portal = true;
-                //window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0xffffff));
-
-
                 portal = false;
-                window.instancedMesh.setColorAt(a, new THREE.Color().setHex(0x808080));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new THREE.Color().setHex(0x808080));
             }
 
             var hasItem = false;
@@ -366,7 +379,7 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
 
             //ADD USERDATA TO ARRAY LINKED WITH THE INSTANCED ID
             clone.position.copy(clone.position.round());
-            window.planeUserData[a] = {
+            GLOBALS.PLANE_USER_DATA[a] = {
                 iniPos: clone.position.clone(),
                 base: true,
                 side: side,
@@ -384,13 +397,15 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
                 checked: false
             }
 
+            GLOBALS.BUDGET -= 1;
+
             a++;
         }
 
         y = yo;
     }
 
-    window.RENDERER.renderLists.dispose();
+    GLOBALS.RENDERER.renderLists.dispose();
 }
 
 //
@@ -406,19 +421,19 @@ $("body").on('click', '#minus-portal', function () {
 
 $("body").on('click', '#portalable', function () {
 
-    if (window.SELECTED_ID.length > 0) {
-        window.planeUserData[window.SELECTED_ID[0]].portal = !window.planeUserData[window.SELECTED_ID[0]].portal;
-        console.log(window.planeUserData[window.SELECTED_ID[0]].portal);
+    if (GLOBALS.SELECTED_ID.length > 0) {
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].portal = !GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].portal;
+        console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].portal);
 
-        for (var i = 0; i < window.SELECTED_ID.length; i++) {
-            window.planeUserData[window.SELECTED_ID[i]].portal = window.planeUserData[window.SELECTED_ID[0]].portal;
+        for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
+            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].portal;
 
-            if (window.planeUserData[window.SELECTED_ID[i]].portal)
-                window.instancedMesh.setColorAt(window.SELECTED_ID[i], new THREE.Color(0xffffff));
+            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal)
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new THREE.Color(0xffffff));
             else
-                window.instancedMesh.setColorAt(window.SELECTED_ID[i], new THREE.Color(0x808080));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new THREE.Color(0x808080));
 
-            window.instancedMesh.instanceColor.needsUpdate = true;
+            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
         }
     }
 

@@ -1,15 +1,22 @@
 import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+import {
+    GLOBALS
+} from '../../Globals.js';
 
-window.GOO_PLANES = [];
+var GOO = null;
 
 const AddGoo = function (found, loading) {
+
+    if(GOO == null){
+        GOO = new THREE.Group();
+        GLOBALS.SCENE.add(GOO);
+    }
 
     if (!loading) {
         for (var i = 0; i < found.length; i++) {
 
-            var userData = window.planeUserData[found[i].instanceId];
-            //console.log(userData);
+            var userData = GLOBALS.PLANE_USER_DATA[found[i].instanceId];
 
             if (userData.side != "down") {
                 continue;
@@ -55,15 +62,15 @@ const AddGoo = function (found, loading) {
             var clone = plane.clone();
             clone.position.copy(goo[i]);
             clone.translateZ(1.8);
-            window.GOO.add(clone);
+            GOO.add(clone);
         }*/
 
         //
-        
+
         /*var mesh = new THREE.InstancedMesh(geometry.clone(), material, goo.length);
         mesh.receiveShadow = true;
         mesh.frustumCulled = false;
-        window.GOO.add(mesh);
+        GOO.add(mesh);
     
         for (var i = 0; i < goo.length; i++) {
     
@@ -89,19 +96,15 @@ const AddGoo = function (found, loading) {
             new THREE.Vector3(7,0,5),
             new THREE.Vector3(7,0,7),
             new THREE.Vector3(7,0,3)]*/
-    }else{
+    } else {
         goo = found;
     }
-
-
-
-    console.log(goo)
 
     const geometry = new THREE.PlaneGeometry(2, 2);
     const geometries = [];
     const matrix = new THREE.Matrix4();
 
-    window.GOO_PLANES.push(goo)
+    GLOBALS.GOO_PLANES.push(goo)
 
     for (let i = 0; i < goo.length; i++) {
 
@@ -128,18 +131,14 @@ const AddGoo = function (found, loading) {
 
     var mesh = new THREE.Mesh(mergedGeometry, material);
 
-    window.GOO.add(mesh);
+    GOO.add(mesh);
 
     var bb = new THREE.Box3(); // for re-use
     bb.setFromObject(mesh);
     bb.max.y += 0.2;
 
-    console.log(bb)
-
-    window.gooBoxes.push(bb);
+    GLOBALS.GOO_BOXES.push(bb);
 };
-
-window.gooBoxes = [];
 
 const randomizeMatrix = function () {
 
@@ -223,16 +222,10 @@ function checkSides(userData) {
                 checkSides(userData2[0])
         }
     }
-
-    //console.log(box1)
-    //console.log(box2)
-    //console.log(box3)
-    //console.log(box4)
-    //console.log(goo)
 }
 
 function getPlaneByName(name) {
-    return window.planeUserData.filter(
+    return GLOBALS.PLANE_USER_DATA.filter(
         function (data) {
             return data.name == name
         }
@@ -332,7 +325,6 @@ const material = new THREE.ShaderMaterial({
 
 });
 
-console.log(material)
 
 var clock = new THREE.Clock();
 var clock2 = new THREE.Clock();
@@ -354,8 +346,6 @@ function renderGoo2() {
     //uniforms[ 'time' ].value += 0.2 * delta;
 
     uniforms['iTime'].value += clock.getDelta();
-
-    //window.uniformsBridge[ 'iTime' ].value += clock.getDelta();
 }
 
 export {

@@ -8,6 +8,7 @@ import {
     AddGoo
 } from '../goo/Goo';
 import { viewFPS } from '../test/Test';
+import { GLOBALS } from '../../Globals.js';
 
 const vshader = `
 varying vec2 vUv; 
@@ -295,9 +296,9 @@ var plane2;
 
 var transition = false;
 var transition2 = false;
-var stopMenuLoop = false;
+var stopMenuLoop = true;
 
-/*$("#blocker").css("display", "none");
+$("#blocker").css("display", "none");
 $("#ui").css("display", "block");
 $("#container #back-effect").css("display", "none");
 $("#main-container").css("display", "block");
@@ -307,26 +308,26 @@ $("#options-settings").css("display", "block");
 $("#settings-menu-title").text("OPTIONS");
 $("#back-main").css("display", "none");
 $("#settings-close").css("display", "block");
-$("#main-container").css("display", "block");*/
+$("#main-container").css("display", "block");
 
 //
-$("#blocker").css("display", "flex");
+/*$("#blocker").css("display", "flex");
 $("#options-main").css("display", "block");
 $("#loading-parent").css("opacity", "0");
-$("#loading-parent").css("pointer-events", "none");
+$("#loading-parent").css("pointer-events", "none");*/
 
 if (!stopMenuLoop) {
     setTimeout(() => {
         var planegeometry = new THREE.PlaneGeometry(1, 1);
         plane1 = new THREE.Mesh(planegeometry, mat);
-        window.MAIN_SCENE.add(plane1);
+        GLOBALS.SCENE.add(plane1);
 
         var planegeometry = new THREE.PlaneGeometry(1, 1);
         plane2 = new THREE.Mesh(planegeometry, mat2);
 
-        window.MAIN_SCENE.background = new THREE.Color(0x000000)
+        GLOBALS.SCENE.background = new THREE.Color(0x000000)
 
-        planeFitPerspectiveCamera(plane1, window.MAIN_CAMERA)
+        planeFitPerspectiveCamera(plane1, GLOBALS.MAIN_CAMERA)
 
         animate();
         window.addEventListener('resize', onWindowResize);
@@ -341,12 +342,11 @@ if (!stopMenuLoop) {
 
 
 function onWindowResize() {
-    window.RENDERER.setSize(window.innerWidth, window.innerHeight);
-    window.COMPOSER.setSize(window.innerWidth, window.innerHeight);
+    GLOBALS.RENDERER.setSize(window.innerWidth, window.innerHeight);
 
-    window.MAIN_CAMERA.aspect = window.innerWidth / window.innerHeight;
-    window.MAIN_CAMERA.updateProjectionMatrix();
-    planeFitPerspectiveCamera(plane1, window.MAIN_CAMERA)
+    GLOBALS.MAIN_CAMERA.aspect = window.innerWidth / window.innerHeight;
+    GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
+    planeFitPerspectiveCamera(plane1, GLOBALS.MAIN_CAMERA)
 }
 
 function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
@@ -360,7 +360,6 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
     plane2.scale.set(scaleX, scaleY, 1);
 }
 
-window.loadedLevel = false;
 var level;
 $("body").on('click', '#option-single-load', function () {
     fetch("./levels/1.json")
@@ -368,7 +367,7 @@ $("body").on('click', '#option-single-load', function () {
         .then(json => {
             console.log(json)
             level = json;
-            window.loadedLevel = true;
+            GLOBALS.LOADED_LEVEL = true;
 
             startLevel();
 
@@ -403,9 +402,9 @@ function startLevel() {
     /*$("#blocker").css("display", "none");
         $("#ui").css("display", "block");
         $("#container #back-effect").css("display", "none");
-        window.MAIN_SCENE.remove(plane1);
-        window.MAIN_SCENE.remove(plane2);
-        window.MAIN_SCENE.background = null;
+        GLOBALS.SCENE.remove(plane1);
+        GLOBALS.SCENE.remove(plane2);
+        GLOBALS.SCENE.background = null;
         stopMenuLoop = true;*/
 
     $("#blocker .body").css("opacity", "0");
@@ -417,8 +416,8 @@ function startLevel() {
 
     transition = true;
     transition2 = false;
-    window.MAIN_SCENE.add(plane1);
-    window.MAIN_SCENE.remove(plane2);
+    GLOBALS.SCENE.add(plane1);
+    GLOBALS.SCENE.remove(plane2);
 
     setTimeout(() => {
         $("#loading-parent").css("opacity", "1");
@@ -437,9 +436,9 @@ function startLevel() {
             $("#settings-close").css("display", "block");
             $("#main-container").css("display", "block");
 
-            window.MAIN_SCENE.remove(plane1);
-            window.MAIN_SCENE.remove(plane2);
-            window.MAIN_SCENE.background = null;
+            GLOBALS.SCENE.remove(plane1);
+            GLOBALS.SCENE.remove(plane2);
+            GLOBALS.SCENE.background = null;
             stopMenuLoop = true;
         }, 1000);
     }, 1000);
@@ -475,8 +474,8 @@ function optionMenu(texture, title, id) {
 
     if (transition2) {
         transition2 = false;
-        window.MAIN_SCENE.add(plane1);
-        window.MAIN_SCENE.remove(plane2);
+        GLOBALS.SCENE.add(plane1);
+        GLOBALS.SCENE.remove(plane2);
     }
 
     pointerState("block", "none", title, "flex", id);
@@ -486,8 +485,8 @@ $("body").on('click', '#back-main', function () {
     window.tuniform2.iTime.value = 1.2;
     transition2 = true;
     transition = false;
-    window.MAIN_SCENE.remove(plane1);
-    window.MAIN_SCENE.add(plane2);
+    GLOBALS.SCENE.remove(plane1);
+    GLOBALS.SCENE.add(plane2);
 
     pointerState("none", "block", "", "none", ".option-main");
 });
@@ -534,7 +533,7 @@ function animate(time) {
         if (transition2)
             window.tuniform2.iTime.value += clock.getDelta();
 
-        window.RENDERER.render(window.MAIN_SCENE, window.MAIN_CAMERA)
+        GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA)
         requestAnimationFrame(animate);
     }
 }
@@ -578,24 +577,23 @@ function readTextFile(file, callback) {
 
 function loadLevel(data) {
 
-    window.planeUserData = data;
-    window.CUBES.remove(window.instancedMesh);
+    GLOBALS.PLANE_USER_DATA = data;
+    GLOBALS.CUBES.remove(GLOBALS.PLANE_LEVEL_INSTANCED);
 
     const geometry = new THREE.PlaneGeometry(2, 2);
 
-    window.instancedMesh = new THREE.InstancedMesh(geometry.clone(), window.MATERIAL_PORTAL_EDITOR, 3000);
-    //window.instancedMesh.position.y = 10000;
-    window.instancedMesh.castShadow = true;
-    window.instancedMesh.receiveShadow = true;
-    window.instancedMesh.name = "cube-parent";
-    window.CUBES.add(window.instancedMesh);
+    GLOBALS.PLANE_LEVEL_INSTANCED = new THREE.InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
+    GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = true;
+    GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = true;
+    GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
+    GLOBALS.CUBES.add(GLOBALS.PLANE_LEVEL_INSTANCED);
 
     var clone = new THREE.Object3D();
 
-    for (var i = 0; i < 3000; i++) {
+    for (var i = 0; i < GLOBALS.BUDGET; i++) {
         clone.scale.set(0, 0, 0);
         clone.updateMatrix();
-        window.instancedMesh.setMatrixAt(i, clone.matrix);
+        GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(i, clone.matrix);
     }
 
     var triggers = [];
@@ -609,16 +607,16 @@ function loadLevel(data) {
             clone.scale.set(1, 1, 1);
 
             clone.updateMatrix();
-            window.instancedMesh.setMatrixAt(i, clone.matrix);
+            GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(i, clone.matrix);
 
-            //window.planeUserData[i] = data[i];
+            //GLOBALS.PLANE_USER_DATA[i] = data[i];
 
             if (data[i].portal)
-                window.instancedMesh.setColorAt(i, new THREE.Color().setHex(0xffffff));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(i, new THREE.Color().setHex(0xffffff));
             else
-                window.instancedMesh.setColorAt(i, new THREE.Color().setHex(0x808080));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(i, new THREE.Color().setHex(0x808080));
 
-            window.instancedMesh.instanceColor.needsUpdate = true;
+            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
             if (data[i].hasItem) {
 
@@ -631,14 +629,14 @@ function loadLevel(data) {
 
                     console.log(data[i])
 
-                    addItem(window.planeUserData[i], true)
+                    addItem(GLOBALS.PLANE_USER_DATA[i], true)
 
-                    window.planeUserData[i].state = state;
+                    GLOBALS.PLANE_USER_DATA[i].state = state;
 
                     //console.log(data[i].trigger)
                     if (data[i].trigger) {
                         console.log("111111111111")
-                        triggers.push(window.planeUserData[i]);
+                        triggers.push(GLOBALS.PLANE_USER_DATA[i]);
                     }
                 }
 
@@ -652,18 +650,18 @@ function loadLevel(data) {
         console.log(triggers[i])
         const id = triggers[i].id_instanced;
 
-        window.startItem = window.planeUserData[id];
-        window.startItem.instanceId = id;
-        window.startItem.trigger = window.planeUserData[triggers[i].trigger];
-        console.log(window.startItem)
-        if (window.startItem.itemName.includes("pedestal_button"))
-            window.startItem.trigger.item.item.state = window.startItem.state;
-        window.startItem.trigger.instanceId = window.startItem.trigger.id_instanced;
-        window.startItem.normal = window.startItem.normal;
-        window.startItem.trigger.normal = window.startItem.normal;
+        GLOBALS.SELECTED_FOR_CONNECTION = GLOBALS.PLANE_USER_DATA[id];
+        GLOBALS.SELECTED_FOR_CONNECTION.instanceId = id;
+        GLOBALS.SELECTED_FOR_CONNECTION.trigger = GLOBALS.PLANE_USER_DATA[triggers[i].trigger];
+        console.log(GLOBALS.SELECTED_FOR_CONNECTION)
+        if (GLOBALS.SELECTED_FOR_CONNECTION.itemName.includes("pedestal_button"))
+            GLOBALS.SELECTED_FOR_CONNECTION.trigger.item.item.state = GLOBALS.SELECTED_FOR_CONNECTION.state;
+        GLOBALS.SELECTED_FOR_CONNECTION.trigger.instanceId = GLOBALS.SELECTED_FOR_CONNECTION.trigger.id_instanced;
+        GLOBALS.SELECTED_FOR_CONNECTION.normal = GLOBALS.SELECTED_FOR_CONNECTION.normal;
+        GLOBALS.SELECTED_FOR_CONNECTION.trigger.normal = GLOBALS.SELECTED_FOR_CONNECTION.normal;
 
-        console.log(window.planeUserData[id].trigger)
-        findPath(window.planeUserData[id].position, window.planeUserData[id].trigger.position, window.planeUserData[id].trigger)
+        console.log(GLOBALS.PLANE_USER_DATA[id].trigger)
+        findPath(GLOBALS.PLANE_USER_DATA[id].position, GLOBALS.PLANE_USER_DATA[id].trigger.position, GLOBALS.PLANE_USER_DATA[id].trigger)
     }
 
     //

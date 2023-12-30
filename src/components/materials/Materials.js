@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import {
+    GLOBALS
+} from '../../Globals.js';
 
 function loadMaterials() {
     //MATERIAL FLOOR NON PORTAL
@@ -44,10 +47,8 @@ function loadMaterials() {
 
 
     window.materialUpPortal = window.materialFloorPortal.clone();
-    //window.materialUpPortal.envMapIntensity = 0.2;
 
     window.materialUpNonPortal = window.materialFloorNonPortal.clone();
-    //window.materialUpNonPortal.envMapIntensity = 0.2;
 }
 
 function loadMaterial(material, base, normal, ao, rough, metal, roughValue) {
@@ -87,9 +88,46 @@ function loadMaterial(material, base, normal, ao, rough, metal, roughValue) {
         material.metalness = 1;
     }
 
-    material.envMap = window.ENV_MAP_FPS;
-    material.envMapIntensity = window.ENV_INTENSITY;
+    material.envMap = GLOBALS.ENV_MAP;
+    material.envMapIntensity = 0.15;
 }
+
+const textureLoader = new THREE.TextureLoader();
+const map = textureLoader.load('./assets/textures/decal/base2.png');
+//decalDiffuse.colorSpace = THREE.SRGBColorSpace;
+map.encoding = THREE.sRGBEncoding;
+const normal = textureLoader.load('./assets/textures/decal/normal.jpg');
+
+GLOBALS.INK_MATERIAL = new THREE.MeshStandardMaterial({
+    map: map,
+    normalMap: normal,
+    normalScale: new THREE.Vector2(1, 1),
+    transparent: true,
+    depthTest: true,
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -4,
+    wireframe: false,
+    roughness: 0.0,
+});
+
+//
+var texture = new THREE.TextureLoader().load("./assets/models/tilePortal.jpg");
+texture.encoding = THREE.sRGBEncoding;
+GLOBALS.MATERIAL_PORTAL_EDITOR = new THREE.MeshStandardMaterial({
+    map: texture,
+    transparent: true
+})
+//
+var texture = new THREE.TextureLoader().load("./assets/models/tileNonPortal.jpg");
+texture.encoding = THREE.sRGBEncoding;
+GLOBALS.MATERIAL_NON_PORTAL_EDITOR = new THREE.MeshStandardMaterial({
+    map: texture,
+    transparent: true
+});
+//
+GLOBALS.IMG_CHECK = new THREE.TextureLoader().load('./assets/check.png');
+GLOBALS.IMG_CLOSE = new THREE.TextureLoader().load('./assets/close.png');
 
 export {
     loadMaterials

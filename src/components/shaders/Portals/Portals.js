@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { GLOBALS } from '../../../Globals';
 
 var width = window.innerWidth,
     height = window.innerHeight;
@@ -332,7 +333,7 @@ const generateMeshPortalShader = () => {
         polygonOffsetFactor: -10
     });
 
-    var planegeometry = new THREE.CircleGeometry(window.PORTAL_WIDTH, 50);
+    var planegeometry = new THREE.CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
     var plane = new THREE.Mesh(planegeometry, mat);
     window.leftPortalShader = plane;
 
@@ -346,7 +347,7 @@ const generateMeshPortalShader = () => {
         polygonOffsetFactor: -10
     });
 
-    var planegeometry = new THREE.CircleGeometry(window.PORTAL_WIDTH, 50);
+    var planegeometry = new THREE.CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
     var plane = new THREE.Mesh(planegeometry, mat2);
     window.rightPortalShader = plane;
 };

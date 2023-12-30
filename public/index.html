@@ -40,6 +40,17 @@
   </div>
 
   <div id="ui">
+
+    <span id="budget" style="position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: green;
+  color: black;
+  font-size: 30px;
+  padding: 5px;">
+      BUDGET:
+    </span>
+
     <div id="side-bar-left">
       <div id="info-box">
         <h2 id="info-title">Button</h1>
@@ -76,29 +87,22 @@
             data-title="LASER EMITTER" class="item" data-name="laser_emitter"
             src="../assets/ui/items/laser_emitter.png" />
 
-          <img
-            data-content="Trigger with the laser."
-            data-title="LASER RECEIVER" class="item" data-name="laser_receiver"
-            src="../assets/ui/items/laser_receiver.png" />
+          <img data-content="Trigger with the laser." data-title="LASER RECEIVER" class="item"
+            data-name="laser_receiver" src="../assets/ui/items/laser_receiver.png" />
 
-          <img
-            data-content="Trigger with the laser."
-            data-title="LASER RELAYS" class="item" data-name="laser_relays"
+          <img data-content="Trigger with the laser." data-title="LASER RELAYS" class="item" data-name="laser_relays"
             src="../assets/ui/items/laser_relays.png" />
 
-          <img
-            data-content="Reflects the laser."
-            data-title="LASER CUBE" class="item" data-name="laser_cube" src="../assets/ui/items/laser_cube.png" />
+          <img data-content="Reflects the laser." data-title="LASER CUBE" class="item" data-name="laser_cube"
+            src="../assets/ui/items/laser_cube.png" />
 
           <img
             data-content="Fizzlers destroy any objects which pass through them such as cubes or turrets. If a player walks through a Fizzler any previously placed portals will also be destroyed. You can increase and decrease the size of the Fizzler using the arrows that appear when the object is selected."
-            data-title="FIZZLERS" class="item" data-name="fizzlers"
-            src="../assets/ui/items/fizzlers.png" />
+            data-title="FIZZLERS" class="item" data-name="fizzlers" src="../assets/ui/items/fizzlers.png" />
 
           <img
             data-content="Glass panels can be placed in your level which the player cannot break. You can increase and decrease the size of the panel by using the arrows that appear when the object is selected. You can change the barrier type to grating within the properties menu which will allow players to place a portal on the other side."
-            data-title="GLASS PANELS" class="item" data-name="glass"
-            src="../assets/ui/items/glass.png" />
+            data-title="GLASS PANELS" class="item" data-name="glass" src="../assets/ui/items/glass.png" />
 
           <img
             data-content="Piston Platforms will move up and down whenever the player stands on it. If it is connected to a trigger then the trigger must be activated before it will begin to move. You can adjust the height of the platform using the arrows that appear when the object is selected."
@@ -131,8 +135,7 @@
 
           <img
             data-content="If a player walks onto a Faith Plate it will cause them to get bounced into the air. When you place a Faith Plate within the editor it will also create a bullseye and a yellow ball. The Bullseye is where the player will ultimately land, and the yellow ball is the trajectory the player will travel."
-            data-title="FAITH PLATE" class="item" data-name="faith_plate"
-            src="../assets/ui/items/faith_plate.png" />
+            data-title="FAITH PLATE" class="item" data-name="faith_plate" src="../assets/ui/items/faith_plate.png" />
 
           <img
             data-content="Players and objects will not pass through the surface of Light Bridges. Within the properties menu you're given the option to start the bridge enabled or disabled."
@@ -144,26 +147,32 @@
 
           <img
             data-content=" Any contact with the lasers will result in instant death. However, the Field allows objects to pass through without harm."
-            data-title="LASER FIELD" class="item" data-name="laser_field"
-            src="../assets/ui/items/laser_field.png" />
+            data-title="LASER FIELD" class="item" data-name="laser_field" src="../assets/ui/items/laser_field.png" />
 
-          <img data-content="Turrets will attack the player on sight if they run within their field of vision. You can adjust the field of vision by moving the cone when the object is selected." data-title="TURRETS" class="item"
-            data-name="turrets" src="../assets/ui/items/turrets.png" />
+          <img
+            data-content="Turrets will attack the player on sight if they run within their field of vision. You can adjust the field of vision by moving the cone when the object is selected."
+            data-title="TURRETS" class="item" data-name="turrets" src="../assets/ui/items/turrets.png" />
 
           <img data-content="If the player steps in Deadly Goo they will be instantly killed." data-title="DEADLY GOO"
             class="item" data-name="goo" src="../assets/ui/items/goo.png" />
 
-          <img data-content="The player can recharge the paint gun, you can choose between the blue, orange, white and puple gels. If a player go through fizzlers the gun will lose all the painting and the player will need to recharge again." data-title="GEL GUN RECHARGER"
-            class="item" data-name="gel_gun_blue" src="../assets/ui/items/gel_gun_blue.png" />
+          <img
+            data-content="The player can recharge the paint gun, you can choose between the blue, orange, white and puple gels. If a player go through fizzlers the gun will lose all the painting and the player will need to recharge again."
+            data-title="GEL GUN RECHARGER" class="item" data-name="gel_gun_blue"
+            src="../assets/ui/items/gel_gun_blue.png" />
 
-          <img data-content="You can choose if you want the panel to be automatically deployed or not." data-title="ANGLED GLASS PANEL" class="item"
-            data-name="angled_panel1" src="../assets/ui/items/angled_panel1.png" />
+          <img data-content="You can choose if you want the panel to be automatically deployed or not."
+            data-title="ANGLED GLASS PANEL" class="item" data-name="angled_panel1"
+            src="../assets/ui/items/angled_panel1.png" />
 
-          <img data-content="You can choose if you want the panel to be automatically deployed or not." data-title="ANGLED PORTAL PANEL" class="item"
-            data-name="angled_panel2" src="../assets/ui/items/angled_panel2.png" />
+          <img data-content="You can choose if you want the panel to be automatically deployed or not."
+            data-title="ANGLED PORTAL PANEL" class="item" data-name="angled_panel2"
+            src="../assets/ui/items/angled_panel2.png" />
 
-          <img data-content="Flip Panels must be connected to a trigger. Once you have activated the trigger the panel will flip around revealing a surface capable of allowing Portals." data-title="FLIP PANELS" class="item"
-            data-name="angled_panel3" src="../assets/ui/items/angled_panel3.png" />
+          <img
+            data-content="Flip Panels must be connected to a trigger. Once you have activated the trigger the panel will flip around revealing a surface capable of allowing Portals."
+            data-title="FLIP PANELS" class="item" data-name="angled_panel3"
+            src="../assets/ui/items/angled_panel3.png" />
 
           <img
             data-content="Purely cosmetic and provide your map with additional light. Every map will start off with an observation room which cannot be removed."
@@ -172,56 +181,45 @@
 
           <img
             data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
-            data-title="LIGHT TOP" class="item" data-name="light"
-            src="../assets/ui/items/light.png" />
-
-            <img
-            data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
-            data-title="LIGHT STRIPS" class="item" data-name="stripe"
-            src="../assets/ui/items/stripe.png" />
+            data-title="LIGHT TOP" class="item" data-name="light" src="../assets/ui/items/light.png" />
 
           <img
-            data-content="You can link a trigger to it to open the door."
-            data-title="DOOR" class="item" data-name="door" src="../assets/ui/items/door.png" />
+            data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
+            data-title="LIGHT STRIPS" class="item" data-name="stripe" src="../assets/ui/items/stripe.png" />
+
+          <img data-content="You can link a trigger to it to open the door." data-title="DOOR" class="item"
+            data-name="door" src="../assets/ui/items/door.png" />
 
           <img
             data-content="You can place automatic portals on the scene, it can be static or activated by a trigger. You can choose which portal color on the level editor. If the player has a portal gun and shoots a portal with the same color as the automatic portal, the automatic portal will be destroyed and vice versa."
-            data-title="AUTOMATIC PORTAL" class="item" data-name="portal"
-            src="../assets/ui/items/portal.png" />
+            data-title="AUTOMATIC PORTAL" class="item" data-name="portal" src="../assets/ui/items/portal.png" />
 
           <img
             data-content="You can place the recall gun on the level editor, when the player touches, it will equipe. With the recall gun players can make objects go back in time."
-            data-title="RECALL GUN" class="item" data-name="recall2"
-            src="../assets/ui/items/recall2.png" />
+            data-title="RECALL GUN" class="item" data-name="recall2" src="../assets/ui/items/recall2.png" />
 
-          <img
-            data-content=""
-            data-title="PORTAL GUN" class="item" data-name="gun2" src="../assets/ui/items/gun2.png" />
+          <img data-content="" data-title="PORTAL GUN" class="item" data-name="gun2"
+            src="../assets/ui/items/gun2.png" />
 
           <img
             data-content="Blue will cause the player to bounce. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL BLUE" class="item" data-name="gel_blue"
-            src="../assets/ui/items/gel_blue.png" />
+            data-title="GEL BLUE" class="item" data-name="gel_blue" src="../assets/ui/items/gel_blue.png" />
 
           <img
             data-content="Orange will give the player increased speed. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GLE ORANGE" class="item" data-name="gel_orange"
-            src="../assets/ui/items/gel_orange.png" />
+            data-title="GLE ORANGE" class="item" data-name="gel_orange" src="../assets/ui/items/gel_orange.png" />
 
           <img
             data-content="White will allow the player to create a portal on any surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL WHITE" class="item" data-name="gel_white"
-            src="../assets/ui/items/gel_white.png" />
+            data-title="GEL WHITE" class="item" data-name="gel_white" src="../assets/ui/items/gel_white.png" />
 
           <img
             data-content="Purple will allow players to walk on walls or ceilings. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL PURPLE" class="item" data-name="gel_purple"
-            src="../assets/ui/items/gel_purple.png" />
+            data-title="GEL PURPLE" class="item" data-name="gel_purple" src="../assets/ui/items/gel_purple.png" />
 
-            <img
+          <img
             data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL CLEAR" class="item" data-name="gel_new"
-            src="../assets/ui/items/gel_new.png" />
+            data-title="GEL CLEAR" class="item" data-name="gel_new" src="../assets/ui/items/gel_new.png" />
         </div>
       </div>
     </div>

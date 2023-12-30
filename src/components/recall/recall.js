@@ -13,19 +13,20 @@ import {
     PostRender
 } from '../../usePostRender.js';
 import $ from 'jquery';
+import { GLOBALS } from '../../Globals.js';
 
 window.pickingToRecall = false;
 var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
 
 function recall() {
-    raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
-    var intersects = raycaster2.intersectObjects(window.INTERACTIVE);
+    raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
+    var intersects = raycaster2.intersectObjects(GLOBALS.INTERACTIVE);
 
     if (intersects.length > 0) {
         var instancedId = intersects[0].instanceId;
         var name = intersects[0].object.name;
-        var item = window.DYMANIC_ITEMS[name][instancedId];
+        var item = GLOBALS.DYMANIC_ITEMS[name][instancedId];
 
         if (item.body.arrayPos.length > 0) {
             recallingItem = item.body;
@@ -39,7 +40,7 @@ function recall() {
 
 
 function recallRay() {
-    raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
+    raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
     var intersects = raycaster2.intersectObjects(arr);
 
     if (intersects.length > 0) {
@@ -60,7 +61,7 @@ function recallRay() {
 
 function tweenCamera2(duration, ini, final, item, end2) {
     var obj = new THREE.Object3D();
-    window.MAIN_SCENE.add(obj)
+    GLOBALS.SCENE.add(obj)
     obj.quaternion.copy(ini.clone());
     new TWEEN.Tween(ini).to(final, duration)
         .onUpdate((tween) => {
@@ -111,8 +112,6 @@ function transport(item, i) {
                 value: 0
             }, 500)
             .onUpdate(() => {
-                //window.sepiaEffect.intensity = aa.value;
-                //window.vig.darkness = aa.value * 0.7;
             })
             .start();
 
@@ -137,12 +136,12 @@ function KeyZ() {
         $("#viewer-3d").css("filter", "sepia(0.5)")
 
         window.groupRecall = new THREE.Group();
-        window.MAIN_SCENE.add(window.groupRecall)
+        GLOBALS.SCENE.add(window.groupRecall)
 
         var it = 0;
         arr = [];
 
-        for (let d of window.dynamicObjects) {
+        for (let d of GLOBALS.DYNAMIC_OBJECTS) {
 
             if (d.name == "player")
                 continue;
@@ -243,17 +242,17 @@ function KeyZ() {
             window.groupRecall.add(g);
             it++;
         }
-        window.stopTime = true;
+        GLOBALS.STOP_TIME = true;
     } else {
-        window.MAIN_SCENE.remove(window.groupRecall)
-        window.stopTime = false;
+        GLOBALS.SCENE.remove(window.groupRecall)
+        GLOBALS.STOP_TIME = false;
         $("#viewer-3d").css("filter", "sepia(0)")
     }
 
 }
 
 function KeyQ() {
-    window.stopTime = false;
+    GLOBALS.STOP_TIME = false;
     $("#viewer-3d").css("filter", "sepia(0)")
     if (window.recalling) {
         for (var i = 0; i < timeouts.length; i++) {
@@ -276,14 +275,12 @@ function KeyQ() {
                 value: 0
             }, 500)
             .onUpdate(() => {
-                //window.sepiaEffect.intensity = aa.value;
-                //window.vig.darkness = aa.value * 0.7;
             })
             .start();
     } else {
 
         if (window.pickingToRecall) {
-            window.MAIN_SCENE.remove(window.groupRecall)
+            GLOBALS.SCENE.remove(window.groupRecall)
             window.pickingToRecall = false;
         }
 
@@ -296,8 +293,6 @@ function KeyQ() {
                 value: 1
             }, 500)
             .onUpdate(() => {
-                //window.sepiaEffect.intensity = aa.value;
-                //window.vig.darkness = aa.value * 0.7;
             })
             .start();
 
@@ -336,8 +331,6 @@ function customMaterial(tex, depth) {
     hex.wrapS = hex.wrapT = THREE.RepeatWrapping;
     //hex.repeat.set( 0.1, 0.1 );
 
-    console.log(window.PLAYER.position)
-
     const mat = new THREE.RawShaderMaterial({
         name: 'SonarPostEffectMaterial',
         depthTest: true,
@@ -370,8 +363,8 @@ function customMaterial(tex, depth) {
             },
             playerPosition: {
                 type: 'v3',
-                value: new THREE.Vector3(-window.PLAYER.position.x,
-                    0.0, -window.PLAYER.position.z)
+                value: new THREE.Vector3(-GLOBALS.PLAYER.position.x,
+                    0.0, -GLOBALS.PLAYER.position.z)
             },
         },
         glslVersion: THREE.GLSL3,

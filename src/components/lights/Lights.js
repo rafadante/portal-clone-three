@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {
     RectAreaLightUniformsLib
 } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import { GLOBALS } from '../../Globals';
 
 const Lights = function (THREE) {
 
@@ -10,11 +11,6 @@ const Lights = function (THREE) {
 
     const light = new THREE.AmbientLight(0x404040); // soft white light
     lightGroup.add(light);
-
-    const ambient = new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 0.15);
-    //lightGroup.add(ambient);
-
-    window.ambient = ambient;
 
     var spotLight = new THREE.SpotLight(0xffffff, 20);
     spotLight.name = "spotLightMain";
@@ -27,7 +23,7 @@ const Lights = function (THREE) {
 
     spotLight.castShadow = true;
 
-    if(window.mobile){
+    if(GLOBALS.MOBILE){
         spotLight.shadow.mapSize.width = 512;
         spotLight.shadow.mapSize.height = 512;
     }else{

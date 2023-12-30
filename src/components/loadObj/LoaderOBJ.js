@@ -20,6 +20,9 @@ import {
 import {
     loadLevelJSON
 } from '../menuShader/MenuShader.js';
+import {
+    GLOBALS
+} from '../../Globals.js';
 
 async function handleZip(path, obj) {
     await JSZipUtils.getBinaryContent(path, function (err, data) {
@@ -88,6 +91,13 @@ async function handleZip(path, obj) {
                     loadLightEmissiveManager(result.scene)
                 else if (obj == "loadLightStripe")
                     loadLightStripeManager(result.scene)
+                else if (obj == "loadGelBlue")
+                    loadGelBlueManager(result.scene)
+                else if (obj == "loadElevatorRoom")
+                    loadElevatorRoomManager(result.scene)
+                else if (obj == "loadGelOrange")
+                    loadGelOrangeManager(result.scene)
+
 
 
             });
@@ -101,12 +111,12 @@ const loader = new GLTFLoader(manager).setPath('./assets');
 function loadCube() {
 
     var bb = new THREE.Box3()
-    bb.setFromObject(window.CUBES);
-    bb.getCenter(window.CONTROLS.target);
+    bb.setFromObject(GLOBALS.CUBES);
+    bb.getCenter(GLOBALS.CONTROLS.target);
 
-    window.CONTROLS.target.set(window.CONTROLS.target.x + 8, window.CONTROLS.target.y + 2, window.CONTROLS.target.z + 6);
-    window.MAIN_CAMERA.position.set(-12.2, 17.4, 26.3)
-    window.CONTROLS.update();
+    GLOBALS.CONTROLS.target.set(GLOBALS.CONTROLS.target.x + 8, GLOBALS.CONTROLS.target.y + 2, GLOBALS.CONTROLS.target.z + 6);
+    GLOBALS.MAIN_CAMERA.position.set(-12.2, 17.4, 26.3)
+    GLOBALS.CONTROLS.update();
 
     buildIniCubes();
     loadWindowIMG()
@@ -138,8 +148,8 @@ function loadWindowIMG() {
         gltf.scene.translateY(-1)
         gltf.scene.translateX(-1)
         gltf.scene.name = "window";
-        window.MAIN_SCENE.add(gltf.scene);
-        window.OBSERVATION_ROOM_IMG = gltf.scene;
+        GLOBALS.SCENE.add(gltf.scene);
+        GLOBALS.OBSERVATION_ROOM_IMG = gltf.scene;
         loadWindow();
     });
 }
@@ -150,34 +160,6 @@ function loadWindow() {
 
 function loadWindowManager(scene) {
 
-    console.log("11111111111111")
-
-    var material = new THREE.MeshStandardMaterial();
-
-    material.envMap = window.ENV_MAP_FPS;
-
-    var map = new THREE.TextureLoader().load('./assets/textures/window/Glass_Blocks_001a_Base_Color.jpg');
-    map.encoding = THREE.sRGBEncoding;
-    material.map = map;
-
-    var map = new THREE.TextureLoader().load('./assets/textures/window/Glass_Blocks_001a_Normal.jpg');
-    //map.encoding = THREE.sRGBEncoding;
-    material.normalMap = map;
-
-    var map = new THREE.TextureLoader().load('./assets/textures/window/Glass_Blocks_001a_Roughness.jpg');
-    //map.encoding = THREE.sRGBEncoding;
-    material.roughnessMap = map;
-
-    var map = new THREE.TextureLoader().load('./assets/textures/window/Glass_Blocks_001a_ambientOcclusion.jpg');
-    //map.encoding = THREE.sRGBEncoding;
-    material.aoMap = map;
-
-    var map = new THREE.TextureLoader().load('./assets/textures/window/Glass_Blocks_001a_Glass.jpg');
-    //map.encoding = THREE.sRGBEncoding;
-    material.alphaMap = map;
-
-    console.log(material)
-
     scene.traverse(child => {
         if (child.name.includes("Cube")) {
             child.receiveShadow = true;
@@ -185,24 +167,14 @@ function loadWindowManager(scene) {
         }
 
         if (child.name == "room_light") {
-            const light = new THREE.PointLight(0xffffff, 50, 3);
-            var target = new THREE.Vector3(); // create once an reuse it
-            child.getWorldPosition(target);
-            light.position.copy(target);
-            light.translateY(-0.2);
-            //scene.add(light);
             window.room_light = child;
-
-            window.lightRoom = light;
         }
 
-        if (child.name.includes("vidro")) {
+        if (child.name.includes("image")) {
             child.material.side = 2;
-            child.material.envMap = window.ENV_MAP_FPS;
-        }
-
-        if (child.name.includes("window")) {
-            child.material = material;
+            child.material.envMap = GLOBALS.ENV_MAP;
+            child.material.envMapIntensity = 0.5;
+            child.material.roughness = 0.3;
         }
     })
 
@@ -210,9 +182,9 @@ function loadWindowManager(scene) {
     scene.position.set(16, 6, 6);
     scene.visible = false;
     scene.name = "OBSERVATION_ROOM";
-    window.MAIN_SCENE.add(scene);
+    GLOBALS.SCENE.add(scene);
 
-    window.OBSERVATION_ROOM = scene;
+    GLOBALS.OBSERVATION_ROOM = scene;
     loadGun();
 }
 
@@ -222,51 +194,39 @@ function loadGun() {
 
 function loadGunManager(scene) {
 
-    window.GUN = new THREE.Group();
-    window.GUN.visible = false;
+    GLOBALS.GUN = new THREE.Group();
+    GLOBALS.GUN.visible = false;
 
     var newGroup = new THREE.Group();
 
-    window.GUN.add(newGroup);
+    GLOBALS.GUN.add(newGroup);
     newGroup.add(scene);
+
+    var cube_1, cube_2, cube_3;
 
     scene.traverse(child => {
         if (child.material) {
             child.receiveShadow = true;
-            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.25;
         }
 
         child.renderOrder = 10;
 
         if (child.name == "sphere")
-            window.GUN_SPHERE = child;
+            GLOBALS.GUN_SPHERE = child;
         else if (child.name == "cylinder")
-            window.GUN_CYLINDER = child;
+            GLOBALS.GUN_CYLINDER = child;
         else if (child.name == "cube_1")
-            window.cube_1 = child;
+            cube_1 = child;
         else if (child.name == "cube_2")
-            window.cube_2 = child;
+            cube_2 = child;
         else if (child.name == "cube_3")
-            window.cube_3 = child;
-
-        if (child.name == "ink") {
-            window.INK = child;
-            window.INK.position.y = 0; //0.08
-        } else if (child.name == "ink1") {
-            child.visible = false;
-            child.material = new THREE.MeshBasicMaterial();
-        } else if (child.name == "ink2") {
-            child.visible = false;
-            child.material = new THREE.MeshBasicMaterial();
-        } else if (child.name == "ink3") {
-            child.visible = false;
-            child.material = new THREE.MeshBasicMaterial();
-        }
+            cube_3 = child;
     });
 
-    window.GUN.name = "GUN";
-    window.MAIN_SCENE.add(window.GUN);
+    GLOBALS.GUN.name = "GUN";
+    GLOBALS.SCENE.add(GLOBALS.GUN);
 
     //gltf.scene.position.set(0.12, -0.14, -0.13);
     scene.scale.set(0.1, 0.1, 0.1)
@@ -280,26 +240,26 @@ function loadGunManager(scene) {
     });
     const sphere = new THREE.Mesh(geometry, material);
     const sphere1 = sphere.clone();
+    sphere1.name = "sphere1";
     const sphere2 = sphere.clone();
+    sphere2.name = "sphere2";
     const sphere3 = sphere.clone();
+    sphere3.name = "sphere3";
 
     var target = new THREE.Vector3(); // create once an reuse it
-    window.cube_1.getWorldPosition(target);
+    cube_1.getWorldPosition(target);
     sphere1.position.copy(target)
-    window.GUN.add(sphere1)
-    window.cube_1 = sphere1;
+    GLOBALS.GUN.add(sphere1)
 
     var target = new THREE.Vector3(); // create once an reuse it
-    window.cube_2.getWorldPosition(target);
+    cube_2.getWorldPosition(target);
     sphere2.position.copy(target)
-    window.GUN.add(sphere2)
-    window.cube_2 = sphere2;
+    GLOBALS.GUN.add(sphere2)
 
     var target = new THREE.Vector3(); // create once an reuse it
-    window.cube_3.getWorldPosition(target);
+    cube_3.getWorldPosition(target);
     sphere3.position.copy(target)
-    window.GUN.add(sphere3)
-    window.cube_3 = sphere3;
+    GLOBALS.GUN.add(sphere3)
 }
 
 function loadDoor() {
@@ -312,8 +272,8 @@ function loadExitDoor(scene) {
     door.position.set(13, 1, -0.99)
     door.translateZ(1);
     door.name = "exitDoor";
-    window.EXIT_DOOR = door;
-    window.MAIN_SCENE.add(door);
+    GLOBALS.EXIT_DOOR = door;
+    GLOBALS.SCENE.add(door);
     window.planeExitDoor = door;
 
     door.traverse(child => {
@@ -325,19 +285,13 @@ function loadExitDoor(scene) {
         if (child.isBone) {
             if (child.name == "portal_door_right_04") {
                 child.scale.set(0, 0, 0);
-                window.exit_door_right = child;
             } else if (child.name == "portal_door_left_06") {
                 child.scale.set(0, 0, 0);
-                window.exit_door_left = child;
-            } else if (child.name == "central_spinner_right_05") {
-                window.exit_door_right_spinner = child;
-            } else if (child.name == "central_spinner_left_07") {
-                window.exit_door_left_spinner = child;
             }
         }
 
         if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.5;
         }
     })
@@ -355,8 +309,8 @@ function loadEnterDoor(scene) {
     door.rotation.y = Math.PI;
     door.position.set(3, 1, 13);
     door.translateZ(1);
-    window.ENTER_DOOR = door;
-    window.MAIN_SCENE.add(door);
+    GLOBALS.ENTER_DOOR = door;
+    GLOBALS.SCENE.add(door);
 
     //
     const geometry = new THREE.PlaneGeometry(2, 2);
@@ -378,19 +332,13 @@ function loadEnterDoor(scene) {
         if (child.isBone) {
             if (child.name == "portal_door_right_04") {
                 child.scale.set(0, 0, 0);
-                window.enter_door_right = child;
             } else if (child.name == "portal_door_left_06") {
                 child.scale.set(0, 0, 0);
-                window.enter_door_left = child;
-            } else if (child.name == "central_spinner_right_05") {
-                window.enter_door_right_spinner = child;
-            } else if (child.name == "central_spinner_left_07") {
-                window.enter_door_left_spinner = child;
             }
         }
 
         if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.5;
         }
     })
@@ -416,45 +364,23 @@ function loadCorridorEnter(scene) {
 
     corridor.traverse(child => {
         if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMap = GLOBALS.ENV_MAP;
 
             if (child.material.name == "lambert5") {
                 child.material = new THREE.MeshBasicMaterial()
             }
-        }
-    });
 
-    window.CORRIDOR_ENTER = corridor;
-    window.CORRIDOR_ENTER.name = "corridorEnter";
-    window.ENTER_DOOR.add(window.CORRIDOR_ENTER);
-    loadCorridorExit(scene);
-}
-
-function loadCorridorExit(scene) {
-
-    var corridor = scene.clone();
-    corridor.position.z = -0.99;
-    corridor.visible = false;
-
-    corridor.traverse(child => {
-        if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
-
-            if (child.material.name == "lambert5") {
-                child.material = new THREE.MeshBasicMaterial()
+            if (child.name == "back") {
+                window.corridorBackPosition = child;
             }
         }
     });
 
-    window.CORRIDOR_EXIT = corridor;
-    window.CORRIDOR_EXIT.name = "corridorExit";
-    window.CORRIDOR_EXIT.getObjectByName("spawn").material = new THREE.MeshBasicMaterial({
-        transparent: true,
-        opacity: 0
-    })
-    window.CORRIDOR_EXIT.getObjectByName("spawn").name = "completed";
-    window.EXIT_DOOR.add(window.CORRIDOR_EXIT);
-    loadPortalCube()
+    GLOBALS.CORRIDOR_ENTER = corridor;
+    GLOBALS.CORRIDOR_ENTER.name = "corridorEnter";
+    GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
+    //loadCorridorExit(scene);
+    loadPortalCube();
 }
 
 function loadPortalCube() {
@@ -491,13 +417,13 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity) {
     item.name = name;
     item.receiveShadow = true;
     item.castShadow = true;
-    item.material.envMap = window.ENV_MAP_FPS;
+    item.material.envMap = GLOBALS.ENV_MAP;
     item.material.envMapIntensity = envIntensity;
     item.material.roughness = roughness;
     item.frustumCulled = false;
 
     if (interactive) {
-        window.INTERACTIVE.push(item);
+        GLOBALS.INTERACTIVE.push(item);
     }
 
     if (name == "laser_cube") {
@@ -508,9 +434,9 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity) {
     }
 
     for (var i = 0; i < 20; i++)
-        window.DYMANIC_ITEMS[name].push([])
+        GLOBALS.DYMANIC_ITEMS[name].push([])
 
-    window.ITEMS_ADDED.add(item);
+    GLOBALS.ITEMS_ADDED.add(item);
 
     return item;
 }
@@ -534,7 +460,7 @@ function loadHalfWindow() {
         gltf.scene.userData.wall = true;
         gltf.scene.userData.ground = false;
         gltf.scene.userData.ceiling = false;
-        window.ITEMS.add(gltf.scene);
+        GLOBALS.ITEMS.add(gltf.scene);
         //HALF WINDOW
         handleZip('./assets/3ds/window_half.zip', "loadWindowHalf");
     })
@@ -546,7 +472,7 @@ function loadWindowHalfManager(scene) {
         child.receiveShadow = true;
         child.castShadow = true;
         if (child.material) {
-            //child.material.envMap = window.ENV_MAP_FPS;
+            //child.material.envMap = GLOBALS.ENV_MAP;
             //child.material.envMapIntensity = 1;
         }
 
@@ -567,13 +493,12 @@ function loadWindowHalfManager(scene) {
         if (child.name.includes("vidro")) {
             //child.renderOrder = -1;
             child.material.side = 2;
-            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMap = GLOBALS.ENV_MAP;
         }
     })
 
     scene.position.y = -1;
     scene.visible = false;
-    //window.add(scene);
 }
 
 function loadDispenser() {
@@ -592,12 +517,12 @@ function loadDispenserManager(scene) {
     scene.userData.wall = false;
     scene.userData.ground = true;
     scene.userData.ceiling = false;
-    window.ITEMS.add(scene);
+    GLOBALS.ITEMS.add(scene);
     scene.traverse(child => {
         child.receiveShadow = true;
         child.castShadow = true;
         if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.5;
         }
     })*/
@@ -675,12 +600,12 @@ function loadCameraManager(scene) {
     scene.userData.wall = true;
     scene.userData.ground = false;
     scene.userData.ceiling = false;
-    window.ITEMS.add(scene);
+    GLOBALS.ITEMS.add(scene);
     scene.traverse(child => {
         child.receiveShadow = true;
         child.castShadow = true;
         if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.5;
             child.material.roughness = 0.2;
 
@@ -848,12 +773,12 @@ function loadFaithPlateManager(scene) {
     scene.userData.wall = false;
     scene.userData.ground = true;
     scene.userData.ceiling = true;
-    window.ITEMS.add(scene);
+    GLOBALS.ITEMS.add(scene);
     scene.traverse(child => {
         child.receiveShadow = true;
         child.castShadow = true;
         if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 1;
             child.material.roughness = 0.2;
         }
@@ -873,12 +798,12 @@ function loadDoorNormalManager(scene) {
     scene.userData.wall = false;
     scene.userData.ground = true;
     scene.userData.ceiling = false;
-    window.ITEMS.add(scene);
+    GLOBALS.ITEMS.add(scene);
     scene.traverse(child => {
         child.receiveShadow = true;
         child.castShadow = true;
         if (child.material) {
-            child.material.envMap = window.ENV_MAP_FPS;
+            child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.5;
             child.material.roughness = 0.2;
         }
@@ -923,14 +848,98 @@ function loadLightStripeManager(scene) {
     item.userData.ground = true;
     item.userData.ceiling = true;
 
-    if (window.loadedLevel) {
+    loadGelBlue()
+}
+
+function loadGelBlue() {
+    handleZip('./assets/3ds/gel_blue.zip', "loadGelBlue");
+}
+
+function loadGelBlueManager(scene) {
+    var item = instancedTransform(scene, "gel_blue", false, 0.2, 1)
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
+
+
+    loadGelOrange()
+}
+
+function loadGelOrange() {
+    handleZip('./assets/3ds/gel_orange.zip', "loadGelOrange");
+}
+
+function loadGelOrangeManager(scene) {
+    var item = instancedTransform(scene, "gel_orange", false, 0.2, 1)
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
+
+
+    loadElevatorRoom()
+}
+
+function loadElevatorRoom() {
+    handleZip('./assets/3ds/exit_room.zip', "loadElevatorRoom");
+}
+
+window.EXIT_ROOM_COLLIDERS = [];
+
+
+function loadElevatorRoomManager(scene) {
+
+    scene.name = "exit_room";
+    window.EXIT_ROOM = scene;
+
+    GLOBALS.SCENE.add(scene)
+    window.EXIT_ROOM.visible = false;
+
+    scene.traverse(child => {
+        //child.receiveShadow = true;
+        //child.castShadow = true;
+        if (child.material) {
+            child.material.envMap = GLOBALS.ENV_MAP;
+            //child.material.envMapIntensity = 0.5;
+            //child.material.roughness = 0.2;
+        }
+
+        if (child.name == "shader") {
+            child.material = window.shaderExitRoom;
+            child.material.side = 1;
+        } else if (child.name == "ground") {
+            child.material.roughness = 1;
+        } else if (child.name == "trigger") {
+            child.visible = false;
+            window.elevatorTrigger = child;
+        } else if (child.name == "door") {
+            child.visible = false;
+            window.elevatorDoor = child;
+        }
+
+        if (child.name.includes("col")) {
+            child.visible = false;
+            window.EXIT_ROOM_COLLIDERS.push(child)
+        }
+
+
+        if (child.isBone && child.name == "spinnydoor_left_06") {
+            window.elevator_left = child;
+            child.rotation.y = Math.PI / 3;
+        }
+
+        if (child.isBone && child.name == "spinnydoor_right_08") {
+            window.elevator_right = child;
+            child.rotation.y = -Math.PI / 3;
+        }
+    })
+
+    if (GLOBALS.LOADED_LEVEL) {
         loadLevelJSON()
     } else {
         $("#loading-parent").css("opacity", 0);
         $("#loading-parent").css("pointer-events", "none");
     }
     animate();
-
 }
 
 export {

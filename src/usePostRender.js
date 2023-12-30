@@ -1,26 +1,45 @@
 import * as THREE from 'three';
+import {
+    GLOBALS
+} from './Globals.js';
+
+var fbo,sceneSonar;
+let clock = new THREE.Clock();
+clock.start();
+
+function animateSonar() {
+    GLOBALS.RENDERER.setRenderTarget(fbo);
+    GLOBALS.RENDERER.clearColor();
+    GLOBALS.RENDERER.clearDepth();
+
+    const deltaTime = clock.getDelta();
+    const ellapseTime = clock.getElapsedTime();
+
+    GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+
+    window["TTT"](deltaTime, ellapseTime);
+
+    GLOBALS.RENDERER.setRenderTarget(null);
+    GLOBALS.RENDERER.clearColor();
+    GLOBALS.RENDERER.clearDepth();
+    GLOBALS.RENDERER.render(sceneSonar, GLOBALS.MAIN_CAMERA);
+}
 
 function PostRender() {
 
-    //window.RENDERER.outputColorSpace   = THREE.SRGBColorSpace;
-    //window.RENDERER.autoClearColor     = false;
-    //window.RENDERER.autoClearDepth     = false;
+    //GLOBALS.RENDERER.outputColorSpace   = THREE.SRGBColorSpace;
+    //GLOBALS.RENDERER.autoClearColor     = false;
+    //GLOBALS.RENDERER.autoClearDepth     = false;
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Core
     const scene = new THREE.Scene();
-    window.scene2  = scene;
-    const camera = window.MAIN_CAMERA; //new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
-    console.log(window.RENDERER.getDrawingBufferSize(new THREE.Vector2()).toArray())
-    window.fbo = fboColorDepthSRGB(window.RENDERER.getDrawingBufferSize(new THREE.Vector2()).toArray());
-    const tri = ndcTriangle(postColorMaterial(window.fbo.texture));
-
-    console.log(window.fbo)
-    console.log(tri)
+    sceneSonar = scene;
+    const camera = GLOBALS.MAIN_CAMERA; //new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+    fbo = fboColorDepthSRGB(GLOBALS.RENDERER.getDrawingBufferSize(new THREE.Vector2()).toArray());
+    const tri = ndcTriangle(postColorMaterial(fbo.texture));
 
     scene.add(tri);
-
-    console.log(camera)
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // METHODS
@@ -37,17 +56,16 @@ function PostRender() {
 
     Object.defineProperty(self, 'colorTexture', {
         get() {
-            return window.fbo.texture;
+            return fbo.texture;
         }
     });
     Object.defineProperty(self, 'depthTexture', {
         get() {
-            return window.fbo.depthTexture;
+            return fbo.depthTexture;
         }
     });
     Object.defineProperty(self, 'postMaterial', {
         set(mat) {
-            console.log("oooooooooo")
             tri.material = mat;
         }
     });
@@ -68,7 +86,6 @@ function ndcTriangle(mat) {
 }
 
 function fboColorDepthSRGB(rendSize, isMultiSamples = true) {
-    // const dpr  = window.devicePixelRatio;
     const fbo = new THREE.WebGLRenderTarget(
         rendSize[0], // * dpr,
         rendSize[1], // * dpr,
@@ -98,15 +115,18 @@ function fboColorDepthSRGB(rendSize, isMultiSamples = true) {
 
 function postColorMaterial(tex) {
     return new THREE.RawShaderMaterial({
-      name: "PostMaterial",
-      depthTest: false,
-      transparent: false,
-      alphaToCoverage: false,
-      uniforms: {
-        texColor: { type: "sampler2D", value: tex },
-      },
-      glslVersion: THREE.GLSL3,
-      vertexShader: `
+        name: "PostMaterial",
+        depthTest: false,
+        transparent: false,
+        alphaToCoverage: false,
+        uniforms: {
+            texColor: {
+                type: "sampler2D",
+                value: tex
+            },
+        },
+        glslVersion: THREE.GLSL3,
+        vertexShader: `
           in vec2 position;
           in vec2 uv;
   
@@ -120,8 +140,8 @@ function postColorMaterial(tex) {
               // gl_Position = projectionMatrix * viewMatrix * vec4( position, 0.0, 1.0 );
               gl_Position = vec4( position, 0.0, 1.0 );
           }`,
-  
-      fragmentShader: `
+
+        fragmentShader: `
           precision mediump float;
           
           uniform sampler2D texColor;
@@ -138,5 +158,6 @@ function postColorMaterial(tex) {
 // #endregion
 
 export {
-    PostRender
+    PostRender,
+    animateSonar
 }

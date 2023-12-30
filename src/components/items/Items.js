@@ -19,10 +19,13 @@ import {
 import {
     tweenCamera
 } from '../../Main.js';
+import {
+    GLOBALS
+} from '../../Globals.js';
 
 $("body").on('pointerdown', '.item', function (event) {
     event.preventDefault();
-    window.ITEM_HOLDED_NAME = $(this).data("name");
+    GLOBALS.ITEM_HOLDED_NAME = $(this).data("name");
     window.BEAM_TYPE = $(this).data("beam");
     $("#follow").attr("src", $(this).attr("src"));
 });
@@ -30,7 +33,7 @@ $("body").on('pointerdown', '.item', function (event) {
 var raycaster = new THREE.Raycaster();
 
 $("body").on('pointerdown', '.dispenser-once', function (event) {
-    var i = window.planeUserData[window.SELECTED_ID[0]];
+    var i = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]];
     i.trigger.item.item.state = "once";
     i.state = "once";
     console.log(i);
@@ -38,7 +41,7 @@ $("body").on('pointerdown', '.dispenser-once', function (event) {
 });
 
 $("body").on('pointerdown', '.dispenser-always', function (event) {
-    var i = window.planeUserData[window.SELECTED_ID[0]];
+    var i = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]];
     i.trigger.item.item.state = "always";
     i.state = "always";
     console.log(i);
@@ -46,17 +49,17 @@ $("body").on('pointerdown', '.dispenser-always', function (event) {
 
 function itemUpdate() { //found, event, type
 
-    if (window.CURRENT_ITEM && window.HOLDING_ITEM) {
+    if (GLOBALS.CURRENT_ITEM && GLOBALS.HOLDING_ITEM) {
 
         var target = new THREE.Vector3();
-        window.holder.getWorldPosition(target);
+        GLOBALS.MAIN_CAMERA.getObjectByName("cubeHolder").getWorldPosition(target);
 
         //FRONT
         checkCollision(target, new THREE.Vector3(0, 0, -1), "z");
 
         if (none == 1) {
             window.COL_Z = false;
-            window.holder.position.z = -1;
+            GLOBALS.MAIN_CAMERA.getObjectByName("cubeHolder").position.z = -1;
         }
     }
 }
@@ -66,12 +69,12 @@ var none = 0;
 function checkCollision(target, dir, axis) {
 
     var vector = dir;
-    vector = window.MAIN_CAMERA.localToWorld(vector);
-    vector.sub(window.MAIN_CAMERA.position); // Now vector is a unit vector with the same direction as the camera
+    vector = GLOBALS.MAIN_CAMERA.localToWorld(vector);
+    vector.sub(GLOBALS.MAIN_CAMERA.position); // Now vector is a unit vector with the same direction as the camera
 
-    raycaster.set(window.MAIN_CAMERA.position, vector);
+    raycaster.set(GLOBALS.MAIN_CAMERA.position, vector);
     raycaster.far = 1.2; // comment this line to have an infinite ray
-    var intersects = raycaster.intersectObjects(window.ITEMS_ADDED);
+    var intersects = raycaster.intersectObjects(GLOBALS.ITEMS_ADDED);
 }
 
 var itemCount = 0;
@@ -87,31 +90,26 @@ window.checks = [];
 function addItem(found, loaded) {
 
 
-    if (window.ITEM_HOLDED_NAME == "goo") {
+    if (GLOBALS.ITEM_HOLDED_NAME == "goo") {
         AddGoo(found, false);
         return;
     }
 
     if (loaded) {
-        window.ITEM_HOLDED_NAME = found.itemName.split('-')[0];
+        GLOBALS.ITEM_HOLDED_NAME = found.itemName.split('-')[0];
     }
 
     //for (var i = 0; i < found.length; i++) {
     const i = 0;
 
-    if (window.connecting) {
+    if (GLOBALS.CONNECTING) {
 
-        target = window.planeUserData[found[i].instanceId];
+        target = GLOBALS.PLANE_USER_DATA[found[i].instanceId];
 
-        //
-        console.log("9999999999999")
-        console.log(window.startItem)
-        console.log(target)
+        GLOBALS.SELECTED_FOR_CONNECTION.trigger = target;
+        GLOBALS.SELECTED_FOR_CONNECTION.normal = found[i].normal;
 
-        window.startItem.trigger = target;
-        window.startItem.normal = found[i].normal;
-
-        findPath(window.startItem.position, target.position, found[i])
+        findPath(GLOBALS.SELECTED_FOR_CONNECTION.position, target.position, found[i])
 
         //break;
         //}
@@ -121,35 +119,35 @@ function addItem(found, loaded) {
 
         if (loaded) {
             userData = found;
-            console.log(window.ITEM_HOLDED_NAME)
+            console.log(GLOBALS.ITEM_HOLDED_NAME)
         } else {
-            userData = window.planeUserData[found[i].instanceId];
+            userData = GLOBALS.PLANE_USER_DATA[found[i].instanceId];
         }
 
         //console.log(userData)
 
         if (!userData.hasItem || loaded) {
 
-            if (window.ITEM_HOLDED_NAME == "camera") {
-                var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
+            if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
+                var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
 
                 item.traverse(child => {
                     if (child.name == "horizontal")
-                        window.horizontal.push(child)
+                        GLOBALS.CAMERA_OBJ_HORIZONTAL.push(child)
                     else if (child.name == "vertical")
-                        window.vertical.push(child)
+                        GLOBALS.CAMERA_OBJ_VERTICAL.push(child)
                 })
-            } else if (window.ITEM_HOLDED_NAME == "faith_plate" || window.ITEM_HOLDED_NAME == "door") {
-                var item = window.ITEMS.getObjectByName(window.ITEM_HOLDED_NAME).clone();
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate" || GLOBALS.ITEM_HOLDED_NAME == "door") {
+                var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
 
 
-            } else if (window.ITEM_HOLDED_NAME == "gel_blue_dispenser") {
-                window.ITEM_HOLDED_NAME = "dispenser";
-                var instanced = window.ITEMS_ADDED.getObjectByName("dispenser");
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_blue2") {
+                GLOBALS.ITEM_HOLDED_NAME = "dispenser";
+                var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
                 var item = new THREE.Object3D();
                 item.userData = instanced.userData;
             } else {
-                var instanced = window.ITEMS_ADDED.getObjectByName(window.ITEM_HOLDED_NAME);
+                var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);
                 var item = new THREE.Object3D();
                 item.userData = instanced.userData;
             }
@@ -165,11 +163,11 @@ function addItem(found, loaded) {
             }
 
             userData.hasItem = true;
-            userData.itemName = window.ITEM_HOLDED_NAME + "-" + itemCount;
+            userData.itemName = GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount;
             userData.item = item;
             userData.state = "open";
 
-            if (window.ITEM_HOLDED_NAME == "camera") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
                 var target = new THREE.Vector3(); // create once an reuse it
                 found[i].object.getWorldPosition(target);
                 item.position.copy(target);
@@ -179,50 +177,50 @@ function addItem(found, loaded) {
 
             item.position.copy(userData.position);
             item.renderOrder = 2;
-            item.name = window.ITEM_HOLDED_NAME + "-" + itemCount;
+            item.name = GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount;
             item.planeInstancedId = userData.id_instanced;
 
             if (loaded) {
                 item.rotation.copy(userData.itemRotation);
             } else if (userData.side == "front") {
-                if (window.ITEM_HOLDED_NAME == "light")
+                if (GLOBALS.ITEM_HOLDED_NAME == "light")
                     item.rotation.x = Math.PI / 2;
                 else
                     item.rotation.y = 0;
                 //item.rotation.x = Math.PI / 2;
             } else if (userData.side == "right") {
-                if (window.ITEM_HOLDED_NAME == "light")
+                if (GLOBALS.ITEM_HOLDED_NAME == "light")
                     item.rotation.z = Math.PI / 2;
                 else
                     item.rotation.y = -Math.PI / 2;
             } else if (userData.side == "back") {
-                if (window.ITEM_HOLDED_NAME == "light")
+                if (GLOBALS.ITEM_HOLDED_NAME == "light")
                     item.rotation.x = -Math.PI / 2;
                 else
                     item.rotation.y = Math.PI;
             } else if (userData.side == "left") {
-                if (window.ITEM_HOLDED_NAME == "light")
+                if (GLOBALS.ITEM_HOLDED_NAME == "light")
                     item.rotation.z = -Math.PI / 2;
                 else
                     item.rotation.y = Math.PI / 2;
             } else if (userData.side == "down") {
-                if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere" || window.ITEM_HOLDED_NAME == "laser_cube")
+                if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube")
                     item.translateY(1);
-                else if (window.ITEM_HOLDED_NAME == "radio")
+                else if (GLOBALS.ITEM_HOLDED_NAME == "radio")
                     item.translateY(0.25);
 
-                if (window.ITEM_HOLDED_NAME == "stripe" || window.ITEM_HOLDED_NAME == "tractor_beam")
+                if (GLOBALS.ITEM_HOLDED_NAME == "stripe" || GLOBALS.ITEM_HOLDED_NAME == "tractor_beam")
                     item.rotation.x = -Math.PI / 2;
             } else {
-                if (window.ITEM_HOLDED_NAME == "light" || window.ITEM_HOLDED_NAME == "button_box")
+                if (GLOBALS.ITEM_HOLDED_NAME == "light" || GLOBALS.ITEM_HOLDED_NAME == "button_box")
                     item.rotation.x = Math.PI;
-                else if (window.ITEM_HOLDED_NAME == "stripe" || window.ITEM_HOLDED_NAME == "tractor_beam")
+                else if (GLOBALS.ITEM_HOLDED_NAME == "stripe" || GLOBALS.ITEM_HOLDED_NAME == "tractor_beam")
                     item.rotation.x = Math.PI / 2;
             }
 
             userData.itemRotation = item.rotation;
 
-            if (window.ITEM_HOLDED_NAME == "button_box") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "button_box") {
 
 
                 const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -231,7 +229,7 @@ function addItem(found, loaded) {
                 });
                 const cube = new THREE.Mesh(geometry, material);
                 cube.position.copy(item.position)
-                //window.MAIN_SCENE.add(cube);
+                //GLOBALS.SCENE.add(cube);
 
                 var bb = new THREE.Box3(); // for re-use
                 bb.setFromObject(cube);
@@ -246,19 +244,19 @@ function addItem(found, loaded) {
                 window.TRIGGER.push(bb);
             }
 
-            if (window.ITEM_HOLDED_NAME == "cube" || window.ITEM_HOLDED_NAME == "sphere" || window.ITEM_HOLDED_NAME == "laser_cube") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
 
                 var idInstanced;
 
-                for (var j = 0; j < window.DYMANIC_ITEMS["dispenser"].length; j++) {
-                    if (window.DYMANIC_ITEMS["dispenser"][j].length == 0) {
-                        window.DYMANIC_ITEMS["dispenser"][j] = item;
+                for (var j = 0; j < GLOBALS.DYMANIC_ITEMS["dispenser"].length; j++) {
+                    if (GLOBALS.DYMANIC_ITEMS["dispenser"][j].length == 0) {
+                        GLOBALS.DYMANIC_ITEMS["dispenser"][j] = item;
                         idInstanced = j;
                         break;
                     }
                 }
 
-                var instanced2 = window.ITEMS_ADDED.getObjectByName("dispenser");
+                var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
                 var item2 = new THREE.Object3D();
                 //item2.userData = instanced2.userData;
                 item2.position.copy(userData.position);
@@ -292,51 +290,53 @@ function addItem(found, loaded) {
                 instanced2.computeBoundingSphere();
             }
 
-            if (window.ITEM_HOLDED_NAME == "light_bridge")
+            if (GLOBALS.ITEM_HOLDED_NAME == "light_bridge")
                 item.position.y += 1;
 
-            if (window.ITEM_HOLDED_NAME == "tractor_beam")
+            if (GLOBALS.ITEM_HOLDED_NAME == "tractor_beam")
                 item.beam = window.BEAM_TYPE;
 
-            if (window.ITEM_HOLDED_NAME == "camera" || window.ITEM_HOLDED_NAME == "faith_plate") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
+                GLOBALS.ITEMS_ADDED.add(item);
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
                 item.translateY(0.025);
 
                 var bb = new THREE.Box3(); // for re-use
                 bb.setFromObject(item);
                 bb.side = 1;
 
-                if (window.faithBox.length == 1) {
+                if (GLOBALS.FAITH_PLATE_CONTACT_BOX.length == 1) {
                     item.rotation.y = Math.PI;
-                } else if (window.faithBox.length == 2) {
+                } else if (GLOBALS.FAITH_PLATE_CONTACT_BOX.length == 2) {
                     item.rotation.y = Math.PI / 2;
                 }
 
-                window.faithBox.push(bb);
+                GLOBALS.FAITH_PLATE_CONTACT_BOX.push(bb);
 
                 item.traverse(child => {
                     if (child.name == "launch") {
-                        window.faithBox2.push(child)
+                        GLOBALS.FAITH_PLATE_TO_ROTATE.push(child)
                     }
                 })
 
 
-                window.ITEMS_ADDED.add(item);
-            } else if (window.ITEM_HOLDED_NAME == "door") {
-                window.ITEMS_ADDED.add(item);
+                GLOBALS.ITEMS_ADDED.add(item);
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
+                GLOBALS.ITEMS_ADDED.add(item);
                 window.DOORS.push(item)
             } else {
                 var idInstanced;
 
-                for (var j = 0; j < window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME].length; j++) {
-                    if (window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME][j].length == 0) {
+                for (var j = 0; j < GLOBALS.DYMANIC_ITEMS[GLOBALS.ITEM_HOLDED_NAME].length; j++) {
+                    if (GLOBALS.DYMANIC_ITEMS[GLOBALS.ITEM_HOLDED_NAME][j].length == 0) {
                         item.laser = false;
-                        window.DYMANIC_ITEMS[window.ITEM_HOLDED_NAME][j] = item;
+                        GLOBALS.DYMANIC_ITEMS[GLOBALS.ITEM_HOLDED_NAME][j] = item;
                         idInstanced = j;
                         break;
                     }
                 }
 
-                if (window.ITEM_HOLDED_NAME == "dispenser") {
+                if (GLOBALS.ITEM_HOLDED_NAME == "dispenser") {
                     //GET CEILING SURFACE
                     for (var x = 0, j = 2; x < 100; x++, j += 2) {
 
@@ -354,13 +354,13 @@ function addItem(found, loaded) {
                 item.updateMatrix();
                 instanced.setMatrixAt(idInstanced, item.matrix);
 
-                if (window.ITEM_HOLDED_NAME == "gel_gun_blue") {
+                if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_blue") {
                     instanced.setColorAt(idInstanced, new THREE.Color(0x0000ff));
                     instanced.instanceColor.needsUpdate = true;
-                } else if (window.ITEM_HOLDED_NAME == "gel_gun_orange") {
+                } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_orange") {
                     instanced.setColorAt(idInstanced, new THREE.Color(0xffa500));
                     instanced.instanceColor.needsUpdate = true;
-                } else if (window.ITEM_HOLDED_NAME == "gel_gun_white") {
+                } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_white") {
                     instanced.setColorAt(idInstanced, new THREE.Color(0xffffff));
                     instanced.instanceColor.needsUpdate = true;
                 }
@@ -377,7 +377,7 @@ function addItem(found, loaded) {
     //}
 
     if (loaded) {
-        window.ITEM_HOLDED_NAME = null;
+        GLOBALS.ITEM_HOLDED_NAME = null;
         $("#follow").css("display", "none");
         //animate()
     }
@@ -396,43 +396,43 @@ function findPath(ini, target, found) {
         side: THREE.DoubleSide,
         polygonOffset: true,
         polygonOffsetFactor: -7,
-        map: window.CLOSE,
+        map: GLOBALS.IMG_CLOSE,
     });
     const plane = new THREE.Mesh(geometryCheck, materialCheck);
-    window.MAIN_SCENE.add(plane);
+    GLOBALS.SCENE.add(plane);
 
     var side = true;
 
     console.log(found.instanceId)
-    console.log(window.planeUserData[found.instanceId])
+    console.log(GLOBALS.PLANE_USER_DATA[found.instanceId])
 
-    if (window.planeUserData[found.instanceId].side == "up") {
+    if (GLOBALS.PLANE_USER_DATA[found.instanceId].side == "up") {
         plane.rotation.x = Math.PI / 2;
         plane.position.set(found.normal.z * 1.3 + (target.x), (target.y), found.normal.x * 1.3 + (target.z))
-    } else if (window.planeUserData[found.instanceId].side == "down") {
+    } else if (GLOBALS.PLANE_USER_DATA[found.instanceId].side == "down") {
         plane.rotation.x = -Math.PI / 2;
         plane.position.set((target.x), (target.y), (target.z))
         side = false;
     } else
         plane.position.set(found.normal.z * 1.3 + (target.x), (target.y), found.normal.x * 1.3 + (target.z))
 
-    window.connecting = false;
+    GLOBALS.CONNECTING = false;
 
-    window.MATERIAL_PORTAL_EDITOR.opacity = 1;
-    window.MATERIAL_NON_PORTAL_EDITOR.opacity = 1;
-    window.MATERIAL_PORTAL_EDITOR.transparent = false;
-    window.MATERIAL_NON_PORTAL_EDITOR.transparent = false;
+    GLOBALS.MATERIAL_PORTAL_EDITOR.opacity = 1;
+    GLOBALS.MATERIAL_NON_PORTAL_EDITOR.opacity = 1;
+    GLOBALS.MATERIAL_PORTAL_EDITOR.transparent = false;
+    GLOBALS.MATERIAL_NON_PORTAL_EDITOR.transparent = false;
 
     isDrawStart = false;
-    global.MAIN_SCENE.remove(lineFollow);
+    GLOBALS.SCENE.remove(lineFollow);
     count = 0;
 
-    window.startItem.check = plane;
+    GLOBALS.SELECTED_FOR_CONNECTION.check = plane;
     window.checks.push(plane);
 
-    for (var j = 0; j < window.planeUserData.length; j++) {
-        if (window.planeUserData[j].exists) {
-            nodes.push(window.planeUserData[j]);
+    for (var j = 0; j < GLOBALS.PLANE_USER_DATA.length; j++) {
+        if (GLOBALS.PLANE_USER_DATA[j].exists) {
+            nodes.push(GLOBALS.PLANE_USER_DATA[j]);
         }
     }
 
@@ -613,9 +613,9 @@ function path2(dgraph, start, end, side) {
 
     var circlePAth = new THREE.Mesh(mergedGeometry, circleMaterial);
 
-    window.MAIN_SCENE.add(circlePAth);
+    GLOBALS.SCENE.add(circlePAth);
     window.lines.push(circlePAth);
-    window.startItem.circle = circlePAth;
+    GLOBALS.SELECTED_FOR_CONNECTION.circle = circlePAth;
 }
 
 var dgraph;
@@ -630,11 +630,8 @@ function dist(t0, t1) {
     return distance;
 }
 
-window.faithBox = [];
-window.faithBox2 = [];
-
 function getPlaneByName(name) {
-    return window.planeUserData.filter(
+    return GLOBALS.PLANE_USER_DATA.filter(
         function (data) {
             return data.name == name
         }
@@ -652,14 +649,14 @@ document.addEventListener('keydown', (event) => {
     if (event.code == "Escape" && isDrawStart) {
 
         isDrawStart = false;
-        global.MAIN_SCENE.remove(lineFollow);
+        GLOBALS.SCENE.remove(lineFollow);
 
-        window.connecting = false;
+        GLOBALS.CONNECTING = false;
 
-        window.MATERIAL_PORTAL_EDITOR.opacity = 1;
-        window.MATERIAL_NON_PORTAL_EDITOR.opacity = 1;
-        window.MATERIAL_PORTAL_EDITOR.transparent = false;
-        window.MATERIAL_NON_PORTAL_EDITOR.transparent = false;
+        GLOBALS.MATERIAL_PORTAL_EDITOR.opacity = 1;
+        GLOBALS.MATERIAL_NON_PORTAL_EDITOR.opacity = 1;
+        GLOBALS.MATERIAL_PORTAL_EDITOR.transparent = false;
+        GLOBALS.MATERIAL_NON_PORTAL_EDITOR.transparent = false;
 
         count = 0;
     }
@@ -669,11 +666,11 @@ document.addEventListener('keydown', (event) => {
 
 $("body").on('click', '#conection', function (event) {
 
-    window.connecting = true;
-    window.MATERIAL_PORTAL_EDITOR.opacity = 0.25;
-    window.MATERIAL_NON_PORTAL_EDITOR.opacity = 0.25;
-    window.MATERIAL_PORTAL_EDITOR.transparent = true;
-    window.MATERIAL_NON_PORTAL_EDITOR.transparent = true;
+    GLOBALS.CONNECTING = true;
+    GLOBALS.MATERIAL_PORTAL_EDITOR.opacity = 0.25;
+    GLOBALS.MATERIAL_NON_PORTAL_EDITOR.opacity = 0.25;
+    GLOBALS.MATERIAL_PORTAL_EDITOR.transparent = true;
+    GLOBALS.MATERIAL_NON_PORTAL_EDITOR.transparent = true;
 
     $(".menu").removeClass("menu-show");
 
@@ -685,22 +682,22 @@ $("body").on('click', '#conection', function (event) {
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
     lineFollow = new THREE.Line(geometry, materialLine);
-    window.MAIN_SCENE.add(lineFollow);
+    GLOBALS.SCENE.add(lineFollow);
 
     isDrawStart = true;
 
-    window.startItem = window.planeUserData[window.SELECTED_ID[0]];
+    GLOBALS.SELECTED_FOR_CONNECTION = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]];
 
-    addPoint(window.planeUserData[window.SELECTED_ID[0]].position.x,
-        window.planeUserData[window.SELECTED_ID[0]].position.y,
-        window.planeUserData[window.SELECTED_ID[0]].position.z);
+    addPoint(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.x,
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.y,
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.z);
 
-    addPoint(window.planeUserData[window.SELECTED_ID[0]].position.x,
-        window.planeUserData[window.SELECTED_ID[0]].position.y,
-        window.planeUserData[window.SELECTED_ID[0]].position.z);
+    addPoint(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.x,
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.y,
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.z);
 
-    //addPoint(window.SELECTED.parent.position.x, window.SELECTED.parent.position.y - 1, window.SELECTED.parent.position.z);
-    //addPoint(window.SELECTED.parent.position.x, window.SELECTED.parent.position.y - 1, window.SELECTED.parent.position.z);
+    //addPoint(GLOBALS.SELECTED.parent.position.x, GLOBALS.SELECTED.parent.position.y - 1, GLOBALS.SELECTED.parent.position.z);
+    //addPoint(GLOBALS.SELECTED.parent.position.x, GLOBALS.SELECTED.parent.position.y - 1, GLOBALS.SELECTED.parent.position.z);
 })
 
 function addPoint(x, y, z) {
@@ -717,14 +714,14 @@ document.body.addEventListener('mousemove', onPointerMove);
 
 function onPointerMove(event) {
 
-    if (!window.connecting)
+    if (!GLOBALS.CONNECTING)
         return;
 
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     mouse.z = 0;
-    mouse.unproject(window.MAIN_CAMERA);
-    if (count !== 0 && window.connecting) {
+    mouse.unproject(GLOBALS.MAIN_CAMERA);
+    if (count !== 0 && GLOBALS.CONNECTING) {
         updateLine();
     }
 }
@@ -740,14 +737,14 @@ function updateLine() {
 
 function hoverItem(found) {
 
-    if (found.length == 0 && !window.itemSelected) {
+    if (found.length == 0) {
         return
     }
 
-    var userData = window.planeUserData[found[0].instanceId];
+    var userData = GLOBALS.PLANE_USER_DATA[found[0].instanceId];
 
-    window.ITEM_CUBE.position.copy(userData.position);
-    window.ITEM_CUBE.visible = true;
+    GLOBALS.ITEM_CUBE.position.copy(userData.position);
+    GLOBALS.ITEM_CUBE.visible = true;
 }
 
 var itemHolder = null;
@@ -755,11 +752,11 @@ var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
 
 function interactWithItem() {
-    raycaster2.setFromCamera(coords, window.MAIN_CAMERA);
-    var intersects = raycaster2.intersectObjects(window.INTERACTIVE);
+    raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
+    var intersects = raycaster2.intersectObjects(GLOBALS.INTERACTIVE);
 
-    if (window.HOLDING_ITEM) {
-        window.HOLDING_ITEM = false;
+    if (GLOBALS.HOLDING_ITEM) {
+        GLOBALS.HOLDING_ITEM = false;
 
         // Position
         itemHolder.position.setZero();
@@ -782,11 +779,11 @@ function interactWithItem() {
         itemHolder.timeLastSleepy = 0;
         itemHolder._wakeUpAfterNarrowphase = false;
 
-        itemHolder.position.copy(window.CURRENT_ITEM.position);
-        itemHolder.quaternion.copy(window.CURRENT_ITEM.quaternion);
+        itemHolder.position.copy(GLOBALS.CURRENT_ITEM.position);
+        itemHolder.quaternion.copy(GLOBALS.CURRENT_ITEM.quaternion);
 
-        window.PLAYER.velocity.set(0, 0, 0);
-        window.PLAYER.angularVelocity.set(0, 0, 0);
+        GLOBALS.PLAYER.velocity.set(0, 0, 0);
+        GLOBALS.PLAYER.angularVelocity.set(0, 0, 0);
 
         itemHolder.gelJumping = false;
 
@@ -794,111 +791,62 @@ function interactWithItem() {
         itemHolder.recall = false;
         window.recalling = false;
 
-        window.CANNON_WORLD.addBody(itemHolder);
+        GLOBALS.CANNON_WORLD.addBody(itemHolder);
 
-        window.CURRENT_ITEM = null;
-        window.CURRENT_ITEM_ID = null;
+        GLOBALS.CURRENT_ITEM = null;
+        GLOBALS.CURRENT_ITEM_ID = null;
         itemHolder = null;
         window.COL_Z = false;
-        window.holder.position.z = -1;
+        GLOBALS.MAIN_CAMERA.getObjectByName("cubeHolder").position.z = -1;
     } else if (intersects.length > 0) {
 
-        if (intersects[0].object.name == "gel_gun_blue" ||
-            intersects[0].object.name == "gel_gun_orange" ||
-            intersects[0].object.name == "gel_gun_white") {
-
-            if (window.GUN_MODE == 2) {
-                for (var i = 2; i >= 0; i--) {
-                    if (!window.INK.children[i].visible) {
-
-                        window.INK.children[i].visible = true;
-                        window.INK.children[i].name = intersects[0].object.name;
-
-                        if (intersects[0].object.name == "gel_gun_blue") {
-                            window.INK.children[i].material.color = new THREE.Color(0x0000ff)
-                            window.INK_BLUE = true;
-                        } else if (intersects[0].object.name == "gel_gun_orange") {
-                            window.INK.children[i].material.color = new THREE.Color(0xffa500)
-                            window.INK_ORANGE = true;
-                        } else if (intersects[0].object.name == "gel_gun_white") {
-                            window.INK.children[i].material.color = new THREE.Color(0xffffff)
-                            window.INK_WHITE = true;
-                        }
-
-                        break;
-                    } else {
-                        if (window.INK.children[i].name == intersects[0].object.name)
-                            break;
-                    }
-                }
-            }
-        } else if (intersects[0].object.name == "pedestal_button") {
+        if (intersects[0].object.name == "pedestal_button") {
 
             if (intersects[0].distance < 1) {
-                var item = window.DYMANIC_ITEMS[intersects[0].object.name][intersects[0].instanceId];
-                var goal = window.planeUserData[item.planeInstancedId];
+                var item = GLOBALS.DYMANIC_ITEMS[intersects[0].object.name][intersects[0].instanceId];
+                var goal = GLOBALS.PLANE_USER_DATA[item.planeInstancedId];
                 console.log(goal);
 
                 if (goal.trigger.itemName.includes("exitDoor")) {
 
                 } else if (goal.trigger.itemName.includes("dispenser")) {
-                    window.BOX_BODY[goal.trigger.item.userData.id].mass = 5;
+                    GLOBALS.BOX_BODY[goal.trigger.item.userData.id].mass = 5;
                 }
 
                 goal.circle.material.color = new THREE.Color(0xfcba03);
                 goal.check.material.color = new THREE.Color(0xfcba03);
-                goal.check.material.map = window.CHECK;
+                goal.check.material.map = GLOBALS.IMG_CHECK;
 
                 setTimeout(() => {
                     goal.circle.material.color = new THREE.Color(0x03e8fc);
                     goal.check.material.color = new THREE.Color(0x03e8fc);
-                    goal.check.material.map = window.CLOSE;
+                    goal.check.material.map = GLOBALS.CLOSE;
                 }, 2000);
             }
-
-            //planeInstancedId
-
-            /*var plane = getPlaneByName(name)
-            console.log(plane);
-
-            */
-
-            /*for (var i = 0; i < window.BOX_BODY.length; i++) {
-                window.BOX_BODY[i].mass = 5;
-
-                window.lines[1].material.color = new THREE.Color(0xfcba03);
-                window.checks[1].material.color = new THREE.Color(0xfcba03);
-
-                setTimeout(() => {
-                    window.lines[1].material.color = new THREE.Color(0x03e8fc);
-                    window.checks[1].material.color = new THREE.Color(0x03e8fc);
-                }, 2000);
-                //window.CANNON_WORLD.addBody(window.BOX_BODY[i])
-            }*/
         } else {
             if (intersects[0].distance < 2) {
-                window.HOLDING_ITEM = true;
+                GLOBALS.HOLDING_ITEM = true;
                 var instancedId = intersects[0].instanceId;
                 var name = intersects[0].object.name;
 
-                window.CURRENT_ITEM = window.DYMANIC_ITEMS[name][instancedId];
-                window.CURRENT_INSTANCED = window.ITEMS_ADDED.getObjectByName(name);
-                window.CURRENT_ITEM_ID = instancedId;
+                GLOBALS.CURRENT_ITEM = GLOBALS.DYMANIC_ITEMS[name][instancedId];
+                GLOBALS.CURRENT_INSTANCED = GLOBALS.ITEMS_ADDED.getObjectByName(name);
+                GLOBALS.CURRENT_ITEM_ID = instancedId;
 
-                itemHolder = window.DYMANIC_ITEMS[name][instancedId].body;
-                window.CANNON_WORLD.removeBody(window.DYMANIC_ITEMS[name][instancedId].body);
+                itemHolder = GLOBALS.DYMANIC_ITEMS[name][instancedId].body;
+                GLOBALS.CANNON_WORLD.removeBody(GLOBALS.DYMANIC_ITEMS[name][instancedId].body);
 
-                console.log(window.DYMANIC_ITEMS[name][instancedId].body)
-                if (window.DYMANIC_ITEMS[name][instancedId].body.placed) {
-                    revert(window.DYMANIC_ITEMS[name][instancedId].body)
+                console.log(GLOBALS.DYMANIC_ITEMS[name][instancedId].body)
+                if (GLOBALS.DYMANIC_ITEMS[name][instancedId].body.placed) {
+                    revert(GLOBALS.DYMANIC_ITEMS[name][instancedId].body)
                 }
             }
         }
     }
 
-    window.lightningStrikeMesh.visible = window.HOLDING_ITEM;
-    window.lightningStrikeMesh2.visible = window.HOLDING_ITEM;
-    window.lightningStrikeMesh3.visible = window.HOLDING_ITEM;
+    GLOBALS.LIGHTNIN_STRIKE_1.visible = GLOBALS.HOLDING_ITEM;
+    GLOBALS.LIGHTNIN_STRIKE_2.visible = GLOBALS.HOLDING_ITEM;
+    GLOBALS.LIGHTNIN_STRIKE_3.visible = GLOBALS.HOLDING_ITEM;
 }
 
 function revert(d) {
@@ -906,7 +854,7 @@ function revert(d) {
     var goal = d.goal;
     goal.circle.material.color = new THREE.Color(0x03e8fc);
     goal.check.material.color = new THREE.Color(0x03e8fc);
-    goal.check.material.map = window.CLOSE;
+    goal.check.material.map = GLOBALS.IMG_CLOSE;
 
     setTimeout(() => {
         d.placed = false;
@@ -921,7 +869,7 @@ function revert(d) {
         setTimeout(() => {
             //doorLeft.position.z += 0.1;
             //doorRight.position.z += 0.1;
-            window.CANNON_WORLD.addBody(goal.trigger.item.body);
+            GLOBALS.CANNON_WORLD.addBody(goal.trigger.item.body);
             tweenCamera(1000, doorLeft.position, new THREE.Vector3(doorLeft.position.x + 1, doorLeft.position.y, doorLeft.position.z))
             tweenCamera(1000, doorRight.position, new THREE.Vector3(doorRight.position.x - 1, doorRight.position.y, doorRight.position.z))
         }, 1000);
@@ -929,21 +877,19 @@ function revert(d) {
     } else {
         /*exit = true;
         setTimeout(() => {
-            tweenCamera(500, window.exit_door_right_spinner.rotation, new THREE.Vector3(Math.PI,
-                window.exit_door_right_spinner.rotation.y,
-                window.exit_door_right_spinner.rotation.z))
+            tweenCamera(500, GLOBALS.EXIT_DOOR.getObjectByName("central_spinner_right_05").rotation, new THREE.Vector3(Math.PI,
+                GLOBALS.EXIT_DOOR.getObjectByName("central_spinner_right_05").rotation.y,
+                GLOBALS.EXIT_DOOR.getObjectByName("central_spinner_right_05").rotation.z))
 
-            tweenCamera(500, window.exit_door_left_spinner.rotation, new THREE.Vector3(Math.PI,
-                window.exit_door_left_spinner.rotation.y,
-                window.exit_door_left_spinner.rotation.z))
+            tweenCamera(500, GLOBALS.EXIT_DOOR.getObjectByName("central_spinner_left_07").rotation, new THREE.Vector3(Math.PI,
+                GLOBALS.EXIT_DOOR.getObjectByName("central_spinner_left_07").rotation.y,
+                GLOBALS.EXIT_DOOR.getObjectByName("central_spinner_left_07").rotation.z))
 
-            window.CORRIDOR_EXIT.visible = true;
+            GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").position.z = -5;
+            tweenCamera(1000, GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").position, new THREE.Vector3(GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").position.x + 60, GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").position.y, GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").position.z))
 
-            window.exit_door_right.position.z = -5;
-            tweenCamera(1000, window.exit_door_right.position, new THREE.Vector3(window.exit_door_right.position.x + 60, window.exit_door_right.position.y, window.exit_door_right.position.z))
-
-            window.exit_door_left.position.z = -5;
-            tweenCamera(1000, window.exit_door_left.position, new THREE.Vector3(window.exit_door_right.position.x + 60, window.exit_door_left.position.y, window.exit_door_left.position.z))
+            GLOBALS.EXIT_DOOR.getObjectByName("portal_door_left_06").position.z = -5;
+            tweenCamera(1000, GLOBALS.EXIT_DOOR.getObjectByName("portal_door_left_06").position, new THREE.Vector3(GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").position.x + 60, GLOBALS.EXIT_DOOR.getObjectByName("portal_door_left_06").position.y, GLOBALS.EXIT_DOOR.getObjectByName("portal_door_left_06").position.z))
         }, 1000);*/
     }
 }

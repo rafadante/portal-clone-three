@@ -10,8 +10,7 @@ import {
     PlaneGeometry,
     Vector3
 } from 'three';
-
-
+import { GLOBALS } from '../../Globals.js';
 
 class Portal extends Group {
     // position - the center position (vector3)
@@ -56,8 +55,6 @@ class Portal extends Group {
         let zHelper = new THREE.ArrowHelper(this.tz, position, 1, 0x0000ff)
         this.debugMeshes.add(xHelper, yHelper, zHelper)
 
-        console.log(this)
-
         this.transform = tRot.clone().setPosition(position)
         this.plane.applyMatrix4(this.transform)
         this.plane.translate(normal.clone().multiplyScalar(0.0001));
@@ -82,7 +79,7 @@ class Portal extends Group {
         }
         `
 
-        const geometry = new THREE.CylinderGeometry(window.PORTAL_WIDTH, window.PORTAL_WIDTH, window.PORTAL_HEIGHT, 50);
+        const geometry = new THREE.CylinderGeometry(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_HEIGHT, 50);
         const uniforms = {
             texture1: {
                 type: 't',
@@ -116,7 +113,7 @@ class Portal extends Group {
         this.mesh.updateMatrix()
         this.mesh.matrixAutoUpdate = true;
         this.matrixAutoUpdate = true;
-        this.mesh.scale.x *= 0.5;
+        //this.mesh.scale.x *= 0.75;
         this.mesh.frustumCulled = false;
         this.add(this.mesh)
 
@@ -137,12 +134,10 @@ class Portal extends Group {
 
 
         portalShader.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
-        //portalShader.applyMatrix4(new THREE.Matrix4().makeRotationY(-Math.PI / 6))
         portalShader.applyMatrix4(this.transform)
-        //portalShader.position.add(normal.clone().multiplyScalar(window.PORTAL_HEIGHT / 2 + 0.002))
         portalShader.updateMatrix()
         portalShader.matrixAutoUpdate = true;
-        portalShader.scale.x *= 0.5;
+        //portalShader.scale.x *= 0.5;
         this.portalShader = portalShader;
         this.portalShader.frustumCulled = false;
         this.add(portalShader)
@@ -150,7 +145,7 @@ class Portal extends Group {
 
 
         // constructing the portal borders
-        const ringGeometry = new THREE.PlaneGeometry(window.PORTAL_WIDTH + 2 * window.PORTAL_RING_THICKNESS, window.PORTAL_DEPTH + 2 * window.PORTAL_RING_THICKNESS);
+        const ringGeometry = new THREE.PlaneGeometry(GLOBALS.PORTAL_WIDTH + 2 * GLOBALS.PORTAL_RING_THICKNESS, GLOBALS.PORTAL_DEPTH + 2 * GLOBALS.PORTAL_RING_THICKNESS);
         // https://stackoverflow.com/questions/33571642/why-do-transparent-materials-result-in-occlusion
         const ringMaterial = new THREE.MeshBasicMaterial({
             color: ringColor,
@@ -162,7 +157,7 @@ class Portal extends Group {
         this.ringMesh = new THREE.Mesh(ringGeometry, ringMaterial)
         this.ringMesh.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
         this.ringMesh.applyMatrix4(this.transform)
-        this.ringMesh.position.add(normal.clone().multiplyScalar(window.PORTAL_HEIGHT / 2 + 0.001))
+        this.ringMesh.position.add(normal.clone().multiplyScalar(GLOBALS.PORTAL_HEIGHT / 2 + 0.001))
         this.ringMesh.updateMatrix()
         this.ringMesh.matrixAutoUpdate = true;
         //this.ringMesh.rotation.set(0,0,0);
@@ -174,9 +169,9 @@ class Portal extends Group {
 
         //var dir = new THREE.Vector3();
         //console.log(dir)
-        //dir.subVectors(window.MAIN_CAMERA.position, this.portalShader.getWorldPosition(dir)).normalize();
+        //dir.subVectors(GLOBALS.MAIN_CAMERA.position, this.portalShader.getWorldPosition(dir)).normalize();
         //console.log(dir)
-        //this.portalShader.translateOnAxis(dir, 1);
+        //this.portalShader.translateOnAxis(dir, 2);
 
         // CDBB: collision disable BB
         // STBB: should teleport BB
@@ -186,11 +181,11 @@ class Portal extends Group {
         let tCDBB = this.transform.clone()
         // STBB is centered at 1/4 height of CDBB behind the portal
         // because height of STBB is half height of CDBB
-        let pSTBB = position.clone().add(normal.clone().multiplyScalar(-window.PORTAL_CDBB_HEIGHT / 4))
+        let pSTBB = position.clone().add(normal.clone().multiplyScalar(-GLOBALS.PORTAL_CDBB_HEIGHT / 4))
         let tSTBB = tRot.clone().setPosition(pSTBB)
 
-        this.CDBB = new GeneralBB(window.PORTAL_WIDTH, window.PORTAL_CDBB_HEIGHT, window.PORTAL_DEPTH, tCDBB, 0xff0000)
-        this.STBB = new GeneralBB(window.PORTAL_WIDTH, window.PORTAL_CDBB_HEIGHT / 2, window.PORTAL_DEPTH, tSTBB, 0x00ff00)
+        this.CDBB = new GeneralBB(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_CDBB_HEIGHT, GLOBALS.PORTAL_DEPTH, tCDBB, 0xff0000)
+        this.STBB = new GeneralBB(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_CDBB_HEIGHT / 2, GLOBALS.PORTAL_DEPTH, tSTBB, 0x00ff00)
 
         this.debugMeshes.add(this.CDBB.helper)
         this.debugMeshes.add(this.STBB.helper)
@@ -224,6 +219,14 @@ function teleportPhysicalObject(object, portal) {
     previousPosition = getTeleportedPositionalVector(previousPosition, portal)
     velocity = getTeleportedDirectionalVector(velocity, portal)
     force = getTeleportedDirectionalVector(force, portal)
+
+    /*console.log("---------------------------")
+    console.log(velocity)
+    console.log(force)
+    console.log(orientation)
+
+    velocity.x = 0;
+    velocity.z = 0;*/
 
     object.position.copy(position)
     object.previousPosition.copy(previousPosition)

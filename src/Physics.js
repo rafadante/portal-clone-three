@@ -1,4 +1,5 @@
 import * as CANNON from 'cannon';
+import { GLOBALS } from './Globals.js';
 
 // return the cannon world
 // Setup our world
@@ -23,4 +24,4 @@ world.gravity.set(0, -9.8, 0);
 world.allowSleep = false;
 world.broadphase = new CANNON.NaiveBroadphase();
 
-window.CANNON_WORLD = world;
+GLOBALS.CANNON_WORLD = world;

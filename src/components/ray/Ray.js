@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {
     LightningStrike
 } from '../../LightningStrike.js';
+import { GLOBALS } from '../../Globals.js';
 
 const rayParams1 = {
     sourceOffset: new THREE.Vector3(),
@@ -92,13 +93,13 @@ function recreateRay() {
         color: 0xffffff
     }));
 
-    window.lightningStrikeMesh = lightningStrikeMesh;
+    GLOBALS.LIGHTNIN_STRIKE_1 = lightningStrikeMesh;
     lightningStrikeMesh.visible = false;
 
-    window.lightningStrikeMesh2 = lightningStrikeMesh2;
+    GLOBALS.LIGHTNIN_STRIKE_2 = lightningStrikeMesh2;
     lightningStrikeMesh2.visible = false;
 
-    window.lightningStrikeMesh3 = lightningStrikeMesh3;
+    GLOBALS.LIGHTNIN_STRIKE_3 = lightningStrikeMesh3;
     lightningStrikeMesh3.visible = false;
 }
 
@@ -108,16 +109,16 @@ let t = 0;
 function updateRay() {
     t += 0.01;
 
-    if (lightningStrike && lightningStrike2 && lightningStrike3 && window.FPS) {
+    if (lightningStrike && lightningStrike2 && lightningStrike3 && GLOBALS.FPS_MODE) {
 
-        lightningStrike.rayParameters.sourceOffset.copy(window.cube_1.position);
-        lightningStrike.rayParameters.destOffset.copy(window.cube_2.position);
+        lightningStrike.rayParameters.sourceOffset.copy(GLOBALS.GUN.getObjectByName("sphere1").position);
+        lightningStrike.rayParameters.destOffset.copy(GLOBALS.GUN.getObjectByName("sphere2").position);
 
-        lightningStrike2.rayParameters.sourceOffset.copy(window.cube_2.position);
-        lightningStrike2.rayParameters.destOffset.copy(window.cube_3.position);
+        lightningStrike2.rayParameters.sourceOffset.copy(GLOBALS.GUN.getObjectByName("sphere2").position);
+        lightningStrike2.rayParameters.destOffset.copy(GLOBALS.GUN.getObjectByName("sphere3").position);
 
-        lightningStrike3.rayParameters.sourceOffset.copy(window.cube_3.position);
-        lightningStrike3.rayParameters.destOffset.copy(window.cube_1.position);
+        lightningStrike3.rayParameters.sourceOffset.copy(GLOBALS.GUN.getObjectByName("sphere3").position);
+        lightningStrike3.rayParameters.destOffset.copy(GLOBALS.GUN.getObjectByName("sphere1").position);
 
         lightningStrike.update(t);
         lightningStrike2.update(t);

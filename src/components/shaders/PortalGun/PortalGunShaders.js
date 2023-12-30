@@ -54,11 +54,6 @@ void main()
 }
 `;
 
-//window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(1.0, 0.25, 0.0);
-//window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(0.3, 0.5, 1.0);
-
-
-
 window.uniformShaderPortalGunBallEnergy = {
     iTime: {
         type: 'f',
@@ -97,4 +92,3 @@ window.materialGun = new THREE.ShaderMaterial({
 });
 
 const sphere = new THREE.Mesh( geometry, window.materialGun );
-//window.MAIN_SCENE.add(sphere);
