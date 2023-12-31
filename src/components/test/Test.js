@@ -7,7 +7,7 @@ import {
 } from 'three-to-cannon';
 import {
     createLightBridges
-} from '../lightBridges/LightBridges.js';
+} from '../continuous/Continuous.js';
 import {
     animate
 } from '../../Main.js';
@@ -18,22 +18,12 @@ import {
 import {
     GLOBALS
 } from '../../Globals.js';
-//
-window.raycastLightBridge = [];
-window.raycastTractorBeam = [];
-window.raycastLaserEmitter = [];
-window.lightBridgesClone = [];
-window.lightBridgesColliderClone = [];
-window.portalShader = [];
-window.beamLength = 0;
-//
+
 var totalBodies = 0;
 var meshesWallPortal = [];
 var meshesWallNonPortal = [];
 var meshesFloorPortal = [];
 var meshesFloorNonPortal = [];
-var meshesUpPortal = [];
-var meshesUpNonPortal = [];
 var id = 0;
 
 var sideDown = [];
@@ -50,7 +40,7 @@ $("body").on('click', '#view-fps', function () {
 function viewFPS() {
 
     GLOBALS.ITEM_CUBE.visible = false;
-    window.spotLight.intensity = 0;
+    GLOBALS.SPOTLIGHT.intensity = 0;
 
     var obj = GLOBALS.ENTER_DOOR.clone();
     obj.translateZ(1);
@@ -64,7 +54,7 @@ function viewFPS() {
     setTimeout(() => {
 
         //
-        window.EXIT_ROOM.visible = true;
+        GLOBALS.EXIT_ROOM.visible = true;
 
         // DOORS SCALE
         GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").scale.set(1, 1, 1);
@@ -72,7 +62,7 @@ function viewFPS() {
         GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").scale.set(1, 1, 1);
         GLOBALS.EXIT_DOOR.getObjectByName("portal_door_left_06").scale.set(1, 1, 1);
 
-        window.planeExitDoor.getObjectByName("warning").visible = false;
+        GLOBALS.EXIT_DOOR.getObjectByName("warning").visible = false;
 
         setTimeout(() => {
             //UI SETUP
@@ -106,23 +96,17 @@ function viewFPS() {
                         sideLeft.push(GLOBALS.PLANE_USER_DATA[i])
 
                     if (GLOBALS.PLANE_USER_DATA[i].portal) {
-                        if (GLOBALS.PLANE_USER_DATA[i].side == "up") {
+                        if (GLOBALS.PLANE_USER_DATA[i].side == "up" || GLOBALS.PLANE_USER_DATA[i].side == "down") {
                             sideUp.push(GLOBALS.PLANE_USER_DATA[i])
                             meshesFloorPortal.push(GLOBALS.PLANE_USER_DATA[i]);
-                        } else if (GLOBALS.PLANE_USER_DATA[i].side == "down") {
-                            sideDown.push(GLOBALS.PLANE_USER_DATA[i])
-                            meshesUpPortal.push(GLOBALS.PLANE_USER_DATA[i]);
-                        } else {
+                        }  else {
                             meshesWallPortal.push(GLOBALS.PLANE_USER_DATA[i]);
                         }
                     } else {
-                        if (GLOBALS.PLANE_USER_DATA[i].side == "up") {
+                        if (GLOBALS.PLANE_USER_DATA[i].side == "up" || GLOBALS.PLANE_USER_DATA[i].side == "down") {
                             meshesFloorNonPortal.push(GLOBALS.PLANE_USER_DATA[i])
                             sideUp.push(GLOBALS.PLANE_USER_DATA[i])
-                        } else if (GLOBALS.PLANE_USER_DATA[i].side == "down") {
-                            meshesUpNonPortal.push(GLOBALS.PLANE_USER_DATA[i])
-                            sideDown.push(GLOBALS.PLANE_USER_DATA[i])
-                        } else {
+                        }  else {
                             meshesWallNonPortal.push(GLOBALS.PLANE_USER_DATA[i]);
                         }
                     }
@@ -149,7 +133,7 @@ function viewFPS() {
         GLOBALS.OBSERVATION_ROOM.rotation.copy(GLOBALS.OBSERVATION_ROOM_IMG.rotation);
         //---------------------------------------------------------
         var target = new THREE.Vector3(); // create once an reuse it
-        window.room_light.getWorldPosition(target);
+        GLOBALS.OBSERVATION_ROOM.getObjectByName("room_light").getWorldPosition(target);
 
         GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").position.copy(target);
         GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").translateY(-1);
@@ -167,16 +151,16 @@ function viewFPS() {
         GLOBALS.GUN.children[0].add(GLOBALS.LIGHTNIN_STRIKE_1,
             GLOBALS.LIGHTNIN_STRIKE_2, GLOBALS.LIGHTNIN_STRIKE_3);
         GLOBALS.GUN.visible = true;
-        GLOBALS.GUN_SPHERE.material = window.materialGun;
-        GLOBALS.GUN_CYLINDER.material = window.materialGun;
+        GLOBALS.GUN_SPHERE.material = GLOBALS.MATERIAL_GUN;
+        GLOBALS.GUN_CYLINDER.material = GLOBALS.MATERIAL_GUN;
         GLOBALS.MAIN_CAMERA.add(GLOBALS.GUN)
 
         //CORRIDOR ENTER COLLIDERS
         corridorColliderNames(true);
 
         var bb = new THREE.Box3(); // for re-use
-        bb.setFromObject(window.elevatorTrigger);
-        window.elevatorTrigger = bb;
+        bb.setFromObject(GLOBALS.ELEVATOR_TRIGGER);
+        GLOBALS.ELEVATOR_TRIGGER = bb;
         //
         var target = new THREE.Vector3(); // create once an reuse it
         GLOBALS.CORRIDOR_ENTER.getObjectByName("spawn").getWorldPosition(target);
@@ -188,12 +172,10 @@ function viewFPS() {
         GLOBALS.MAIN_CAMERA.rotation.z = 0;
 
         //
-        createInstances(meshesWallPortal, window.materialWallPortal)
-        createInstances(meshesWallNonPortal, window.materialWallNonPortal)
-        createInstances(meshesFloorPortal, window.materialUpPortal)
-        createInstances(meshesFloorNonPortal, window.materialUpNonPortal)
-        createInstances(meshesUpPortal, window.materialFloorPortal)
-        createInstances(meshesUpNonPortal, window.materialFloorNonPortal)
+        createInstances(meshesWallPortal, GLOBALS.MATERIAL_WALL_PORTAL)
+        createInstances(meshesWallNonPortal, GLOBALS.MATERIAL_WALL_NON_PORTAL)
+        createInstances(meshesFloorPortal, GLOBALS.MATERIAL_FLOOR_PORTAL)
+        createInstances(meshesFloorNonPortal, GLOBALS.MATERIAL_FLOOR_NON_PORTAL)
 
         GLOBALS.SCENE.remove(GLOBALS.ROOM);
         GLOBALS.RENDERER.renderLists.dispose();
@@ -220,15 +202,15 @@ function viewFPS() {
         addColliderItem(GLOBALS.DYMANIC_ITEMS['ramp_half2'], "ramp_half2", 0)
         addColliderItem(GLOBALS.DYMANIC_ITEMS['stairs'], "stairs", 0)
         addColliderItem(GLOBALS.DYMANIC_ITEMS['laser_cube'], "laser_cube", 5)
-        addColliderItem(window.DOORS, "door", 0)
+        addColliderItem(GLOBALS.DOORS, "door", 0)
         //
-        createLightBridges('light_bridge', window.raycastLightBridge);
-        createLightBridges("tractor_beam", window.raycastTractorBeam);
-        createLightBridges("laser_emitter", window.raycastLaserEmitter);
+        createLightBridges('light_bridge', GLOBALS.LIGHT_BRIDGE_RAYCASTER);
+        createLightBridges("tractor_beam", GLOBALS.TRACTOR_BEAM_RAYCASTER);
+        createLightBridges("laser_emitter", GLOBALS.LASER_EMITTER_RAYCASTER);
 
         for (var s = 0; s < GLOBALS.DYMANIC_ITEMS["tractor_beam"].length; s++) {
             if (GLOBALS.DYMANIC_ITEMS["tractor_beam"][s].length != 0)
-                window.beamLength++
+                GLOBALS.TRACTOR_BEAM_LENGTH++
         }
 
         for (var s = 0; s < GLOBALS.DYMANIC_ITEMS["laser_emitter"].length; s++) {
@@ -237,7 +219,7 @@ function viewFPS() {
         }
 
         GLOBALS.SCENE.traverse(child => {
-            child.frustumCulled = false;
+            child.frustumCulled = true;
         })
 
         GLOBALS.FPS_MODE = true;
@@ -348,7 +330,7 @@ function viewFPS() {
             setTimeout(() => {
                 deletePortal(0);
                 deletePortal(1);
-                window.EXIT_ROOM.visible = false;
+                GLOBALS.EXIT_ROOM.visible = false;
             }, 1000);
         }, 1000);
 
@@ -647,7 +629,7 @@ function corridorColliderNames(first) {
     corridorCollider(GLOBALS.CORRIDOR_ENTER, "front", 1, 1, 0.001, false);
 
     if (!first)
-        window.wallCorridorEnter.position.y = 0;
+        GLOBALS.WALL_CORRIDOR_ENTER.position.y = 0;
 }
 
 function corridorCollider(parent, name, x, y, z, state) {
@@ -676,23 +658,23 @@ function corridorCollider(parent, name, x, y, z, state) {
     GLOBALS.CANNON_WORLD.addBody(wall);
 
     if (name == "front")
-        window.wallCorridorEnter = wall;
+        GLOBALS.WALL_CORRIDOR_ENTER = wall;
 
     corridor_colliders.push(wall)
 }
 
 function exitRoomCollider() {
 
-    window.corridorBackPosition.visible = false;
+    GLOBALS.WALL_CORRIDOR_BACK.visible = false;
     var posExitRoom = new THREE.Vector3();
-    window.corridorBackPosition.getWorldPosition(posExitRoom)
-    window.EXIT_ROOM.position.copy(posExitRoom)
-    window.EXIT_ROOM.position.y -= 1;
+    GLOBALS.WALL_CORRIDOR_BACK.getWorldPosition(posExitRoom)
+    GLOBALS.EXIT_ROOM.position.copy(posExitRoom)
+    GLOBALS.EXIT_ROOM.position.y -= 1;
 
 
-    for (var i = 0; i < window.EXIT_ROOM_COLLIDERS.length; i++) {
+    for (var i = 0; i < GLOBALS.EXIT_ROOM_COLLIDERS.length; i++) {
 
-        const result = threeToCannon(window.EXIT_ROOM_COLLIDERS[i], {
+        const result = threeToCannon(GLOBALS.EXIT_ROOM_COLLIDERS[i], {
             type: ShapeType.BOX
         });
 
@@ -703,11 +685,11 @@ function exitRoomCollider() {
         })
 
         var pos = new THREE.Vector3();
-        window.EXIT_ROOM_COLLIDERS[i].getWorldPosition(pos);
+        GLOBALS.EXIT_ROOM_COLLIDERS[i].getWorldPosition(pos);
         wall.position.copy(pos)
 
         var rot = new THREE.Quaternion();
-        window.EXIT_ROOM_COLLIDERS[i].getWorldQuaternion(rot);
+        GLOBALS.EXIT_ROOM_COLLIDERS[i].getWorldQuaternion(rot);
         wall.quaternion.copy(rot)
 
         wall.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
@@ -719,7 +701,7 @@ function exitRoomCollider() {
 
 function elevatorCollider() {
 
-    const result = threeToCannon(window.elevatorDoor, {
+    const result = threeToCannon(GLOBALS.ELEVATOR, {
         type: ShapeType.BOX
     });
 
@@ -730,11 +712,11 @@ function elevatorCollider() {
     })
 
     var pos = new THREE.Vector3();
-    window.elevatorDoor.getWorldPosition(pos);
+    GLOBALS.ELEVATOR.getWorldPosition(pos);
     wall.position.copy(pos)
 
     var rot = new THREE.Quaternion();
-    window.elevatorDoor.getWorldQuaternion(rot);
+    GLOBALS.ELEVATOR.getWorldQuaternion(rot);
     wall.quaternion.copy(rot)
 
     wall.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT

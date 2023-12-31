@@ -4,149 +4,9 @@ import {
     threeToCannon,
     ShapeType
 } from 'three-to-cannon';
-import { GLOBALS } from '../../Globals.js';
-
-//
-window.uniformsBridge = {
-    'iTime': {
-        value: 0.0
-    },
-    iResolution: {
-        type: "v2",
-        value: new THREE.Vector2(1000, 1000)
-    },
-};
-
-const vshader = `
-varying vec2 vUv; 
-void main()
-{
-    vUv = uv;
-
-    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0 );
-    gl_Position = projectionMatrix * mvPosition;
-}
-`;
-
-const fshader = `
-uniform float iTime;
-uniform vec2 iResolution;
-
-// Found this on GLSL sandbox. I really liked it, changed a few things and made it tileable.
-// :)
-// by David Hoskins.
-// Original water turbulence effect by joltz0r
-
-
-// Redefine below to see the tiling...
-//#define SHOW_TILING
-
-#define TAU 6.28318530718
-#define MAX_ITER 5
-
-varying vec2 vUv;
-
-void main() 
-{
-	float time = iTime * .5+23.0;
-    // uv should be the 0-1 uv of texture...
-	//vec2 uv = gl_FragCoord.xy / iResolution.y;
-  vec2 uv = -1.0 + 2.0 *vUv;
-    
-#ifdef SHOW_TILING
-	vec2 p = mod(uv*TAU*2.0, TAU)-250.0;
-#else
-    vec2 p = mod(uv*TAU, TAU)-250.0;
-#endif
-	vec2 i = vec2(p);
-	float c = 1.0;
-	float inten = .005;
-
-	for (int n = 0; n < MAX_ITER; n++) 
-	{
-		float t = time * (1.0 - (3.5 / float(n+1)));
-		i = p + vec2(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));
-		c += 1.0/length(vec2(p.x / (sin(i.x+t)/inten),p.y / (cos(i.y+t)/inten)));
-	}
-	c /= float(MAX_ITER);
-	c = 1.17-pow(c, 1.4);
-	vec3 colour = vec3(pow(abs(c), 8.0));
-    colour = clamp(colour + vec3(0.0, 0.35, 0.5), 0.0, 1.0);
-    
-	gl_FragColor = vec4(colour, 0.5);
-}
-`;
-
-const fshaderOrange = `
-uniform float iTime;
-uniform vec2 iResolution;
-
-// Found this on GLSL sandbox. I really liked it, changed a few things and made it tileable.
-// :)
-// by David Hoskins.
-// Original water turbulence effect by joltz0r
-
-
-// Redefine below to see the tiling...
-//#define SHOW_TILING
-
-#define TAU 6.28318530718
-#define MAX_ITER 5
-
-varying vec2 vUv;
-
-void main() 
-{
-	float time = iTime * .5+23.0;
-    // uv should be the 0-1 uv of texture...
-	//vec2 uv = gl_FragCoord.xy / iResolution.y;
-  vec2 uv = -1.0 + 2.0 *vUv;
-    
-#ifdef SHOW_TILING
-	vec2 p = mod(uv*TAU*2.0, TAU)-250.0;
-#else
-    vec2 p = mod(uv*TAU, TAU)-250.0;
-#endif
-	vec2 i = vec2(p);
-	float c = 1.0;
-	float inten = .005;
-
-	for (int n = 0; n < MAX_ITER; n++) 
-	{
-		float t = time * (1.0 - (3.5 / float(n+1)));
-		i = p + vec2(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));
-		c += 1.0/length(vec2(p.x / (sin(i.x+t)/inten),p.y / (cos(i.y+t)/inten)));
-	}
-	c /= float(MAX_ITER);
-	c = 1.17-pow(c, 1.4);
-	vec3 colour = vec3(pow(abs(c), 8.0));
-    colour = clamp(colour + vec3(1.0, 0.5, 0.0), 0.0, 1.0);
-    
-	gl_FragColor = vec4(colour, 0.5);
-}
-`;
-
-window.materialBridge = new THREE.ShaderMaterial({
-    uniforms: window.uniformsBridge,
-    vertexShader: vshader,
-    fragmentShader: fshader,
-    side: 2,
-    transparent: true,
-    depthWrite: false,
-    polygonOffset: true,
-    polygonOffsetFactor: -5
-});
-
-window.materialBridgeOrange = new THREE.ShaderMaterial({
-    uniforms: window.uniformsBridge,
-    vertexShader: vshader,
-    fragmentShader: fshaderOrange,
-    side: 2,
-    transparent: true,
-    depthWrite: false,
-    polygonOffset: true,
-    polygonOffsetFactor: -5
-});
+import {
+    GLOBALS
+} from '../../Globals.js';
 
 function createLightBridges(item, rayItem) {
     for (var i = 0; i < GLOBALS.DYMANIC_ITEMS[item].length; i++) {
@@ -168,7 +28,7 @@ function createLightBridges(item, rayItem) {
             raycaster.set(vector, dir);
             var intersects = raycaster.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
 
-            var material = window.materialBridge;
+            var material = GLOBALS.MATERIAL_LIGHT_BRIDGERS;
 
             if (item == "light_bridge") {
                 var geometry = new THREE.BoxGeometry(0.9, 0.025, intersects[0].distance);
@@ -181,8 +41,10 @@ function createLightBridges(item, rayItem) {
                 raycaster.beam = "blue";
 
                 if (GLOBALS.DYMANIC_ITEMS[item][i].beam == "orange") {
-                    material = window.materialBridgeOrange;
+                    material = null; //materialBridgeOrange
                     raycaster.beam = "orange";
+                } else {
+                    material = GLOBALS.MATERIAL_TRACTOR_BEAM;
                 }
             } else if (item == "laser_emitter") {
                 var geometry = new THREE.CylinderGeometry(0.02, 0.02, intersects[0].distance, 32);
@@ -194,7 +56,7 @@ function createLightBridges(item, rayItem) {
                 })
             }
 
-            const plane = new THREE.Mesh(geometry, material); //materialBridge
+            const plane = new THREE.Mesh(geometry, material);
             GLOBALS.SCENE.add(plane);
 
             if (item == "tractor_beam" || item == "laser_emitter") {
@@ -241,8 +103,8 @@ function createLightBridges(item, rayItem) {
                     bb.side = -1;
 
                 plane.inTractor = false;
-                window.tractorBeam.push(plane);
-                window.tractorBeamBoundingBox.push(bb);
+                GLOBALS.TRACTOR_BEAM.push(plane);
+                GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.push(bb);
             } else if (item == "laser_emitter") {
 
                 //var clone = plane.clone();
@@ -258,19 +120,11 @@ function createLightBridges(item, rayItem) {
 
                 obj.position.y = plane.position.y;
                 obj.distance = intersects[0].distance;
-                GLOBALS.LASER_EMITTER_RAYCASTER.push(obj);
+                GLOBALS.LASER_EMITTER_OBJ.push(obj);
             }
         }
     }
 }
-
-//raycaster
-
-window.tractorBeamBoundingBox = [];
-window.tractorBeam = [];
-window.raycastTractorBeam = [];
-
-window.laserEmitterBoundingBox = [];
 
 function createLightBridgesFromPortal(portal, rayItem) {
 
@@ -279,7 +133,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
     for (var g = 0; g < rayItem.length; g++) {
 
-        var intersects = rayItem[g].intersectObjects(GLOBALS.PORTALShader);
+        var intersects = rayItem[g].intersectObjects(GLOBALS.PORTAL_SHADER);
 
         if (intersects.length > 0) {
 
@@ -289,46 +143,46 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 portal = 0;
 
             if (rayItem[g].name == "light_bridge") {
-                if (window.lightBridgesClone[g]) {
-                    GLOBALS.SCENE.remove(window.lightBridgesClone[g]);
-                    GLOBALS.CANNON_WORLD.removeBody(window.lightBridgesColliderClone[g]);
+                if (GLOBALS.LIGHT_BRIDGE_CLONE[g]) {
+                    GLOBALS.SCENE.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
+                    GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
                 }
             } else if (rayItem[g].name == "tractor_beam") {
-                if (window.tractorBeam[window.beamLength + g]) {
-                    GLOBALS.SCENE.remove(window.tractorBeam[window.beamLength + g]);
-                    window.tractorBeamBoundingBox[window.beamLength + g] = null;
+                if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
+                    GLOBALS.SCENE.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
+                    GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
                 }
             } else if (rayItem[g].name == "laser_emitter") {
                 if (GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]) {
                     GLOBALS.SCENE.remove(GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]);
-                    window.laserEmitterBoundingBox[GLOBALS.LASER_EMITTER_LENGTH + g] = null;
+                    GLOBALS.LASER_EMITTER_BOUNDING_BOX[GLOBALS.LASER_EMITTER_LENGTH + g] = null;
                 }
             }
 
             let dir = new THREE.Vector3()
-            GLOBALS.PORTALShader[portal].getWorldDirection(dir)
+            GLOBALS.PORTAL_SHADER[portal].getWorldDirection(dir)
 
             var raycasterBridge = new THREE.Raycaster();
-            raycasterBridge.set(GLOBALS.PORTALShader[portal].position, dir);
+            raycasterBridge.set(GLOBALS.PORTAL_SHADER[portal].position, dir);
 
             var intersectsInstance = raycasterBridge.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
 
             if (intersects.length > 0) {
                 if (intersects[0].uv.x > 0.3 && intersects[0].uv.x < 0.7) {
                     if (rayItem[g].name == "light_bridge") {
-                        if (window.lightBridgesClone[g]) {
-                            GLOBALS.SCENE.remove(window.lightBridgesClone[g]);
-                            GLOBALS.CANNON_WORLD.removeBody(window.lightBridgesColliderClone[g]);
+                        if (GLOBALS.LIGHT_BRIDGE_CLONE[g]) {
+                            GLOBALS.SCENE.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
+                            GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
                         }
                     } else if (rayItem[g].name == "tractor_beam") {
-                        if (window.tractorBeam[window.beamLength + g]) {
-                            GLOBALS.SCENE.remove(window.tractorBeam[window.beamLength + g]);
-                            window.tractorBeamBoundingBox[window.beamLength + g] = null;
+                        if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
+                            GLOBALS.SCENE.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
+                            GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
                         }
                     } else if (rayItem[g].name == "laser_emitter") {
                         if (GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]) {
                             GLOBALS.SCENE.remove(GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]);
-                            window.laserEmitterBoundingBox[GLOBALS.LASER_EMITTER_LENGTH + g] = null;
+                            GLOBALS.LASER_EMITTER_BOUNDING_BOX[GLOBALS.LASER_EMITTER_LENGTH + g] = null;
                         }
                     }
                 } else {
@@ -338,7 +192,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
             //---------------------------------------------------------------------
 
-            var material = window.materialBridge;
+            var material = GLOBALS.MATERIAL_LIGHT_BRIDGERS;
 
             if (rayItem[g].name == "light_bridge") {
                 var geometry = new THREE.BoxGeometry(0.9, 0.025, intersectsInstance[0].distance);
@@ -346,7 +200,10 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 var geometry = new THREE.CylinderGeometry(0.9, 0.9, intersectsInstance[0].distance, 32);
 
                 if (rayItem[g].beam == "orange")
-                    material = window.materialBridgeOrange;
+                    material = null; //materialBridgeOrange
+                else {
+                    material = GLOBALS.MATERIAL_TRACTOR_BEAM;
+                }
             } else if (rayItem[g].name == "laser_emitter") {
                 var geometry = new THREE.CylinderGeometry(0.02, 0.02, intersectsInstance[0].distance, 32);
 
@@ -355,7 +212,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 })
             }
 
-            const plane = new THREE.Mesh(geometry, material); //materialBridge
+            const plane = new THREE.Mesh(geometry, material);
             GLOBALS.SCENE.add(plane);
 
             if (rayItem[g].name == "tractor_beam" || rayItem[g].name == "laser_emitter") {
@@ -364,8 +221,8 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 plane.geometry.applyMatrix4(plane.matrix);
             }
 
-            plane.position.copy(GLOBALS.PORTALShader[portal].position);
-            plane.rotation.copy(GLOBALS.PORTALShader[portal].rotation);
+            plane.position.copy(GLOBALS.PORTAL_SHADER[portal].position);
+            plane.rotation.copy(GLOBALS.PORTAL_SHADER[portal].rotation);
             plane.translateZ(intersectsInstance[0].distance / 2);
             plane.translateY((((intersects[0].uv.y) - 0.5) * 2));
 
@@ -395,8 +252,8 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 box.collisionFilterMask = 10;
                 GLOBALS.CANNON_WORLD.addBody(box);
 
-                window.lightBridgesClone[g] = plane;
-                window.lightBridgesColliderClone[g] = box;
+                GLOBALS.LIGHT_BRIDGE_CLONE[g] = plane;
+                GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g] = box;
             } else if (rayItem[g].name == "tractor_beam") {
 
                 var bb = new THREE.Box3(); // for re-use
@@ -408,13 +265,13 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
                 plane.inTractor = false;
 
-                window.tractorBeam[window.beamLength + g] = plane;
-                window.tractorBeamBoundingBox[window.beamLength + g] = bb;
+                GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g] = plane;
+                GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = bb;
             } else if (rayItem[g].name == "laser_emitter") {
 
                 var obj = new THREE.Object3D();
-                obj.position.copy(GLOBALS.PORTALShader[portal].position);
-                obj.rotation.copy(GLOBALS.PORTALShader[portal].rotation);
+                obj.position.copy(GLOBALS.PORTAL_SHADER[portal].position);
+                obj.rotation.copy(GLOBALS.PORTAL_SHADER[portal].rotation);
 
                 //var clone = plane.clone();
                 //plane.scale.set(10,10,10);
@@ -429,40 +286,31 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
                 obj.position.y = plane.position.y;
                 obj.distance = intersects[0].distance;
-                GLOBALS.LASER_EMITTER_RAYCASTER.push(obj);
+                GLOBALS.LASER_EMITTER_OBJ.push(obj);
             }
         } else {
 
             if (rayItem[g].name == "light_bridge") {
-                if (window.lightBridgesClone[g]) {
-                    GLOBALS.SCENE.remove(window.lightBridgesClone[g]);
-                    GLOBALS.CANNON_WORLD.removeBody(window.lightBridgesColliderClone[g]);
+                if (GLOBALS.LIGHT_BRIDGE_CLONE[g]) {
+                    GLOBALS.SCENE.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
+                    GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
                 }
             } else if (rayItem[g].name == "tractor_beam") {
-                if (window.tractorBeam[window.beamLength + g]) {
-                    GLOBALS.SCENE.remove(window.tractorBeam[window.beamLength + g]);
-                    window.tractorBeamBoundingBox[window.beamLength + g] = null;
+                if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
+                    GLOBALS.SCENE.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
+                    GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
                 }
             } else if (rayItem[g].name == "laser_emitter") {
                 if (GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]) {
                     GLOBALS.SCENE.remove(GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]);
-                    window.laserEmitterBoundingBox[GLOBALS.LASER_EMITTER_LENGTH + g] = null;
+                    GLOBALS.LASER_EMITTER_BOUNDING_BOX[GLOBALS.LASER_EMITTER_LENGTH + g] = null;
                 }
             }
         }
     }
 }
 
-window.tractorBeamBoundingBoxClone = [];
-
-var clock = new THREE.Clock();
-
-function animateLightBridges() {
-    window.uniformsBridge['iTime'].value += clock.getDelta();
-}
-
 export {
-    animateLightBridges,
     createLightBridges,
     createLightBridgesFromPortal
 };

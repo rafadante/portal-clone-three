@@ -1,8 +1,9 @@
 import $ from 'jquery';
-import "./Variables.js";
 import "./components/materials/Materials.js"
 import "./components/ui/UI.js";
-import * as physics from './Physics.js';
+import {
+    updatePhysics
+} from './Physics.js';
 import * as THREE from 'three';
 import {
     TWEEN
@@ -25,7 +26,6 @@ import {
 import {
     loadCube
 } from './components/loadObj/LoaderOBJ.js';
-import CannonDebugger from 'cannon-es-debugger';
 import {
     updateRay,
     recreateRay
@@ -63,10 +63,10 @@ import {
 import {
     animateSonar
 } from './usePostRender.js';
+import * as CANNON from 'cannon';
 
 
 //VARIABLES
-var debugColision = true;
 var raycaster = new THREE.Raycaster();
 let pmremGenerator, currentRenderTarget;
 let timeTarget = 0;
@@ -87,6 +87,7 @@ GLOBALS.STATS = new Stats({
 });
 mainContainer.appendChild(GLOBALS.STATS.container);
 GLOBALS.STATS.init(GLOBALS.RENDERER.domElement);
+GLOBALS.STATS.container.style.display = "none";
 //
 const geometry = new THREE.BoxGeometry(2, 2, 2);
 const material = new THREE.MeshBasicMaterial({
@@ -262,15 +263,7 @@ function onWindowResize() {
     GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
 }
 
-const cannonDebugger = new CannonDebugger(GLOBALS.SCENE, GLOBALS.CANNON_WORLD, {
-    onInit(body, mesh) {
-        mesh.visible = false;
-        $("body").on('input', '#debug-input', function () {
-            debugColision = this.checked;
-            mesh.visible = this.checked;
-        })
-    }
-})
+
 //SCENE FPS
 let clock = new THREE.Clock();
 let clock2 = new THREE.Clock();
@@ -345,88 +338,9 @@ function render(time) {
     animateShader();
     renderGoo();
     updateEvents();
-    TWEEN.update();
-
-
-    if (GLOBALS.HOLDING_ITEM) {
-        var target = new THREE.Vector3(); // create once an reuse it
-        GLOBALS.MAIN_CAMERA.getObjectByName("cubeHolder").getWorldPosition(target);
-
-        var x = target.x;
-        var y = target.y;
-        var z = target.z;
-        var item = new THREE.Object3D();
-
-        item.position.copy(new THREE.Vector3(x, y, z));
-        item.rotation.copy(GLOBALS.MAIN_CAMERA.rotation);
-
-        GLOBALS.CURRENT_ITEM.position.copy(item.position);
-        GLOBALS.CURRENT_ITEM.rotation.copy(item.rotation);
-
-        item.updateMatrix();
-        GLOBALS.CURRENT_INSTANCED.setMatrixAt(GLOBALS.CURRENT_ITEM_ID, item.matrix)
-        GLOBALS.CURRENT_INSTANCED.instanceMatrix.needsUpdate = true;
-        GLOBALS.CURRENT_INSTANCED.computeBoundingSphere();
-
-        if (recordingPosition && !GLOBALS.CURRENT_ITEM.body.recall) {
-            GLOBALS.CURRENT_ITEM.body.arrayPos.push(item.position.clone())
-            GLOBALS.CURRENT_ITEM.body.arrayRot.push(item.quaternion.clone())
-        }
-    }
-
-    for (const property in GLOBALS.DYMANIC_ITEMS) {
-
-        var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(property);
-
-        if (property == "gel_gun_blue" || property == "gel_gun_orange" || property == "gel_gun_white" ||
-            property == "pedestal_button" || property == "button_weight" || property == "button_box" ||
-            property == "button_circle" || property == "dispenser" || property == "ramp" ||
-            property == "ramp_half" || property == "ramp_half2" || property == "stairs" ||
-            property == "light_bridge" | property == "tractor_beam" || property == "laser_emitter" ||
-            property == "door" || property == "light" || property == "stripe" || property == "gel_blue" ||
-            property == "gel_orange")
-            continue;
-
-        for (var i = 0; i < GLOBALS.DYMANIC_ITEMS[property].length; i++) {
-
-            if (GLOBALS.DYMANIC_ITEMS[property][i].length != 0) {
-
-                if (i == GLOBALS.CURRENT_ITEM_ID) {
-                    if (GLOBALS.CURRENT_INSTANCED.name == property)
-                        continue;
-                }
-
-                var item = new THREE.Object3D();
-                item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
-                item.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
-
-                if (GLOBALS.DYMANIC_ITEMS[property][i].body.arrayPos) {
-                    if (recordingPosition && !GLOBALS.DYMANIC_ITEMS[property][i].body.recall) {
-                        if (!GLOBALS.DYMANIC_ITEMS[property][i].body.sleeping || GLOBALS.DYMANIC_ITEMS[property][i].body.inTractor) {
-                            GLOBALS.DYMANIC_ITEMS[property][i].body.arrayPos.push(item.position.clone())
-                            GLOBALS.DYMANIC_ITEMS[property][i].body.arrayRot.push(item.quaternion.clone())
-                        }
-                    }
-                }
-
-
-                item.updateMatrix();
-                instanced.setMatrixAt(i, item.matrix)
-                instanced.instanceMatrix.needsUpdate = true;
-                instanced.computeBoundingSphere();
-            }
-
-        }
-    }
-
+    updatePhysics();
     updateGels();
-
-    if (recordingPosition) {
-        recordingPosition = false;
-        setTimeout(() => {
-            recordingPosition = true;
-        }, 10);
-    }
+    TWEEN.update();
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {
         GLOBALS.CAMERA_OBJ_HORIZONTAL[i].lookAt(GLOBALS.MAIN_CAMERA.position);
@@ -439,9 +353,6 @@ function render(time) {
         GLOBALS.CAMERA_OBJ_VERTICAL[i].rotation.z = 0;
         GLOBALS.CAMERA_OBJ_VERTICAL[i].rotation.y = 0;
     }
-
-    if (debugColision)
-        cannonDebugger.update();
 
     // finally, render to screen
     GLOBALS.RENDERER.setRenderTarget(currentRenderTarget);
@@ -458,7 +369,6 @@ function tweenCamera(duration, ini, final) {
         .start();
 }
 
-var recordingPosition = true;
 
 var deltaPortalRecursive = 0;
 var clockPortalRecursive = new THREE.Clock();
@@ -481,11 +391,11 @@ function animatePortal() {
 
     deltaPortal += clockPortal.getDelta();
 
-    if (deltaPortal > 1 / 10) {
+    if (deltaPortal > (1 / 30)) {
         // The draw or time dependent code are here
         renderPortal2(0, 1)
         renderPortal2(1, 0)
-        deltaPortal = deltaPortal % 10;
+        deltaPortal = deltaPortal % (1 / 30);
     }
 
     GLOBALS.RENDERER.autoClear = false;

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { GLOBALS } from '../../../Globals';
 
 const vshader = `
 varying vec2 vUv; 
@@ -54,7 +55,7 @@ void main()
 }
 `;
 
-window.uniformShaderPortalGunBallEnergy = {
+GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY = {
     iTime: {
         type: 'f',
         value: 1.0
@@ -82,8 +83,8 @@ window.uniformShaderPortalGunBallEnergy = {
 const geometry = new THREE.SphereGeometry( 15, 32, 16 ); 
 const material2 = new THREE.MeshBasicMaterial( { color: 0xffff00 } ); 
 
-window.materialGun = new THREE.ShaderMaterial({
-    uniforms: window.uniformShaderPortalGunBallEnergy,
+GLOBALS.MATERIAL_GUN = new THREE.ShaderMaterial({
+    uniforms: GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY,
     vertexShader: vshader,
     fragmentShader: fshader,
     side: 2,
@@ -91,4 +92,4 @@ window.materialGun = new THREE.ShaderMaterial({
     opacity: 0
 });
 
-const sphere = new THREE.Mesh( geometry, window.materialGun );
+const sphere = new THREE.Mesh( geometry, GLOBALS.MATERIAL_GUN );

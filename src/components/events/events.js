@@ -45,7 +45,7 @@ function updateEvents() {
 
 
 
-        if (window.elevatorTrigger.containsPoint(pos) && d.name == "player") {
+        if (GLOBALS.ELEVATOR_TRIGGER.containsPoint(pos) && d.name == "player") {
 
             if (!d.exiting) {
                 d.exiting = true;
@@ -68,7 +68,7 @@ function updateEvents() {
             }
         }
 
-        for (let trigger of window.TRIGGER) {
+        for (let trigger of GLOBALS.TRIGGER) {
             if (trigger && d.name != "player" && !exit && !d.placed) {
                 if (trigger.containsPoint(pos)) {
 
@@ -82,12 +82,7 @@ function updateEvents() {
                     d.goal = goal;
                     //d.mass = 0;
 
-                    //
-
-                    console.log(goal)
-
                     if (goal.trigger.itemName.includes("door")) {
-                        console.log("55555555555555")
                         const doorLeft = goal.trigger.item.getObjectByName("door_left");
                         const doorRight = goal.trigger.item.getObjectByName("door_right");
 
@@ -119,7 +114,7 @@ function updateEvents() {
                         exitRoomCollider();
                         setTimeout(() => {
 
-                            window.wallCorridorEnter.position.y = -2;
+                            GLOBALS.WALL_CORRIDOR_ENTER.position.y = -2;
 
                             tweenCamera(500, GLOBALS.EXIT_DOOR.getObjectByName("central_spinner_right_05").rotation, new THREE.Vector3(Math.PI,
                                 GLOBALS.EXIT_DOOR.getObjectByName("central_spinner_right_05").rotation.y,
@@ -130,7 +125,7 @@ function updateEvents() {
                                 GLOBALS.EXIT_DOOR.getObjectByName("central_spinner_left_07").rotation.z))
 
                             GLOBALS.CORRIDOR_ENTER.visible = true;
-                            window.EXIT_ROOM.visible = true;
+                            GLOBALS.EXIT_ROOM.visible = true;
 
                             GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").position.z = -5;
                             tweenCamera(1000, GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").position, new THREE.Vector3(GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").position.x + 60, GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").position.y, GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").position.z))
@@ -149,7 +144,7 @@ var exit = false;
 
 function respawn(d) {
 
-    if (d.name != "player")
+    if (d.name.includes("gel"))
         return;
 
     d.repawning = true;
@@ -185,20 +180,18 @@ function respawn(d) {
 var yyy;
 
 function laser() {
-    for (var i = 0; i < GLOBALS.LASER_EMITTER_RAYCASTER.length; i++) {
-        //console.log(window.laser_cube)
+    for (var i = 0; i < GLOBALS.LASER_EMITTER_OBJ.length; i++) {
         //if (GLOBALS.INTERACTIVE[7]) {
-        //var intersects = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObjects(GLOBALS.INTERACTIVE);
-        //console.log(intersects)
+        //var intersects = GLOBALS.LASER_EMITTER_OBJ[i].intersectObjects(GLOBALS.INTERACTIVE);
         //}
 
-        var obj2 = GLOBALS.LASER_EMITTER_RAYCASTER[i];
+        var obj2 = GLOBALS.LASER_EMITTER_OBJ[i];
 
-        if (GLOBALS.LASER_EMITTER_RAYCASTER[i].fromCube) {
+        if (GLOBALS.LASER_EMITTER_OBJ[i].fromCube) {
             obj2 = new THREE.Object3D();
-            obj2.position.copy(GLOBALS.LASER_EMITTER_RAYCASTER[i].position)
-            obj2.rotation.copy(GLOBALS.LASER_EMITTER_RAYCASTER[i].rotation)
-            //obj2.translateY(GLOBALS.LASER_EMITTER_RAYCASTER[i].distance / 2);
+            obj2.position.copy(GLOBALS.LASER_EMITTER_OBJ[i].position)
+            obj2.rotation.copy(GLOBALS.LASER_EMITTER_OBJ[i].rotation)
+            //obj2.translateY(GLOBALS.LASER_EMITTER_OBJ[i].distance / 2);
             obj2.fromCube = true;
         }
 
@@ -212,7 +205,7 @@ function laser() {
         dir.normalize()
 
         raycasterLaser.set(vector, dir);
-        var intersects = raycasterLaser.intersectObject(window.laser_cube);
+        var intersects = raycasterLaser.intersectObject(GLOBALS.LASER_CUBE);
 
         if (intersects.length > 0) {
 
@@ -221,7 +214,6 @@ function laser() {
             if (obj2.fromCube) {
                 /*for (var h = 0; h < intersects.length; h++) {
                     if (intersects[i].instanceId != 1) {
-                        //console.log("ttttttttttttt")
                     }
                 }*/
             } else {
@@ -253,7 +245,6 @@ function laser() {
                 var intersects = raycasterLaser.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
 
                 if (intersects.length > 0) {
-                    //console.log("Iiiiiiiiiiiiiiiiiii")
                     const geometry = new THREE.CylinderGeometry(0.02, 0.02, intersects[0].distance, 32);
 
                     if (!cube.laser) {
@@ -306,16 +297,15 @@ function laser() {
                 GLOBALS.LASER_EMITTER[i].position.set(0, 0, 0)
 
                 GLOBALS.LASER_EMITTER[i].geometry.dispose();
-                GLOBALS.LASER_EMITTER[i].geometry = new THREE.CylinderGeometry(0.02, 0.02, GLOBALS.LASER_EMITTER_RAYCASTER[i].distance, 32);
-                GLOBALS.LASER_EMITTER[i].position.copy(GLOBALS.LASER_EMITTER_RAYCASTER[i].position);
-                GLOBALS.LASER_EMITTER[i].translateZ(GLOBALS.LASER_EMITTER_RAYCASTER[i].distance / 2);
+                GLOBALS.LASER_EMITTER[i].geometry = new THREE.CylinderGeometry(0.02, 0.02, GLOBALS.LASER_EMITTER_OBJ[i].distance, 32);
+                GLOBALS.LASER_EMITTER[i].position.copy(GLOBALS.LASER_EMITTER_OBJ[i].position);
+                GLOBALS.LASER_EMITTER[i].translateZ(GLOBALS.LASER_EMITTER_OBJ[i].distance / 2);
 
                 GLOBALS.LASER_EMITTER[i].rotation.x = Math.PI / 2;
             }
 
             if (yyy) {
                 if (yyy.laser) {
-                    console.log("111111111111111")
                     GLOBALS.SCENE.remove(yyy.plane);
                     yyy.laser = false;
                 }
@@ -349,16 +339,12 @@ function tractorBeam() {
                         launch = false;
                     }, 50);
 
-                    console.log(j);
-
                     var ff = GLOBALS.FAITH_PLATE_TO_ROTATE[j];
 
                     tweenCamera(200, ff.rotation, new THREE.Vector3(Math.PI * 0.7, 0, 0))
                     setTimeout(() => {
                         tweenCamera(200, ff.rotation, new THREE.Vector3(Math.PI / 2, 0, 0))
                     }, 200);
-
-                    console.log(d)
 
                     //const strength = 500
                     //const dt = 1 / 60
@@ -423,44 +409,36 @@ function tractorBeam() {
                     // Calculate acceleration (a = F / m)
                     const acceleration = new CANNON.Vec3().copy(force).scale(1 / d.mass);
 
-                    console.log(acceleration)
-
                     // Calculate displacement (s = ut + (1/2)at^2)
                     const displacement = new CANNON.Vec3();
                     displacement.copy(initialVelocity).scale(dt).vadd(acceleration.scale(0.5 * dt * dt));
 
-                    console.log(displacement)
-                    console.log(initialVelocity)
-
                     // Calculate final position
                     const finalPosition = new CANNON.Vec3();
                     finalPosition.copy(initialPosition).vadd(displacement);
-
-                    console.log(finalPosition)
                 }
-                //console.log("oooooooooooooooo")
             }
         }
 
         pos.y += 1;
 
-        for (var j = 0; j < window.tractorBeam.length; j++) {
+        for (var j = 0; j < GLOBALS.TRACTOR_BEAM.length; j++) {
 
-            if (window.tractorBeamBoundingBox[j]) {
+            if (GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j]) {
 
                 if (d.inTractor && d.tractor != j)
                     continue;
 
-                if (window.tractorBeamBoundingBox[j].containsPoint(pos)) {
+                if (GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].containsPoint(pos)) {
 
                     var vec = new THREE.Vector3();
-                    window.tractorBeam[j].getWorldDirection(vec)
+                    GLOBALS.TRACTOR_BEAM[j].getWorldDirection(vec)
 
                     if (!d.inTractor) {
                         d.inTractorPositionY = d.position.clone().y;
                         d.inTractor = true;
                         d.tractor = j;
-                        window.tractorBeam[j].inTractor = true;
+                        GLOBALS.TRACTOR_BEAM[j].inTractor = true;
                         aa = true;
                         d.mass = 0;
 
@@ -475,20 +453,19 @@ function tractorBeam() {
                         d.torque.setZero();
 
                         if (!d.inArea) {
-                            var center = new THREE.Vector3((Math.abs(vec.x - 1)) * window.tractorBeam[j].position.x + (d.position.x * vec.x),
-                                (Math.abs(vec.y - 1)) * window.tractorBeam[j].position.y + (d.position.y * vec.y),
-                                (Math.abs(vec.z - 1)) * window.tractorBeam[j].position.z + (d.position.z * vec.z));
+                            var center = new THREE.Vector3((Math.abs(vec.x - 1)) * GLOBALS.TRACTOR_BEAM[j].position.x + (d.position.x * vec.x),
+                                (Math.abs(vec.y - 1)) * GLOBALS.TRACTOR_BEAM[j].position.y + (d.position.y * vec.y),
+                                (Math.abs(vec.z - 1)) * GLOBALS.TRACTOR_BEAM[j].position.z + (d.position.z * vec.z));
 
                             tweenCamera(500, d.position, center)
                         }
                     } else {
 
                         /*if (d.recall) {
-                            //console.log("kkkkkkkkkkkkkk")
                             continue;
                         }*/
 
-                        pos.add(vec.clone().multiplyScalar(0.02)); //* window.tractorBeamBoundingBox[j].side
+                        pos.add(vec.clone().multiplyScalar(0.02)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side
                         d.position.copy(pos);
                         d.angularVelocity.setZero();
                         d.velocity.setZero();
@@ -497,26 +474,26 @@ function tractorBeam() {
                     }
 
                 } else {
-                    if (d.inTractor && d.tractor == j) { //&& window.tractorBeam[j].inTractor
+                    if (d.inTractor && d.tractor == j) { //&& GLOBALS.TRACTOR_BEAM[j].inTractor
                         if (d.name == "player")
                             d.mass = 50;
                         else
                             d.mass = 5;
 
                         d.inTractor = false;
-                        window.tractorBeam[j].inTractor = false;
+                        GLOBALS.TRACTOR_BEAM[j].inTractor = false;
                         d.tractor = null;
                     }
                 }
             } else {
-                if (d.inTractor && d.tractor == j) { //&& window.tractorBeam[j].inTractor
+                if (d.inTractor && d.tractor == j) { //&& GLOBALS.TRACTOR_BEAM[j].inTractor
                     if (d.name == "player")
                         d.mass = 50;
                     else
                         d.mass = 5;
 
                     d.inTractor = false;
-                    window.tractorBeam[j].inTractor = false;
+                    GLOBALS.TRACTOR_BEAM[j].inTractor = false;
                     d.tractor = null;
                 }
             }
@@ -566,17 +543,11 @@ function applyImpulseToFollowTrajectory(start, middle, end, body) {
 
     impulse.y *= -2;
     impulse.z *= -1;
-    console.log(direction1)
-    console.log(direction2)
-    console.log(impulseMagnitude)
 
     //impulse.normalize().scale(impulseMagnitude, impulse);
 
     impulse.normalize();
     impulse.scale(impulseMagnitude, impulse);
-
-    console.log(impulse)
-
 
 
     // Apply the impulse to the Cannon.js body
@@ -614,8 +585,6 @@ function portalCollision() {
                 d.collisionFilterMask &= ~GLOBALS.PORTALS[p].hostObjects.collisionFilterGroup;
                 d.inArea = true;
 
-                //console.log("0000000000000")
-
                 if (dd == 0)
                     inArea++;
             } else {
@@ -634,9 +603,7 @@ function portalCollision() {
             // should teleport
             if (GLOBALS.PORTALS[p].STBB.containsPoint(pos)) {
 
-
                 teleportPhysicalObject(d, GLOBALS.PORTALS[p])
-
 
                 if (dd == 0) {
                     teleportObject3D(GLOBALS.MAIN_CAMERA, GLOBALS.PORTALS[p])
@@ -653,8 +620,8 @@ function portalCollision() {
                     let cameraMat = new THREE.Matrix4().makeBasis(cameraRight, cameraUp, cameraForward.negate())
                     GLOBALS.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat)
 
-                    window.targetRotationX = GLOBALS.MAIN_CAMERA.rotation.y;
-                    window.targetRotationY = GLOBALS.MAIN_CAMERA.rotation.x;
+                    GLOBALS.TARGET_ROTATION_X = GLOBALS.MAIN_CAMERA.rotation.y;
+                    GLOBALS.TARGET_ROTATION_Y = GLOBALS.MAIN_CAMERA.rotation.x;
 
                     if (inArea > 0)
                         GLOBALS.SMOOTHNESS = 1;
@@ -674,18 +641,18 @@ function portalCollision() {
 function levelEnteredFunction() {
     if (!leveEntered) {
         raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
-        var intersects = raycaster2.intersectObject(window.planeEnterDoor);
+        var intersects = raycaster2.intersectObject(GLOBALS.ENTER_DOOR);
 
         if (intersects.length > 0) {
             if (intersects[0].distance < 0.1) {
                 leveEntered = true;
 
                 setTimeout(() => {
-                    window.wallCorridorEnter.position.y = 0;
+                    GLOBALS.WALL_CORRIDOR_ENTER.position.y = 0;
                 }, 200);
 
                 setTimeout(() => {
-                    window.spotLight.intensity = 20;
+                    GLOBALS.SPOTLIGHT.intensity = 20;
 
                     setTimeout(() => {
 

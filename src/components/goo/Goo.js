@@ -28,10 +28,7 @@ const AddGoo = function (found, loading) {
                 var box3 = getPlaneByName(userData.position.x + "/" + (userData.position.y + 1) + "/" + (userData.position.z + 1));
                 var box4 = getPlaneByName(userData.position.x + "/" + (userData.position.y + 1) + "/" + (userData.position.z - 1));
     
-                console.log(box1)
-                console.log(box2)
-                console.log(box3)
-                console.log(box4)*/
+                */
 
                 /*for (var x = 0; x < 2; x++) {
     
@@ -52,7 +49,7 @@ const AddGoo = function (found, loading) {
 
         }
 
-        /*console.log(goo)
+        /*
     
         const geometry = new THREE.PlaneGeometry(2, 2);
         const plane = new THREE.Mesh(geometry, material);
@@ -82,8 +79,6 @@ const AddGoo = function (found, loading) {
             dummy.position.copy(goo[i]);
             dummy.translateZ(1.8);
             dummy.updateMatrix();
-    
-            console.log(dummy.position)
     
             mesh.setMatrixAt(i, dummy.matrix);
         }

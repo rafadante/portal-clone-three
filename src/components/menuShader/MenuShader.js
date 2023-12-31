@@ -7,289 +7,13 @@ import {
 import {
     AddGoo
 } from '../goo/Goo';
-import { viewFPS } from '../test/Test';
-import { GLOBALS } from '../../Globals.js';
-
-const vshader = `
-varying vec2 vUv; 
-void main()
-{
-    vUv = uv;
-
-    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0 );
-    gl_Position = projectionMatrix * mvPosition;
-}
-`;
-
-
-const fshader = `
-// inspired by shader from VoidChicken
-// https://www.shadertoy.com/view/XtdXR2
-// ... and portal of course ;)
-
-uniform vec2 resolution;
-uniform float iTime;
-uniform sampler2D iChannel0;
-uniform sampler2D iChannel1;
-uniform bool start;
-
-// 1 .. 3
-const int transitionType = 1;
-bool transitionStarted = false; // Variable to track if the transition has started
-float transitionProgress = 0.0; // Variable to control the transition progress
-
-varying vec2 vUv;
-
-void main()
-{
-
-    gl_FragColor = vec4(0);
-    float depth = -1e3;
-    for (float i=0. ; i<=1. ; ++i)
-    {
-        vec2 fragCoord = vUv * resolution;
-        vec2 xy = fragCoord - resolution.xy / 2.0;
-
-        //vec2 xy = fragCoord - iResolution / 2.0;
-        //vec2 xy = vUv * resolution / 2.0;
-        //vec2 xy = vUv;
-        //vec2 xy = -0.1 + 1.0 *vUv;
-
-        float grid_width = 100.0;//159
-        xy /= grid_width;
-        xy.y += i + .5;
-        xy.y /= 2.;
-        vec2 grid = floor(xy);
-        xy -= grid + 0.5;
-        xy.y *= 2.;
-        grid.y = grid.y * 2. - i;
-
-        float phase = 0.0;
-        float offset = (grid.y - grid.x)*-0.1;
-        float time = iTime*1.5 - offset;
-        if (transitionType == 1)
-        {
-            // Check if the transition has not started yet
-            if (!transitionStarted)
-            {
-                // Increment the transitionProgress only once
-                transitionProgress += 1.0;
-                
-                // Set time based on transitionProgress
-                float time = mod(transitionProgress, 6.0);
-                
-                // If one full cycle has occurred, set the transitionStarted flag to true
-                if (transitionProgress >= 6.0)
-                {
-                    transitionStarted = true;
-                    
-                    // Reset transitionProgress to ensure the transition effect doesn't continue
-                    transitionProgress = 0.0;
-                }
-                
-                // Apply your transition effect here based on the value of 'time'
-                // This effect will run once and then stop
-                // For example, you can use 'time' to control the progress of the transition.
-                // The effect will complete in one cycle, and then the flag will be set, stopping further transitions.
-            }
-        }
-        else if (transitionType == 2)
-            // flip once
-            time = clamp(time - 1., 0., 1.);
-        else if (transitionType == 3)
-            ;// flip and return once
-        //phase += smoothstep(0.0, 1.0, time);
-        phase += 1.0 - smoothstep(3.0, 4.0, time);
-        phase = abs(mod(phase, 2.0)-1.0);
-        
-        float side = step(0.5, phase);
-
-        float angle = radians(phase * 180.), z = 2.;
-        vec3 p = inverse(mat3(cos(angle),0,-sin(angle), 0,1,0, 0,0,z)) * vec3(xy, z);
-        vec2 uv = p.xy / p.z + .5;
-
-        float alpha = 1.;
-        if (uv.x>0.0&&uv.y>0.0&&uv.x<1.0&&uv.y<1.0 && p.z>depth)
-            depth = p.z;
-        else
-            alpha = 0.;
-
-        vec2 scale = grid_width / resolution.xy;
-        vec2 uv1 = (grid + uv) * scale + .5;
-        vec2 uv2 = (grid + vec2(1. - uv.x, uv.y)) * scale + .5;
-        vec4 c1 = texture(iChannel0, uv1);
-        vec4 c2 = texture(iChannel1, uv2);
-
-        gl_FragColor = mix(gl_FragColor, mix(c1, c2, side), alpha);
-        //gl_FragColor = mix(gl_FragColor, vec4(p.z-1., 1.-p.z, 0, 1)*10., alpha);
-    }
-}
-`;
-
-const fshader2 = `
-// inspired by shader from VoidChicken
-// https://www.shadertoy.com/view/XtdXR2
-// ... and portal of course ;)
-
-uniform vec2 resolution;
-uniform float iTime;
-uniform sampler2D iChannel0;
-uniform sampler2D iChannel1;
-uniform bool start;
-
-// 1 .. 3
-const int transitionType = 1;
-bool transitionStarted = false; // Variable to track if the transition has started
-float transitionProgress = 0.0; // Variable to control the transition progress
-
-varying vec2 vUv;
-
-void main()
-{
-
-    gl_FragColor = vec4(0);
-    float depth = -1e3;
-    for (float i=0. ; i<=1. ; ++i)
-    {
-        vec2 fragCoord = vUv * resolution;
-        vec2 xy = fragCoord - resolution.xy / 2.0;
-
-        //vec2 xy = fragCoord - iResolution / 2.0;
-        //vec2 xy = vUv * resolution / 2.0;
-        //vec2 xy = vUv;
-        //vec2 xy = -0.1 + 1.0 *vUv;
-
-        float grid_width = 100.0;//159
-        xy /= grid_width;
-        xy.y += i + .5;
-        xy.y /= 2.;
-        vec2 grid = floor(xy);
-        xy -= grid + 0.5;
-        xy.y *= 2.;
-        grid.y = grid.y * 2. - i;
-
-        float phase = 0.0;
-        float offset = (grid.y - grid.x)*0.1;
-        float time = iTime*1.5 - offset;
-        if (transitionType == 1)
-        {
-            // Check if the transition has not started yet
-            if (!transitionStarted)
-            {
-                // Increment the transitionProgress only once
-                transitionProgress += 1.0;
-                
-                // Set time based on transitionProgress
-                float time = mod(transitionProgress, 6.0);
-                
-                // If one full cycle has occurred, set the transitionStarted flag to true
-                if (transitionProgress >= 6.0)
-                {
-                    transitionStarted = true;
-                    
-                    // Reset transitionProgress to ensure the transition effect doesn't continue
-                    transitionProgress = 0.0;
-                }
-                
-                // Apply your transition effect here based on the value of 'time'
-                // This effect will run once and then stop
-                // For example, you can use 'time' to control the progress of the transition.
-                // The effect will complete in one cycle, and then the flag will be set, stopping further transitions.
-            }
-        }
-        else if (transitionType == 2)
-            // flip once
-            time = clamp(time - 1., 0., 1.);
-        else if (transitionType == 3)
-            ;// flip and return once
-        //phase += smoothstep(0.0, 1.0, time);
-        phase += 1.0 - smoothstep(3.0, 4.0, time);
-        phase = abs(mod(phase, 2.0)-1.0);
-        
-        float side = step(0.5, phase);
-
-        float angle = radians(phase * 180.), z = 2.;
-        vec3 p = inverse(mat3(cos(angle),0,-sin(angle), 0,1,0, 0,0,z)) * vec3(xy, z);
-        vec2 uv = p.xy / p.z + .5;
-
-        float alpha = 1.;
-        if (uv.x>0.0&&uv.y>0.0&&uv.x<1.0&&uv.y<1.0 && p.z>depth)
-            depth = p.z;
-        else
-            alpha = 0.;
-
-        vec2 scale = grid_width / resolution.xy;
-        vec2 uv1 = (grid + uv) * scale + .5;
-        vec2 uv2 = (grid + vec2(1. - uv.x, uv.y)) * scale + .5;
-        vec4 c1 = texture(iChannel1, uv1);
-        vec4 c2 = texture(iChannel0, uv2);
-
-        gl_FragColor = mix(gl_FragColor, mix(c1, c2, side), alpha);
-        //gl_FragColor = mix(gl_FragColor, vec4(p.z-1., 1.-p.z, 0, 1)*10., alpha);
-    }
-}
-`;
-
-const width = window.innerWidth;
-const height = window.innerHeight;
-
-var background = new THREE.TextureLoader().load('./assets/loading/3.jpg');
-
-var grid = new THREE.TextureLoader().load('./assets/ui/grid.jpg');
-
-window.tuniform = {
-    iTime: {
-        type: 'f',
-        value: 1.2
-    },
-    resolution: {
-        type: "v2",
-        value: new THREE.Vector2(width, height)
-    },
-    iChannel0: {
-        type: "t",
-        value: background,
-    },
-    iChannel1: {
-        type: "t",
-        value: grid,
-    },
-};
-
-window.tuniform2 = {
-    iTime: {
-        type: 'f',
-        value: 1.2
-    },
-    resolution: {
-        type: "v2",
-        value: new THREE.Vector2(width, height)
-    },
-    iChannel0: {
-        type: "t",
-        value: background,
-    },
-    iChannel1: {
-        type: "t",
-        value: grid,
-    },
-};
-
-var mat = new THREE.ShaderMaterial({
-    uniforms: window.tuniform,
-    vertexShader: vshader,
-    fragmentShader: fshader,
-    side: 2,
-    transparent: true,
-});
-
-var mat2 = new THREE.ShaderMaterial({
-    uniforms: window.tuniform2,
-    vertexShader: vshader,
-    fragmentShader: fshader2,
-    side: 2,
-    transparent: true,
-});
+import {
+    viewFPS
+} from '../test/Test';
+import {
+    GLOBALS
+} from '../../Globals.js';
+import '../shaders/MainMenu/MainMenu.js'
 
 var plane1;
 var plane2;
@@ -319,11 +43,11 @@ $("#loading-parent").css("pointer-events", "none");*/
 if (!stopMenuLoop) {
     setTimeout(() => {
         var planegeometry = new THREE.PlaneGeometry(1, 1);
-        plane1 = new THREE.Mesh(planegeometry, mat);
+        plane1 = new THREE.Mesh(planegeometry, GLOBALS.MATERIAL_MAIN_MENU);
         GLOBALS.SCENE.add(plane1);
 
         var planegeometry = new THREE.PlaneGeometry(1, 1);
-        plane2 = new THREE.Mesh(planegeometry, mat2);
+        plane2 = new THREE.Mesh(planegeometry, GLOBALS.MATERIAL_SUB_MENU);
 
         GLOBALS.SCENE.background = new THREE.Color(0x000000)
 
@@ -334,12 +58,9 @@ if (!stopMenuLoop) {
 
         setTimeout(() => {
             getMonitorFPS = false;
-            console.log(window.unlockedFPS)
         }, 1000);
     }, 1000);
 }
-
-
 
 function onWindowResize() {
     GLOBALS.RENDERER.setSize(window.innerWidth, window.innerHeight);
@@ -365,7 +86,6 @@ $("body").on('click', '#option-single-load', function () {
     fetch("./levels/1.json")
         .then(response => response.json())
         .then(json => {
-            console.log(json)
             level = json;
             GLOBALS.LOADED_LEVEL = true;
 
@@ -410,9 +130,9 @@ function startLevel() {
     $("#blocker .body").css("opacity", "0");
     $("#logo").css("opacity", "0");
 
-    window.tuniform.iChannel0.value = window.tuniform.iChannel1.value;
-    window.tuniform.iChannel1.value = null;
-    window.tuniform.iTime.value = 1.2;
+    GLOBALS.MATERIAL_MAIN_MENU.uniforms.iChannel0.value = GLOBALS.MATERIAL_MAIN_MENU.uniforms.iChannel1.value;
+    GLOBALS.MATERIAL_MAIN_MENU.uniforms.iChannel1.value = null;
+    GLOBALS.MATERIAL_MAIN_MENU.uniforms.iTime.value = 1.2;
 
     transition = true;
     transition2 = false;
@@ -445,31 +165,31 @@ function startLevel() {
 }
 
 $("body").on('click', '#option-single', function () {
-    optionMenu(grid, "SINGLE PLAYER", "#options-single");
+    optionMenu(GLOBALS.TEXTURE_MENU_GRID, "SINGLE PLAYER", "#options-single");
 });
 
 $("body").on('click', '#option-community', function () {
-    optionMenu(grid, "COMMUNITY CHAMBERS", "#options-community");
+    optionMenu(GLOBALS.TEXTURE_MENU_GRID, "COMMUNITY CHAMBERS", "#options-community");
 });
 
 $("body").on('click', '#option-options', function () {
     $("#back-editor").css("display", "none");
-    optionMenu(grid, "OPTIONS", "#options-settings");
+    optionMenu(GLOBALS.TEXTURE_MENU_GRID, "OPTIONS", "#options-settings");
 });
 
 $("body").on('click', '#option-about', function () {
-    optionMenu(grid, "ABOUT", "#options-about");
+    optionMenu(GLOBALS.TEXTURE_MENU_GRID, "ABOUT", "#options-about");
 });
 
 $("body").on('click', '#option-patreon', function () {
-    optionMenu(grid, "PATREON", "#options-patreon");
+    optionMenu(GLOBALS.TEXTURE_MENU_GRID, "PATREON", "#options-patreon");
 });
 
 function optionMenu(texture, title, id) {
-    window.tuniform.iChannel1.value = texture;
-    window.tuniform2.iChannel1.value = texture;
-    window.tuniform.iTime.value = 1.2;
-    window.tuniform2.iTime.value = 1.2;
+    GLOBALS.MATERIAL_MAIN_MENU.uniforms.iChannel1.value = texture;
+    GLOBALS.MATERIAL_SUB_MENU.uniforms.iChannel1.value = texture;
+    GLOBALS.MATERIAL_MAIN_MENU.uniforms.iTime.value = 1.2;
+    GLOBALS.MATERIAL_SUB_MENU.uniforms.iTime.value = 1.2;
     transition = true;
 
     if (transition2) {
@@ -482,7 +202,7 @@ function optionMenu(texture, title, id) {
 }
 
 $("body").on('click', '#back-main', function () {
-    window.tuniform2.iTime.value = 1.2;
+    GLOBALS.MATERIAL_SUB_MENU.uniforms.iTime.value = 1.2;
     transition2 = true;
     transition = false;
     GLOBALS.SCENE.remove(plane1);
@@ -492,7 +212,6 @@ $("body").on('click', '#back-main', function () {
 });
 
 function pointerState(display1, display2, title, titleDisplay, id) {
-    console.log(id)
     $("#blocker .body").css("opacity", "0");
     $("#logo").css("opacity", "0");
     $("#blocker").css("pointer-events", "none");
@@ -528,10 +247,10 @@ function animate(time) {
         }
 
         if (transition)
-            window.tuniform.iTime.value += clock.getDelta();
+            GLOBALS.MATERIAL_MAIN_MENU.uniforms.iTime.value += clock.getDelta();
 
         if (transition2)
-            window.tuniform2.iTime.value += clock.getDelta();
+            GLOBALS.MATERIAL_SUB_MENU.uniforms.iTime.value += clock.getDelta();
 
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA)
         requestAnimationFrame(animate);
@@ -552,8 +271,6 @@ $("#input-level").on('change', function (e) {
     var path = (window.URL || window.webkitURL).createObjectURL(file);
     readTextFile(path, function (text) {
         var data = JSON.parse(text);
-
-        console.log(data);
 
         loadLevel(data[0])
 
@@ -627,45 +344,34 @@ function loadLevel(data) {
 
                     const state = data[i].state;
 
-                    console.log(data[i])
-
                     addItem(GLOBALS.PLANE_USER_DATA[i], true)
 
                     GLOBALS.PLANE_USER_DATA[i].state = state;
 
-                    //console.log(data[i].trigger)
                     if (data[i].trigger) {
-                        console.log("111111111111")
                         triggers.push(GLOBALS.PLANE_USER_DATA[i]);
                     }
                 }
-
             }
         }
-
     }
 
     for (var i = 0; i < triggers.length; i++) {
 
-        console.log(triggers[i])
         const id = triggers[i].id_instanced;
 
         GLOBALS.SELECTED_FOR_CONNECTION = GLOBALS.PLANE_USER_DATA[id];
         GLOBALS.SELECTED_FOR_CONNECTION.instanceId = id;
         GLOBALS.SELECTED_FOR_CONNECTION.trigger = GLOBALS.PLANE_USER_DATA[triggers[i].trigger];
-        console.log(GLOBALS.SELECTED_FOR_CONNECTION)
+        
         if (GLOBALS.SELECTED_FOR_CONNECTION.itemName.includes("pedestal_button"))
             GLOBALS.SELECTED_FOR_CONNECTION.trigger.item.item.state = GLOBALS.SELECTED_FOR_CONNECTION.state;
         GLOBALS.SELECTED_FOR_CONNECTION.trigger.instanceId = GLOBALS.SELECTED_FOR_CONNECTION.trigger.id_instanced;
         GLOBALS.SELECTED_FOR_CONNECTION.normal = GLOBALS.SELECTED_FOR_CONNECTION.normal;
         GLOBALS.SELECTED_FOR_CONNECTION.trigger.normal = GLOBALS.SELECTED_FOR_CONNECTION.normal;
 
-        console.log(GLOBALS.PLANE_USER_DATA[id].trigger)
         findPath(GLOBALS.PLANE_USER_DATA[id].position, GLOBALS.PLANE_USER_DATA[id].trigger.position, GLOBALS.PLANE_USER_DATA[id].trigger)
     }
-
-    //
-
 }
 
 export {

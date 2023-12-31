@@ -15,9 +15,10 @@ import {
 import $ from 'jquery';
 import { GLOBALS } from '../../Globals.js';
 
-window.pickingToRecall = false;
+var pickingToRecall = false;
 var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
+var groupRecall;
 
 function recall() {
     raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
@@ -31,7 +32,7 @@ function recall() {
         if (item.body.arrayPos.length > 0) {
             recallingItem = item.body;
             item.body.recall = true;
-            window.recalling = true;
+            GLOBALS.RECALLING = true;
             transport(item, item.body.arrayPos.length - 1);
 
         }
@@ -45,16 +46,14 @@ function recallRay() {
 
     if (intersects.length > 0) {
         intersects[0].object.parent.visible = true;
-        //console.log(intersects[0].object.parent.name)
         /*var instancedId = intersects[0].instanceId;
         var name = intersects[0].object.name;
 
-        console.log(name)
-        window.groupRecall.getObjectByName("name").visible = true;*/
+        groupRecall.getObjectByName("name").visible = true;*/
     } else {
-        for (var i = 0; i < window.groupRecall.children.length; i++) {
-            if (!window.groupRecall.children[i].material)
-                window.groupRecall.children[i].visible = false;
+        for (var i = 0; i < groupRecall.children.length; i++) {
+            if (!groupRecall.children[i].material)
+                groupRecall.children[i].visible = false;
         }
     }
 }
@@ -72,7 +71,7 @@ function tweenCamera2(duration, ini, final, item, end2) {
 }
 
 var timeouts = [];
-window.recalling = false;
+GLOBALS.RECALLING = false;
 var recallingItem;
 
 function transport(item, i) {
@@ -89,7 +88,7 @@ function transport(item, i) {
     } else {
         item.body.recall = false;
         //item.body.allowSleep = true;
-        window.recalling = false;
+        GLOBALS.RECALLING = false;
         item.body.arrayPos = [];
         item.body.arrayRot = [];
 
@@ -128,15 +127,15 @@ function transport(item, i) {
 var arr = [];
 
 function KeyZ() {
-    window.pickingToRecall = !window.pickingToRecall;
+    pickingToRecall = !pickingToRecall;
 
-    if (window.pickingToRecall) {
+    if (pickingToRecall) {
 
         window["RECAL"]();
         $("#viewer-3d").css("filter", "sepia(0.5)")
 
-        window.groupRecall = new THREE.Group();
-        GLOBALS.SCENE.add(window.groupRecall)
+        groupRecall = new THREE.Group();
+        GLOBALS.SCENE.add(groupRecall)
 
         var it = 0;
         arr = [];
@@ -181,20 +180,14 @@ function KeyZ() {
                 }
             }
 
-            console.log(d.arrayPos)
-            console.log(newArray)
-
             var length = newArray.length;
             var values = parseInt(length / 5);
-            console.log(values)
 
             for (var i = 0, j = 0; i < 5; i++, j += values) {
-                //console.log(newArray[j])
                 points.push(newArray[j].x, newArray[j].y, newArray[j].z)
                 var cube = new THREE.Mesh(geometry, material);
                 cube.position.copy(newArray[j]);
                 cube.quaternion.copy(newArrayRot[j]);
-                console.log(cube)
                 g.add(cube);
             }
 
@@ -205,10 +198,8 @@ function KeyZ() {
             cube.quaternion.copy(d.arrayRot[d.arrayPos.length - 1]);
             g.add(cube);
 
-            console.log(cube)
-
             var clone = cube.clone();
-            window.groupRecall.add(clone);
+            groupRecall.add(clone);
 
             const geometry2 = new MeshLineGeometry();
             geometry2.setPoints(points, (p) => 2 + Math.sin(50 * p));
@@ -227,24 +218,21 @@ function KeyZ() {
                 //dashArray: 0
             });
 
-            console.log(material2)
-
             const line = new THREE.Mesh(geometry2, material2)
             g.add(line);
 
             g.visible = false;
-            console.log(d)
             d.name = "item-" + it;
             g.name = d.name;
 
             arr.push(g);
 
-            window.groupRecall.add(g);
+            groupRecall.add(g);
             it++;
         }
         GLOBALS.STOP_TIME = true;
     } else {
-        GLOBALS.SCENE.remove(window.groupRecall)
+        GLOBALS.SCENE.remove(groupRecall)
         GLOBALS.STOP_TIME = false;
         $("#viewer-3d").css("filter", "sepia(0)")
     }
@@ -254,7 +242,7 @@ function KeyZ() {
 function KeyQ() {
     GLOBALS.STOP_TIME = false;
     $("#viewer-3d").css("filter", "sepia(0)")
-    if (window.recalling) {
+    if (GLOBALS.RECALLING) {
         for (var i = 0; i < timeouts.length; i++) {
             clearTimeout(timeouts[i]);
         }
@@ -262,7 +250,7 @@ function KeyQ() {
 
         recallingItem.recall = false;
         //recallingItem.allowSleep = true;
-        window.recalling = false;
+        GLOBALS.RECALLING = false;
         recallingItem.arrayPos = [];
         recallingItem.arrayRot = [];
 
@@ -279,9 +267,9 @@ function KeyQ() {
             .start();
     } else {
 
-        if (window.pickingToRecall) {
-            GLOBALS.SCENE.remove(window.groupRecall)
-            window.pickingToRecall = false;
+        if (pickingToRecall) {
+            GLOBALS.SCENE.remove(groupRecall)
+            pickingToRecall = false;
         }
 
         var aa = {
@@ -310,9 +298,6 @@ window["RECAL"] = function () {
     Ref.mat = customMaterial(Post.colorTexture, Post.depthTexture);
     Post.postMaterial = Ref.mat;
     //Post.createRenderLoop( null, onPostRender ).start();
-
-    console.log(Ref)
-    console.log(Post)
 }
 
 window["TTT"] = function (dt, et) {

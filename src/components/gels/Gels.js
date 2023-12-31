@@ -198,7 +198,6 @@ function createGelOrange(pos, plane) {
     box.vel = new THREE.Vector3(1, 0, 1)
 
     gel.updateMatrix();
-    console.log(instancedMeshGel)
     instancedMeshGel.setMatrixAt(id, gel.matrix);
     instancedMeshGel.setColorAt(id, new THREE.Color(0xFF8C00));
     instancedMeshGel.instanceColor.needsUpdate = true;

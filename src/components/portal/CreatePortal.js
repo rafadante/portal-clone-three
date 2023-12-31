@@ -4,7 +4,7 @@ import {
 } from '../../Tween.js';
 import {
     createLightBridgesFromPortal
-} from '../lightBridges/LightBridges.js';
+} from '../continuous/Continuous.js';
 import {
     tweenCamera
 } from '../../Main.js';
@@ -38,7 +38,6 @@ function portalButton(button) {
                     var obj = intersects[0].object;
                     var target = new THREE.Vector3(); // create once an reuse it
                     intersects[0].object.getWorldPosition(target);
-                    window.wallName = userData.name;
 
                     var direction = new THREE.Vector3(0, 1, 0).applyQuaternion(obj.quaternion);
                     var offsetVector = new THREE.Vector3(0.0 * direction.x, 0.0 * direction.y, 0.0 * direction.z);
@@ -196,9 +195,9 @@ function portalButton(button) {
 
                         newPortal(0, 1, point, normal, userData.body, playerUpDirection, portalPoints)
 
-                        window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(1.0, 0.25, 0.0);
-                        if (window.uniformShaderPortalGunBallEnergy.iAlpha.value == 0.0) {
-                            new TWEEN.Tween(window.uniformShaderPortalGunBallEnergy.iAlpha).to({
+                        GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new THREE.Vector3(1.0, 0.25, 0.0);
+                        if (GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha.value == 0.0) {
+                            new TWEEN.Tween(GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha).to({
                                 value: 0.5
                             }, 300).start();
                         }
@@ -220,9 +219,9 @@ function portalButton(button) {
 
                         newPortal(1, 0, point, normal, userData.body, playerUpDirection, userData.rotation)
 
-                        window.uniformShaderPortalGunBallEnergy.iColor.value = new THREE.Vector3(0.0, 0.3, 1.0);
-                        if (window.uniformShaderPortalGunBallEnergy.iAlpha.value == 0.0) {
-                            new TWEEN.Tween(window.uniformShaderPortalGunBallEnergy.iAlpha).to({
+                        GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new THREE.Vector3(0.0, 0.3, 1.0);
+                        if (GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha.value == 0.0) {
+                            new TWEEN.Tween(GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha).to({
                                 value: 0.5
                             }, 300).start();
                         }
@@ -230,13 +229,13 @@ function portalButton(button) {
 
                     setTimeout(() => {
                         if (button == 0) {
-                            createLightBridgesFromPortal(1, window.raycastLightBridge);
-                            createLightBridgesFromPortal(1, window.raycastTractorBeam);
-                            createLightBridgesFromPortal(1, window.raycastLaserEmitter);
+                            createLightBridgesFromPortal(1, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
+                            createLightBridgesFromPortal(1, GLOBALS.TRACTOR_BEAM_RAYCASTER);
+                            createLightBridgesFromPortal(1, GLOBALS.LASER_EMITTER_RAYCASTER);
                         } else if (button == 2) {
-                            createLightBridgesFromPortal(0, window.raycastLightBridge);
-                            createLightBridgesFromPortal(0, window.raycastTractorBeam);
-                            createLightBridgesFromPortal(0, window.raycastLaserEmitter);
+                            createLightBridgesFromPortal(0, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
+                            createLightBridgesFromPortal(0, GLOBALS.TRACTOR_BEAM_RAYCASTER);
+                            createLightBridgesFromPortal(0, GLOBALS.LASER_EMITTER_RAYCASTER);
                         }
                     }, 300);
                 } else {
@@ -266,7 +265,8 @@ function deletePortal(portalIndex) {
         }
     }
     GLOBALS.SCENE.remove(GLOBALS.PORTALS[portalIndex]);
-    GLOBALS.PORTALS[portalIndex] = null
+    GLOBALS.PORTALS[portalIndex].portalShader.material.uniforms.iOpened.value = 0;
+    GLOBALS.PORTALS[portalIndex] = null;
 }
 
 // creates a new portal and adds it to the scene
@@ -304,8 +304,8 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
         GLOBALS.PORTALS[otherPortalIndex].output = GLOBALS.PORTALS[thisPortalIndex]
 
     if (GLOBALS.PORTALS[0] !== null && GLOBALS.PORTALS[1] !== null) {
-        GLOBALS.PORTALS[0].portalShader.material = window.materialLeftOpened
-        GLOBALS.PORTALS[1].portalShader.material = window.materialRightOpened
+        GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value = 1;
+        GLOBALS.PORTALS[1].portalShader.material.uniforms.iOpened.value = 1;
     }
 
     var pLocal = new THREE.Vector3(0, 0, -1);

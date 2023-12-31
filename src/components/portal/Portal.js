@@ -114,35 +114,30 @@ class Portal extends Group {
         this.mesh.matrixAutoUpdate = true;
         this.matrixAutoUpdate = true;
         //this.mesh.scale.x *= 0.75;
-        this.mesh.frustumCulled = false;
+        this.mesh.frustumCulled = true;
         this.add(this.mesh)
 
-        var portalShader;
         if (index == 0) {
-            portalShader = window.leftPortalShader.clone();
-            portalShader.name = "portal-0"
             this.mesh.userData.this = 0;
             this.mesh.userData.other = 1;
-            window.portalShader[0] = portalShader;
         } else {
-            portalShader = window.rightPortalShader.clone();
-            portalShader.name = "portal-1"
             this.mesh.userData.this = 1;
             this.mesh.userData.other = 0;
-            window.portalShader[1] = portalShader;
         }
 
+        var parent = GLOBALS.PORTAL_SHADER[index].parent;
+        if(parent){
+            parent.remove(GLOBALS.PORTAL_SHADER[index]);
+            GLOBALS.PORTAL_SHADER[index].matrix.identity().decompose(GLOBALS.PORTAL_SHADER[index].position, GLOBALS.PORTAL_SHADER[index].quaternion, GLOBALS.PORTAL_SHADER[index].scale)
+        }
 
-        portalShader.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
-        portalShader.applyMatrix4(this.transform)
-        portalShader.updateMatrix()
-        portalShader.matrixAutoUpdate = true;
-        //portalShader.scale.x *= 0.5;
-        this.portalShader = portalShader;
-        this.portalShader.frustumCulled = false;
-        this.add(portalShader)
-
-
+        GLOBALS.PORTAL_SHADER[index].applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
+        GLOBALS.PORTAL_SHADER[index].applyMatrix4(this.transform)
+        GLOBALS.PORTAL_SHADER[index].updateMatrix()
+        GLOBALS.PORTAL_SHADER[index].matrixAutoUpdate = true;
+        this.portalShader = GLOBALS.PORTAL_SHADER[index];
+        this.portalShader.frustumCulled = true;
+        this.add(GLOBALS.PORTAL_SHADER[index])
 
         // constructing the portal borders
         const ringGeometry = new THREE.PlaneGeometry(GLOBALS.PORTAL_WIDTH + 2 * GLOBALS.PORTAL_RING_THICKNESS, GLOBALS.PORTAL_DEPTH + 2 * GLOBALS.PORTAL_RING_THICKNESS);
@@ -168,9 +163,7 @@ class Portal extends Group {
         //this.translateZ(1)
 
         //var dir = new THREE.Vector3();
-        //console.log(dir)
         //dir.subVectors(GLOBALS.MAIN_CAMERA.position, this.portalShader.getWorldPosition(dir)).normalize();
-        //console.log(dir)
         //this.portalShader.translateOnAxis(dir, 2);
 
         // CDBB: collision disable BB
@@ -220,12 +213,8 @@ function teleportPhysicalObject(object, portal) {
     velocity = getTeleportedDirectionalVector(velocity, portal)
     force = getTeleportedDirectionalVector(force, portal)
 
-    /*console.log("---------------------------")
-    console.log(velocity)
-    console.log(force)
-    console.log(orientation)
 
-    velocity.x = 0;
+    /*velocity.x = 0;
     velocity.z = 0;*/
 
     object.position.copy(position)

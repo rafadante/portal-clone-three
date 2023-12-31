@@ -5,50 +5,23 @@ import {
 
 function loadMaterials() {
     //MATERIAL FLOOR NON PORTAL
-    window.materialFloorNonPortal = new THREE.MeshPhysicalMaterial();
-    loadMaterial(window.materialFloorNonPortal, 'floor/nonPortalable/1/base.jpg',
+    GLOBALS.MATERIAL_FLOOR_NON_PORTAL = new THREE.MeshPhysicalMaterial();
+    loadMaterial(GLOBALS.MATERIAL_FLOOR_NON_PORTAL, 'floor/nonPortalable/1/base.jpg',
         'floor/nonPortalable/1/normal.jpg', null, 'floor/nonPortalable/1/roughness.jpg', null, 1);
 
     //MATERIAL FLOOR PORTAL
-    window.materialFloorPortal = window.materialFloorNonPortal.clone();
-    loadMaterial(window.materialFloorPortal, 'floor/portalable/1/base.jpg', null, null, null, null, 1);
+    GLOBALS.MATERIAL_FLOOR_PORTAL = GLOBALS.MATERIAL_FLOOR_NON_PORTAL.clone();
+    loadMaterial(GLOBALS.MATERIAL_FLOOR_PORTAL, 'floor/portalable/1/base.jpg', null, null, null, null, 1);
 
     //MATERIAL WALL PORTAL
-    window.materialWallPortal = new THREE.MeshPhysicalMaterial();
-    loadMaterial(window.materialWallPortal, 'wall/portalable/1/base.jpg', 'wall/portalable/1/normal.jpg',
+    GLOBALS.MATERIAL_WALL_PORTAL = new THREE.MeshPhysicalMaterial();
+    loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL, 'wall/portalable/1/base.jpg', 'wall/portalable/1/normal.jpg',
         null, 'wall/portalable/1/roughness.jpg', null, 1);
 
-    //MATERIAL WALL PORTAL 2
-    window.materialWallPortal2 = new THREE.MeshPhysicalMaterial();
-    loadMaterial(window.materialWallPortal2, 'wall/portalable/2/base.jpg', 'wall/portalable/2/normal.jpg',
-        'wall/portalable/2/ao.jpg', 'wall/portalable/2/roughness.jpg', null, 1);
-    /*loadMaterial(window.materialWallPortal2, null, 'wall/portalable/2/normal.jpg',
-        null, null, null, 0.35, true);*/
-
-    //MATERIAL WALL PORTAL 3
-    window.materialWallPortal3 = new THREE.MeshPhysicalMaterial();
-    loadMaterial(window.materialWallPortal3, 'wall/portalable/3/base.jpg', 'wall/portalable/3/normal.jpg',
-        null, 'wall/portalable/3/roughness.jpg', null, 1);
-
-    //MATERIAL NON WALL PORTAL
-    window.materialWallNonPortal = window.materialWallPortal.clone();
-    loadMaterial(window.materialWallNonPortal, 'wall/nonPortalable/1/base.jpg', null,
+    //MATERIAL WALL NON PORTAL
+    GLOBALS.MATERIAL_WALL_NON_PORTAL = GLOBALS.MATERIAL_WALL_PORTAL.clone();
+    loadMaterial(GLOBALS.MATERIAL_WALL_NON_PORTAL, 'wall/nonPortalable/1/base.jpg', null,
         null, null, null, 1);
-
-    //MATERIAL NON WALL PORTAL 2
-    window.materialWallNonPortal2 = new THREE.MeshPhysicalMaterial();
-    loadMaterial(window.materialWallNonPortal2, 'wall/nonPortalable/2/base.jpg',
-        'wall/nonPortalable/2/normal.jpg', null, null, 'wall/nonPortalable/2/metal.jpg', 0.5);
-
-    //MATERIAL NON WALL PORTAL 3
-    window.materialWallNonPortal3 = new THREE.MeshPhysicalMaterial();
-    loadMaterial(window.materialWallNonPortal3, 'wall/nonPortalable/3/base.jpg',
-        'wall/nonPortalable/3/normal.jpg', null, null, 'wall/nonPortalable/3/metal.jpg', 0.5);
-
-
-    window.materialUpPortal = window.materialFloorPortal.clone();
-
-    window.materialUpNonPortal = window.materialFloorNonPortal.clone();
 }
 
 function loadMaterial(material, base, normal, ao, rough, metal, roughValue) {
@@ -112,14 +85,14 @@ GLOBALS.INK_MATERIAL = new THREE.MeshStandardMaterial({
 });
 
 //
-var texture = new THREE.TextureLoader().load("./assets/models/tilePortal.jpg");
+var texture = new THREE.TextureLoader().load("./assets/textures/tilePortal.jpg");
 texture.encoding = THREE.sRGBEncoding;
 GLOBALS.MATERIAL_PORTAL_EDITOR = new THREE.MeshStandardMaterial({
     map: texture,
     transparent: true
 })
 //
-var texture = new THREE.TextureLoader().load("./assets/models/tileNonPortal.jpg");
+var texture = new THREE.TextureLoader().load("./assets/textures/tileNonPortal.jpg");
 texture.encoding = THREE.sRGBEncoding;
 GLOBALS.MATERIAL_NON_PORTAL_EDITOR = new THREE.MeshStandardMaterial({
     map: texture,

@@ -73,11 +73,11 @@ $('#resolution-select').on('change', function () {
 
 //SHADOW RESOLUTION
 $('#shadows-resolution-select').on('change', function () {
-    window.spotLight.shadow.mapSize.width = $(this).val();
-    window.spotLight.shadow.mapSize.height = $(this).val();
+    GLOBALS.SPOTLIGHT.shadow.mapSize.width = $(this).val();
+    GLOBALS.SPOTLIGHT.shadow.mapSize.height = $(this).val();
 
-    window.spotLight.shadow.map.dispose(); // important
-    window.spotLight.shadow.map = null;
+    GLOBALS.SPOTLIGHT.shadow.map.dispose(); // important
+    GLOBALS.SPOTLIGHT.shadow.map = null;
 });
 
 //FOV
@@ -93,14 +93,7 @@ $('#mouse-val-range').on('input', function () {
 
     if (!GLOBALS.MOBILE)
         GLOBALS.POINTER_CONTROLS.pointerSpeed = $(this).val();
-    //else
-    //    window.rotationMobile = $(this).val() * 0.1;
 });
-
-//GYRO
-$("body").on('input', '#gyro-input', function () {
-    window.gyro = !this.checked;
-})
 
 //BUTTON OPACITY
 $("body").on('input', '#opacity-val-range', function () {

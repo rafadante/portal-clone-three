@@ -60,9 +60,6 @@ function raycastSelected(found, event, type) {
         GLOBALS.SELECTED_ID_ORANGE = [];
 
         if (GLOBALS.SELECTED_ID.length == 0) {
-           // console.log(GLOBALS.PLANE_USER_DATA)
-            //console.log(instanceId)
-           // console.log(GLOBALS.PLANE_USER_DATA[instanceId])
             initialPosition = GLOBALS.PLANE_USER_DATA[instanceId].position;
             GLOBALS.SELECTED_ID.push(instanceId);
             GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.PLANE_USER_DATA[instanceId].id_instanced, orange);
@@ -119,8 +116,6 @@ function raycastSelected(found, event, type) {
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
     }
 
-    //console.log(GLOBALS.PLANE_USER_DATA[instanceId])
-
     if (event.button == 2) {
         if (GLOBALS.PLANE_USER_DATA[instanceId].itemName != "exitDoor" &&
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "enterDoor" &&
@@ -169,8 +164,6 @@ $("body").on('click', '#rotate-item', function () {
 
         var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("door");
 
-        console.log(instanced)
-
         var dummy = new THREE.Object3D();
         dummy.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.position);
         dummy.rotation.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation);
@@ -186,12 +179,8 @@ $("body").on('click', '#rotate-item', function () {
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation.copy(dummy.rotation);
     }*/
 
-    console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]])
-    console.log(GLOBALS.ITEMS_ADDED)
-
     var door = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName);
     door.rotation.y += Math.PI / 2;
-    console.log(door)
 });
 
 $("body").on('click', '#delete', function () {

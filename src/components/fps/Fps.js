@@ -5,9 +5,6 @@ import {
 import $ from 'jquery';
 import * as CANNON from 'cannon';
 import nipplejs from 'nipplejs';
-/*import {
-    DeviceOrientationControls
-} from 'three/addons/controls/DeviceOrientationControls.js';*/
 import {
     KeyQ,
     KeyZ
@@ -81,7 +78,7 @@ slipperyMaterial.friction = 0.00;
 
 //WINDOW VARIABLES
 
-window.rotationMobile = 0.1;
+var rotationMobile = 0.1;
 
 // MOBILE VARIABLES
 
@@ -92,9 +89,7 @@ let lftValue = 0;
 
 if (GLOBALS.MOBILE) {
     //var controlsDevice = new DeviceOrientationControls(GLOBALS.MAIN_CAMERA);
-    window.targetRotationX = 0;
     var targetRotationOnMouseDownX = 0;
-    window.targetRotationY = 0;
     var targetRotationOnMouseDownY = 0;
     var mouseX = 0;
     var mouseXOnMouseDown = 0;
@@ -123,10 +118,10 @@ if (GLOBALS.MOBILE) {
 
             if (touches == 0 || touches == 1) {
                 mouseXOnMouseDown = event.touches[touches].pageX - windowHalfX;
-                targetRotationOnMouseDownX = window.targetRotationX;
+                targetRotationOnMouseDownX = GLOBALS.TARGET_ROTATION_X;
 
                 mouseYOnMouseDown = event.touches[touches].pageY - windowHalfY;
-                targetRotationOnMouseDownY = window.targetRotationY;
+                targetRotationOnMouseDownY = GLOBALS.TARGET_ROTATION_Y;
             }
         }
     }
@@ -134,7 +129,7 @@ if (GLOBALS.MOBILE) {
     function onDocumentTouchMove(event) {
         if (event.touches.length > 0 && (touches == 0 || touches == 1)) {
             mouseX = event.touches[touches].pageX - windowHalfX;
-            window.targetRotationX = targetRotationOnMouseDownX + (mouseX - mouseXOnMouseDown) * (-0.01); //camera speed
+            GLOBALS.TARGET_ROTATION_X = targetRotationOnMouseDownX + (mouseX - mouseXOnMouseDown) * (-0.01); //camera speed
 
             mouseY = event.touches[touches].pageY - windowHalfY;
             deltaX2 = event.touches[touches].pageY - touchX2;
@@ -142,10 +137,10 @@ if (GLOBALS.MOBILE) {
 
             if (deltaX2 > 0) {
                 if (!blocked_bottom)
-                    window.targetRotationY = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * (-0.01);
+                    GLOBALS.TARGET_ROTATION_Y = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * (-0.01);
             } else {
                 if (!blocked_top)
-                    window.targetRotationY = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * (-0.01);
+                    GLOBALS.TARGET_ROTATION_Y = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * (-0.01);
             }
         }
     }
@@ -563,12 +558,12 @@ const updatePlayer = function (deltaTime) {
     //ROTATE THE CAMERA WITH TOUCH ON MOBILE
     if (GLOBALS.MOBILE) {
         velocity = 900;
-        GLOBALS.MAIN_CAMERA.rotation.y += (window.targetRotationX - GLOBALS.MAIN_CAMERA.rotation.y) * window.rotationMobile;
+        GLOBALS.MAIN_CAMERA.rotation.y += (GLOBALS.TARGET_ROTATION_X - GLOBALS.MAIN_CAMERA.rotation.y) * rotationMobile;
 
         //vertical rotation 
-        finalRotationY = (window.targetRotationY - GLOBALS.MAIN_CAMERA.rotation.x);
+        finalRotationY = (GLOBALS.TARGET_ROTATION_Y - GLOBALS.MAIN_CAMERA.rotation.x);
         if (GLOBALS.MAIN_CAMERA.rotation.x <= 1 && GLOBALS.MAIN_CAMERA.rotation.x >= -1)
-            GLOBALS.MAIN_CAMERA.rotation.x += finalRotationY * window.rotationMobile;
+            GLOBALS.MAIN_CAMERA.rotation.x += finalRotationY * rotationMobile;
 
         if (GLOBALS.MAIN_CAMERA.rotation.x > 1) {
             blocked_top = true;
@@ -581,11 +576,6 @@ const updatePlayer = function (deltaTime) {
             GLOBALS.MAIN_CAMERA.rotation.x = -1
         } else
             blocked_bottom = false;
-
-        if (window.gyro) {
-            //controlsDevice.update();
-            GLOBALS.MAIN_CAMERA.rotation.z = 0
-        }
     }
 
     // gives a bit of air control
@@ -710,7 +700,7 @@ const updatePlayer = function (deltaTime) {
 
             var posPlayer = new THREE.Vector3(GLOBALS.PLAYER.position.x, GLOBALS.PLAYER.position.y, GLOBALS.PLAYER.position.z)
 
-            if (controller["KeyW"].pressed && !window.COL_Z)
+            if (controller["KeyW"].pressed)
                 movePlayerKeyboard(forward, posPlayer, f, movementMultiplier)
             if (controller["KeyS"].pressed)
                 movePlayerKeyboard(backward, posPlayer, f, movementMultiplier)
@@ -757,7 +747,7 @@ const updatePlayer = function (deltaTime) {
     updateHeadBob(deltaTime);
 
     if (GLOBALS.MAIN_CAMERA.position.distanceTo(new THREE.Vector3(0, 0, 0)) > 100) {
-        var obj = GLOBALS.GLOBALS.ENTER_DOOR.clone();
+        var obj = GLOBALS.ENTER_DOOR.clone();
         obj.translateZ(1);
         GLOBALS.PLAYER.position.copy(obj.position);
     }
@@ -842,8 +832,8 @@ function elevator() {
     elevatorCollider();
 
     setTimeout(() => {
-        tweenCamera(1000, window.elevator_left.rotation, new THREE.Vector3(0, 0, 0))
-        tweenCamera(1000, window.elevator_right.rotation, new THREE.Vector3(0, 0, 0))
+        tweenCamera(1000, GLOBALS.ELEVATOR_DOOR_LEFT.rotation, new THREE.Vector3(0, 0, 0))
+        tweenCamera(1000, GLOBALS.ELEVATOR_DOOR_RIGHT.rotation, new THREE.Vector3(0, 0, 0))
 
         setTimeout(() => {
             $("#loading-parent").css("opacity", 1);

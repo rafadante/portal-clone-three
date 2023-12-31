@@ -301,7 +301,6 @@ $("body").on('click', '#save-level', function () {
         }
 
         if (GLOBALS.PLANE_USER_DATA[i].trigger) {
-            console.log(GLOBALS.PLANE_USER_DATA[i]);
             var obj = new THREE.Object3D();
             obj.position.copy(GLOBALS.PLANE_USER_DATA[i].trigger.position);
             obj.rotation.copy(GLOBALS.PLANE_USER_DATA[i].trigger.rotation);
@@ -423,7 +422,6 @@ $("body").on('click', '#portalable', function () {
 
     if (GLOBALS.SELECTED_ID.length > 0) {
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].portal = !GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].portal;
-        console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].portal);
 
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
             GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].portal;

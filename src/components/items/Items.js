@@ -1,18 +1,9 @@
 import * as THREE from 'three';
 import $ from 'jquery';
 import {
-    MeshLineGeometry,
-    MeshLineMaterial,
-    raycast
-} from 'meshline';
-import {
     AddGoo
 } from '../goo/Goo.js';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
-import {
-    Pathfinding,
-    PathfindingHelper,
-} from 'three-pathfinding';
 import {
     animate
 } from '../../Main.js';
@@ -22,11 +13,14 @@ import {
 import {
     GLOBALS
 } from '../../Globals.js';
+import { removeJointConstraint } from '../../Physics.js';
+
+var beamType;
 
 $("body").on('pointerdown', '.item', function (event) {
     event.preventDefault();
     GLOBALS.ITEM_HOLDED_NAME = $(this).data("name");
-    window.BEAM_TYPE = $(this).data("beam");
+    beamType = $(this).data("beam");
     $("#follow").attr("src", $(this).attr("src"));
 });
 
@@ -36,7 +30,6 @@ $("body").on('pointerdown', '.dispenser-once', function (event) {
     var i = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]];
     i.trigger.item.item.state = "once";
     i.state = "once";
-    console.log(i);
 
 });
 
@@ -44,7 +37,6 @@ $("body").on('pointerdown', '.dispenser-always', function (event) {
     var i = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]];
     i.trigger.item.item.state = "always";
     i.state = "always";
-    console.log(i);
 });
 
 function itemUpdate() { //found, event, type
@@ -58,7 +50,6 @@ function itemUpdate() { //found, event, type
         checkCollision(target, new THREE.Vector3(0, 0, -1), "z");
 
         if (none == 1) {
-            window.COL_Z = false;
             GLOBALS.MAIN_CAMERA.getObjectByName("cubeHolder").position.z = -1;
         }
     }
@@ -83,9 +74,6 @@ const materialLine = new THREE.LineBasicMaterial({
     color: 0xff0000,
     linewidth: 2
 });
-
-window.lines = [];
-window.checks = [];
 
 function addItem(found, loaded) {
 
@@ -119,12 +107,9 @@ function addItem(found, loaded) {
 
         if (loaded) {
             userData = found;
-            console.log(GLOBALS.ITEM_HOLDED_NAME)
         } else {
             userData = GLOBALS.PLANE_USER_DATA[found[i].instanceId];
         }
-
-        //console.log(userData)
 
         if (!userData.hasItem || loaded) {
 
@@ -241,7 +226,7 @@ function addItem(found, loaded) {
                 }
 
 
-                window.TRIGGER.push(bb);
+                GLOBALS.TRIGGER.push(bb);
             }
 
             if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
@@ -294,7 +279,7 @@ function addItem(found, loaded) {
                 item.position.y += 1;
 
             if (GLOBALS.ITEM_HOLDED_NAME == "tractor_beam")
-                item.beam = window.BEAM_TYPE;
+                item.beam = beamType;
 
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
                 GLOBALS.ITEMS_ADDED.add(item);
@@ -323,7 +308,7 @@ function addItem(found, loaded) {
                 GLOBALS.ITEMS_ADDED.add(item);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
                 GLOBALS.ITEMS_ADDED.add(item);
-                window.DOORS.push(item)
+                GLOBALS.DOORS.push(item)
             } else {
                 var idInstanced;
 
@@ -383,8 +368,6 @@ function addItem(found, loaded) {
     }
 }
 
-window.TRIGGER = [];
-
 function findPath(ini, target, found) {
 
     var nodes = [];
@@ -402,9 +385,6 @@ function findPath(ini, target, found) {
     GLOBALS.SCENE.add(plane);
 
     var side = true;
-
-    console.log(found.instanceId)
-    console.log(GLOBALS.PLANE_USER_DATA[found.instanceId])
 
     if (GLOBALS.PLANE_USER_DATA[found.instanceId].side == "up") {
         plane.rotation.x = Math.PI / 2;
@@ -428,7 +408,6 @@ function findPath(ini, target, found) {
     count = 0;
 
     GLOBALS.SELECTED_FOR_CONNECTION.check = plane;
-    window.checks.push(plane);
 
     for (var j = 0; j < GLOBALS.PLANE_USER_DATA.length; j++) {
         if (GLOBALS.PLANE_USER_DATA[j].exists) {
@@ -570,8 +549,6 @@ function path2(dgraph, start, end, side) {
         let currentDistance = 0;
 
         for (let j = 0; j < pathPoints.length - 1; j++) {
-            //console.log(pathPoints[j])
-            //console.log(pathPoints[j + 1])
 
 
             const segmentLength = pathPoints[j].distanceTo(pathPoints[j + 1]);
@@ -614,7 +591,6 @@ function path2(dgraph, start, end, side) {
     var circlePAth = new THREE.Mesh(mergedGeometry, circleMaterial);
 
     GLOBALS.SCENE.add(circlePAth);
-    window.lines.push(circlePAth);
     GLOBALS.SELECTED_FOR_CONNECTION.circle = circlePAth;
 }
 
@@ -756,8 +732,10 @@ function interactWithItem() {
     var intersects = raycaster2.intersectObjects(GLOBALS.INTERACTIVE);
 
     if (GLOBALS.HOLDING_ITEM) {
+
         GLOBALS.HOLDING_ITEM = false;
 
+        /*
         // Position
         itemHolder.position.setZero();
         itemHolder.previousPosition.setZero();
@@ -783,21 +761,22 @@ function interactWithItem() {
         itemHolder.quaternion.copy(GLOBALS.CURRENT_ITEM.quaternion);
 
         GLOBALS.PLAYER.velocity.set(0, 0, 0);
-        GLOBALS.PLAYER.angularVelocity.set(0, 0, 0);
+        GLOBALS.PLAYER.angularVelocity.set(0, 0, 0);*/
 
         itemHolder.gelJumping = false;
 
         itemHolder.sleeping = false;
         itemHolder.recall = false;
-        window.recalling = false;
+        GLOBALS.RECALLING = false;
 
-        GLOBALS.CANNON_WORLD.addBody(itemHolder);
-
+        //GLOBALS.CANNON_WORLD.addBody(itemHolder);
+        GLOBALS.CURRENT_ITEM.body.angularDamping = 0;
         GLOBALS.CURRENT_ITEM = null;
         GLOBALS.CURRENT_ITEM_ID = null;
         itemHolder = null;
-        window.COL_Z = false;
-        GLOBALS.MAIN_CAMERA.getObjectByName("cubeHolder").position.z = -1;
+        //GLOBALS.MAIN_CAMERA.getObjectByName("cubeHolder").position.z = -1;
+
+        removeJointConstraint();
     } else if (intersects.length > 0) {
 
         if (intersects[0].object.name == "pedestal_button") {
@@ -805,7 +784,6 @@ function interactWithItem() {
             if (intersects[0].distance < 1) {
                 var item = GLOBALS.DYMANIC_ITEMS[intersects[0].object.name][intersects[0].instanceId];
                 var goal = GLOBALS.PLANE_USER_DATA[item.planeInstancedId];
-                console.log(goal);
 
                 if (goal.trigger.itemName.includes("exitDoor")) {
 
@@ -834,9 +812,9 @@ function interactWithItem() {
                 GLOBALS.CURRENT_ITEM_ID = instancedId;
 
                 itemHolder = GLOBALS.DYMANIC_ITEMS[name][instancedId].body;
-                GLOBALS.CANNON_WORLD.removeBody(GLOBALS.DYMANIC_ITEMS[name][instancedId].body);
+                //GLOBALS.CANNON_WORLD.removeBody(GLOBALS.DYMANIC_ITEMS[name][instancedId].body);
+                GLOBALS.CURRENT_ITEM.body.angularDamping = 1;
 
-                console.log(GLOBALS.DYMANIC_ITEMS[name][instancedId].body)
                 if (GLOBALS.DYMANIC_ITEMS[name][instancedId].body.placed) {
                     revert(GLOBALS.DYMANIC_ITEMS[name][instancedId].body)
                 }
@@ -850,7 +828,6 @@ function interactWithItem() {
 }
 
 function revert(d) {
-    console.log("ppppppppppppppp")
     var goal = d.goal;
     goal.circle.material.color = new THREE.Color(0x03e8fc);
     goal.check.material.color = new THREE.Color(0x03e8fc);
@@ -862,7 +839,6 @@ function revert(d) {
     }, 5000);
 
     if (goal.trigger.itemName.includes("door")) {
-        console.log("55555555555555")
         const doorLeft = goal.trigger.item.getObjectByName("door_left");
         const doorRight = goal.trigger.item.getObjectByName("door_right");
 
@@ -915,7 +891,6 @@ var Graph = (function (undefined) {
 
     var findPaths = function (map, start, end, infinity) {
         infinity = infinity || Infinity;
-        console.log(this)
         this.start = start;
         this.end = end;
 

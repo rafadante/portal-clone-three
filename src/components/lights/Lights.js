@@ -37,7 +37,7 @@ const Lights = function (THREE) {
     //spotLight.shadow.bias = -0.1;//-0.0001
     spotLight.shadow.bias = 0;//-0.0009//-0.02
 
-    window.spotLight = spotLight;
+    GLOBALS.SPOTLIGHT = spotLight;
 
     lightGroup.add(spotLight);
 

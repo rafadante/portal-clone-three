@@ -32,7 +32,7 @@ camera.position.set(0, 0, 30);
 
 //POINT OF OBJECTS WHILE HOLDING WITH THE GUN
 const cubeHolder = new THREE.Object3D()
-cubeHolder.position.z = -1;
+cubeHolder.position.z = -1.25;
 cubeHolder.name = "cubeHolder";
 camera.add(cubeHolder);
 
@@ -86,6 +86,7 @@ var GLOBALS = {
     ALLOW_PLACE_PORTALS: true,
     GEL_ORANGE: false,
     LOADED_LEVEL: false,
+    RECALLING: false,
 
     //GROUPS
     ITEMS_ADDED: new THREE.Group(),
@@ -96,7 +97,7 @@ var GLOBALS = {
     //LEVEL EDITOR
     PLANE_USER_DATA: [],
     PLANE_LEVEL_INSTANCED: null,
-    BUDGET: 2000,
+    BUDGET: 2500,
 
     //PORTALS
     PORTALS: [null, null],
@@ -110,6 +111,7 @@ var GLOBALS = {
     PORTAL_CDBB_HEIGHT: 3,
     PORTAL_HEIGHT: 0.0,
     PORTAL_RING_THICKNESS: 0.3,
+    PORTAL_SHADER: [],
 
     /**********************************************************
      * PHYSICS
@@ -155,6 +157,7 @@ var GLOBALS = {
     PLAYER: null,
     BOX_BODY: [],
     SPHERE_BODY: [],
+    TRIGGER: [],
 
     //ITEMS
     DYMANIC_ITEMS: {
@@ -214,8 +217,20 @@ var GLOBALS = {
     EXIT_DOOR: null,
 
     LASER_EMITTER: [],
-    LASER_EMITTER_RAYCASTER: [],
+    LASER_EMITTER_OBJ: [],
     LASER_EMITTER_LENGTH: 0,
+    LASER_EMITTER_BOUNDING_BOX: [],
+    LASER_EMITTER_RAYCASTER: [],
+    LASER_CUBE: null,
+
+    TRACTOR_BEAM: [],
+    TRACTOR_BEAM_BOUNDING_BOX: [],
+    TRACTOR_BEAM_RAYCASTER: [],
+    TRACTOR_BEAM_LENGTH: 0,
+
+    LIGHT_BRIDGE_RAYCASTER: [],
+    LIGHT_BRIDGE_CLONE: [],
+    LIGHT_BRIDGE_COLLIDER_CLONE: [],
 
     LIGHT_GROUP: null,
     INTERVAL: 1 / 60,
@@ -242,10 +257,46 @@ var GLOBALS = {
     FAITH_PLATE_CONTACT_BOX: [],
 
     UNIFORMS_GEL: null,
+    UNIFORMS_LIGHT_BRIDGE: null,
+    UNIFORMS_TRACTOR_BEAM: null,
+    UNIFORMS_PORTAL_GUN_ENERGY: null,
 
     LIGHTNIN_STRIKE_1: null,
     LIGHTNIN_STRIKE_2: null,
     LIGHTNIN_STRIKE_3: null,
+
+    TARGET_ROTATION_X: 0,
+    TARGET_ROTATION_y: 0,
+
+    EXIT_ROOM: null,
+    EXIT_ROOM_COLLIDERS: [],
+
+    SPOTLIGHT: null,
+
+    DOORS: [],
+
+    MATERIAL_FLOOR_PORTAL: null,
+    MATERIAL_FLOOR_NON_PORTAL: null,
+    MATERIAL_WALL_PORTAL: null,
+    MATERIAL_WALL_NON_PORTAL: null,
+    MATERIAL_GUN: null,
+    MATERIAL_EXIT_ROOM: null,
+    MATERIAL_MAIN_MENU: null,
+    MATERIAL_SUB_MENU: null,
+    TEXTURE_MENU_GRID: null,
+
+    MATERIAL_TRACTOR_BEAM: null,
+    MATERIAL_LIGHT_BRIDGERS: null,
+
+    ELEVATOR: null,
+    ELEVATOR_DOOR_LEFT: null,
+    ELEVATOR_DOOR_RIGHT: null,
+    ELEVATOR_TRIGGER: null,
+
+    WALL_CORRIDOR_ENTER: null,
+    WALL_CORRIDOR_BACK: null,
+
+    PLANE_EXIT_DOOR: null,
 }
 
 export {
