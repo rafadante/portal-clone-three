@@ -9,20 +9,22 @@ import {
     OrbitControls
 } from 'three/addons/controls/OrbitControls.js';
 
-var pixelRatio, shadowMap, portalsRecursive, fov, mobile;
+var pixelRatio, shadowMap, portalsRecursive, fov, mobile,antialias;
 
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     mobile = true;
-    pixelRatio = 0.4;
-    shadowMap = false;
+    pixelRatio = 0.5;
+    shadowMap = true;
     portalsRecursive = 1;
-    fov = 70;
+    fov = 60;
+    antialias = false;
 } else {
     mobile = false;
     pixelRatio = 1;
     shadowMap = true;
-    portalsRecursive = 1;
+    portalsRecursive = 5;
     fov = 60;
+    antialias = true;
 }
 
 //MAIN CAMERA
@@ -40,7 +42,7 @@ camera.add(cubeHolder);
 const renderer = new THREE.WebGLRenderer({
     alpha: true,
     powerPreference: "high-performance",
-    antialias: true,
+    antialias: antialias,
 });
 renderer.setPixelRatio(window.devicePixelRatio * pixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -49,14 +51,14 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;;
 renderer.toneMappingExposure = 0.6;
 renderer.shadowMap.enabled = shadowMap;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.shadowMap.needsUpdate = true;
+renderer.shadowMap.needsUpdate = false;
 renderer.localClippingEnabled = true;
 renderer.physicallyCorrectLights = true;
 renderer.domElement.id = "viewer-3d";
 //renderer.outputEncoding = THREE.sRGBEncoding;
 //renderer.setClearColor(0x3a3a3a, 1);
 //renderer.shadowMap.type = THREE.VSMShadowMap;
-//renderer.shadowMap.autoUpdate = false;
+renderer.shadowMap.autoUpdate = false;
 
 //CONTROLS
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -97,7 +99,7 @@ var GLOBALS = {
     //LEVEL EDITOR
     PLANE_USER_DATA: [],
     PLANE_LEVEL_INSTANCED: null,
-    BUDGET: 2500,
+    BUDGET: 3000,
 
     //PORTALS
     PORTALS: [null, null],
@@ -155,6 +157,10 @@ var GLOBALS = {
         restitution: 0.1
     }),
     PLAYER: null,
+    PLAYER_MODEL: null,
+    PLAYER_MODEL_CLONE: null,
+    PLAYER_ANIMATIONS: null,
+    MIXERS: null,
     BOX_BODY: [],
     SPHERE_BODY: [],
     TRIGGER: [],
@@ -206,6 +212,7 @@ var GLOBALS = {
     CURRENT_ITEM_ID: null,
 
     GUN: null,
+    GUN_CLONE: null,
     GUN_MODE: 1,
 
     ENV_MAP: null,
@@ -266,7 +273,7 @@ var GLOBALS = {
     LIGHTNIN_STRIKE_3: null,
 
     TARGET_ROTATION_X: 0,
-    TARGET_ROTATION_y: 0,
+    TARGET_ROTATION_Y: 0,
 
     EXIT_ROOM: null,
     EXIT_ROOM_COLLIDERS: [],

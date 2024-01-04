@@ -27,6 +27,7 @@ import {
 import {
     GLOBALS
 } from '../../Globals.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
 //
 let shouldJump = false;
@@ -230,7 +231,7 @@ function player() {
     GLOBALS.PLAYER.addShape(physicsShape);
     GLOBALS.PLAYER.position.set(5, 5, 5);
     GLOBALS.PLAYER.linearDamping = 0.9;
-    GLOBALS.PLAYER.name = "player"
+    GLOBALS.PLAYER.name = "player";
 
     // keep the player upright
     GLOBALS.PLAYER.angularDamping = 1
@@ -307,6 +308,10 @@ $("body").on('click', '#close', function () {
     //$("#mobile-controls").css("display", "none");
     $("#container").css("filter", "blur(2px)");
     //openFullscreen();
+})
+
+$("body").on('click', '#item', function () {
+    interactWithItem();
 })
 
 $("body").on('click', '#settings-close', function () {
@@ -550,6 +555,7 @@ function jumpTouch() {
 
 var vv = false;
 var up = new THREE.Vector3(0, 1, 0)
+var lastTimeStamp = 0;
 
 const updatePlayer = function (deltaTime) {
 
@@ -722,7 +728,7 @@ const updatePlayer = function (deltaTime) {
 
             if (shouldJump) {
                 GLOBALS.PLAYER.inJump = true
-                GLOBALS.PLAYER.applyImpulse(up.clone().multiplyScalar(f * 0.14), GLOBALS.PLAYER.position)
+                GLOBALS.PLAYER.applyImpulse(up.clone().multiplyScalar(f * 0.1), GLOBALS.PLAYER.position)
             }
         }
     }
@@ -751,9 +757,89 @@ const updatePlayer = function (deltaTime) {
         obj.translateZ(1);
         GLOBALS.PLAYER.position.copy(obj.position);
     }
+
+    // copy position and rotation so player model aligns with the physical body
+    if (GLOBALS.PLAYER_MODEL) {
+        GLOBALS.PLAYER_MODEL.position.copy(GLOBALS.PLAYER.position).add(new THREE.Vector3(0, -1, 0))
+        GLOBALS.PLAYER_MODEL.quaternion.copy(GLOBALS.PLAYER.quaternion)
+        GLOBALS.PLAYER_MODEL.quaternion.multiply(new THREE.Quaternion(0, 50, 0)).normalize()
+
+        GLOBALS.PLAYER_MODEL.position.y += 0.2;
+
+        GLOBALS.SCENE.remove(GLOBALS.PLAYER_MODEL_CLONE)
+        GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
+        GLOBALS.SCENE.add(GLOBALS.PLAYER_MODEL_CLONE)
+    }
+
+    // handle model movements
+    const timeElapsedS = (deltaTime - lastTimeStamp) * 0.001;
+    lastTimeStamp = deltaTime;
+    let action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
+    if (GLOBALS.PLAYER_MODEL.modelReady) {
+        if (GLOBALS.PLAYER.inJump) {
+            action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_JUMP
+        } else if (controller["KeyW"].pressed && controller["KeyD"].pressed && controller["KeyA"].pressed && controller["KeyS"].pressed) {
+            action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
+        } else if (controller["KeyW"].pressed && controller["KeyS"].pressed) {
+            action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
+            if (controller["KeyD"].pressed) {
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_RIGHT_STRAFE
+            } else if (controller["KeyA"].pressed) {
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_LEFT_STRAFE
+            }
+        } else if (controller["KeyA"].pressed && controller["KeyD"].pressed) {
+            action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
+            if (controller["KeyW"].pressed) {
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STATIONARY_RUNNING
+            } else if (controller["KeyS"].pressed) {
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_BACKWARD_RUNNING
+            }
+        } else {
+            if (controller["KeyW"].pressed) {
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STATIONARY_RUNNING
+            }
+            if (controller["KeyS"].pressed) {
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_BACKWARD_RUNNING
+            }
+            if (controller["KeyD"].pressed) {
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_RIGHT_STRAFE
+            }
+            if (controller["KeyA"].pressed) {
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_LEFT_STRAFE
+            }
+        }
+
+        setAction(action);
+
+        const delta = clock.getDelta();
+
+        GLOBALS.MIXERS.update(delta);
+
+    }
+}
+
+var activeAction, lastAction;
+const clock = new THREE.Clock();
+
+function setAction(action) {
+    if (action != activeAction) {
+        lastAction = activeAction;
+        activeAction = action;
+        let fadeDuration = 0.01
+        if (lastAction) {
+            fadeDuration = 0.8
+            lastAction.fadeOut(fadeDuration)
+        }
+        activeAction.reset()
+        activeAction.fadeIn(fadeDuration)
+        activeAction.play()
+    }
 }
 
 function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
+    //if (GLOBALS.PLAYER.launch)
+    //    return;
+
     moving = true;
     if (GLOBALS.PLAYER.mass == 0) {
         posPlayer.add(direction.clone().multiplyScalar(0.02));

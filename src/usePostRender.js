@@ -81,7 +81,7 @@ function ndcTriangle(mat) {
     geo.setAttribute('uv', new THREE.BufferAttribute(new Float32Array([0, 0, 2, 0, 0, 2]), 2));
 
     const mesh = new THREE.Mesh(geo, mat);
-    mesh.frustumCulled = false;
+    mesh.frustumCulled = true;
     return mesh;
 }
 

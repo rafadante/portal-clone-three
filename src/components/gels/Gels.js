@@ -21,7 +21,7 @@ function initGels() {
     instancedMeshGel = new THREE.InstancedMesh(geometryDecal.clone(), GLOBALS.INK_MATERIAL, 100);
     instancedMeshGel.castShadow = true;
     instancedMeshGel.receiveShadow = true;
-    instancedMeshGel.frustumCulled = false;
+    instancedMeshGel.frustumCulled = true;
     instancedMeshGel.name = "gel-parent";
     GLOBALS.SCENE.add(instancedMeshGel);
 

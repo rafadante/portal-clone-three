@@ -21,6 +21,7 @@ import {
     corridorColliderNames
 } from '../test/Test.js';
 
+
 var leveEntered = false;
 var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
@@ -328,16 +329,20 @@ function tractorBeam() {
 
         hh++;
 
+        if (d.holding)
+            continue
+
         for (var j = 0; j < GLOBALS.FAITH_PLATE_CONTACT_BOX.length; j++) {
 
             if (GLOBALS.FAITH_PLATE_CONTACT_BOX[j].containsPoint(pos)) {
 
                 if (!launch) {
                     launch = true;
+                    d.launch = true;
 
                     setTimeout(() => {
                         launch = false;
-                    }, 50);
+                    }, 150);
 
                     var ff = GLOBALS.FAITH_PLATE_TO_ROTATE[j];
 
@@ -352,6 +357,18 @@ function tractorBeam() {
                     //const impulse = new CANNON.Vec3(-strength * dt, 0, 0)
                     //d.applyImpulse(impulse)
 
+                    // Position
+                    //d.position.setZero();
+                    d.previousPosition.setZero();
+                    d.interpolatedPosition.setZero();
+                    d.initPosition.setZero();
+
+                    // orientation
+                    //d.quaternion.set(0, 0, 0, 1);
+                    //d.initQuaternion.set(0, 0, 0, 1);
+                    //d.previousQuaternion.set(0, 0, 0, 1);
+                    //d.interpolatedQuaternion.set(0, 0, 0, 1);
+
                     // Velocity
                     d.velocity.setZero();
                     d.initVelocity.setZero();
@@ -362,17 +379,45 @@ function tractorBeam() {
                     d.force.setZero();
                     d.torque.setZero();
 
+                    d.position.x = GLOBALS.FAITH_PLATE_CONTACT_BOX[j].position.x
+                    d.position.z = GLOBALS.FAITH_PLATE_CONTACT_BOX[j].position.z
+
+                    // d.linearDamping = 0.5
+                    //d.angularDamping = 0.5
+
                     var up;
                     var f;
 
-                    if (j == 1) {
-                        up = new THREE.Vector3(0, 1, -0.5);
+                    var up = new THREE.Vector3();
+                    GLOBALS.FAITH_PLATE_CONTACT_BOX[j].item.getWorldDirection(up);
+                    up.y = 1;
+                    up.x *= 0.55;
+                    up.z *= 0.55;
+                    console.log(up);
+
+                    if (d.name == "player")
+                        f = 52500;
+                    else {
+                        if (up.z == -0.55)
+                            f = 4325;
+                        else
+                            f = 4300;
+                    }
+
+                    if (up.x == -0.55) {
+                        //f = 70000;
+                        up.x = -1.2;
+                        up.y = 1.2;
+                    }
+
+                    /*if (j == 0 || j == 1) {
+                        up = new THREE.Vector3(0, 1, 0.5);
 
                         if (hh == 1)
                             f = 3500;
                         else
                             f = 280; //3500
-                    } else if (j == 0) {
+                    } else if (j == 1) {
 
 
                         up = new THREE.Vector3(0, 1, 0.5);
@@ -388,13 +433,42 @@ function tractorBeam() {
                             f = 3500 //2800;
                         else
                             f = 280; //3500 
-                    }
+                    }*/
 
+                    d.applyImpulse(up.clone().multiplyScalar(f * 1 / 60), d.position)
 
+                    const initialPosition = new CANNON.Vec3(-15, 0, 21);
 
-                    d.applyImpulse(up.clone().multiplyScalar(f * 0.25), d.position)
+                    // Set the desired final position
+                    const finalPosition = new CANNON.Vec3(-15, 0, -3);
 
-                    const impulse = up.clone().multiplyScalar(f * 0.25);
+                    // Set the desired maximum height
+                    const maxHeight = 2; // meters
+
+                    // Set the gravitational acceleration
+                    const gravity = new CANNON.Vec3(0, -9.8, 0);
+
+                    // Calculate the required initial velocity to reach the desired maximum height
+                    const initialVelocity = Math.sqrt(2 * maxHeight * gravity.length());
+
+                    console.log(2 * (finalPosition.z - initialPosition.z) / gravity.length())
+
+                    // Calculate the time of flight to reach the desired final position
+                    const timeToReachDestination = Math.sqrt(2 * Math.abs(finalPosition.z - initialPosition.z) / gravity.length());
+
+                    // Calculate the required constant force to achieve the desired initial velocity
+                    const requiredForce = new CANNON.Vec3();
+                    gravity.scale(d.mass, requiredForce);
+                    requiredForce.scale(initialVelocity / timeToReachDestination, requiredForce);
+
+                    console.log(initialVelocity);
+                    console.log(timeToReachDestination);
+                    console.log(requiredForce);
+
+                    // Apply the force to the body
+                    //d.applyImpulse(force, d.position);
+
+                    /*const impulse = up.clone().multiplyScalar(f * 0.25);
 
                     // Assuming sphereBody is your Cannon.js body
 
@@ -415,7 +489,7 @@ function tractorBeam() {
 
                     // Calculate final position
                     const finalPosition = new CANNON.Vec3();
-                    finalPosition.copy(initialPosition).vadd(displacement);
+                    finalPosition.copy(initialPosition).vadd(displacement);*/
                 }
             }
         }
@@ -571,6 +645,10 @@ function portalCollision() {
 
         var inArea = 0;
 
+        GLOBALS.PLAYER_MODEL_CLONE.visible = false;
+        GLOBALS.GUN_CLONE.visible = false;
+        let CDBB_isOverlap = false;
+
         for (let p = 0; p < GLOBALS.PORTALS.length; p++) {
 
             // collision disable, might be partially intersecting with portal
@@ -585,8 +663,30 @@ function portalCollision() {
                 d.collisionFilterMask &= ~GLOBALS.PORTALS[p].hostObjects.collisionFilterGroup;
                 d.inArea = true;
 
-                if (dd == 0)
+                if (dd == 0) {
                     inArea++;
+
+                    // show the clone
+                    if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
+                        CDBB_isOverlap = true;
+                        teleportObject3D(GLOBALS.PLAYER_MODEL_CLONE, GLOBALS.PORTALS[p])
+                        GLOBALS.PLAYER_MODEL_CLONE.visible = true;
+
+                        GLOBALS.PLAYER_MODEL_CLONE.traverse(c => {
+                            if (c.isBone) {
+                                if (c.name == "wrist_R") {
+                                    window.hand2 = c;
+                                    //console.log("1111111111111")
+                                    //window.hand2.add(GLOBALS.GUN_CLONE);
+                                }
+                            }
+                        })
+
+                        GLOBALS.GUN_CLONE.visible = true;
+                    }
+                }
+
+
             } else {
                 if ((d.name == "gel" || d.name == "gel-orange") && d.disabled) {
                     //d.position.y = d.posIni;
@@ -653,8 +753,10 @@ function levelEnteredFunction() {
 
                 setTimeout(() => {
                     GLOBALS.SPOTLIGHT.intensity = 20;
+                    GLOBALS.RENDERER.shadowMap.autoUpdate = true;
 
                     setTimeout(() => {
+                        GLOBALS.RENDERER.shadowMap.autoUpdate = false;
 
                         for (var i = 0; i < DISPENSER_COVERS.length; i++)
                             tweenCamera(300, DISPENSER_COVERS[i].scale, new THREE.Vector3(0, 0, 0))
@@ -664,11 +766,14 @@ function levelEnteredFunction() {
 
                             for (var i = 0; i < GLOBALS.BOX_BODY.length; i++) {
 
-                                if (GLOBALS.BOX_BODY[i].state == "open")
+                                if (GLOBALS.BOX_BODY[i].state == "open") {
                                     GLOBALS.BOX_BODY[i].mass = 5;
+                                    GLOBALS.BOX_BODY[i].allowSleep = true;
+                                }
                             }
                             for (var i = 0; i < GLOBALS.SPHERE_BODY.length; i++) {
                                 GLOBALS.SPHERE_BODY[i].mass = 5;
+                                GLOBALS.SPHERE_BODY[i].allowSleep = true;
                             }
 
                             setTimeout(() => {

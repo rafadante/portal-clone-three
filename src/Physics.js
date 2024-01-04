@@ -26,7 +26,7 @@ else
     world.solver = solver;
 
 world.gravity.set(0, -9.8, 0);
-world.allowSleep = false;
+world.allowSleep = true;
 world.broadphase = new CANNON.NaiveBroadphase();
 
 //PHYSICS INTERACTIONS
@@ -159,6 +159,9 @@ function moveMovementPlane(point, camera) {
 // Add a constraint between the cube and the jointBody
 // in the initeraction position
 function addJointConstraint(position, constrainedBody) {
+
+    //
+    constrainedBody.position.copy(position)
     // Vector that goes from the body to the clicked point
     const vector = new CANNON.Vec3().copy(position).vsub(constrainedBody.position)
 
@@ -168,6 +171,7 @@ function addJointConstraint(position, constrainedBody) {
 
     // Move the cannon click marker body to the click position
     jointBody.position.copy(position)
+    
 
     // Create a new constraint
     // The pivot for the jointBody is zero
@@ -175,6 +179,8 @@ function addJointConstraint(position, constrainedBody) {
 
     // Add the constraint to world
     world.addConstraint(jointConstraint)
+
+    console.log(jointConstraint)
 }
 
 // Remove constraint from world

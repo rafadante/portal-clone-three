@@ -3,12 +3,16 @@ import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
 import {
     GLOBALS
 } from '../../Globals.js';
+import {
+    Water
+} from '../../Water.js';
 
 var GOO = null;
+var water;
 
 const AddGoo = function (found, loading) {
 
-    if(GOO == null){
+    if (GOO == null) {
         GOO = new THREE.Group();
         GLOBALS.SCENE.add(GOO);
     }
@@ -109,7 +113,7 @@ const AddGoo = function (found, loading) {
         dummy.rotation.x = -Math.PI / 2;
 
         dummy.position.copy(goo[i]);
-        dummy.translateZ(1.8);
+        dummy.translateZ(1.79);
         dummy.updateMatrix();
 
         matrix.compose(dummy.position, dummy.quaternion, dummy.scale);
@@ -124,8 +128,39 @@ const AddGoo = function (found, loading) {
 
     const mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries);
 
-    var mesh = new THREE.Mesh(mergedGeometry, material);
+    // mergedGeometry.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI))
 
+    var mesh = new THREE.Mesh(mergedGeometry, new THREE.MeshBasicMaterial({
+        color: new THREE.Color(0x964B00)
+    })); //material
+
+    const waterGeometry = new THREE.PlaneGeometry(1000, 1000);
+
+    water = new Water(
+        waterGeometry, {
+            textureWidth: 512,
+            textureHeight: 512,
+            waterNormals: new THREE.TextureLoader().load('assets/textures/waternormals.jpg', function (texture) {
+
+                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+            }),
+            sunDirection: new THREE.Vector3(),
+            sunColor: 0xffffff,
+            waterColor: 0x001e0f,
+            distortionScale: 0.4,
+            alpha: 0.8
+        }
+    );
+
+    //water.updateMatrix();
+
+    water.rotation.x = -Math.PI / 2;
+    water.position.set(0, -0.2, 0)
+    water.material.transparent = true;
+    console.log(water)
+
+    GOO.add(water);
     GOO.add(mesh);
 
     var bb = new THREE.Box3(); // for re-use
@@ -259,7 +294,7 @@ vec2 rot(vec2 p, float a) {
 
 void mainImage(out vec4 o, in vec2 uv) {
     uv = vUv;
-    uv = vec2(.125, .75) + (uv - vec2(.125, .75)) * .03; // Adjust the offset
+    uv = vec2(.125, .75) + (uv - vec2(.125, .75)) * .01; // Adjust the offset
     float T = iTime * .25;
 
     vec3 c = clamp(1. - .7 * vec3(
@@ -277,10 +312,10 @@ void mainImage(out vec4 o, in vec2 uv) {
     float wp = 0.5 + (i + 1.) * (i + 1.5) * 0.001;
     float wb = .05 + i / N * 0.1;
     c.zx = rot(c.zx, 1.6 + T * 0.65 * wt + (uv.x + .7) * 23. * wp);
-    c.xy = rot(c.xy, c.z * c.x * wb + 1.7 + T * wt + (uv.y + 1.1) * 15. * wp);
-    c.yz = rot(c.yz, c.x * c.y * wb + 2.4 - T * 0.79 * wt + (uv.x + uv.y * (fract(i / 2.) - 0.25) * 4.) * 17. * wp);
-    c.zx = rot(c.zx, c.y * c.z * wb + 1.6 - T * 0.65 * wt + (uv.x + .7) * 23. * wp);
-    c.xy = rot(c.xy, c.z * c.x * wb + 1.7 - T * wt + (uv.y + 1.1) * 15. * wp);
+    //c.xy = rot(c.xy, c.z * c.x * wb + 1.7 + T * wt + (uv.y + 1.1) * 15. * wp);
+    //c.yz = rot(c.yz, c.x * c.y * wb + 2.4 - T * 0.79 * wt + (uv.x + uv.y * (fract(i / 2.) - 0.25) * 4.) * 17. * wp);
+    //c.zx = rot(c.zx, c.y * c.z * wb + 1.6 - T * 0.65 * wt + (uv.x + .7) * 23. * wp);
+    //c.xy = rot(c.xy, c.z * c.x * wb + 1.7 - T * wt + (uv.y + 1.1) * 15. * wp);
     float w = (1.5 - i / N);
     c0 += c * w;
     w0 += w;
@@ -329,18 +364,23 @@ const interval = 1 / 20;
 function renderGoo() {
     delta += clock2.getDelta();
 
-    if (delta > interval) {
+    /*if (delta > interval) {
         // The draw or time dependent code are here
         renderGoo2();
         delta = delta % interval;
-    }
+    }*/
+
+    renderGoo2();
 }
 
 function renderGoo2() {
     //const delta = 5 * clock.getDelta();
     //uniforms[ 'time' ].value += 0.2 * delta;
 
-    uniforms['iTime'].value += clock.getDelta();
+    //uniforms['iTime'].value += clock.getDelta();
+    if (water)
+        water.material.uniforms['time'].value += 0.0005;
+
 }
 
 export {

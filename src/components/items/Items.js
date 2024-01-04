@@ -13,7 +13,9 @@ import {
 import {
     GLOBALS
 } from '../../Globals.js';
-import { removeJointConstraint } from '../../Physics.js';
+import {
+    removeJointConstraint
+} from '../../Physics.js';
 
 var beamType;
 
@@ -109,6 +111,7 @@ function addItem(found, loaded) {
             userData = found;
         } else {
             userData = GLOBALS.PLANE_USER_DATA[found[i].instanceId];
+            userData.hasItem = false; //delete here
         }
 
         if (!userData.hasItem || loaded) {
@@ -154,7 +157,14 @@ function addItem(found, loaded) {
 
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
                 var target = new THREE.Vector3(); // create once an reuse it
-                found[i].object.getWorldPosition(target);
+
+                console.log(found)
+
+                if (loaded)
+                    target = found.position;
+                else
+                    found[i].object.getWorldPosition(target);
+
                 item.position.copy(target);
             } else {
                 item.position.copy(userData.position);
@@ -289,12 +299,18 @@ function addItem(found, loaded) {
                 var bb = new THREE.Box3(); // for re-use
                 bb.setFromObject(item);
                 bb.side = 1;
+                bb.position = item.position;
+                bb.item = item;
+                //bb.max.x += 0.3;
+                //bb.max.z += 0.3;
 
-                if (GLOBALS.FAITH_PLATE_CONTACT_BOX.length == 1) {
+                //item.rotation.y = Math.PI;
+
+                /*if (GLOBALS.FAITH_PLATE_CONTACT_BOX.length == 0) {
                     item.rotation.y = Math.PI;
                 } else if (GLOBALS.FAITH_PLATE_CONTACT_BOX.length == 2) {
                     item.rotation.y = Math.PI / 2;
-                }
+                }*/
 
                 GLOBALS.FAITH_PLATE_CONTACT_BOX.push(bb);
 
@@ -356,6 +372,7 @@ function addItem(found, loaded) {
 
             itemCount++;
             //break;
+
         }
 
     }
@@ -770,7 +787,9 @@ function interactWithItem() {
         GLOBALS.RECALLING = false;
 
         //GLOBALS.CANNON_WORLD.addBody(itemHolder);
+        GLOBALS.CURRENT_ITEM.body.holding = false;
         GLOBALS.CURRENT_ITEM.body.angularDamping = 0;
+        GLOBALS.CURRENT_ITEM.body.allowSleep = true;
         GLOBALS.CURRENT_ITEM = null;
         GLOBALS.CURRENT_ITEM_ID = null;
         itemHolder = null;
@@ -814,6 +833,9 @@ function interactWithItem() {
                 itemHolder = GLOBALS.DYMANIC_ITEMS[name][instancedId].body;
                 //GLOBALS.CANNON_WORLD.removeBody(GLOBALS.DYMANIC_ITEMS[name][instancedId].body);
                 GLOBALS.CURRENT_ITEM.body.angularDamping = 1;
+                GLOBALS.CURRENT_ITEM.body.allowSleep = false;
+                GLOBALS.CURRENT_ITEM.body.holding = true;
+                //GLOBALS.CURRENT_ITEM.body.quaternion.setZero();
 
                 if (GLOBALS.DYMANIC_ITEMS[name][instancedId].body.placed) {
                     revert(GLOBALS.DYMANIC_ITEMS[name][instancedId].body)

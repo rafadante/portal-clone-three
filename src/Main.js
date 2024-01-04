@@ -277,6 +277,8 @@ let deltaPortal = 0;
 
 function animate(time) {
 
+    $("#drawcalls").text("DRAWCALLS: " + GLOBALS.RENDERER.info.render.calls);
+
     if (GLOBALS.FPS_MODE) {
         requestAnimationFrame(animate);
     }
@@ -376,8 +378,17 @@ var renderRecursive = true;
 
 function animatePortal() {
 
-    const currentShadowAutoUpdate = GLOBALS.RENDERER.shadowMap.autoUpdate;
-    GLOBALS.RENDERER.shadowMap.autoUpdate = false;
+    // only show player model when rendering portals
+    // don't show the clone model when rendering portals
+    let cloneVisible = false
+    if (GLOBALS.PLAYER && GLOBALS.PLAYER_MODEL) {
+        GLOBALS.PLAYER_MODEL.visible = true
+        cloneVisible = GLOBALS.PLAYER_MODEL_CLONE.visible
+        GLOBALS.PLAYER_MODEL_CLONE.visible = false;
+    }
+
+    //const currentShadowAutoUpdate = GLOBALS.RENDERER.shadowMap.autoUpdate;
+    //GLOBALS.RENDERER.shadowMap.autoUpdate = false;
     currentRenderTarget = GLOBALS.RENDERER.getRenderTarget();
     GLOBALS.RENDERER.xr.enabled = false;
 
@@ -386,22 +397,46 @@ function animatePortal() {
     // times when it is going to be viewed by the portal
     GLOBALS.RENDERER.autoClearStencil = false;
 
-    GLOBALS.GUN.children[0].children[0].scale.set(1, 1, 1)
-    GLOBALS.GUN.children[0].children[0].position.set(0.12, -0.14, -0.13);
+    GLOBALS.GUN.visible = false;
+    GLOBALS.GUN_CLONE.visible = true;
+
+    var positionBoneHand = new THREE.Vector3();
+    window.hand.getWorldPosition(positionBoneHand);
+
+    GLOBALS.GUN_CLONE.position.copy(positionBoneHand);
+    GLOBALS.GUN_CLONE.rotation.y = GLOBALS.MAIN_CAMERA.rotation.y;
 
     deltaPortal += clockPortal.getDelta();
 
-    if (deltaPortal > (1 / 30)) {
-        // The draw or time dependent code are here
-        renderPortal2(0, 1)
-        renderPortal2(1, 0)
-        deltaPortal = deltaPortal % (1 / 30);
-    }
+    //if (deltaPortal > (1 / 30)) {
+    // The draw or time dependent code are here
+    renderPortal2(0, 1)
+    renderPortal2(1, 0)
+    //    deltaPortal = deltaPortal % 30;
+    //}
 
     GLOBALS.RENDERER.autoClear = false;
 
+    GLOBALS.GUN.visible = true;
     GLOBALS.GUN.children[0].children[0].scale.set(0.1, 0.1, 0.1)
     GLOBALS.GUN.children[0].children[0].position.set(0.01, -0.012, -0.011);
+
+    GLOBALS.GUN_CLONE.visible = cloneVisible;
+
+    if (window.hand2) {
+        var positionBoneHand = new THREE.Vector3();
+        window.hand2.getWorldPosition(positionBoneHand);
+
+        GLOBALS.GUN_CLONE.position.copy(positionBoneHand);
+        GLOBALS.GUN_CLONE.rotation.y = GLOBALS.MAIN_CAMERA.rotation.y;
+        GLOBALS.GUN_CLONE.rotation.y += Math.PI
+    }
+
+
+    if (GLOBALS.PLAYER && GLOBALS.PLAYER_MODEL) {
+        GLOBALS.PLAYER_MODEL.visible = false;
+        GLOBALS.PLAYER_MODEL_CLONE.visible = cloneVisible;
+    }
 
     if (GLOBALS.PORTALS[0] === null && GLOBALS.PORTALS[1] !== null) {
         GLOBALS.PORTALS[1].mesh.visible = false
@@ -414,7 +449,9 @@ function animatePortal() {
         GLOBALS.PORTALS[1].mesh.visible = true
     }
 
-    GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
+    GLOBALS.GUN.visible = true;
+
+    //GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
 }
 
 // Render loop
@@ -436,6 +473,11 @@ function renderPortal2(thisIndex, pairIndex) {
     GLOBALS.PORTAL_TARGETS[thisIndex].setSize(width, height)
     GLOBALS.PORTAL_TMP_TARGETS[thisIndex].setSize(width, height)
 
+    GLOBALS.PORTALS[thisIndex].mesh.material.stencilWrite = true
+    GLOBALS.RENDERER.clearStencil()
+    GLOBALS.RENDERER.setRenderTarget(null)
+    GLOBALS.RENDERER.render(GLOBALS.PORTALS[pairIndex].mesh, GLOBALS.MAIN_CAMERA)
+
     let shouldRender = new Array(GLOBALS.PORTAL_RECURSION_LEVELS + 1)
     shouldRender[0] = portalIsVisibleInCamera(GLOBALS.MAIN_CAMERA, GLOBALS.PORTALS[thisIndex], null)
     for (let i = 0; i < GLOBALS.PORTAL_RECURSION_LEVELS; i++) {
@@ -456,9 +498,9 @@ function renderPortal2(thisIndex, pairIndex) {
 
     for (let level = GLOBALS.PORTAL_RECURSION_LEVELS - 1; level >= 0; level--) {
 
-        if (level > 0 && !renderRecursive) {
+        /*if (level > 0 && !renderRecursive) {
             break;
-        }
+        }*/
 
         if (!shouldRender[level]) {
             teleportObject3D(GLOBALS.PORTALS[pairIndex], portalCamera)

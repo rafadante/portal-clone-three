@@ -10,7 +10,9 @@ import {
     PlaneGeometry,
     Vector3
 } from 'three';
-import { GLOBALS } from '../../Globals.js';
+import {
+    GLOBALS
+} from '../../Globals.js';
 
 class Portal extends Group {
     // position - the center position (vector3)
@@ -75,7 +77,7 @@ class Portal extends Group {
         void main() {
             gl_FragColor = texture2D(texture1, gl_FragCoord.xy / vec2(ww, wh));
             #include <tonemapping_fragment>
-            #include <encodings_fragment>
+            #include <colorspace_fragment>
         }
         `
 
@@ -103,8 +105,23 @@ class Portal extends Group {
             stencilFunc: THREE.EqualStencilFunc,
             stencilRef: 1,
             stencilFail: THREE.ReplaceStencilOp,
-            /*polygonOffset: true,
-            polygonOffsetFactor: -1*/
+            polygonOffset: true,
+            polygonOffsetFactor: -1
+
+            /*stencilWrite: true,
+            stencilFunc: THREE.AlwaysStencilFunc,
+            stencilFail: THREE.KeepStencilOp,
+            stencilZFail: THREE.KeepStencilOp,
+            stencilZPass: THREE.ReplaceStencilOp,
+            stencilRef: 1*/
+
+            /*depthFunc: THREE.AlwaysDepth,
+            stencilWrite: true,
+            stencilFunc: THREE.EqualStencilFunc,
+            stencilFail: THREE.DecrementWrapStencilOp,
+            stencilZFail: THREE.DecrementWrapStencilOp,
+            stencilZPass: THREE.DecrementWrapStencilOp,
+            stencilRef: 1*/
         });
 
         this.mesh = new THREE.Mesh(geometry, material);
@@ -117,6 +134,10 @@ class Portal extends Group {
         this.mesh.frustumCulled = true;
         this.add(this.mesh)
 
+        this.mesh.onAfterRender = function (renderer) {
+            renderer.clearStencil();
+        };
+
         if (index == 0) {
             this.mesh.userData.this = 0;
             this.mesh.userData.other = 1;
@@ -126,7 +147,7 @@ class Portal extends Group {
         }
 
         var parent = GLOBALS.PORTAL_SHADER[index].parent;
-        if(parent){
+        if (parent) {
             parent.remove(GLOBALS.PORTAL_SHADER[index]);
             GLOBALS.PORTAL_SHADER[index].matrix.identity().decompose(GLOBALS.PORTAL_SHADER[index].position, GLOBALS.PORTAL_SHADER[index].quaternion, GLOBALS.PORTAL_SHADER[index].scale)
         }
@@ -216,6 +237,28 @@ function teleportPhysicalObject(object, portal) {
 
     /*velocity.x = 0;
     velocity.z = 0;*/
+
+    //console.log(velocity)
+
+    /*if(velocity.x > 15){
+        velocity.x = 15;
+    }else if(velocity.x < -15){
+        velocity.x = -15;
+    }
+
+    if(velocity.y > 15){
+        velocity.y = 15;
+    }else if(velocity.y < -15){
+        velocity.y = -15;
+    }
+
+    if(velocity.z > 15){
+        velocity.z = 15;
+    }else if(velocity.z < -15){
+        velocity.z = -15;
+    }*/
+
+
 
     object.position.copy(position)
     object.previousPosition.copy(previousPosition)

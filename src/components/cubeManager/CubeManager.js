@@ -16,7 +16,7 @@ function cubeState(button) {
         //
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
 
-            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == 22 ||
+            /*if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == 22 ||
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == -16) {
                 warning();
                 return;
@@ -28,7 +28,7 @@ function cubeState(button) {
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.z == 26) {
                 warning();
                 return;
-            }
+            }*/
 
             trasnlatePlane(GLOBALS.SELECTED_ID[i], -1, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal);
         }
@@ -254,7 +254,7 @@ function buildIniCubes(obj) {
         const geometry = new THREE.PlaneGeometry(2, 2);
 
         GLOBALS.PLANE_LEVEL_INSTANCED = new THREE.InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
-        GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = false;
+        GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
@@ -264,6 +264,7 @@ function buildIniCubes(obj) {
 
         for (var i = 0; i < GLOBALS.BUDGET; i++) {
             clone.scale.set(0, 0, 0);
+            clone.position.set(100000, 100000, 100000);
             clone.updateMatrix();
             GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(i, clone.matrix);
         }

@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 import $ from 'jquery';
-import { GLOBALS } from '../../Globals.js';
+import {
+    GLOBALS
+} from '../../Globals.js';
+import {
+    animate
+} from '../../Main.js';
 
 var color = new THREE.Color();
 const orange = new THREE.Color("rgb(255, 165, 0)");
@@ -116,6 +121,8 @@ function raycastSelected(found, event, type) {
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
     }
 
+    //console.log(GLOBALS.PLANE_USER_DATA[instanceId])
+
     if (event.button == 2) {
         if (GLOBALS.PLANE_USER_DATA[instanceId].itemName != "exitDoor" &&
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "enterDoor" &&
@@ -130,7 +137,10 @@ function raycastSelected(found, event, type) {
                 $("#dispenser-state").css("display", "none");
             }
 
-            if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem && GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("door")) {
+            if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem &&
+                (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("door") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("ramp") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("faith_plate"))) {
                 $("#rotate-item").css("display", "block");
             } else {
                 $("#rotate-item").css("display", "none");
@@ -179,8 +189,35 @@ $("body").on('click', '#rotate-item', function () {
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation.copy(dummy.rotation);
     }*/
 
-    var door = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName);
-    door.rotation.y += Math.PI / 2;
+    if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("door") ||
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("faith_plate")) {
+
+        var door = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName);
+        door.rotation.y += Math.PI / 2;
+    } else {
+        for (var i = 0; i < 1; i++) { //GLOBALS.SELECTED_ID.length
+
+            var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].itemName);
+
+            var dummy = new THREE.Object3D();
+            dummy.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.position);
+            dummy.rotation.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation);
+
+            dummy.rotation.y += Math.PI / 2;
+
+            dummy.updateMatrix();
+            instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.userData.id, dummy.matrix)
+
+            instanced.instanceMatrix.needsUpdate = true;
+            instanced.computeBoundingSphere();
+
+            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation.copy(dummy.rotation);
+        }
+    }
+    animate();
+
+
+
 });
 
 $("body").on('click', '#delete', function () {

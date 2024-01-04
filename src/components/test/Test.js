@@ -83,8 +83,8 @@ function viewFPS() {
         //SEPARETE MESHS FOR INSTANCING
         for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
             if (GLOBALS.PLANE_USER_DATA[i].exists) {
-                if (GLOBALS.PLANE_USER_DATA[i].itemName != "enterDoor" &&
-                    GLOBALS.PLANE_USER_DATA[i].itemName != "exitDoor") {
+                if (GLOBALS.PLANE_USER_DATA[i].name != GLOBALS.ENTER_DOOR.namePosition &&
+                    GLOBALS.PLANE_USER_DATA[i].name != GLOBALS.EXIT_DOOR.namePosition) {
 
                     if (GLOBALS.PLANE_USER_DATA[i].side == "front")
                         sideFront.push(GLOBALS.PLANE_USER_DATA[i])
@@ -148,12 +148,17 @@ function viewFPS() {
 
         GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").target = obj;
         GLOBALS.SCENE.add(GLOBALS.GUN);
+        GLOBALS.SCENE.add(GLOBALS.GUN_CLONE);
+        
         GLOBALS.GUN.children[0].add(GLOBALS.LIGHTNIN_STRIKE_1,
             GLOBALS.LIGHTNIN_STRIKE_2, GLOBALS.LIGHTNIN_STRIKE_3);
         GLOBALS.GUN.visible = true;
         GLOBALS.GUN_SPHERE.material = GLOBALS.MATERIAL_GUN;
         GLOBALS.GUN_CYLINDER.material = GLOBALS.MATERIAL_GUN;
         GLOBALS.MAIN_CAMERA.add(GLOBALS.GUN)
+
+        console.log(GLOBALS.GUN)
+
 
         //CORRIDOR ENTER COLLIDERS
         corridorColliderNames(true);
@@ -267,6 +272,8 @@ function viewFPS() {
                 lightEmissive.updateMatrix();
                 instanced.setMatrixAt(i, lightEmissive.matrix);
                 instanced.instanceMatrix.needsUpdate = true;
+                instanced.computeBoundingSphere();
+                console.log(instanced)
 
                 //
                 var spotLight = new THREE.SpotLight(0xffffff, 100);
@@ -324,7 +331,7 @@ function viewFPS() {
         var vec = new THREE.Vector3(0, 0, 0);
         var obj = new THREE.Object3D();
 
-        setTimeout(() => {
+        /*setTimeout(() => {
             newPortal(0, 1, new THREE.Vector3(3, 1, 0), new THREE.Vector3(0, 0, 1), obj, new THREE.Vector3(0, 1, 0), vec)
             newPortal(1, 0, new THREE.Vector3(5.6, 1, 0), new THREE.Vector3(0, 0, 1), obj, new THREE.Vector3(0, 1, 0), vec)
             setTimeout(() => {
@@ -332,9 +339,9 @@ function viewFPS() {
                 deletePortal(1);
                 GLOBALS.EXIT_ROOM.visible = false;
             }, 1000);
-        }, 1000);
+        }, 1000);*/
 
-
+        GLOBALS.EXIT_ROOM.visible = false;
     }, 500);
 };
 
@@ -415,7 +422,7 @@ function addColliderItem(items, type, mass, offset) {
                     type: ShapeType.HULL
                 });
                 var shape = result.shape;
-                PHYSICS_MATERIAL.friction = 0.3; //0.01
+               // PHYSICS_MATERIAL.friction = 0.3; //0.01
             }
 
             var box = new CANNON.Body({
@@ -449,9 +456,9 @@ function addColliderItem(items, type, mass, offset) {
                 }
 
                 box.spawnPosition = items[i].position.clone();
-                box.allowSleep = true;
-                box.sleepSpeedLimit = 1.0;
-                box.sleepTimeLimit = 1.0;
+                box.allowSleep = false;
+                box.sleepSpeedLimit = 0.1;
+                box.sleepTimeLimit = 5.0;
                 box.mass = 0;
 
                 GLOBALS.DYNAMIC_OBJECTS.push(box);
@@ -588,7 +595,7 @@ function createInstances(meshes, material) {
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     mesh.name = "Instanced-" + id;
-    mesh.frustumCulled = false;
+    mesh.frustumCulled = true;
     GLOBALS.SCENE.add(mesh);
     id++;
 

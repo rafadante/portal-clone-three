@@ -24,11 +24,11 @@ const Lights = function (THREE) {
     spotLight.castShadow = true;
 
     if(GLOBALS.MOBILE){
-        spotLight.shadow.mapSize.width = 512;
-        spotLight.shadow.mapSize.height = 512;
-    }else{
         spotLight.shadow.mapSize.width = 2048;
         spotLight.shadow.mapSize.height = 2048;
+    }else{
+        spotLight.shadow.mapSize.width = 4096;
+        spotLight.shadow.mapSize.height = 4096;
     }
     
     spotLight.shadow.camera.near = 1;

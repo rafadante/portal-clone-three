@@ -23,6 +23,17 @@ import {
 import {
     GLOBALS
 } from '../../Globals.js';
+import {
+    FBXLoader
+} from 'three/addons/loaders/FBXLoader.js'
+import * as SceneUtils from 'three/addons/utils/SceneUtils.js';
+
+import {
+    InstancedMesh2
+} from '../../InstancedMesh2.js';
+import {
+    InstancedEntity
+} from '../../InstancedEntity.js';
 
 async function handleZip(path, obj) {
     await JSZipUtils.getBinaryContent(path, function (err, data) {
@@ -38,7 +49,7 @@ async function handleZip(path, obj) {
             loader23.parse(file.buffer, '', function (result) {
 
                 result.scene.traverse(child => {
-                    child.frustumCulled = false;
+                    child.frustumCulled = true;
                 })
 
                 if (obj == "loadButtonCube")
@@ -159,8 +170,23 @@ function loadWindowManager(scene) {
 
     scene.traverse(child => {
         if (child.name.includes("Cube")) {
-            child.receiveShadow = true;
+            //child.receiveShadow = true;
             child.castShadow = true;
+            child.material = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(0x000000)
+            })
+        }
+
+        if (child.name == "room_light") {
+            const light = new THREE.PointLight(0xffffff, 50, 3);
+            var target = new THREE.Vector3(); // create once an reuse it
+            child.getWorldPosition(target);
+            light.position.copy(target);
+            light.translateY(-0.2);
+            scene.add(light);
+            // window.room_light = child;
+
+            // window.lightRoom = light;
         }
 
         if (child.name.includes("image")) {
@@ -169,6 +195,8 @@ function loadWindowManager(scene) {
             child.material.envMapIntensity = 0.5;
             child.material.roughness = 0.3;
         }
+
+
     })
 
     scene.rotation.y = -Math.PI / 2;
@@ -178,6 +206,8 @@ function loadWindowManager(scene) {
     GLOBALS.SCENE.add(scene);
 
     GLOBALS.OBSERVATION_ROOM = scene;
+
+    console.log(scene)
     loadGun();
 }
 
@@ -196,6 +226,14 @@ function loadGunManager(scene) {
     newGroup.add(scene);
 
     var cube_1, cube_2, cube_3;
+
+
+    GLOBALS.GUN_CLONE = new THREE.Group();
+    var gunClone = scene.clone();
+    //gunClone.rotation.y = THREE.MathUtils.degToRad(38);
+    gunClone.rotation.x = THREE.MathUtils.degToRad(10);
+    gunClone.position.set(-0.05, 0.075, -0.1)
+    GLOBALS.GUN_CLONE.add(gunClone)
 
     scene.traverse(child => {
         if (child.material) {
@@ -266,7 +304,7 @@ function loadExitDoor(scene) {
     door.translateZ(1);
     door.name = "exitDoor";
     GLOBALS.EXIT_DOOR = door;
-    GLOBALS.SCENE.add(door);
+    //GLOBALS.SCENE.add(door);
 
     door.traverse(child => {
 
@@ -298,9 +336,16 @@ function loadEnterDoor(scene) {
 
     //ENTER DOOR
     door.name = "enterDoor";
-    door.rotation.y = Math.PI;
-    door.position.set(3, 1, 13);
-    door.translateZ(1);
+
+    
+door.rotation.y = Math.PI/2;
+door.position.set(-20, 1, 23);
+    
+
+    /*door.rotation.y = Math.PI;
+    door.position.set(3, 1, 12);*/
+
+    door.namePosition = door.position.x + "/" + door.position.y + "/" + door.position.z;
     GLOBALS.ENTER_DOOR = door;
     GLOBALS.SCENE.add(door);
 
@@ -394,6 +439,13 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity) {
     //if (interactive)
     //    geometry.scale(0.015, 0.015, 0.015);
 
+
+    /*const item = new InstancedMesh2(geometry, scene.children[0].material.clone(), 100, (obj, index) => {
+        obj.position.random().multiplyScalar(500).subScalar(250);
+        obj.quaternion.random();
+        obj.forceUpdateMatrix();
+      });*/
+
     var item = new THREE.InstancedMesh(geometry, scene.children[0].material.clone(), 20);
     item.instanceMatrix.setUsage(THREE.DynamicDrawUsage); // will be updated every frame
 
@@ -401,6 +453,7 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity) {
 
     for (var i = 0; i < 20; i++) {
         clone.scale.set(0, 0, 0);
+        clone.position.set(100000, 100000, 100000);
         clone.updateMatrix();
         item.setMatrixAt(i, clone.matrix);
     }
@@ -478,7 +531,7 @@ function loadWindowHalfManager(scene) {
             child.getWorldPosition(target);
             light.position.copy(target);
             light.translateY(-1);
-            scene.add(light);
+            //scene.add(light);
         }
 
         if (child.name.includes("vidro")) {
@@ -919,6 +972,86 @@ function loadElevatorRoomManager(scene) {
         }
     })
 
+    loadAvatar();
+}
+
+const fbxLoader = new FBXLoader();
+const gltfLoader = new GLTFLoader();
+
+function loadAvatar() {
+
+    const playerModel = gltfLoader.loadAsync('./assets/avatar/chell.glb');
+
+    GLOBALS.PLAYER_ANIMATIONS = {
+        ANIM_STANDING_IDLE: gltfLoader.loadAsync('./assets/avatar/StandingIdle.glb'),
+        ANIM_JUMP: gltfLoader.loadAsync('./assets/avatar/Jump.glb'),
+        ANIM_STATIONARY_RUNNING: gltfLoader.loadAsync('./assets/avatar/StationaryRunning.glb'),
+        ANIM_BACKWARD_RUNNING: gltfLoader.loadAsync('./assets/avatar/RunningBackward.glb'),
+        ANIM_RIGHT_STRAFE: gltfLoader.loadAsync('./assets/avatar/RightStrafe.glb'),
+        ANIM_LEFT_STRAFE: gltfLoader.loadAsync('./assets/avatar/LeftStrafe.glb'),
+        ANIM_FALLING_IDLE: gltfLoader.loadAsync('./assets/avatar/FallingIdle.glb'),
+    }
+
+    playerModel.then((glb) => {
+
+        const fbx = glb.scene;
+
+        //console.log(fbx)
+
+        fbx.scale.setScalar(0.015);
+        GLOBALS.MIXERS = new THREE.AnimationMixer(fbx)
+        fbx.visible = false;
+
+        fbx.traverse(c => {
+            c.castShadow = true;
+
+            if (c.material) {
+
+                c.material.envMap = GLOBALS.ENV_MAP;
+                c.material.envMapIntensity = 0.5;
+
+            }
+
+            if (c.isBone) {
+                if (c.name == "wrist_R") {
+                    window.hand = c;
+                }
+            }
+        })
+
+        GLOBALS.GUN_CLONE.scale.setScalar(0.7);
+        console.log(GLOBALS.GUN_CLONE)
+
+        GLOBALS.PLAYER_MODEL = fbx;
+        GLOBALS.PLAYER_MODEL_CLONE = GLOBALS.PLAYER_MODEL.clone();
+
+        GLOBALS.SCENE.add(GLOBALS.PLAYER_MODEL);
+        GLOBALS.SCENE.add(GLOBALS.PLAYER_MODEL_CLONE);
+
+        GLOBALS.PLAYER_MODEL.animationActions = {};
+        GLOBALS.PLAYER_MODEL.modelReady = true;
+    }).then(() => {
+        let animationPromises = []
+        for (let index in GLOBALS.PLAYER_ANIMATIONS) {
+            const anim = GLOBALS.PLAYER_ANIMATIONS[index]
+
+            anim.then((anim) => {
+                const animationAction = GLOBALS.MIXERS.clipAction(anim.animations[0])
+                GLOBALS.PLAYER_MODEL.animationActions[index] = animationAction
+            })
+            animationPromises.push(anim)
+        }
+        Promise.all(animationPromises).then(() => GLOBALS.PLAYER_MODEL.modelReady = true)
+    });
+
+    // modify bone update function to also update its world matrix
+    // possibly do this only to skeletons you need it for, not for all bones
+    var update = THREE.Bone.prototype.update;
+    THREE.Bone.prototype.update = function (parentSkinMatrix, forceUpdate) {
+        update.call(this, parentSkinMatrix, forceUpdate);
+        this.updateMatrixWorld(true);
+    };
+
     if (GLOBALS.LOADED_LEVEL) {
         loadLevelJSON()
     } else {
@@ -927,8 +1060,6 @@ function loadElevatorRoomManager(scene) {
     }
     animate();
 }
-
-
 export {
     loadCube
 };
