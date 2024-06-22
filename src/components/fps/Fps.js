@@ -6,10 +6,6 @@ import $ from 'jquery';
 import * as CANNON from 'cannon';
 import nipplejs from 'nipplejs';
 import {
-    KeyQ,
-    KeyZ
-} from '../recall/recall.js'
-import {
     tweenCamera
 } from '../../Main.js';
 import {
@@ -76,6 +72,7 @@ var moving = false;
 var wasInJump = false;
 var slipperyMaterial = new CANNON.Material();
 slipperyMaterial.friction = 0.00;
+window.PLAYER_JUMPING_FROM_BLUE_GEL = false;
 
 //WINDOW VARIABLES
 
@@ -266,6 +263,10 @@ function player() {
                     }
 
                     GLOBALS.PLAYER.inJump = (contactNormal.dot(upVector) <= 0.5);
+
+                    if(!GLOBALS.PLAYER.inJump){
+                        window.PLAYER_JUMPING_FROM_BLUE_GEL = false;
+                    }
                 }
             }
         }
@@ -296,10 +297,6 @@ document.addEventListener('keydown', (event) => {
             Crouch(-0.25);
         } else if (event.code == "KeyE")
             interactWithItem();
-        else if (event.code == "KeyQ")
-            KeyQ();
-        else if (event.code == "KeyZ")
-            KeyZ();
     }
 });
 
@@ -376,6 +373,7 @@ function controlsLock() {
 
     GLOBALS.POINTER_CONTROLS.addEventListener('lock', function () {
         document.getElementById('blocker').style.display = 'none';
+        GLOBALS.PAUSED = false;
 
         setTimeout(() => {
             GLOBALS.ALLOW_PLACE_PORTALS = true;
@@ -388,6 +386,7 @@ function controlsLock() {
         document.getElementById('blocker').style.display = 'block';
         GLOBALS.ALLOW_PLACE_PORTALS = false;
         allowEnterFPS = false;
+        GLOBALS.PAUSED = true;
 
         setTimeout(() => {
             allowEnterFPS = true;
@@ -428,7 +427,7 @@ $("body").on('pointerup', '#crouch', function () {
 function tweenBBB(duration, ini, final) {
 
     var obj = new THREE.Object3D();
-    GLOBALS.SCENE.add(obj)
+    GLOBALS.SCENE_CHILDREN.add(obj)
     obj.quaternion.copy(ini.clone());
 
     new TWEEN.Tween(ini).to(final, duration)
@@ -478,7 +477,7 @@ document.addEventListener('mousedown', (event) => {
             var angle = Math.PI / 2;
 
             var obj = new THREE.Object3D();
-            GLOBALS.SCENE.add(obj)
+            GLOBALS.SCENE_CHILDREN.add(obj)
             obj.quaternion.setFromAxisAngle(axis, angle);
 
             tweenBBB(10000, GLOBALS.MAIN_CAMERA.quaternion, obj.quaternion)
@@ -496,7 +495,7 @@ document.addEventListener('mousedown', (event) => {
             var angle = -Math.PI;
 
             var obj = new THREE.Object3D();
-            GLOBALS.SCENE.add(obj)
+            GLOBALS.SCENE_CHILDREN.add(obj)
             obj.quaternion.setFromAxisAngle(axis, angle);
 
             tweenBBB(10000, GLOBALS.MAIN_CAMERA.quaternion, obj.quaternion)
@@ -516,7 +515,7 @@ document.addEventListener('mousedown', (event) => {
             var angle = 0;
 
             var obj = new THREE.Object3D();
-            GLOBALS.SCENE.add(obj)
+            GLOBALS.SCENE_CHILDREN.add(obj)
             obj.quaternion.setFromAxisAngle(axis, angle);
 
             tweenBBB(10000, GLOBALS.MAIN_CAMERA.quaternion, obj.quaternion)
@@ -621,7 +620,7 @@ const updatePlayer = function (deltaTime) {
     if (GLOBALS.GEL_ORANGE)
         GLOBALS.PLAYER.applyForce(forward.clone().multiplyScalar(f * 3), GLOBALS.PLAYER.position)
 
-    if (!GLOBALS.STOP_TIME) {
+    if (!GLOBALS.STOP_TIME && !GLOBALS.GEL_ORANGE && !window.PLAYER_JUMPING_FROM_BLUE_GEL) {
         if (GLOBALS.MOBILE) {
 
             if (fwdValue > 0)
@@ -656,7 +655,6 @@ const updatePlayer = function (deltaTime) {
                     /*crouched = true;
                     Crouch(-0.25);
                     gamepadButton3 = true;*/
-                    KeyZ();
                     vv = true;
                 } else if (gamepad.buttons[3].value == 0) {
                     /*if (crouched) {
@@ -665,7 +663,6 @@ const updatePlayer = function (deltaTime) {
                     gamepadButton3 = false;
                     crouched = false;*/
                     if (vv) {
-                        KeyZ();
                         vv = false;
                     }
                 }
@@ -742,13 +739,16 @@ const updatePlayer = function (deltaTime) {
     GLOBALS.PLAYER.quaternion.normalize()
 
     // set camera position to be at player
-    GLOBALS.MAIN_CAMERA.position.copy(GLOBALS.PLAYER.position)
+    GLOBALS.MAIN_CAMERA.position.copy(GLOBALS.PLAYER.position);
+    GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
+    
 
     if (moving)
         GLOBALS.GUN.children[0].position.x += Math.sin(headBobTimer * headBobSpeed) * headBobHeight;
 
     //const targetPosition = GLOBALS.MAIN_CAMERA.quaternion.clone();
-    //GLOBALS.GUN.quaternion.slerp(GLOBALS.GUN.quaternion, GLOBALS.SMOOTHNESS);
+    //GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
+    GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.SMOOTHNESS);
     //GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
     updateHeadBob(deltaTime);
 
@@ -758,7 +758,7 @@ const updatePlayer = function (deltaTime) {
         GLOBALS.PLAYER.position.copy(obj.position);
     }
 
-    // copy position and rotation so player model aligns with the physical body
+    /*// copy position and rotation so player model aligns with the physical body
     if (GLOBALS.PLAYER_MODEL) {
         GLOBALS.PLAYER_MODEL.position.copy(GLOBALS.PLAYER.position).add(new THREE.Vector3(0, -1, 0))
         GLOBALS.PLAYER_MODEL.quaternion.copy(GLOBALS.PLAYER.quaternion)
@@ -766,9 +766,9 @@ const updatePlayer = function (deltaTime) {
 
         GLOBALS.PLAYER_MODEL.position.y += 0.2;
 
-        GLOBALS.SCENE.remove(GLOBALS.PLAYER_MODEL_CLONE)
+        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLAYER_MODEL_CLONE)
         GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
-        GLOBALS.SCENE.add(GLOBALS.PLAYER_MODEL_CLONE)
+        GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE)
     }
 
     // handle model movements
@@ -815,7 +815,7 @@ const updatePlayer = function (deltaTime) {
 
         GLOBALS.MIXERS.update(delta);
 
-    }
+    }*/
 }
 
 var activeAction, lastAction;

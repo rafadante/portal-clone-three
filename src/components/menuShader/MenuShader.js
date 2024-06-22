@@ -44,7 +44,7 @@ if (!stopMenuLoop) {
     setTimeout(() => {
         var planegeometry = new THREE.PlaneGeometry(1, 1);
         plane1 = new THREE.Mesh(planegeometry, GLOBALS.MATERIAL_MAIN_MENU);
-        GLOBALS.SCENE.add(plane1);
+        GLOBALS.SCENE_CHILDREN.add(plane1);
 
         var planegeometry = new THREE.PlaneGeometry(1, 1);
         plane2 = new THREE.Mesh(planegeometry, GLOBALS.MATERIAL_SUB_MENU);
@@ -122,8 +122,8 @@ function startLevel() {
     /*$("#blocker").css("display", "none");
         $("#ui").css("display", "block");
         $("#container #back-effect").css("display", "none");
-        GLOBALS.SCENE.remove(plane1);
-        GLOBALS.SCENE.remove(plane2);
+        GLOBALS.SCENE_CHILDREN.remove(plane1);
+        GLOBALS.SCENE_CHILDREN.remove(plane2);
         GLOBALS.SCENE.background = null;
         stopMenuLoop = true;*/
 
@@ -136,8 +136,8 @@ function startLevel() {
 
     transition = true;
     transition2 = false;
-    GLOBALS.SCENE.add(plane1);
-    GLOBALS.SCENE.remove(plane2);
+    GLOBALS.SCENE_CHILDREN.add(plane1);
+    GLOBALS.SCENE_CHILDREN.remove(plane2);
 
     setTimeout(() => {
         $("#loading-parent").css("opacity", "1");
@@ -156,8 +156,8 @@ function startLevel() {
             $("#settings-close").css("display", "block");
             $("#main-container").css("display", "block");
 
-            GLOBALS.SCENE.remove(plane1);
-            GLOBALS.SCENE.remove(plane2);
+            GLOBALS.SCENE_CHILDREN.remove(plane1);
+            GLOBALS.SCENE_CHILDREN.remove(plane2);
             GLOBALS.SCENE.background = null;
             stopMenuLoop = true;
         }, 1000);
@@ -194,8 +194,8 @@ function optionMenu(texture, title, id) {
 
     if (transition2) {
         transition2 = false;
-        GLOBALS.SCENE.add(plane1);
-        GLOBALS.SCENE.remove(plane2);
+        GLOBALS.SCENE_CHILDREN.add(plane1);
+        GLOBALS.SCENE_CHILDREN.remove(plane2);
     }
 
     pointerState("block", "none", title, "flex", id);
@@ -205,8 +205,8 @@ $("body").on('click', '#back-main', function () {
     GLOBALS.MATERIAL_SUB_MENU.uniforms.iTime.value = 1.2;
     transition2 = true;
     transition = false;
-    GLOBALS.SCENE.remove(plane1);
-    GLOBALS.SCENE.add(plane2);
+    GLOBALS.SCENE_CHILDREN.remove(plane1);
+    GLOBALS.SCENE_CHILDREN.add(plane2);
 
     pointerState("none", "block", "", "none", ".option-main");
 });

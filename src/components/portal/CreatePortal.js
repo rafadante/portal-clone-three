@@ -11,7 +11,6 @@ import {
 import {
     Portal
 } from '../portal/Portal.js';
-import * as CANNON from 'cannon';
 import {
     GLOBALS
 } from '../../Globals.js';
@@ -213,9 +212,8 @@ function portalButton(button) {
                         }
 
                         // delete the old portal this new one is replacing
-                        if (GLOBALS.PORTALS[1] !== null) {
+                        if (GLOBALS.PORTALS[1] !== null)
                             deletePortal(1);
-                        }
 
                         newPortal(1, 0, point, normal, userData.body, playerUpDirection, userData.rotation)
 
@@ -249,9 +247,8 @@ function portalButton(button) {
 // deletes the portal with index portalIndex from the scene
 function deletePortal(portalIndex) {
 
-    if (GLOBALS.PORTALS[portalIndex] === null) {
+    if (GLOBALS.PORTALS[portalIndex] === null)
         return;
-    }
 
     GLOBALS.PORTALS[portalIndex].mesh.geometry.dispose();
     GLOBALS.PORTALS[portalIndex].mesh.material.dispose();
@@ -271,7 +268,6 @@ function deletePortal(portalIndex) {
 
 // creates a new portal and adds it to the scene
 function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject, playerUpDirection, portalPoints) {
-
 
     let color = GLOBALS.PORTAL_COLORS[thisPortalIndex]
 
@@ -307,10 +303,6 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
         GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value = 1;
         GLOBALS.PORTALS[1].portalShader.material.uniforms.iOpened.value = 1;
     }
-
-    var pLocal = new THREE.Vector3(0, 0, -1);
-    var pWorld = pLocal.applyMatrix4(GLOBALS.MAIN_CAMERA.matrixWorld);
-    var dir = pWorld.sub(GLOBALS.MAIN_CAMERA.position).normalize();
 }
 
 function getPlaneByName(name) {

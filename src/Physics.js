@@ -26,7 +26,7 @@ else
     world.solver = solver;
 
 world.gravity.set(0, -9.8, 0);
-world.allowSleep = true;
+world.allowSleep = false;
 world.broadphase = new CANNON.NaiveBroadphase();
 
 //PHYSICS INTERACTIONS
@@ -51,7 +51,7 @@ world.addBody(jointBody)
 const planeGeometry = new THREE.PlaneGeometry(100, 100)
 movementPlane = new THREE.Mesh(planeGeometry, new THREE.MeshBasicMaterial())
 movementPlane.visible = false // Hide it..
-//GLOBALS.SCENE.add(movementPlane)
+//GLOBALS.SCENE_CHILDREN.add(movementPlane)
 
 const cannonDebugger = new CannonDebugger(GLOBALS.SCENE, world, {
     onInit(body, mesh) {
@@ -109,16 +109,6 @@ function updatePhysics() {
                 var item = new THREE.Object3D();
                 item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
                 item.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
-
-                if (GLOBALS.DYMANIC_ITEMS[property][i].body.arrayPos) {
-                    if (recordingPosition && !GLOBALS.DYMANIC_ITEMS[property][i].body.recall) {
-                        if (!GLOBALS.DYMANIC_ITEMS[property][i].body.sleeping || GLOBALS.DYMANIC_ITEMS[property][i].body.inTractor) {
-                            GLOBALS.DYMANIC_ITEMS[property][i].body.arrayPos.push(item.position.clone())
-                            GLOBALS.DYMANIC_ITEMS[property][i].body.arrayRot.push(item.quaternion.clone())
-                        }
-                    }
-                }
-
 
                 item.updateMatrix();
                 instanced.setMatrixAt(i, item.matrix)
@@ -179,8 +169,6 @@ function addJointConstraint(position, constrainedBody) {
 
     // Add the constraint to world
     world.addConstraint(jointConstraint)
-
-    console.log(jointConstraint)
 }
 
 // Remove constraint from world

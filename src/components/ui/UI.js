@@ -3,8 +3,7 @@ import * as THREE from 'three';
 import { GLOBALS } from '../../Globals.js';
 
 if (!GLOBALS.MOBILE)
-    $(".mobile").css("display", "none")
-
+    $(".mobile").css("display", "none");
 
 $("body").on('click', '#settings-video', function () {
     $("#options-video").css("display", "block");
@@ -37,6 +36,8 @@ $("body").on('input', '#option-stats', function () {
         $("#main-container").css("display", "none");
     else
         $("#main-container").css("display", "block");
+
+    update()
 })
 
 //SHADOW
@@ -47,6 +48,7 @@ $("body").on('input', '#option-shadow', function () {
 //RECURSIVE PORTALS
 $('#recursive-select').on('change', function () {
     GLOBALS.PORTAL_RECURSION_LEVELS = $(this).val();
+    update()
 });
 
 //FPS MAIN SCENE
@@ -62,13 +64,13 @@ $('#fps-select').on('change', function () {
 
 
     GLOBALS.INTERVAL = 1 / GLOBALS.FPS_MODE;
+    update()
 });
 
 //RESOLUTION
 $('#resolution-select').on('change', function () {
     GLOBALS.RENDERER.setPixelRatio(window.devicePixelRatio * $(this).val());
-    //GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
-    //GLOBALS.SCENE.updateWorldMatrix(false, true);
+    update()
 });
 
 //SHADOW RESOLUTION
@@ -76,8 +78,9 @@ $('#shadows-resolution-select').on('change', function () {
     GLOBALS.SPOTLIGHT.shadow.mapSize.width = $(this).val();
     GLOBALS.SPOTLIGHT.shadow.mapSize.height = $(this).val();
 
-    GLOBALS.SPOTLIGHT.shadow.map.dispose(); // important
-    GLOBALS.SPOTLIGHT.shadow.map = null;
+    GLOBALS.RENDERER.shadowMap.autoUpdate = true;
+    GLOBALS.RENDERER.shadowMap.autoUpdate = false;
+    update()
 });
 
 //FOV
@@ -128,10 +131,10 @@ $("body").on('click', '#back-editor', function () {
     GLOBALS.MAIN_CAMERA.remove(GLOBALS.GUN);
 
     if (GLOBALS.PORTALS.length == 1) {
-        GLOBALS.SCENE.remove(GLOBALS.PORTALS[0]);
+        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PORTALS[0]);
     } else if (GLOBALS.PORTALS.length == 2) {
-        GLOBALS.SCENE.remove(GLOBALS.PORTALS[1]);
-        GLOBALS.SCENE.remove(GLOBALS.PORTALS[0]);
+        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PORTALS[1]);
+        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PORTALS[0]);
     }
     GLOBALS.PORTALS = [null, null];
 });
@@ -157,3 +160,10 @@ $(".item").mouseenter(function () {
 $(".item").mouseleave(function () {
     $("#info-box").css("opacity", 0)
 })
+
+function update(){
+    GLOBALS.PAUSED = false;
+    setTimeout(() => {
+        GLOBALS.PAUSED = true;
+    }, 100);
+}

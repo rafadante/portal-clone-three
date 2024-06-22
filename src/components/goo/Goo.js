@@ -5,16 +5,18 @@ import {
 } from '../../Globals.js';
 import {
     Water
-} from '../../Water.js';
+} from '../Water.js';
+import { roughness } from 'three/examples/jsm/nodes/Nodes.js';
 
 var GOO = null;
-var water;
+var water, lava;
+var water2 = [];
 
 const AddGoo = function (found, loading) {
 
     if (GOO == null) {
         GOO = new THREE.Group();
-        GLOBALS.SCENE.add(GOO);
+        GLOBALS.SCENE_CHILDREN.add(GOO);
     }
 
     if (!loading) {
@@ -130,14 +132,12 @@ const AddGoo = function (found, loading) {
 
     // mergedGeometry.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI))
 
-    var mesh = new THREE.Mesh(mergedGeometry, new THREE.MeshBasicMaterial({
-        color: new THREE.Color(0x964B00)
-    })); //material
+    lava = new THREE.Mesh(mergedGeometry, new THREE.MeshBasicMaterial({color: new THREE.Color(0x7c3f00)})); //material
 
     const waterGeometry = new THREE.PlaneGeometry(1000, 1000);
 
     water = new Water(
-        waterGeometry, {
+        mergedGeometry, {
             textureWidth: 512,
             textureHeight: 512,
             waterNormals: new THREE.TextureLoader().load('assets/textures/waternormals.jpg', function (texture) {
@@ -153,21 +153,28 @@ const AddGoo = function (found, loading) {
         }
     );
 
+    water2.push(water)
+
     //water.updateMatrix();
 
-    water.rotation.x = -Math.PI / 2;
-    water.position.set(0, -0.2, 0)
+    //water.rotation.x = -Math.PI / 2;
+    //water.position.set(0, -0.2, 0)
     water.material.transparent = true;
     console.log(water)
 
     GOO.add(water);
-    GOO.add(mesh);
+    GOO.add(lava);
 
     var bb = new THREE.Box3(); // for re-use
-    bb.setFromObject(mesh);
+    bb.setFromObject(lava);
     bb.max.y += 0.2;
 
     GLOBALS.GOO_BOXES.push(bb);
+
+    console.log("000000000000000")
+    console.log(GLOBALS.GOO_BOXES);
+
+    
 };
 
 const randomizeMatrix = function () {
@@ -267,78 +274,88 @@ const vertexShader = `
 varying vec2 vUv;
 uniform float iTime;
 
-void main() {
-    //vUv = uv;
-    vUv = vec2(position.x,position.z)*0.5;
-    
-    // Add a sine wave displacement to the y-coordinate of the position
-    vec3 displacedPosition = position;
-    displacedPosition.y += sin(position.x * 5.0 + iTime) * 0.02; // Adjust the frequency and amplitude as needed
+void main()
+{
 
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(displacedPosition, 1.0);
+    vUv = vec2(position.x,position.z)*0.25;
+                
+                // Add a sine wave displacement to the y-coordinate of the position
+                vec3 displacedPosition = position;
+                displacedPosition.y += sin(position.x * 5.0 + iTime) * 0.02; // Adjust the frequency and amplitude as needed
+
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(displacedPosition, 1.0);
+
 }
 `;
 
 // Fragment Shader
 const fragmentShader = `
 #define PI 3.141592654
+            
+            uniform float iTime;
+            varying vec2 vUv;
 
-uniform float iTime;
-varying vec2 vUv;
+            vec2 rot(vec2 p, float a) {
+                float c = cos(a * 15.83);
+                float s = sin(a * 15.83);
+                return p * mat2(s, c, c, -s);
+            }
 
-vec2 rot(vec2 p, float a) {
-    float c = cos(a * 15.83);
-    float s = sin(a * 15.83);
-    return p * mat2(s, c, c, -s);
-}
+            void mainImage(out vec4 o, in vec2 uv) {
+                uv = vUv;
+                uv = vec2(.125, .75) + (uv - vec2(.125, .75)) * .1; // Adjust the offset
+                float T = iTime * .25;
 
-void mainImage(out vec4 o, in vec2 uv) {
-    uv = vUv;
-    uv = vec2(.125, .75) + (uv - vec2(.125, .75)) * .01; // Adjust the offset
-    float T = iTime * .25;
+                vec3 c = clamp(1. - .7 * vec3(
+                    length(uv - vec2(.1, 0)),
+                    length(uv - vec2(.9, 0)),
+                    length(uv - vec2(.5, 1))
+                ), 0., 1.) * 2. - 1.;
 
-    vec3 c = clamp(1. - .7 * vec3(
-        length(uv - vec2(.1, 0)),
-        length(uv - vec2(.9, 0)),
-        length(uv - vec2(.5, 1))
-    ), 0., 1.) * 2. - 1.;
+                vec3 c0 = vec3(0);
+                float w0 = 0.;
+                const float N = 10.;
 
-    vec3 c0 = vec3(0);
-    float w0 = 0.;
-    const float N = 20.;
+                for (float i = 0.; i < N; i++) {
+                float wt = (i * i / N / N - .2) * .3;
+                float wp = 0.5 + (i + 1.) * (i + 1.5) * 0.001;
+                float wb = .05 + i / N * 0.1;
+                c.zx = rot(c.zx, 1.6 + T * 0.65 * wt + (uv.x + .7) * 23. * wp);
+                //c.xy = rot(c.xy, c.z * c.x * wb + 1.7 + T * wt + (uv.y + 1.1) * 15. * wp);
+                //c.yz = rot(c.yz, c.x * c.y * wb + 2.4 - T * 0.79 * wt + (uv.x + uv.y * (fract(i / 2.) - 0.25) * 4.) * 17. * wp);
+                //c.zx = rot(c.zx, c.y * c.z * wb + 1.6 - T * 0.65 * wt + (uv.x + .7) * 23. * wp);
+                //c.xy = rot(c.xy, c.z * c.x * wb + 1.7 - T * wt + (uv.y + 1.1) * 15. * wp);
+                float w = (1.5 - i / N);
+                c0 += c * w;
+                w0 += w;
+                }
 
-    for (float i = 0.; i < N; i++) {
-    float wt = (i * i / N / N - .2) * .3;
-    float wp = 0.5 + (i + 1.) * (i + 1.5) * 0.001;
-    float wb = .05 + i / N * 0.1;
-    c.zx = rot(c.zx, 1.6 + T * 0.65 * wt + (uv.x + .7) * 23. * wp);
-    //c.xy = rot(c.xy, c.z * c.x * wb + 1.7 + T * wt + (uv.y + 1.1) * 15. * wp);
-    //c.yz = rot(c.yz, c.x * c.y * wb + 2.4 - T * 0.79 * wt + (uv.x + uv.y * (fract(i / 2.) - 0.25) * 4.) * 17. * wp);
-    //c.zx = rot(c.zx, c.y * c.z * wb + 1.6 - T * 0.65 * wt + (uv.x + .7) * 23. * wp);
-    //c.xy = rot(c.xy, c.z * c.x * wb + 1.7 - T * wt + (uv.y + 1.1) * 15. * wp);
-    float w = (1.5 - i / N);
-    c0 += c * w;
-    w0 += w;
-    }
+                c0 = c0 / w0 * 2. + .5;
+                c0 *= vec3(0.6, 0.4, 0.2); // Adjust the values to achieve a brown color
+                //c0 += pow(length(sin(c0 * PI * 4.)) / sqrt(3.) * 1.0, 20.) * (.3 + .7 * c0);
 
-     c0 = c0 / w0 * 2.0 + 0.5;
+                o = vec4(c0, 1.0);
+            }
 
-    // Adjust the values to achieve a brown color and reduce colorfulness
-    c0 *= vec3(0.4, 0.2, 0.1);
-    //c0 += pow(length(sin(c0 * PI * 4.0)) / sqrt(3.0) * 1.0, 20.0) * (0.3 + 0.7 * c0);;
+            void main() {
+                vec4 color;
+                mainImage(color, vUv);
+                gl_FragColor = color;
 
-    o = vec4(c0, 1.0);
-}
-
-void main() {
-    vec4 color;
-    mainImage(color, vUv);
-    gl_FragColor = color;
-
-    #include <tonemapping_fragment>
-    #include <encodings_fragment>
-}
+                #include <tonemapping_fragment>
+                #include <encodings_fragment>
+            }
 `;
+
+const textureLoader = new THREE.TextureLoader();
+
+const cloudTexture = textureLoader.load( 'lava/cloud.png' );
+const lavaTexture = textureLoader.load( 'lava/lavatile.jpg' );
+
+lavaTexture.colorSpace = THREE.SRGBColorSpace;
+
+cloudTexture.wrapS = cloudTexture.wrapT = THREE.RepeatWrapping;
+lavaTexture.wrapS = lavaTexture.wrapT = THREE.RepeatWrapping;
 
 var uniforms = {
     iTime: {
@@ -362,7 +379,7 @@ var delta = 0;
 const interval = 1 / 20;
 
 function renderGoo() {
-    delta += clock2.getDelta();
+    //delta += clock2.getDelta();
 
     /*if (delta > interval) {
         // The draw or time dependent code are here
@@ -378,8 +395,19 @@ function renderGoo2() {
     //uniforms[ 'time' ].value += 0.2 * delta;
 
     //uniforms['iTime'].value += clock.getDelta();
-    if (water)
-        water.material.uniforms['time'].value += 0.0005;
+    if (lava){
+        //lava.material.uniforms['time'].value += 0.0005;
+        //const delta4 = 5 * clock.getDelta();
+
+        //uniforms[ 'iTime' ].value += 0.2 * delta4;
+    }
+
+    if(water){
+        for(var i=0; i<water2.length;i++){
+            water2[i].material.uniforms[ 'time' ].value += 1.0 / 1000.0;
+        }
+        
+    }
 
 }
 

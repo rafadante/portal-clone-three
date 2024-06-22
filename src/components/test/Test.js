@@ -53,6 +53,8 @@ function viewFPS() {
 
     setTimeout(() => {
 
+        GLOBALS.RENDERER.setPixelRatio(window.devicePixelRatio * GLOBALS.PIXEL_RATIO);
+
         //
         GLOBALS.EXIT_ROOM.visible = true;
 
@@ -114,6 +116,15 @@ function viewFPS() {
             }
         }
 
+         // Floor
+         /*const floorShape = new CANNON.Plane()
+         const floorBody = new CANNON.Body({ mass: 0 })
+         floorBody.addShape(floorShape)
+         floorBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0)
+         floorBody.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
+         floorBody.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC
+         GLOBALS.CANNON_WORLD.addBody(floorBody)*/
+
         colliderRoom(sideDown, "down", "z", "x", "y", "x");
         colliderRoom(sideUp, "up", "z", "x", "y", "x");
         colliderRoom(sideFront, "front", "y", "x", "z", "x");
@@ -144,18 +155,18 @@ function viewFPS() {
 
         var obj = new THREE.Object3D();
         obj.position.copy(target);
-        GLOBALS.SCENE.add(obj);
+        GLOBALS.SCENE_CHILDREN.add(obj);
 
         GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").target = obj;
-        GLOBALS.SCENE.add(GLOBALS.GUN);
-        GLOBALS.SCENE.add(GLOBALS.GUN_CLONE);
+        GLOBALS.SCENE_CHILDREN.add(GLOBALS.GUN);
+        GLOBALS.SCENE_CHILDREN.add(GLOBALS.GUN_CLONE);
         
         GLOBALS.GUN.children[0].add(GLOBALS.LIGHTNIN_STRIKE_1,
             GLOBALS.LIGHTNIN_STRIKE_2, GLOBALS.LIGHTNIN_STRIKE_3);
         GLOBALS.GUN.visible = true;
         GLOBALS.GUN_SPHERE.material = GLOBALS.MATERIAL_GUN;
         GLOBALS.GUN_CYLINDER.material = GLOBALS.MATERIAL_GUN;
-        GLOBALS.MAIN_CAMERA.add(GLOBALS.GUN)
+        //GLOBALS.MAIN_CAMERA.add(GLOBALS.GUN)
 
         console.log(GLOBALS.GUN)
 
@@ -182,7 +193,7 @@ function viewFPS() {
         createInstances(meshesFloorPortal, GLOBALS.MATERIAL_FLOOR_PORTAL)
         createInstances(meshesFloorNonPortal, GLOBALS.MATERIAL_FLOOR_NON_PORTAL)
 
-        GLOBALS.SCENE.remove(GLOBALS.ROOM);
+        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.ROOM);
         GLOBALS.RENDERER.renderLists.dispose();
         GLOBALS.ENTER_DOOR.children[1].visible = false;
 
@@ -247,7 +258,7 @@ function viewFPS() {
                 plane.rotation.copy(GLOBALS.DYMANIC_ITEMS['stripe'][i].rotation);
                 plane.scale.set(0.2, 2, 2)
                 plane.translateZ(0.025);
-                GLOBALS.SCENE.add(plane);
+                GLOBALS.SCENE_CHILDREN.add(plane);
             }
         }
 
@@ -264,7 +275,7 @@ function viewFPS() {
                 rectLight.rotation.x *= -1;
                 rectLight.rotation.y *= -1;
                 rectLight.rotation.z *= -1;
-                //GLOBALS.SCENE.add(rectLight);
+                //GLOBALS.SCENE_CHILDREN.add(rectLight);
 
                 var lightEmissive = new THREE.Object3D();
                 lightEmissive.position.copy(GLOBALS.DYMANIC_ITEMS['light'][i].position);
@@ -273,7 +284,6 @@ function viewFPS() {
                 instanced.setMatrixAt(i, lightEmissive.matrix);
                 instanced.instanceMatrix.needsUpdate = true;
                 instanced.computeBoundingSphere();
-                console.log(instanced)
 
                 //
                 var spotLight = new THREE.SpotLight(0xffffff, 100);
@@ -301,9 +311,9 @@ function viewFPS() {
                     spotLight.position.y + (dir.z * 10),
                     spotLight.position.z + (dir.y * 10));
 
-                GLOBALS.SCENE.add(spotLight);
+                GLOBALS.SCENE_CHILDREN.add(spotLight);
                 var lightHelper = new THREE.SpotLightHelper(spotLight);
-                //GLOBALS.SCENE.add(lightHelper);
+                //GLOBALS.SCENE_CHILDREN.add(lightHelper);
 
                 //
                 const geometry = new THREE.PlaneGeometry(1, 1);
@@ -320,12 +330,16 @@ function viewFPS() {
                 //plane.rotation.x *= -1;
                 //plane.rotation.y *= -1;
                 //plane.rotation.z *= -1;
-                //GLOBALS.SCENE.add(plane);
+                //GLOBALS.SCENE_CHILDREN.add(plane);
             }
         }
 
-        window['createBlueGel']()
-        window['createOrangeGel']()
+        //setTimeout(() => {
+            window['createBlueGel']()
+            window['createOrangeGel']()
+        //}, 10000);
+
+        
 
 
         var vec = new THREE.Vector3(0, 0, 0);
@@ -342,6 +356,15 @@ function viewFPS() {
         }, 1000);*/
 
         GLOBALS.EXIT_ROOM.visible = false;
+
+        for( var i = GLOBALS.SCENE.children.length - 1; i >= 0; i--) { 
+            var obj = GLOBALS.SCENE.children[i];
+            //GLOBALS.SCENE_CHILDREN.remove(obj); 
+       }
+
+       //GLOBALS.RENDERER.renderLists.dispose();
+       console.log(GLOBALS.SCENE)
+       GLOBALS.SCENE.background = new THREE.Color(0x000000);
     }, 500);
 };
 
@@ -468,7 +491,6 @@ function addColliderItem(items, type, mass, offset) {
 
                 box.arrayPos = [];
                 box.arrayRot = [];
-                box.recall = false;
                 box.name = type;
 
                 box.addEventListener("sleep", function (event) {
@@ -595,8 +617,8 @@ function createInstances(meshes, material) {
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     mesh.name = "Instanced-" + id;
-    mesh.frustumCulled = true;
-    GLOBALS.SCENE.add(mesh);
+    //mesh.frustumCulled = true;
+    GLOBALS.SCENE_CHILDREN.add(mesh);
     id++;
 
     for (var i = 0; i < meshes.length; i++) {

@@ -156,10 +156,10 @@
           <img data-content="If the player steps in Deadly Goo they will be instantly killed." data-title="DEADLY GOO"
             class="item" data-name="goo" src="../assets/ui/items/goo.png" />
 
-          <img
+          <!--<img
             data-content="The player can recharge the paint gun, you can choose between the blue, orange, white and puple gels. If a player go through fizzlers the gun will lose all the painting and the player will need to recharge again."
             data-title="GEL GUN RECHARGER" class="item" data-name="gel_gun_blue"
-            src="../assets/ui/items/gel_gun_blue.png" />
+            src="../assets/ui/items/gel_gun_blue.png" />-->
 
           <img data-content="You can choose if you want the panel to be automatically deployed or not."
             data-title="ANGLED GLASS PANEL" class="item" data-name="angled_panel1"
@@ -190,7 +190,7 @@
           <img data-content="You can link a trigger to it to open the door." data-title="DOOR" class="item"
             data-name="door" src="../assets/ui/items/door.png" />
 
-          <img
+          <!--<img
             data-content="You can place automatic portals on the scene, it can be static or activated by a trigger. You can choose which portal color on the level editor. If the player has a portal gun and shoots a portal with the same color as the automatic portal, the automatic portal will be destroyed and vice versa."
             data-title="AUTOMATIC PORTAL" class="item" data-name="portal" src="../assets/ui/items/portal.png" />
 
@@ -199,15 +199,15 @@
             data-title="RECALL GUN" class="item" data-name="recall2" src="../assets/ui/items/recall2.png" />
 
           <img data-content="" data-title="PORTAL GUN" class="item" data-name="gun2"
-            src="../assets/ui/items/gun2.png" />
+            src="../assets/ui/items/gun2.png" />-->
 
-          <img
+          <!--<img
             data-content="Blue will cause the player to bounce. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
             data-title="GEL BLUE" class="item" data-name="gel_blue" src="../assets/ui/items/gel_blue.png" />
 
           <img
             data-content="Orange will give the player increased speed. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GLE ORANGE" class="item" data-name="gel_orange" src="../assets/ui/items/gel_orange.png" />
+            data-title="GEL ORANGE" class="item" data-name="gel_orange" src="../assets/ui/items/gel_orange.png" />
 
           <img
             data-content="White will allow the player to create a portal on any surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
@@ -219,40 +219,25 @@
 
           <img
             data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL CLEAR" class="item" data-name="gel_new" src="../assets/ui/items/gel_new.png" />
+            data-title="GEL CLEAR" class="item" data-name="gel_new" src="../assets/ui/items/gel_new.png" />-->
 
-            <img
+            <!--<img
             data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
             data-title="GEL CLEAR" class="item" data-name="ramp" src="../assets/ui/items/gel_new.png" />
 
             <img
             data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL CLEAR" class="item" data-name="ramp_half2" src="../assets/ui/items/gel_new.png" />
+            data-title="GEL CLEAR" class="item" data-name="ramp_half2" src="../assets/ui/items/gel_new.png" />-->
         </div>
       </div>
     </div>
 
     <div id="ui-top" class="">
-      <div id="top-menu">
-        <button id="view-fps">
-          <i class="fas fa-eye"></i>
-        </button>
-        <button id="draws">
-          <i class="fas fa-play"></i>
-        </button>
-        <button>
-          <i class="fas fa-undo"></i>
-        </button>
-        <button>
-          <i class="fas fa-redo"></i>
-        </button>
-
-      </div>
-
       <div id="top-menu-left">
         <span id="save-level">Save</span>
         <span id="load-level">Load</span>
         <span>Help</span>
+        <span id="view-fps">Test</span>
       </div>
     </div>
   </div>
@@ -544,7 +529,6 @@
           </section>
         </div>
 
-
         <div id="options-settings" class="option-main">
           <span class="option selected" id="settings-controls">CONTROLS</span>
           <span class="option" id="settings-video">GRAPHICS</span>
@@ -672,22 +656,22 @@
             </div>
           </div>
           <!--SHADOWS-->
-          <div class="options-row">
+          <!--<div class="options-row">
             <span class="option-name" id="">Shadows</span>
             <div class="option-value">
               <input id="option-shadow" checked type="checkbox" />
             </div>
-          </div>
+          </div>-->
           <!--SHADOW RESOLUTIONS-->
           <div class="options-row">
             <span class="option-name" id="">Shadows Resolution</span>
             <div class="option-value">
               <select name="shadows-resolution" id="shadows-resolution-select">
-                <option value="4096">4096</option>
-                <option value="2048">2048</option>
-                <option value="1024">1024</option>
                 <option value="512">512</option>
                 <option value="256">256</option>
+                <option value="1024">1024</option>
+                <option value="2048">2048</option>
+                <option value="4096">4096</option>
               </select>
             </div>
           </div>
@@ -705,18 +689,13 @@
               <input checked type="checkbox" />
             </div>
           </div>-->
-
         </div>
-
       </div>
-
-
       <div id="settings-menu">
         <button id="settings-close">PLAY</button>
         <button id="done">OPTIONS</button>
         <button id="back-main">BACK</button>
       </div>
-
     </div>
   </div>
 
@@ -736,8 +715,6 @@
       <div id="joystickWrapper1"></div>
       <!--<div id="joystickWrapper2"></div>-->
     </div>
-
-    <!--<div id="mobile-right-buttons">-->
 
     <img style="    position: absolute;
     bottom: 115px;
@@ -788,17 +765,7 @@
     transform: rotate(88deg);
     filter: drop-shadow(2px 4px 6px black);
     opacity: 0.8;" id="portal_r" src="./assets/ui/mobile/portalBlue2.png" />
-    <!--</div>-->
-
-
-
     <div id="camera"></div>
-
-    <!--<img style="    position: absolute;
-    width: 805px;
-    right: -95px;
-    bottom: -340px;" src="./assets/gg.png" />-->
-
   </div>
 
   <div id="death-screen" style="width: 100%;

@@ -45,26 +45,17 @@ import {
     updateEvents
 } from './components/events/events.js';
 import {
-    recallRay
-} from './components/recall/recall.js';
-import {
     loadMaterials
 } from "./components/materials/Materials.js";
 import {
     RoomEnvironment
 } from 'three/addons/environments/RoomEnvironment.js';
 import {
-    updateGels,
     initGels
 } from './components/gels/Gels.js';
 import {
     GLOBALS
 } from './Globals.js';
-import {
-    animateSonar
-} from './usePostRender.js';
-import * as CANNON from 'cannon';
-
 
 //VARIABLES
 var raycaster = new THREE.Raycaster();
@@ -113,10 +104,10 @@ function init() {
     GLOBALS.ROOM.name = "ROOM";
     GLOBALS.ITEMS_ADDED.name = "ITEMS";
     GLOBALS.CUBES.name = "CUBES";
-    GLOBALS.SCENE.add(GLOBALS.ROOM);
-    GLOBALS.SCENE.add(GLOBALS.ITEMS_ADDED);
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.ROOM);
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.ITEMS_ADDED);
     GLOBALS.ROOM.add(GLOBALS.CUBES);
-    GLOBALS.SCENE.add(GLOBALS.ITEM_CUBE);
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.ITEM_CUBE);
 
     console.log(GLOBALS.SCENE)
     // CAMERA
@@ -124,7 +115,7 @@ function init() {
     //LIGHT GROUP
     GLOBALS.LIGHT_GROUP = new Lights(THREE);
     GLOBALS.LIGHT_GROUP.name = "LIGHT_GROUP";
-    GLOBALS.SCENE.add(GLOBALS.LIGHT_GROUP);
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_GROUP);
     //HDR
     pmremGenerator = new THREE.PMREMGenerator(GLOBALS.RENDERER);
     const environment = new RoomEnvironment(GLOBALS.RENDERER);
@@ -144,6 +135,7 @@ function init() {
     document.getElementById("container").addEventListener('pointerdown', onDocumentMouseDown, false);
     document.getElementById("container").addEventListener('pointermove', onDocumentMouseMove, false);
     document.getElementById("container").addEventListener('pointerup', onDocumentMouseUp, false);
+    document.getElementById("container").addEventListener('wheel', onDocumentMouseWheel, false);
 
     recreateRay();
 }
@@ -170,6 +162,10 @@ function onDocumentMouseDown(event) {
         raycastManager(event, "down");
         animate();
     }
+}
+
+function onDocumentMouseWheel(){
+    animate();
 }
 
 function onDocumentMouseMove(event) {
@@ -263,14 +259,10 @@ function onWindowResize() {
     GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
 }
 
-
 //SCENE FPS
-let clock = new THREE.Clock();
 let clock2 = new THREE.Clock();
 let clock3 = new THREE.Clock();
-let delta = 0;
 let delta2 = 0;
-
 
 let clockPortal = new THREE.Clock();
 let deltaPortal = 0;
@@ -287,23 +279,7 @@ function animate(time) {
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
     } else if (!GLOBALS.PAUSED) {
 
-        delta += clock.getDelta();
-
-        if (!GLOBALS.STOP_TIME) {
-            if (GLOBALS.FPS_UNLOCKED) {
-                render(time);
-            } else {
-                if (delta > GLOBALS.INTERVAL) {
-                    // The draw or time dependent code are here
-                    render(time);
-                    delta = delta % GLOBALS.INTERVAL;
-                }
-            }
-        } else {
-            animatePortal();
-            recallRay();
-            animateSonar();
-        }
+        render(time);
 
         delta2 += clock3.getDelta();
 
@@ -341,7 +317,7 @@ function render(time) {
     renderGoo();
     updateEvents();
     updatePhysics();
-    updateGels();
+    //updateGels();
     TWEEN.update();
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {
@@ -371,7 +347,6 @@ function tweenCamera(duration, ini, final) {
         .start();
 }
 
-
 var deltaPortalRecursive = 0;
 var clockPortalRecursive = new THREE.Clock();
 var renderRecursive = true;
@@ -382,9 +357,9 @@ function animatePortal() {
     // don't show the clone model when rendering portals
     let cloneVisible = false
     if (GLOBALS.PLAYER && GLOBALS.PLAYER_MODEL) {
-        GLOBALS.PLAYER_MODEL.visible = true
-        cloneVisible = GLOBALS.PLAYER_MODEL_CLONE.visible
-        GLOBALS.PLAYER_MODEL_CLONE.visible = false;
+        //GLOBALS.PLAYER_MODEL.visible = true
+        //cloneVisible = GLOBALS.PLAYER_MODEL_CLONE.visible
+        //GLOBALS.PLAYER_MODEL_CLONE.visible = false;
     }
 
     //const currentShadowAutoUpdate = GLOBALS.RENDERER.shadowMap.autoUpdate;
@@ -398,26 +373,27 @@ function animatePortal() {
     GLOBALS.RENDERER.autoClearStencil = false;
 
     GLOBALS.GUN.visible = false;
-    GLOBALS.GUN_CLONE.visible = true;
+    /*GLOBALS.GUN_CLONE.visible = true;
 
     var positionBoneHand = new THREE.Vector3();
     window.hand.getWorldPosition(positionBoneHand);
 
     GLOBALS.GUN_CLONE.position.copy(positionBoneHand);
-    GLOBALS.GUN_CLONE.rotation.y = GLOBALS.MAIN_CAMERA.rotation.y;
+    GLOBALS.GUN_CLONE.rotation.copy(GLOBALS.MAIN_CAMERA.rotation);
+
+    window.neck.rotation.y = -GLOBALS.MAIN_CAMERA.rotation.x;
+    window.handLeft.rotation.z = GLOBALS.MAIN_CAMERA.rotation.x + Math.PI/2.1;*/
 
     deltaPortal += clockPortal.getDelta();
-
-    //if (deltaPortal > (1 / 30)) {
-    // The draw or time dependent code are here
+    
     renderPortal2(0, 1)
     renderPortal2(1, 0)
-    //    deltaPortal = deltaPortal % 30;
-    //}
+
+    GLOBALS.SCENE_CHILDREN.visible = true;
 
     GLOBALS.RENDERER.autoClear = false;
 
-    GLOBALS.GUN.visible = true;
+    /*GLOBALS.GUN.visible = false;
     GLOBALS.GUN.children[0].children[0].scale.set(0.1, 0.1, 0.1)
     GLOBALS.GUN.children[0].children[0].position.set(0.01, -0.012, -0.011);
 
@@ -448,7 +424,7 @@ function animatePortal() {
         GLOBALS.PORTALS[0].mesh.visible = true
         GLOBALS.PORTALS[1].mesh.visible = true
     }
-
+*/
     GLOBALS.GUN.visible = true;
 
     //GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
@@ -498,9 +474,10 @@ function renderPortal2(thisIndex, pairIndex) {
 
     for (let level = GLOBALS.PORTAL_RECURSION_LEVELS - 1; level >= 0; level--) {
 
-        /*if (level > 0 && !renderRecursive) {
-            break;
-        }*/
+        if(level>0)
+            GLOBALS.SCENE_CHILDREN.visible = false;
+        else
+            GLOBALS.SCENE_CHILDREN.visible = true;
 
         if (!shouldRender[level]) {
             teleportObject3D(GLOBALS.PORTALS[pairIndex], portalCamera)
@@ -547,7 +524,6 @@ function teleportObject3D(obj1, obj2) {
 let frustum = new THREE.Frustum();
 
 function portalIsVisibleInCamera(camera, portal, clippingPlane) {
-
 
     camera.updateMatrix();
     camera.updateMatrixWorld();

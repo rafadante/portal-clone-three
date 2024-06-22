@@ -3,9 +3,6 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import "./components/materials/Materials.js"
 import {
-    animate
-} from './Main.js';
-import {
     OrbitControls
 } from 'three/addons/controls/OrbitControls.js';
 
@@ -20,9 +17,9 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
     antialias = false;
 } else {
     mobile = false;
-    pixelRatio = 1;
+    pixelRatio = 0.8;
     shadowMap = true;
-    portalsRecursive = 5;
+    portalsRecursive = 3;
     fov = 60;
     antialias = true;
 }
@@ -36,6 +33,7 @@ camera.position.set(0, 0, 30);
 const cubeHolder = new THREE.Object3D()
 cubeHolder.position.z = -1.25;
 cubeHolder.name = "cubeHolder";
+window.cubeHolder = cubeHolder;
 camera.add(cubeHolder);
 
 //RENDERER
@@ -44,7 +42,7 @@ const renderer = new THREE.WebGLRenderer({
     powerPreference: "high-performance",
     antialias: antialias,
 });
-renderer.setPixelRatio(window.devicePixelRatio * pixelRatio);
+renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;;
@@ -55,22 +53,18 @@ renderer.shadowMap.needsUpdate = false;
 renderer.localClippingEnabled = true;
 renderer.physicallyCorrectLights = true;
 renderer.domElement.id = "viewer-3d";
-//renderer.outputEncoding = THREE.sRGBEncoding;
-//renderer.setClearColor(0x3a3a3a, 1);
-//renderer.shadowMap.type = THREE.VSMShadowMap;
 renderer.shadowMap.autoUpdate = false;
 
 //CONTROLS
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.minDistance = 0;
-controls.addEventListener('change', function () {
-    if (!GLOBALS.FPS_MODE)
-        animate();
-});
 
 var GLOBALS = {
 
+    PIXEL_RATIO: pixelRatio,
+
     SCENE: new THREE.Scene(),
+    SCENE_CHILDREN: new THREE.Group(),
     MAIN_CAMERA: camera,
     CONTROLS: controls,
     POINTER_CONTROLS: null,
@@ -88,7 +82,6 @@ var GLOBALS = {
     ALLOW_PLACE_PORTALS: true,
     GEL_ORANGE: false,
     LOADED_LEVEL: false,
-    RECALLING: false,
 
     //GROUPS
     ITEMS_ADDED: new THREE.Group(),
@@ -305,6 +298,8 @@ var GLOBALS = {
 
     PLANE_EXIT_DOOR: null,
 }
+
+GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
 
 export {
     GLOBALS

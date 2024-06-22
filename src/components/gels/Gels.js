@@ -23,7 +23,7 @@ function initGels() {
     instancedMeshGel.receiveShadow = true;
     instancedMeshGel.frustumCulled = true;
     instancedMeshGel.name = "gel-parent";
-    GLOBALS.SCENE.add(instancedMeshGel);
+    GLOBALS.SCENE_CHILDREN.add(instancedMeshGel);
 
     var clone = new THREE.Object3D();
 
@@ -73,7 +73,7 @@ window['createOrangeGel'] = function () {
 
                 const geometry = new THREE.IcosahedronGeometry(20, 4);
                 gelBallOrange = new THREE.Mesh(geometry, mat2);
-                GLOBALS.SCENE.add(gelBallOrange);
+                GLOBALS.SCENE_CHILDREN.add(gelBallOrange);
 
                 gelBallOrange.scale.set(0.022, 0.022, 0.022)
 
@@ -94,6 +94,14 @@ window['createOrangeGel'] = function () {
                 // Force
                 gelBallBodyOrange.force.setZero();
                 gelBallBodyOrange.torque.setZero();
+
+                // Position
+                gelBallBodyOrange.position.setZero();
+                gelBallBodyOrange.previousPosition.setZero();
+                gelBallBodyOrange.interpolatedPosition.setZero();
+                gelBallBodyOrange.initPosition.setZero();
+
+                console.log("4444444444444444")
             }
 
             var pos = GLOBALS.DYMANIC_ITEMS['gel_orange'][i].position.clone();
@@ -101,7 +109,10 @@ window['createOrangeGel'] = function () {
             gelBallBodyOrange.position.copy(pos);
             gelBallOrange.position.copy(pos);
 
-            gelBallOrange.visible = true;
+            console.log(pos)
+
+            gelBallOrange.visible = false;
+            console.log(gelBallBodyOrange)
 
             if (!vv2) {
                 gelBallBodyOrange.addEventListener('collide', (event) => {
@@ -110,7 +121,7 @@ window['createOrangeGel'] = function () {
 
                     } else if (event.body.room && !cc2) {
 
-                        cc2 = true;
+                        //cc2 = true;
 
                         if (event.target.name == "player") {
 
@@ -118,9 +129,11 @@ window['createOrangeGel'] = function () {
                             window['createOrangeGel']();
 
                             setTimeout(() => {
-                                cc2 = false;
+                                //cc2 = false;
                             }, 10);
                         } else {
+
+                            console.log("111111111111111")
 
                             const pos = new THREE.Vector3(event.target.position.x, event.body.position.y, event.target.position.z);
                             const pos2 = pos.round();
@@ -130,9 +143,8 @@ window['createOrangeGel'] = function () {
 
                             if (plane.length > 0) {
 
-
-
                                 if (!plane[0].painted) {
+                                    console.log("22222222222222")
                                     createGelOrange(pos2, plane[0]);
                                 }
 
@@ -142,10 +154,11 @@ window['createOrangeGel'] = function () {
                             gelBallOrange.visible = false;
 
                             setTimeout(() => {
-                                window['createOrangeGel']();
+                                console.log("3333333333")
+                               // window['createOrangeGel']();
 
                                 setTimeout(() => {
-                                    cc2 = false;
+                                    //cc2 = false;
                                 }, 10);
                             }, 2000);
                         }
@@ -246,7 +259,7 @@ window['createBlueGel'] = function () {
 
                 const geometry = new THREE.IcosahedronGeometry(20, 4);
                 gelBallBlue = new THREE.Mesh(geometry, mat);
-                GLOBALS.SCENE.add(gelBallBlue);
+                GLOBALS.SCENE_CHILDREN.add(gelBallBlue);
 
                 gelBallBlue.scale.set(0.022, 0.022, 0.022)
 
@@ -274,7 +287,7 @@ window['createBlueGel'] = function () {
             gelBallBodyBlue.position.copy(pos);
             gelBallBlue.position.copy(pos);
 
-            gelBallBlue.visible = true;
+            gelBallBlue.visible = false;
 
             if (!vv) {
                 gelBallBodyBlue.addEventListener('collide', (event) => {
@@ -283,7 +296,7 @@ window['createBlueGel'] = function () {
 
                     } else if (event.body.room && !cc) {
 
-                        cc = true;
+                        //cc = true;
 
                         if (event.target.name == "player") {
 
@@ -291,7 +304,7 @@ window['createBlueGel'] = function () {
                             window['createBlueGel']();
 
                             setTimeout(() => {
-                                cc = false;
+                                //cc = false;
                             }, 10);
                         } else {
 
@@ -315,10 +328,10 @@ window['createBlueGel'] = function () {
                             gelBallBlue.visible = false;
 
                             setTimeout(() => {
-                                window['createBlueGel']();
+                                //window['createBlueGel']();
 
                                 setTimeout(() => {
-                                    cc = false;
+                                    //cc = false;
                                 }, 10);
                             }, 2000);
                         }
@@ -452,6 +465,8 @@ function createGel(pos, plane) {
                 event.body.velocity.set(event.body.velocity.x * event.target.vel.x,
                     event.body.velocity.y * event.target.vel.y,
                     event.body.velocity.z * event.target.vel.z);
+
+            window.PLAYER_JUMPING_FROM_BLUE_GEL = true;
 
             event.body.applyImpulse(event.target.up.clone().multiplyScalar(10 * event.body.mass * Math.abs((relativeVelocity * 0.045) + 1)), event.body.position)
         }

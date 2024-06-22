@@ -57,7 +57,7 @@ function createLightBridges(item, rayItem) {
             }
 
             const plane = new THREE.Mesh(geometry, material);
-            GLOBALS.SCENE.add(plane);
+            GLOBALS.SCENE_CHILDREN.add(plane);
 
             if (item == "tractor_beam" || item == "laser_emitter") {
                 plane.rotation.x = Math.PI / 2;
@@ -144,17 +144,17 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
             if (rayItem[g].name == "light_bridge") {
                 if (GLOBALS.LIGHT_BRIDGE_CLONE[g]) {
-                    GLOBALS.SCENE.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
+                    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
                     GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
                 }
             } else if (rayItem[g].name == "tractor_beam") {
                 if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
-                    GLOBALS.SCENE.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
+                    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
                     GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
                 }
             } else if (rayItem[g].name == "laser_emitter") {
                 if (GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]) {
-                    GLOBALS.SCENE.remove(GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]);
+                    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]);
                     GLOBALS.LASER_EMITTER_BOUNDING_BOX[GLOBALS.LASER_EMITTER_LENGTH + g] = null;
                 }
             }
@@ -171,17 +171,17 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 if (intersects[0].uv.x > 0.3 && intersects[0].uv.x < 0.7) {
                     if (rayItem[g].name == "light_bridge") {
                         if (GLOBALS.LIGHT_BRIDGE_CLONE[g]) {
-                            GLOBALS.SCENE.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
+                            GLOBALS.SCENE_CHILDREN.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
                             GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
                         }
                     } else if (rayItem[g].name == "tractor_beam") {
                         if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
-                            GLOBALS.SCENE.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
+                            GLOBALS.SCENE_CHILDREN.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
                             GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
                         }
                     } else if (rayItem[g].name == "laser_emitter") {
                         if (GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]) {
-                            GLOBALS.SCENE.remove(GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]);
+                            GLOBALS.SCENE_CHILDREN.remove(GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]);
                             GLOBALS.LASER_EMITTER_BOUNDING_BOX[GLOBALS.LASER_EMITTER_LENGTH + g] = null;
                         }
                     }
@@ -213,7 +213,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
             }
 
             const plane = new THREE.Mesh(geometry, material);
-            GLOBALS.SCENE.add(plane);
+            GLOBALS.SCENE_CHILDREN.add(plane);
 
             if (rayItem[g].name == "tractor_beam" || rayItem[g].name == "laser_emitter") {
                 plane.rotation.x = Math.PI / 2;
@@ -292,17 +292,17 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
             if (rayItem[g].name == "light_bridge") {
                 if (GLOBALS.LIGHT_BRIDGE_CLONE[g]) {
-                    GLOBALS.SCENE.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
+                    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
                     GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
                 }
             } else if (rayItem[g].name == "tractor_beam") {
                 if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
-                    GLOBALS.SCENE.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
+                    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
                     GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
                 }
             } else if (rayItem[g].name == "laser_emitter") {
                 if (GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]) {
-                    GLOBALS.SCENE.remove(GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]);
+                    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]);
                     GLOBALS.LASER_EMITTER_BOUNDING_BOX[GLOBALS.LASER_EMITTER_LENGTH + g] = null;
                 }
             }

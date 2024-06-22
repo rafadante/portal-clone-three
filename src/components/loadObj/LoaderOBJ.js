@@ -5,14 +5,10 @@ import {
 import {
     buildIniCubes
 } from '../cubeManager/CubeManager.js';
-import {
-    RectAreaLightHelper
-} from 'three/addons/helpers/RectAreaLightHelper.js';
 import $ from 'jquery';
 import JSZipUtils from 'jszip-utils';
 import {
-    unzipSync,
-    strFromU8
+    unzipSync
 } from 'three/addons/libs/fflate.module.js';
 import {
     animate
@@ -25,15 +21,7 @@ import {
 } from '../../Globals.js';
 import {
     FBXLoader
-} from 'three/addons/loaders/FBXLoader.js'
-import * as SceneUtils from 'three/addons/utils/SceneUtils.js';
-
-import {
-    InstancedMesh2
-} from '../../InstancedMesh2.js';
-import {
-    InstancedEntity
-} from '../../InstancedEntity.js';
+} from 'three/addons/loaders/FBXLoader.js';
 
 async function handleZip(path, obj) {
     await JSZipUtils.getBinaryContent(path, function (err, data) {
@@ -156,7 +144,7 @@ function loadWindowIMG() {
         gltf.scene.translateY(-1)
         gltf.scene.translateX(-1)
         gltf.scene.name = "window";
-        GLOBALS.SCENE.add(gltf.scene);
+        GLOBALS.SCENE_CHILDREN.add(gltf.scene);
         GLOBALS.OBSERVATION_ROOM_IMG = gltf.scene;
         loadWindow();
     });
@@ -184,9 +172,6 @@ function loadWindowManager(scene) {
             light.position.copy(target);
             light.translateY(-0.2);
             scene.add(light);
-            // window.room_light = child;
-
-            // window.lightRoom = light;
         }
 
         if (child.name.includes("image")) {
@@ -195,19 +180,15 @@ function loadWindowManager(scene) {
             child.material.envMapIntensity = 0.5;
             child.material.roughness = 0.3;
         }
-
-
     })
 
     scene.rotation.y = -Math.PI / 2;
     scene.position.set(16, 6, 6);
     scene.visible = false;
     scene.name = "OBSERVATION_ROOM";
-    GLOBALS.SCENE.add(scene);
+    GLOBALS.SCENE_CHILDREN.add(scene);
 
     GLOBALS.OBSERVATION_ROOM = scene;
-
-    console.log(scene)
     loadGun();
 }
 
@@ -227,7 +208,6 @@ function loadGunManager(scene) {
 
     var cube_1, cube_2, cube_3;
 
-
     GLOBALS.GUN_CLONE = new THREE.Group();
     var gunClone = scene.clone();
     //gunClone.rotation.y = THREE.MathUtils.degToRad(38);
@@ -239,7 +219,7 @@ function loadGunManager(scene) {
         if (child.material) {
             child.receiveShadow = true;
             child.material.envMap = GLOBALS.ENV_MAP;
-            child.material.envMapIntensity = 0.25;
+            child.material.envMapIntensity = 0.5;
         }
 
         child.renderOrder = 10;
@@ -254,10 +234,12 @@ function loadGunManager(scene) {
             cube_2 = child;
         else if (child.name == "cube_3")
             cube_3 = child;
+        else if (child.name == "cube_4")
+            window.gun_holder = child;
     });
 
     GLOBALS.GUN.name = "GUN";
-    GLOBALS.SCENE.add(GLOBALS.GUN);
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.GUN);
 
     //gltf.scene.position.set(0.12, -0.14, -0.13);
     scene.scale.set(0.1, 0.1, 0.1)
@@ -300,11 +282,12 @@ function loadDoor() {
 function loadExitDoor(scene) {
     //EXIT DOOR
     var door = scene;
-    door.position.set(13, 1, -0.99)
+
+    door.position.set(13, 1, -1)
     door.translateZ(1);
     door.name = "exitDoor";
     GLOBALS.EXIT_DOOR = door;
-    //GLOBALS.SCENE.add(door);
+    GLOBALS.SCENE_CHILDREN.add(door);
 
     door.traverse(child => {
 
@@ -336,18 +319,12 @@ function loadEnterDoor(scene) {
 
     //ENTER DOOR
     door.name = "enterDoor";
-
-    
-door.rotation.y = Math.PI/2;
-door.position.set(-20, 1, 23);
-    
-
-    /*door.rotation.y = Math.PI;
-    door.position.set(3, 1, 12);*/
+    door.rotation.y = Math.PI;
+    door.position.set(3, 1, 12);
 
     door.namePosition = door.position.x + "/" + door.position.y + "/" + door.position.z;
     GLOBALS.ENTER_DOOR = door;
-    GLOBALS.SCENE.add(door);
+    GLOBALS.SCENE_CHILDREN.add(door);
 
     //
     const geometry = new THREE.PlaneGeometry(2, 2);
@@ -402,20 +379,17 @@ function loadCorridorEnter(scene) {
         if (child.material) {
             child.material.envMap = GLOBALS.ENV_MAP;
 
-            if (child.material.name == "lambert5") {
+            if (child.material.name == "lambert5")
                 child.material = new THREE.MeshBasicMaterial()
-            }
 
-            if (child.name == "back") {
+            if (child.name == "back")
                 GLOBALS.WALL_CORRIDOR_BACK = child;
-            }
         }
     });
 
     GLOBALS.CORRIDOR_ENTER = corridor;
     GLOBALS.CORRIDOR_ENTER.name = "corridorEnter";
     GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
-    //loadCorridorExit(scene);
     loadPortalCube();
 }
 
@@ -435,16 +409,6 @@ function loadPortalCubeManager(scene) {
 function instancedTransform(scene, name, interactive, roughness, envIntensity) {
     var geometry = scene.children[0].geometry.clone();
     geometry.computeVertexNormals();
-
-    //if (interactive)
-    //    geometry.scale(0.015, 0.015, 0.015);
-
-
-    /*const item = new InstancedMesh2(geometry, scene.children[0].material.clone(), 100, (obj, index) => {
-        obj.position.random().multiplyScalar(500).subScalar(250);
-        obj.quaternion.random();
-        obj.forceUpdateMatrix();
-      });*/
 
     var item = new THREE.InstancedMesh(geometry, scene.children[0].material.clone(), 20);
     item.instanceMatrix.setUsage(THREE.DynamicDrawUsage); // will be updated every frame
@@ -466,9 +430,8 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity) {
     item.material.roughness = roughness;
     item.frustumCulled = false;
 
-    if (interactive) {
+    if (interactive)
         GLOBALS.INTERACTIVE.push(item);
-    }
 
     if (name == "laser_cube") {
         GLOBALS.LASER_CUBE = item;
@@ -556,20 +519,6 @@ function loadDispenserManager(scene) {
     item.userData.wall = false;
     item.userData.ground = true;
     item.userData.ceiling = false;
-
-    /*scene.name = "dispenser";
-    scene.userData.wall = false;
-    scene.userData.ground = true;
-    scene.userData.ceiling = false;
-    GLOBALS.ITEMS.add(scene);
-    scene.traverse(child => {
-        child.receiveShadow = true;
-        child.castShadow = true;
-        if (child.material) {
-            child.material.envMap = GLOBALS.ENV_MAP;
-            child.material.envMapIntensity = 0.5;
-        }
-    })*/
 
     loadPedestalButton()
 }
@@ -899,6 +848,7 @@ function loadGelBlue() {
 
 function loadGelBlueManager(scene) {
     var item = instancedTransform(scene, "gel_blue", false, 0.2, 1)
+    item.visible = false;
     item.userData.wall = true;
     item.userData.ground = true;
     item.userData.ceiling = true;
@@ -913,6 +863,7 @@ function loadGelOrange() {
 
 function loadGelOrangeManager(scene) {
     var item = instancedTransform(scene, "gel_orange", false, 0.2, 1)
+    item.visible = false;
     item.userData.wall = true;
     item.userData.ground = true;
     item.userData.ceiling = true;
@@ -930,7 +881,7 @@ function loadElevatorRoomManager(scene) {
     scene.name = "exit_room";
     GLOBALS.EXIT_ROOM = scene;
 
-    //GLOBALS.SCENE.add(scene)
+    //GLOBALS.SCENE_CHILDREN.add(scene)
     GLOBALS.EXIT_ROOM.visible = false;
 
     scene.traverse(child => {
@@ -996,8 +947,6 @@ function loadAvatar() {
 
         const fbx = glb.scene;
 
-        //console.log(fbx)
-
         fbx.scale.setScalar(0.015);
         GLOBALS.MIXERS = new THREE.AnimationMixer(fbx)
         fbx.visible = false;
@@ -1015,18 +964,21 @@ function loadAvatar() {
             if (c.isBone) {
                 if (c.name == "wrist_R") {
                     window.hand = c;
+                }else if (c.name == "elbow_L") {
+                    window.handLeft = c;
+                }else if (c.name == "neck1") {
+                    window.neck = c;
                 }
             }
         })
 
         GLOBALS.GUN_CLONE.scale.setScalar(0.7);
-        console.log(GLOBALS.GUN_CLONE)
 
         GLOBALS.PLAYER_MODEL = fbx;
         GLOBALS.PLAYER_MODEL_CLONE = GLOBALS.PLAYER_MODEL.clone();
 
-        GLOBALS.SCENE.add(GLOBALS.PLAYER_MODEL);
-        GLOBALS.SCENE.add(GLOBALS.PLAYER_MODEL_CLONE);
+        GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL);
+        GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE);
 
         GLOBALS.PLAYER_MODEL.animationActions = {};
         GLOBALS.PLAYER_MODEL.modelReady = true;

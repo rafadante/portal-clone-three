@@ -6,8 +6,6 @@ import {
 } from '../generalBB/GeneralBB.js'
 import {
     Group,
-    MeshStandardMaterial,
-    PlaneGeometry,
     Vector3
 } from 'three';
 import {
@@ -69,7 +67,6 @@ class Portal extends Group {
             gl_Position = projectionMatrix * modelViewPosition;
         }
         `
-
         const FRAG_SHADER = `
         uniform sampler2D texture1;
         uniform float ww;
@@ -80,7 +77,6 @@ class Portal extends Group {
             #include <colorspace_fragment>
         }
         `
-
         const geometry = new THREE.CylinderGeometry(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_HEIGHT, 50);
         const uniforms = {
             texture1: {
@@ -107,21 +103,6 @@ class Portal extends Group {
             stencilFail: THREE.ReplaceStencilOp,
             polygonOffset: true,
             polygonOffsetFactor: -1
-
-            /*stencilWrite: true,
-            stencilFunc: THREE.AlwaysStencilFunc,
-            stencilFail: THREE.KeepStencilOp,
-            stencilZFail: THREE.KeepStencilOp,
-            stencilZPass: THREE.ReplaceStencilOp,
-            stencilRef: 1*/
-
-            /*depthFunc: THREE.AlwaysDepth,
-            stencilWrite: true,
-            stencilFunc: THREE.EqualStencilFunc,
-            stencilFail: THREE.DecrementWrapStencilOp,
-            stencilZFail: THREE.DecrementWrapStencilOp,
-            stencilZPass: THREE.DecrementWrapStencilOp,
-            stencilRef: 1*/
         });
 
         this.mesh = new THREE.Mesh(geometry, material);
@@ -176,16 +157,7 @@ class Portal extends Group {
         this.ringMesh.position.add(normal.clone().multiplyScalar(GLOBALS.PORTAL_HEIGHT / 2 + 0.001))
         this.ringMesh.updateMatrix()
         this.ringMesh.matrixAutoUpdate = true;
-        //this.ringMesh.rotation.set(0,0,0);
         this.ringMesh.visible = false;
-        //this.add(this.ringMesh)
-
-
-        //this.translateZ(1)
-
-        //var dir = new THREE.Vector3();
-        //dir.subVectors(GLOBALS.MAIN_CAMERA.position, this.portalShader.getWorldPosition(dir)).normalize();
-        //this.portalShader.translateOnAxis(dir, 2);
 
         // CDBB: collision disable BB
         // STBB: should teleport BB
@@ -234,13 +206,7 @@ function teleportPhysicalObject(object, portal) {
     velocity = getTeleportedDirectionalVector(velocity, portal)
     force = getTeleportedDirectionalVector(force, portal)
 
-
-    /*velocity.x = 0;
-    velocity.z = 0;*/
-
-    //console.log(velocity)
-
-    /*if(velocity.x > 15){
+    if(velocity.x > 15){
         velocity.x = 15;
     }else if(velocity.x < -15){
         velocity.x = -15;
@@ -256,9 +222,7 @@ function teleportPhysicalObject(object, portal) {
         velocity.z = 15;
     }else if(velocity.z < -15){
         velocity.z = -15;
-    }*/
-
-
+    }
 
     object.position.copy(position)
     object.previousPosition.copy(previousPosition)

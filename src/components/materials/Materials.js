@@ -5,22 +5,22 @@ import {
 
 function loadMaterials() {
     //MATERIAL FLOOR NON PORTAL
-    GLOBALS.MATERIAL_FLOOR_NON_PORTAL = new THREE.MeshPhysicalMaterial();
-    loadMaterial(GLOBALS.MATERIAL_FLOOR_NON_PORTAL, 'floor/nonPortalable/1/base.jpg',
-        'floor/nonPortalable/1/normal.jpg', null, 'floor/nonPortalable/1/roughness.jpg', null, 1);
+    GLOBALS.MATERIAL_FLOOR_NON_PORTAL = new THREE.MeshStandardMaterial();
+    loadMaterial(GLOBALS.MATERIAL_FLOOR_NON_PORTAL, 'metal/floor.jpg', 'metal/floor_normal.jpg', null, 
+    'floor/nonPortalable/1/roughness.jpg', null, 1);
 
     //MATERIAL FLOOR PORTAL
     GLOBALS.MATERIAL_FLOOR_PORTAL = GLOBALS.MATERIAL_FLOOR_NON_PORTAL.clone();
-    loadMaterial(GLOBALS.MATERIAL_FLOOR_PORTAL, 'floor/portalable/1/base.jpg', null, null, null, null, 1);
+    loadMaterial(GLOBALS.MATERIAL_FLOOR_PORTAL, 'portal/floor.jpg', 'portal/floor_normal.jpg', null, null, null, 1);
 
     //MATERIAL WALL PORTAL
-    GLOBALS.MATERIAL_WALL_PORTAL = new THREE.MeshPhysicalMaterial();
-    loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL, 'wall/portalable/1/base.jpg', 'wall/portalable/1/normal.jpg',
-        null, 'wall/portalable/1/roughness.jpg', null, 1);
+    GLOBALS.MATERIAL_WALL_PORTAL = new THREE.MeshStandardMaterial();
+    loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL, 'portal/wall2.jpg', 'portal/wall2_normal.jpg',
+        null, null, null, 1);
 
     //MATERIAL WALL NON PORTAL
     GLOBALS.MATERIAL_WALL_NON_PORTAL = GLOBALS.MATERIAL_WALL_PORTAL.clone();
-    loadMaterial(GLOBALS.MATERIAL_WALL_NON_PORTAL, 'wall/nonPortalable/1/base.jpg', null,
+    loadMaterial(GLOBALS.MATERIAL_WALL_NON_PORTAL, 'metal/wall2.jpg', 'metal/wall2_normal.jpg',
         null, null, null, 1);
 }
 
@@ -28,10 +28,6 @@ function loadMaterial(material, base, normal, ao, rough, metal, roughValue) {
 
     var map;
     material.roughness = roughValue;
-
-    /*if(color){
-        material.color = new THREE.Color(0x800080);
-    }*/
 
     if (base) {
         map = new THREE.TextureLoader().load('./assets/textures/' + base);
@@ -72,7 +68,7 @@ map.encoding = THREE.sRGBEncoding;
 const normal = textureLoader.load('./assets/textures/decal/normal.jpg');
 
 GLOBALS.INK_MATERIAL = new THREE.MeshStandardMaterial({
-    map: map,
+    //map: map,
     normalMap: normal,
     normalScale: new THREE.Vector2(1, 1),
     transparent: true,

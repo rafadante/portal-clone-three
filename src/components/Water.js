@@ -12,7 +12,7 @@ import {
 	Vector4,
 	WebGLRenderTarget
 } from 'three';
-import { GLOBALS } from './Globals';
+import { GLOBALS } from '../Globals';
 
 /**
  * Work based on :

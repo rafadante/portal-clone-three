@@ -224,7 +224,7 @@ function addItem(found, loaded) {
                 });
                 const cube = new THREE.Mesh(geometry, material);
                 cube.position.copy(item.position)
-                //GLOBALS.SCENE.add(cube);
+                //GLOBALS.SCENE_CHILDREN.add(cube);
 
                 var bb = new THREE.Box3(); // for re-use
                 bb.setFromObject(cube);
@@ -399,7 +399,7 @@ function findPath(ini, target, found) {
         map: GLOBALS.IMG_CLOSE,
     });
     const plane = new THREE.Mesh(geometryCheck, materialCheck);
-    GLOBALS.SCENE.add(plane);
+    GLOBALS.SCENE_CHILDREN.add(plane);
 
     var side = true;
 
@@ -421,7 +421,7 @@ function findPath(ini, target, found) {
     GLOBALS.MATERIAL_NON_PORTAL_EDITOR.transparent = false;
 
     isDrawStart = false;
-    GLOBALS.SCENE.remove(lineFollow);
+    GLOBALS.SCENE_CHILDREN.remove(lineFollow);
     count = 0;
 
     GLOBALS.SELECTED_FOR_CONNECTION.check = plane;
@@ -607,7 +607,7 @@ function path2(dgraph, start, end, side) {
 
     var circlePAth = new THREE.Mesh(mergedGeometry, circleMaterial);
 
-    GLOBALS.SCENE.add(circlePAth);
+    GLOBALS.SCENE_CHILDREN.add(circlePAth);
     GLOBALS.SELECTED_FOR_CONNECTION.circle = circlePAth;
 }
 
@@ -642,7 +642,7 @@ document.addEventListener('keydown', (event) => {
     if (event.code == "Escape" && isDrawStart) {
 
         isDrawStart = false;
-        GLOBALS.SCENE.remove(lineFollow);
+        GLOBALS.SCENE_CHILDREN.remove(lineFollow);
 
         GLOBALS.CONNECTING = false;
 
@@ -675,7 +675,7 @@ $("body").on('click', '#conection', function (event) {
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
     lineFollow = new THREE.Line(geometry, materialLine);
-    GLOBALS.SCENE.add(lineFollow);
+    GLOBALS.SCENE_CHILDREN.add(lineFollow);
 
     isDrawStart = true;
 
@@ -783,8 +783,6 @@ function interactWithItem() {
         itemHolder.gelJumping = false;
 
         itemHolder.sleeping = false;
-        itemHolder.recall = false;
-        GLOBALS.RECALLING = false;
 
         //GLOBALS.CANNON_WORLD.addBody(itemHolder);
         GLOBALS.CURRENT_ITEM.body.holding = false;

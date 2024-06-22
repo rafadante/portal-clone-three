@@ -1,9 +1,6 @@
 /* eslint-disable */
 
 import * as THREE from 'three';
-import {
-    Box3
-} from 'three';
 
 class GeneralBB {
     // width, depth, height numbers

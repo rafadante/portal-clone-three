@@ -83,6 +83,9 @@ function updateEvents() {
                     d.goal = goal;
                     //d.mass = 0;
 
+                    if(!goal.trigger.itemName)
+                        return;
+
                     if (goal.trigger.itemName.includes("door")) {
                         const doorLeft = goal.trigger.item.getObjectByName("door_left");
                         const doorRight = goal.trigger.item.getObjectByName("door_right");
@@ -250,7 +253,7 @@ function laser() {
 
                     if (!cube.laser) {
                         const plane = new THREE.Mesh(geometry, GLOBALS.LASER_EMITTER[i].material); //materialBridge
-                        GLOBALS.SCENE.add(plane);
+                        GLOBALS.SCENE_CHILDREN.add(plane);
 
 
                         cube.laser = true;
@@ -307,7 +310,7 @@ function laser() {
 
             if (yyy) {
                 if (yyy.laser) {
-                    GLOBALS.SCENE.remove(yyy.plane);
+                    GLOBALS.SCENE_CHILDREN.remove(yyy.plane);
                     yyy.laser = false;
                 }
             }
@@ -393,10 +396,9 @@ function tractorBeam() {
                     up.y = 1;
                     up.x *= 0.55;
                     up.z *= 0.55;
-                    console.log(up);
 
                     if (d.name == "player")
-                        f = 52500;
+                        f = 53000;
                     else {
                         if (up.z == -0.55)
                             f = 4325;
@@ -451,8 +453,6 @@ function tractorBeam() {
                     // Calculate the required initial velocity to reach the desired maximum height
                     const initialVelocity = Math.sqrt(2 * maxHeight * gravity.length());
 
-                    console.log(2 * (finalPosition.z - initialPosition.z) / gravity.length())
-
                     // Calculate the time of flight to reach the desired final position
                     const timeToReachDestination = Math.sqrt(2 * Math.abs(finalPosition.z - initialPosition.z) / gravity.length());
 
@@ -460,10 +460,6 @@ function tractorBeam() {
                     const requiredForce = new CANNON.Vec3();
                     gravity.scale(d.mass, requiredForce);
                     requiredForce.scale(initialVelocity / timeToReachDestination, requiredForce);
-
-                    console.log(initialVelocity);
-                    console.log(timeToReachDestination);
-                    console.log(requiredForce);
 
                     // Apply the force to the body
                     //d.applyImpulse(force, d.position);
@@ -535,11 +531,7 @@ function tractorBeam() {
                         }
                     } else {
 
-                        /*if (d.recall) {
-                            continue;
-                        }*/
-
-                        pos.add(vec.clone().multiplyScalar(0.02)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side
+                        pos.add(vec.clone().multiplyScalar(0.04)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side
                         d.position.copy(pos);
                         d.angularVelocity.setZero();
                         d.velocity.setZero();
@@ -670,7 +662,7 @@ function portalCollision() {
                     if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
                         CDBB_isOverlap = true;
                         teleportObject3D(GLOBALS.PLAYER_MODEL_CLONE, GLOBALS.PORTALS[p])
-                        GLOBALS.PLAYER_MODEL_CLONE.visible = true;
+                        //GLOBALS.PLAYER_MODEL_CLONE.visible = true;
 
                         GLOBALS.PLAYER_MODEL_CLONE.traverse(c => {
                             if (c.isBone) {
@@ -682,7 +674,7 @@ function portalCollision() {
                             }
                         })
 
-                        GLOBALS.GUN_CLONE.visible = true;
+                        //GLOBALS.GUN_CLONE.visible = true;
                     }
                 }
 
@@ -723,10 +715,15 @@ function portalCollision() {
                     GLOBALS.TARGET_ROTATION_X = GLOBALS.MAIN_CAMERA.rotation.y;
                     GLOBALS.TARGET_ROTATION_Y = GLOBALS.MAIN_CAMERA.rotation.x;
 
-                    if (inArea > 0)
-                        GLOBALS.SMOOTHNESS = 1;
-                    else
-                        GLOBALS.SMOOTHNESS = 0.1;
+                    GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
+
+                    //if (inArea > 0)
+                    //GLOBALS.SMOOTHNESS = 1;
+                    //else
+                    //    GLOBALS.SMOOTHNESS = 0.1;
+                    setTimeout(() => {
+                        //GLOBALS.SMOOTHNESS = 0.1;
+                    }, 10);
                 }
 
                 d.collisionFilterMask |= GLOBALS.PORTALS[p].hostObjects.collisionFilterGroup
