@@ -50,6 +50,7 @@ function viewFPS() {
     $("#loading-parent").css("pointer-events", "all")
     $("#container").css("filter", "blur(3px)")
     $(".img").addClass("image");
+    GLOBALS.FLASH.visible = true;
 
     setTimeout(() => {
 
@@ -158,8 +159,8 @@ function viewFPS() {
         GLOBALS.SCENE_CHILDREN.add(obj);
 
         GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").target = obj;
-        GLOBALS.SCENE_CHILDREN.add(GLOBALS.GUN);
-        GLOBALS.SCENE_CHILDREN.add(GLOBALS.GUN_CLONE);
+        //GLOBALS.SCENE_CHILDREN.add(GLOBALS.GUN);
+        GLOBALS.SCENE.add(GLOBALS.GUN_CLONE);
         
         GLOBALS.GUN.children[0].add(GLOBALS.LIGHTNIN_STRIKE_1,
             GLOBALS.LIGHTNIN_STRIKE_2, GLOBALS.LIGHTNIN_STRIKE_3);
@@ -365,6 +366,7 @@ function viewFPS() {
        //GLOBALS.RENDERER.renderLists.dispose();
        console.log(GLOBALS.SCENE)
        GLOBALS.SCENE.background = new THREE.Color(0x000000);
+       GLOBALS.FLASH.visible = false;
     }, 500);
 };
 

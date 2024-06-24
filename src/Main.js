@@ -21,7 +21,8 @@ import {
     animateShader
 } from "./components/shaders/AnimateShaders.js"
 import {
-    updatePlayer
+    updatePlayer,
+    updateCamera
 } from './components/fps/Fps.js';
 import {
     loadCube
@@ -280,14 +281,15 @@ function animate(time) {
     } else if (!GLOBALS.PAUSED) {
 
         render(time);
+        fixedUpdate();
 
-        delta2 += clock3.getDelta();
+        /*delta2 += clock3.getDelta();
 
         if (delta2 > 1 / 60) {
             // The draw or time dependent code are here
             fixedUpdate();
             delta2 = delta2 % 60;
-        }
+        }*/
     }
 }
 
@@ -318,6 +320,7 @@ function render(time) {
     updateEvents();
     updatePhysics();
     //updateGels();
+    updateCamera(time);
     TWEEN.update();
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {
@@ -357,9 +360,9 @@ function animatePortal() {
     // don't show the clone model when rendering portals
     let cloneVisible = false
     if (GLOBALS.PLAYER && GLOBALS.PLAYER_MODEL) {
-        //GLOBALS.PLAYER_MODEL.visible = true
-        //cloneVisible = GLOBALS.PLAYER_MODEL_CLONE.visible
-        //GLOBALS.PLAYER_MODEL_CLONE.visible = false;
+        GLOBALS.PLAYER_MODEL.visible = true
+        cloneVisible = GLOBALS.PLAYER_MODEL_CLONE.visible
+        GLOBALS.PLAYER_MODEL_CLONE.visible = false;
     }
 
     //const currentShadowAutoUpdate = GLOBALS.RENDERER.shadowMap.autoUpdate;
@@ -373,7 +376,7 @@ function animatePortal() {
     GLOBALS.RENDERER.autoClearStencil = false;
 
     GLOBALS.GUN.visible = false;
-    /*GLOBALS.GUN_CLONE.visible = true;
+    GLOBALS.GUN_CLONE.visible = true;
 
     var positionBoneHand = new THREE.Vector3();
     window.hand.getWorldPosition(positionBoneHand);
@@ -382,18 +385,35 @@ function animatePortal() {
     GLOBALS.GUN_CLONE.rotation.copy(GLOBALS.MAIN_CAMERA.rotation);
 
     window.neck.rotation.y = -GLOBALS.MAIN_CAMERA.rotation.x;
-    window.handLeft.rotation.z = GLOBALS.MAIN_CAMERA.rotation.x + Math.PI/2.1;*/
+    window.handLeft.rotation.z = GLOBALS.MAIN_CAMERA.rotation.x + Math.PI/2.1;
 
     deltaPortal += clockPortal.getDelta();
+
+
+    //CLONE STATE
+    GLOBALS.GUN_CLONE.visible = GLOBALS.PORTAL_GUN_CLONE_STATE;
+    GLOBALS.PLAYER_MODEL.visible = GLOBALS.PLAYER_CLONE_STATE;
     
-    renderPortal2(0, 1)
-    renderPortal2(1, 0)
+    if(GLOBALS.PORTAL_RECURSION_LEVELS>0){
+
+        renderPortal2(0, 1)
+        renderPortal2(1, 0)
+    }else{
+
+        if(GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value == 1){
+            GLOBALS.PORTALS[0].mesh.material.uniforms.texture1.value = null;
+            GLOBALS.PORTALS[1].mesh.material.uniforms.texture1.value = null;
+            GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value = 0;
+            GLOBALS.PORTALS[1].portalShader.material.uniforms.iOpened.value = 0;
+        }
+    }
+    
 
     GLOBALS.SCENE_CHILDREN.visible = true;
 
     GLOBALS.RENDERER.autoClear = false;
 
-    /*GLOBALS.GUN.visible = false;
+    GLOBALS.GUN.visible = false;
     GLOBALS.GUN.children[0].children[0].scale.set(0.1, 0.1, 0.1)
     GLOBALS.GUN.children[0].children[0].position.set(0.01, -0.012, -0.011);
 
@@ -424,7 +444,7 @@ function animatePortal() {
         GLOBALS.PORTALS[0].mesh.visible = true
         GLOBALS.PORTALS[1].mesh.visible = true
     }
-*/
+
     GLOBALS.GUN.visible = true;
 
     //GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;

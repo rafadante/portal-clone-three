@@ -8,6 +8,7 @@ function loadMaterials() {
     GLOBALS.MATERIAL_FLOOR_NON_PORTAL = new THREE.MeshStandardMaterial();
     loadMaterial(GLOBALS.MATERIAL_FLOOR_NON_PORTAL, 'metal/floor.jpg', 'metal/floor_normal.jpg', null, 
     'floor/nonPortalable/1/roughness.jpg', null, 1);
+    GLOBALS.MATERIAL_FLOOR_NON_PORTAL.envMapIntensity = 0.3;
 
     //MATERIAL FLOOR PORTAL
     GLOBALS.MATERIAL_FLOOR_PORTAL = GLOBALS.MATERIAL_FLOOR_NON_PORTAL.clone();

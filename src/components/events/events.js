@@ -656,6 +656,7 @@ function portalCollision() {
                 d.inArea = true;
 
                 if (dd == 0) {
+
                     inArea++;
 
                     // show the clone
@@ -685,6 +686,7 @@ function portalCollision() {
                     d.disabled = false;
                     GLOBALS.CANNON_WORLD.addBody(d);
                 }
+
                 d.inArea = false;
             }
 

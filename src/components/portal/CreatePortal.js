@@ -17,8 +17,12 @@ import {
 
 var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
+var allowPortal = true;
 
 function portalButton(button) {
+
+    if(!allowPortal)
+        return;
 
     if (GLOBALS.FPS_MODE && (button == 2 || button == 0 || button == 1) && GLOBALS.ALLOW_PLACE_PORTALS) {
 
@@ -195,6 +199,15 @@ function portalButton(button) {
                         newPortal(0, 1, point, normal, userData.body, playerUpDirection, portalPoints)
 
                         GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new THREE.Vector3(1.0, 0.25, 0.0);
+
+                        //PORTAL GUN FLASH
+                        GLOBALS.FLASH.children[0].material.color = new THREE.Color( 1, 0.25, 0 );
+                        GLOBALS.FLASH.children[0].material.emissive = new THREE.Color( 1, 0.25, 0 );
+                        GLOBALS.FLASH.visible = true;
+                        setTimeout(() => {
+                            GLOBALS.FLASH.visible = false;
+                        }, 300);
+
                         if (GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha.value == 0.0) {
                             new TWEEN.Tween(GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha).to({
                                 value: 0.5
@@ -218,6 +231,15 @@ function portalButton(button) {
                         newPortal(1, 0, point, normal, userData.body, playerUpDirection, userData.rotation)
 
                         GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new THREE.Vector3(0.0, 0.3, 1.0);
+
+                        //PORTAL GUN FLASH
+                        GLOBALS.FLASH.children[0].material.color = new THREE.Color( 0, 0.3, 1 );
+                        GLOBALS.FLASH.children[0].material.emissive = new THREE.Color( 0, 0.3, 1 );
+                        GLOBALS.FLASH.visible = true;
+                        setTimeout(() => {
+                            GLOBALS.FLASH.visible = false;
+                        }, 300);
+
                         if (GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha.value == 0.0) {
                             new TWEEN.Tween(GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha).to({
                                 value: 0.5
@@ -242,6 +264,44 @@ function portalButton(button) {
             }
         }
     }
+
+    //PORTAL GUN FLASH
+    if (button == 0) { // left click
+        GLOBALS.FLASH.children[0].material.color = new THREE.Color( 1, 0.25, 0 );
+        GLOBALS.FLASH.children[0].material.emissive = new THREE.Color( 1, 0.25, 0 );
+        GLOBALS.FLASH.children[3].color = new THREE.Color( 1, 0.25, 0 );
+    } else if (button == 2) { // left click
+        GLOBALS.FLASH.children[0].material.color = new THREE.Color( 0, 0.3, 1 );
+        GLOBALS.FLASH.children[0].material.emissive = new THREE.Color( 0, 0.3, 1 ); 
+        GLOBALS.FLASH.children[3].color = new THREE.Color( 0, 0.3, 1 );
+    }
+
+    if(button==0 || button ==2){
+        GLOBALS.FLASH.visible = true;
+        GLOBALS.FLASH.children[3].visible = true;
+        tweenCamera(100, GLOBALS.FLASH.scale, new THREE.Vector3(0.02,0.02,0.02));
+
+        console.log(GLOBALS.GUN.children[0].position.z)
+        allowPortal = false;
+        tweenCamera(100, GLOBALS.GUN.children[0].position, new THREE.Vector3(GLOBALS.GUN.children[0].position.x,
+            GLOBALS.GUN.children[0].position.y,
+            0.005));
+        setTimeout(() => {
+            tweenCamera(100, GLOBALS.GUN.children[0].position, new THREE.Vector3(GLOBALS.GUN.children[0].position.x,
+                GLOBALS.GUN.children[0].position.y,
+                0));
+                
+            setTimeout(() => {
+                allowPortal = true;
+            }, 100);
+        }, 100);
+    }
+
+    setTimeout(() => {
+        tweenCamera(100, GLOBALS.FLASH.scale, new THREE.Vector3(0,0,0));
+        GLOBALS.FLASH.children[3].visible = false;
+        //GLOBALS.FLASH.visible = false;
+    }, 100);
 }
 
 // deletes the portal with index portalIndex from the scene

@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import * as THREE from 'three';
 import {
     PointerLockControls
@@ -35,7 +37,7 @@ var gamepadButton7 = false;
 var gamepadButton12 = false;
 var gamepadButton15 = false;
 var headBobTimer = 0;
-var headBobSpeed = 3;
+var headBobSpeed = 5;
 var headBobHeight = 0.00005;
 var headBobActive = false;
 var repositioningGUn = false;
@@ -406,7 +408,7 @@ document.addEventListener('keyup', (event) => {
         headBobTimer = 0;
         //headBobActive = false;
 
-        tweenCamera(500, GLOBALS.GUN.children[0].position, new THREE.Vector3(0, 0, 0))
+        tweenCamera(100, GLOBALS.GUN.children[0].position, new THREE.Vector3(0, 0, 0))
 
         if (crouched) {
             crouched = false;
@@ -730,7 +732,14 @@ const updatePlayer = function (deltaTime) {
         }
     }
 
-    //GLOBALS.MAIN_CAMERA.rotation.multiplyScalar(-1);
+    updateHeadBob(deltaTime);[]
+
+    if (moving)
+        GLOBALS.GUN.children[0].position.x += Math.sin(headBobTimer * headBobSpeed) * headBobHeight;
+}
+
+const updateCamera = function (deltaTime) {
+//GLOBALS.MAIN_CAMERA.rotation.multiplyScalar(-1);
 
     // always look where the camera points
     GLOBALS.PLAYER.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion)
@@ -743,14 +752,10 @@ const updatePlayer = function (deltaTime) {
     GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
     
 
-    if (moving)
-        GLOBALS.GUN.children[0].position.x += Math.sin(headBobTimer * headBobSpeed) * headBobHeight;
-
     //const targetPosition = GLOBALS.MAIN_CAMERA.quaternion.clone();
     //GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
     GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.SMOOTHNESS);
-    //GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
-    updateHeadBob(deltaTime);
+    //GLOBALS.GUN.rotation.copy(GLOBALS.MAIN_CAMERA.rotation);
 
     if (GLOBALS.MAIN_CAMERA.position.distanceTo(new THREE.Vector3(0, 0, 0)) > 100) {
         var obj = GLOBALS.ENTER_DOOR.clone();
@@ -758,7 +763,7 @@ const updatePlayer = function (deltaTime) {
         GLOBALS.PLAYER.position.copy(obj.position);
     }
 
-    /*// copy position and rotation so player model aligns with the physical body
+    // copy position and rotation so player model aligns with the physical body
     if (GLOBALS.PLAYER_MODEL) {
         GLOBALS.PLAYER_MODEL.position.copy(GLOBALS.PLAYER.position).add(new THREE.Vector3(0, -1, 0))
         GLOBALS.PLAYER_MODEL.quaternion.copy(GLOBALS.PLAYER.quaternion)
@@ -815,7 +820,7 @@ const updatePlayer = function (deltaTime) {
 
         GLOBALS.MIXERS.update(delta);
 
-    }*/
+    }
 }
 
 var activeAction, lastAction;
@@ -929,5 +934,6 @@ function elevator() {
 
 export {
     updatePlayer,
-    elevator
+    elevator,
+    updateCamera
 };

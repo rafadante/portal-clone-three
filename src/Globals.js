@@ -17,7 +17,7 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
     antialias = false;
 } else {
     mobile = false;
-    pixelRatio = 0.8;
+    pixelRatio = 0.5;
     shadowMap = true;
     portalsRecursive = 3;
     fov = 60;
@@ -50,7 +50,7 @@ renderer.toneMappingExposure = 0.6;
 renderer.shadowMap.enabled = shadowMap;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.shadowMap.needsUpdate = false;
-renderer.localClippingEnabled = true;
+renderer.localClippingEnabled = false;
 renderer.physicallyCorrectLights = true;
 renderer.domElement.id = "viewer-3d";
 renderer.shadowMap.autoUpdate = false;
@@ -185,7 +185,8 @@ var GLOBALS = {
         lightEmissive: [],
         stripe: [],
         gel_blue: [],
-        gel_orange: []
+        gel_orange: [],
+        camera: []
     },
 
     INTERACTIVE: [],
@@ -248,7 +249,7 @@ var GLOBALS = {
     IMG_CHECK: null,
     IMG_CLOSE: null,
 
-    SMOOTHNESS: 0.1,
+    SMOOTHNESS: 0.15,
 
     GOO_PLANES: [],
     GOO_BOXES: [],
@@ -297,6 +298,11 @@ var GLOBALS = {
     WALL_CORRIDOR_BACK: null,
 
     PLANE_EXIT_DOOR: null,
+
+    PORTAL_GUN_CLONE_STATE: true,
+    PLAYER_CLONE_STATE: true,
+    FLASH: null,
+    FLASH_CLONE: null
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)

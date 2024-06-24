@@ -32,11 +32,26 @@ $("body").on('click', '#done', function () {
 
 //STATS
 $("body").on('input', '#option-stats', function () {
+    localStorage.setItem("option-stats", this.checked);
     if (!this.checked)
         $("#main-container").css("display", "none");
     else
         $("#main-container").css("display", "block");
 
+    update()
+})
+
+//PORTAL GUN CLONE
+$("body").on('input', '#option-portal-gun-clone', function () {
+    localStorage.setItem("option-portal-gun-clone", this.checked);
+    GLOBALS.PORTAL_GUN_CLONE_STATE = this.checked;
+    update()
+})
+
+//PLAYER GUN CLONE
+$("body").on('input', '#option-player-clone', function () {
+    localStorage.setItem("option-player-clone", this.checked);
+    GLOBALS.PLAYER_CLONE_STATE = this.checked;
     update()
 })
 
@@ -47,6 +62,7 @@ $("body").on('input', '#option-shadow', function () {
 
 //RECURSIVE PORTALS
 $('#recursive-select').on('change', function () {
+    localStorage.setItem("recursive-select", $(this).val());
     GLOBALS.PORTAL_RECURSION_LEVELS = $(this).val();
     update()
 });
@@ -69,12 +85,14 @@ $('#fps-select').on('change', function () {
 
 //RESOLUTION
 $('#resolution-select').on('change', function () {
+    localStorage.setItem("resolution-select", window.devicePixelRatio * $(this).val());
     GLOBALS.RENDERER.setPixelRatio(window.devicePixelRatio * $(this).val());
     update()
 });
 
 //SHADOW RESOLUTION
 $('#shadows-resolution-select').on('change', function () {
+    localStorage.setItem("shadows-resolution-select", $(this).val());
     GLOBALS.SPOTLIGHT.shadow.mapSize.width = $(this).val();
     GLOBALS.SPOTLIGHT.shadow.mapSize.height = $(this).val();
 
