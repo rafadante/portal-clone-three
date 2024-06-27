@@ -269,6 +269,8 @@ function player() {
                     if(!GLOBALS.PLAYER.inJump){
                         window.PLAYER_JUMPING_FROM_BLUE_GEL = false;
                     }
+
+                    break;
                 }
             }
         }
@@ -717,17 +719,24 @@ const updatePlayer = function (deltaTime) {
             shouldJump = false;
             // handle jumping when space bar is pressed
 
+            if(!controller["Space"].pressed){
+                jumpPressed = false;
+            }
+
             if (controllerIndex !== null) {
                 if (gamepad.buttons[0].value > 0 && !GLOBALS.PLAYER.inJump)
                     shouldJump = true;
-            } else if (controller["Space"].pressed && !GLOBALS.PLAYER.inJump)
+            } else if (controller["Space"].pressed && !GLOBALS.PLAYER.inJump){
                 shouldJump = true;
+            }
             // update lastTimeStampInJump
             wasInJump = GLOBALS.PLAYER.inJump;
 
-            if (shouldJump) {
+            if (shouldJump && !GLOBALS.PLAYER.inJump && !jumpPressed) {
+                //console.log(deltaTime)
+                jumpPressed = true;
                 GLOBALS.PLAYER.inJump = true
-                GLOBALS.PLAYER.applyImpulse(up.clone().multiplyScalar(f * 0.1), GLOBALS.PLAYER.position)
+                GLOBALS.PLAYER.applyImpulse(up.clone().multiplyScalar(230), GLOBALS.PLAYER.position)
             }
         }
     }
@@ -737,6 +746,8 @@ const updatePlayer = function (deltaTime) {
     if (moving)
         GLOBALS.GUN.children[0].position.x += Math.sin(headBobTimer * headBobSpeed) * headBobHeight;
 }
+
+var jumpPressed = false;
 
 const updateCamera = function (deltaTime) {
 //GLOBALS.MAIN_CAMERA.rotation.multiplyScalar(-1);

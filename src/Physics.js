@@ -26,7 +26,7 @@ else
     world.solver = solver;
 
 world.gravity.set(0, -9.8, 0);
-world.allowSleep = false;
+world.allowSleep = true;
 world.broadphase = new CANNON.NaiveBroadphase();
 
 //PHYSICS INTERACTIONS
@@ -173,6 +173,7 @@ function addJointConstraint(position, constrainedBody) {
 
 // Remove constraint from world
 function removeJointConstraint() {
+    console.log("000000000000")
     world.removeConstraint(jointConstraint)
     jointConstraint = undefined;
     getObject = false;

@@ -262,9 +262,6 @@ function onWindowResize() {
 
 //SCENE FPS
 let clock2 = new THREE.Clock();
-let clock3 = new THREE.Clock();
-let delta2 = 0;
-
 let clockPortal = new THREE.Clock();
 let deltaPortal = 0;
 
@@ -281,7 +278,6 @@ function animate(time) {
     } else if (!GLOBALS.PAUSED) {
 
         render(time);
-        fixedUpdate();
 
         /*delta2 += clock3.getDelta();
 
@@ -293,8 +289,15 @@ function animate(time) {
     }
 }
 
+let previousTime = 0;
+
 function fixedUpdate() { //60 fps always for physics
-    const deltaTime = clock2.getDelta();
+    //const deltaTime = clock2.getElapsedTime();
+
+    const elapsedTime = clock2.getElapsedTime()
+    // Delta Time - デルタタイム
+    const deltaTime = elapsedTime - previousTime;
+    previousTime = elapsedTime
     updatePlayer(deltaTime);
 
     if (Date.now() >= timeTarget && !GLOBALS.STOP_TIME) {
@@ -313,6 +316,7 @@ const STEPS_PER_FRAME = 1;
 function render(time) {
 
     GLOBALS.STATS.begin();
+    fixedUpdate();
     animatePortal();
     updateRay();
     animateShader();
@@ -337,7 +341,7 @@ function render(time) {
 
     // finally, render to screen
     GLOBALS.RENDERER.setRenderTarget(currentRenderTarget);
-    GLOBALS.RENDERER.localClippingEnabled = false
+    //GLOBALS.RENDERER.localClippingEnabled = false
     GLOBALS.RENDERER.clippingPlanes = []
     GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
 
@@ -349,10 +353,6 @@ function tweenCamera(duration, ini, final) {
         //.easing(TWEEN.Easing.Quadratic.Out)
         .start();
 }
-
-var deltaPortalRecursive = 0;
-var clockPortalRecursive = new THREE.Clock();
-var renderRecursive = true;
 
 function animatePortal() {
 
@@ -371,7 +371,7 @@ function animatePortal() {
     GLOBALS.RENDERER.xr.enabled = false;
 
     // stencil optimization - only render parts of scene multiple
-    GLOBALS.RENDERER.autoClear = true
+    //GLOBALS.RENDERER.autoClear = true
     // times when it is going to be viewed by the portal
     GLOBALS.RENDERER.autoClearStencil = false;
 
@@ -389,34 +389,29 @@ function animatePortal() {
 
     deltaPortal += clockPortal.getDelta();
 
-
     //CLONE STATE
     GLOBALS.GUN_CLONE.visible = GLOBALS.PORTAL_GUN_CLONE_STATE;
     GLOBALS.PLAYER_MODEL.visible = GLOBALS.PLAYER_CLONE_STATE;
     
     if(GLOBALS.PORTAL_RECURSION_LEVELS>0){
-
         renderPortal2(0, 1)
         renderPortal2(1, 0)
     }else{
-
-        if(GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value == 1){
-            GLOBALS.PORTALS[0].mesh.material.uniforms.texture1.value = null;
-            GLOBALS.PORTALS[1].mesh.material.uniforms.texture1.value = null;
-            GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value = 0;
-            GLOBALS.PORTALS[1].portalShader.material.uniforms.iOpened.value = 0;
+        if(GLOBALS.PORTALS[0] && GLOBALS.PORTALS[1]){
+            if(GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value == 1){
+                GLOBALS.PORTALS[0].mesh.material.uniforms.texture1.value = null;
+                GLOBALS.PORTALS[1].mesh.material.uniforms.texture1.value = null;
+                GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value = 0;
+                GLOBALS.PORTALS[1].portalShader.material.uniforms.iOpened.value = 0;
+            }
         }
     }
     
-
     GLOBALS.SCENE_CHILDREN.visible = true;
-
     GLOBALS.RENDERER.autoClear = false;
-
     GLOBALS.GUN.visible = false;
     GLOBALS.GUN.children[0].children[0].scale.set(0.1, 0.1, 0.1)
     GLOBALS.GUN.children[0].children[0].position.set(0.01, -0.012, -0.011);
-
     GLOBALS.GUN_CLONE.visible = cloneVisible;
 
     if (window.hand2) {
@@ -427,7 +422,6 @@ function animatePortal() {
         GLOBALS.GUN_CLONE.rotation.y = GLOBALS.MAIN_CAMERA.rotation.y;
         GLOBALS.GUN_CLONE.rotation.y += Math.PI
     }
-
 
     if (GLOBALS.PLAYER && GLOBALS.PLAYER_MODEL) {
         GLOBALS.PLAYER_MODEL.visible = false;
@@ -450,11 +444,33 @@ function animatePortal() {
     //GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
 }
 
+var waitToActivateToneForPortalTexture = true;
+var renderSecondPortal = false;
+
 // Render loop
 function renderPortal2(thisIndex, pairIndex) {
 
     if (GLOBALS.PORTALS[thisIndex] === null || GLOBALS.PORTALS[pairIndex] === null)
         return
+    else{
+        if(waitToActivateToneForPortalTexture){
+            waitToActivateToneForPortalTexture = false;
+            setTimeout(() => {
+                GLOBALS.PORTALS[0].mesh.material.uniforms.tone.value = true;
+                setTimeout(() => {
+                    GLOBALS.PORTALS[1].mesh.material.uniforms.tone.value = true;
+                    window.portalTone = true;
+                }, 5000);
+            }, 5000);
+
+            setTimeout(() => {
+                renderSecondPortal = true;
+            }, 500);
+        }
+    }
+
+    if(thisIndex == 1 && !renderSecondPortal)
+        return;
 
     let portalCamera = GLOBALS.MAIN_CAMERA.clone()
 
@@ -490,11 +506,12 @@ function renderPortal2(thisIndex, pairIndex) {
         GLOBALS.PORTALS[thisIndex].visible = false
         GLOBALS.PORTALS[pairIndex].visible = false
     }
-    GLOBALS.RENDERER.localClippingEnabled = true
+
+    //GLOBALS.RENDERER.localClippingEnabled = true
 
     for (let level = GLOBALS.PORTAL_RECURSION_LEVELS - 1; level >= 0; level--) {
 
-        if(level>0)
+        if(level>GLOBALS.PORTAL_RENDER_LEVEL)
             GLOBALS.SCENE_CHILDREN.visible = false;
         else
             GLOBALS.SCENE_CHILDREN.visible = true;

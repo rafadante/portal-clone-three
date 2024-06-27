@@ -11,7 +11,8 @@ $("body").on('click', '#settings-video', function () {
     $(".settings-menu").css("width", "50%");
     $("#settings-menu-title").text("GRAPHICS");
     $("#done").css("display", "block");
-})
+    alert("The option changes will be saved to local storage while there is no server to allocate player data.");
+});
 
 $("body").on('click', '#settings-controls', function () {
     $("#options-controls").css("display", "block");
@@ -19,7 +20,8 @@ $("body").on('click', '#settings-controls', function () {
     $(".settings-menu").css("width", "50%");
     $("#settings-menu-title").text("CONTROLS");
     $("#done").css("display", "block");
-})
+    alert("The option changes will be saved to local storage while there is no server to allocate player data.");
+});
 
 $("body").on('click', '#done', function () {
     $("#options-video").css("display", "none");
@@ -28,7 +30,92 @@ $("body").on('click', '#done', function () {
     $(".settings-menu").css("width", "25%");
     $("#settings-menu-title").text("OPTIONS");
     $("#done").css("display", "none");
-})
+});
+
+//QUALITY
+$('#quality-select').on('change', function () {
+
+    allowUpdate = false;
+    localStorage.setItem("quality-select", $(this).val());
+
+    console.log($(this).data("recursive"))
+
+    if($(this).val() == "potato"){
+        $("#recursive-select").val(0).change();
+        $("#recursive-render-select").val(0).change();
+        $("#resolution-select").val(0.5).change();
+        $("#shadows-resolution-select").val(512).change();
+    }else if($(this).val() == "very_low"){
+        $("#recursive-select").val(3).change();
+        $("#recursive-render-select").val(0).change();
+        $("#resolution-select").val(0.5).change();
+        $("#shadows-resolution-select").val(512).change();
+    }else if($(this).val() == "low"){
+        $("#recursive-select").val(3).change();
+        $("#recursive-render-select").val(0).change();
+        $("#resolution-select").val(0.7).change();
+        $("#shadows-resolution-select").val(1024).change();
+    }else if($(this).val() == "medium"){
+        $("#recursive-select").val(3).change();
+        $("#recursive-render-select").val(0).change();
+        $("#resolution-select").val(1).change();
+        $("#shadows-resolution-select").val(1024).change();
+    }else if($(this).val() == "high"){
+        $("#recursive-select").val(3).change();
+        $("#recursive-render-select").val(100).change();
+        $("#resolution-select").val(1).change();
+        $("#shadows-resolution-select").val(2048).change();
+    }else if($(this).val() == "epic"){
+        $("#recursive-select").val(7).change();
+        $("#recursive-render-select").val(100).change();
+        $("#resolution-select").val(1).change();
+        $("#shadows-resolution-select").val(4096).change();
+    }
+
+    allowUpdate = true;
+    update();
+});
+
+//RECURSIVE PORTALS
+$('#recursive-select').on('change', function () {
+    localStorage.setItem("recursive-select", $(this).val());
+    GLOBALS.PORTAL_RECURSION_LEVELS = $(this).val();
+    update();
+});
+
+//RECURSIVE PORTALS RENDER
+$('#recursive-render-select').on('change', function () {
+    localStorage.setItem("recursive-render-select", $(this).val());
+    GLOBALS.PORTAL_RENDER_LEVEL = $(this).val();
+    update();
+});
+
+//RESOLUTION
+$('#resolution-select').on('change', function () {
+    console.log($(this).val())
+    GLOBALS.PIXEL_RATIO = $(this).val();
+    localStorage.setItem("resolution-select", $(this).val());
+
+    if(allowUpdate){
+        GLOBALS.RENDERER.setPixelRatio(window.devicePixelRatio * $(this).val());
+        update();
+    }
+});
+
+//SHADOW RESOLUTION
+$('#shadows-resolution-select').on('change', function () {
+    localStorage.setItem("shadows-resolution-select", $(this).val());
+
+    if(allowUpdate){
+        GLOBALS.SPOTLIGHT.shadow.mapSize.width = $(this).val();
+        GLOBALS.SPOTLIGHT.shadow.mapSize.height = $(this).val();
+    }
+
+    GLOBALS.RENDERER.shadowMap.autoUpdate = true;
+        GLOBALS.RENDERER.shadowMap.autoUpdate = false;
+    
+    update()
+});
 
 //STATS
 $("body").on('input', '#option-stats', function () {
@@ -39,70 +126,11 @@ $("body").on('input', '#option-stats', function () {
         $("#main-container").css("display", "block");
 
     update()
-})
-
-//PORTAL GUN CLONE
-$("body").on('input', '#option-portal-gun-clone', function () {
-    localStorage.setItem("option-portal-gun-clone", this.checked);
-    GLOBALS.PORTAL_GUN_CLONE_STATE = this.checked;
-    update()
-})
-
-//PLAYER GUN CLONE
-$("body").on('input', '#option-player-clone', function () {
-    localStorage.setItem("option-player-clone", this.checked);
-    GLOBALS.PLAYER_CLONE_STATE = this.checked;
-    update()
-})
-
-//SHADOW
-$("body").on('input', '#option-shadow', function () {
-    GLOBALS.RENDERER.shadowMap.enabled = !this.checked;
-})
-
-//RECURSIVE PORTALS
-$('#recursive-select').on('change', function () {
-    localStorage.setItem("recursive-select", $(this).val());
-    GLOBALS.PORTAL_RECURSION_LEVELS = $(this).val();
-    update()
-});
-
-//FPS MAIN SCENE
-$('#fps-select').on('change', function () {
-    GLOBALS.FPS_MODE = $(this).val();
-
-    if (GLOBALS.FPS_MODE == "unlocked") {
-        GLOBALS.FPS_MODE = window.unlockedFPS;
-        GLOBALS.FPS_UNLOCKED = true;
-    } else {
-        GLOBALS.FPS_UNLOCKED = false;
-    }
-
-
-    GLOBALS.INTERVAL = 1 / GLOBALS.FPS_MODE;
-    update()
-});
-
-//RESOLUTION
-$('#resolution-select').on('change', function () {
-    localStorage.setItem("resolution-select", window.devicePixelRatio * $(this).val());
-    GLOBALS.RENDERER.setPixelRatio(window.devicePixelRatio * $(this).val());
-    update()
-});
-
-//SHADOW RESOLUTION
-$('#shadows-resolution-select').on('change', function () {
-    localStorage.setItem("shadows-resolution-select", $(this).val());
-    GLOBALS.SPOTLIGHT.shadow.mapSize.width = $(this).val();
-    GLOBALS.SPOTLIGHT.shadow.mapSize.height = $(this).val();
-
-    GLOBALS.RENDERER.shadowMap.autoUpdate = true;
-    GLOBALS.RENDERER.shadowMap.autoUpdate = false;
-    update()
 });
 
 //FOV
 $('#fov-val-range').on('input', function () {
+    localStorage.setItem("fov-val-range", $(this).val());
     $("#fov-val-number").val($(this).val());
     GLOBALS.MAIN_CAMERA.fov = $(this).val();
     GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
@@ -110,6 +138,7 @@ $('#fov-val-range').on('input', function () {
 
 //MOUSE
 $('#mouse-val-range').on('input', function () {
+    localStorage.setItem("mouse-val-range", $(this).val());
     $("#mouse-val-number").val($(this).val());
 
     if (!GLOBALS.MOBILE)
@@ -179,9 +208,37 @@ $(".item").mouseleave(function () {
     $("#info-box").css("opacity", 0)
 })
 
+var allowUpdate = false;
+
 function update(){
-    GLOBALS.PAUSED = false;
-    setTimeout(() => {
-        GLOBALS.PAUSED = true;
-    }, 100);
+    if(allowUpdate){
+        GLOBALS.PAUSED = false;
+        setTimeout(() => {
+            GLOBALS.PAUSED = true;
+        }, 100);
+
+        localStorage.setItem("saved", true);
+        console.log("999999999999")
+    }
 }
+
+//VERIFY IF THE PLAYER HAS SETTINGS SAVED ON THE LOCALSTORAGE
+if(localStorage.getItem("saved")){
+
+    //if(localStorage.getItem("recursive-select"))
+    //    $("#recursive-select").val(localStorage.getItem("recursive-select")).change();
+    //if(localStorage.getItem("recursive-render-select"))
+    //    $("#recursive-render-select").val(localStorage.getItem("recursive-render-select")).change();
+    //if(localStorage.getItem("resolution-select"))
+    //    $("#resolution-select").val(localStorage.getItem("resolution-select")).change();
+
+}else{
+    $("#recursive-select").val(GLOBALS.PORTAL_RECURSION_LEVELS).change();
+    $("#resolution-select").val(0.5).change();
+    $("#shadows-resolution-select").val(512).change();
+
+    //$("#quality-select").val("low").change();
+}
+
+allowUpdate = true;
+console.log(localStorage)

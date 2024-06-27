@@ -12,6 +12,8 @@ import {
     GLOBALS
 } from '../../Globals.js';
 
+window.portalTone = false;
+
 class Portal extends Group {
     // position - the center position (vector3)
     // normal - the normal of the host surface
@@ -71,12 +73,22 @@ class Portal extends Group {
         uniform sampler2D texture1;
         uniform float ww;
         uniform float wh;
+        uniform bool tone;
         void main() {
             gl_FragColor = texture2D(texture1, gl_FragCoord.xy / vec2(ww, wh));
-            #include <tonemapping_fragment>
-            #include <colorspace_fragment>
+
+            if(tone){
+                #include <tonemapping_fragment>
+                #include <colorspace_fragment>
+            }
+            
         }
         `
+
+        //#include <tonemapping_fragment>
+        //#include <colorspace_fragment>
+
+
         const geometry = new THREE.CylinderGeometry(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_HEIGHT, 50);
         const uniforms = {
             texture1: {
@@ -90,6 +102,10 @@ class Portal extends Group {
             wh: {
                 type: 'f',
                 value: 1
+            },
+            tone:{
+                type: 'Boolean',
+                value: window.portalTone
             }
         }
 
@@ -101,8 +117,8 @@ class Portal extends Group {
             stencilFunc: THREE.EqualStencilFunc,
             stencilRef: 1,
             stencilFail: THREE.ReplaceStencilOp,
-            polygonOffset: true,
-            polygonOffsetFactor: -1
+            //polygonOffset: true,
+            //polygonOffsetFactor: -1
         });
 
         this.mesh = new THREE.Mesh(geometry, material);
@@ -119,13 +135,25 @@ class Portal extends Group {
             renderer.clearStencil();
         };
 
+        var light;
+
         if (index == 0) {
             this.mesh.userData.this = 0;
             this.mesh.userData.other = 1;
+
+            light = new THREE.PointLight( new THREE.Color( 1, 0.25, 0 ), 1, 2);
         } else {
             this.mesh.userData.this = 1;
             this.mesh.userData.other = 0;
+
+            light = new THREE.PointLight( new THREE.Color( 0, 0.3, 1 ), 1, 2);
         }
+
+        light.applyMatrix4(this.transform)
+        light.updateMatrix()
+        light.matrixAutoUpdate = true;
+        light.matrixAutoUpdate = true;
+        //this.add( light );
 
         var parent = GLOBALS.PORTAL_SHADER[index].parent;
         if (parent) {
@@ -139,6 +167,7 @@ class Portal extends Group {
         GLOBALS.PORTAL_SHADER[index].matrixAutoUpdate = true;
         this.portalShader = GLOBALS.PORTAL_SHADER[index];
         this.portalShader.frustumCulled = true;
+        //GLOBALS.PORTAL_SHADER[index].scale.set(1.1,1.1,1.1)
         this.add(GLOBALS.PORTAL_SHADER[index])
 
         // constructing the portal borders
@@ -158,6 +187,16 @@ class Portal extends Group {
         this.ringMesh.updateMatrix()
         this.ringMesh.matrixAutoUpdate = true;
         this.ringMesh.visible = false;
+
+        const geometry3 = new THREE.BoxGeometry( 1.4, 2, 0.1 ); 
+        const material3 = new THREE.MeshBasicMaterial( {color: 0x00ff00} ); 
+        GLOBALS.PORTAL_BOX[index] = new THREE.Mesh( geometry3, material3 ); 
+        GLOBALS.PORTAL_BOX[index].applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
+        GLOBALS.PORTAL_BOX[index].applyMatrix4(this.transform)
+        GLOBALS.PORTAL_BOX[index].updateMatrix()
+        GLOBALS.PORTAL_BOX[index].matrixAutoUpdate = true;
+        GLOBALS.PORTAL_BOX[index].visible = false;
+        this.add( GLOBALS.PORTAL_BOX[index] );
 
         // CDBB: collision disable BB
         // STBB: should teleport BB

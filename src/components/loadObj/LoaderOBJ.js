@@ -237,6 +237,9 @@ function loadGunManager(scene) {
             cube_3 = child;
         else if (child.name == "cube_4")
             window.gun_holder = child;
+        else if (child.name == "cube_5")
+            GLOBALS.PORTAL_GUN_FLASH = child;
+        
     });
 
     GLOBALS.GUN.name = "GUN";
@@ -1015,17 +1018,17 @@ function loadMuzzleFlash(){
 function loadMuzzleFlashManager(scene){
 
     
-    scene.visible = false;
-    GLOBALS.FLASH = scene;
-    GLOBALS.MAIN_CAMERA.add(GLOBALS.FLASH);
-    scene.scale.set(0.02,0.02,0.02);
-    scene.position.set(0.011, -0.012, -0.05);
-    scene.children[0].material.envMap = GLOBALS.ENV_MAP;
+    //scene.visible = false;
+    //GLOBALS.FLASH = scene;
+    //GLOBALS.SCENE.add(GLOBALS.FLASH);
+    //scene.scale.set(0.02,0.02,0.02);
+    //scene.position.set(0.011, -0.012, -0.05);
+    //scene.children[0].material.envMap = GLOBALS.ENV_MAP;
 
-    const light = new THREE.PointLight( 0xff0000, 0.1, 100 );
-    scene.add( light );
-    light.visible = false;
-    light.position.set(0,1,-1);
+    GLOBALS.FLASH = new THREE.PointLight( 0xff0000, 10);
+    GLOBALS.SCENE.add( GLOBALS.FLASH );
+    GLOBALS.FLASH.visible = false;
+    //light.position.set(0,1,-1);
 
     if (GLOBALS.LOADED_LEVEL) {
         loadLevelJSON()

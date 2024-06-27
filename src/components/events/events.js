@@ -20,6 +20,9 @@ import {
     exitRoomCollider,
     corridorColliderNames
 } from '../test/Test.js';
+import {
+    removeJointConstraint
+} from '../../Physics.js';
 
 
 var leveEntered = false;
@@ -646,6 +649,11 @@ function portalCollision() {
             // collision disable, might be partially intersecting with portal
             if (GLOBALS.PORTALS[p].CDBB.containsPoint(pos)) {
 
+                if(d.name != "player"){
+                    //d.allowSleep = false;
+                    //console.log("9999999999999")
+                }
+
                 if ((d.name == "gel" || d.name == "gel-orange") && !d.disabled) {
                     d.disabled = true;
                     GLOBALS.CANNON_WORLD.removeBody(d);
@@ -688,6 +696,10 @@ function portalCollision() {
                 }
 
                 d.inArea = false;
+
+                if(d.name != "player"){
+                    //d.allowSleep = true;
+                }
             }
 
             if (d.name == "gel") {
@@ -697,42 +709,44 @@ function portalCollision() {
             // should teleport
             if (GLOBALS.PORTALS[p].STBB.containsPoint(pos)) {
 
-                teleportPhysicalObject(d, GLOBALS.PORTALS[p])
-
-                if (dd == 0) {
-                    teleportObject3D(GLOBALS.MAIN_CAMERA, GLOBALS.PORTALS[p])
-
-                    // fix camera rotation
-                    // create a new basis with up as the up
-                    // https://danielilett.com/2020-01-03-tut4-4-portal-momentum/
-                    let up = new THREE.Vector3(0, 1, 0)
-                    let cameraForward = new THREE.Vector3()
-                    GLOBALS.MAIN_CAMERA.getWorldDirection(cameraForward)
-                    cameraForward.normalize()
-                    let cameraRight = cameraForward.clone().cross(up).normalize()
-                    let cameraUp = cameraRight.clone().cross(cameraForward).normalize()
-                    let cameraMat = new THREE.Matrix4().makeBasis(cameraRight, cameraUp, cameraForward.negate())
-                    GLOBALS.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat)
-
-                    GLOBALS.TARGET_ROTATION_X = GLOBALS.MAIN_CAMERA.rotation.y;
-                    GLOBALS.TARGET_ROTATION_Y = GLOBALS.MAIN_CAMERA.rotation.x;
-
-                    GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
-
-                    //if (inArea > 0)
-                    //GLOBALS.SMOOTHNESS = 1;
-                    //else
-                    //    GLOBALS.SMOOTHNESS = 0.1;
-                    setTimeout(() => {
-                        //GLOBALS.SMOOTHNESS = 0.1;
-                    }, 10);
+                if(d.name != "player"){
+                    //d.allowSleep = false;
+                    console.log("777777777777")
                 }
 
-                d.collisionFilterMask |= GLOBALS.PORTALS[p].hostObjects.collisionFilterGroup
-                d.collisionFilterMask &= ~GLOBALS.PORTALS[1 - p].hostObjects.collisionFilterGroup
+                //GLOBALS.CURRENT_ITEM.body.holding
+                if(d.holding){
+                    d.teleportingHolding = true;
+                }else{
+                    teleportPhysicalObject(d, GLOBALS.PORTALS[p])
+
+                    if (dd == 0) {
+                        removeJointConstraint();
+                        teleportObject3D(GLOBALS.MAIN_CAMERA, GLOBALS.PORTALS[p])
+    
+                        // fix camera rotation
+                        // create a new basis with up as the up
+                        // https://danielilett.com/2020-01-03-tut4-4-portal-momentum/
+                        let up = new THREE.Vector3(0, 1, 0)
+                        let cameraForward = new THREE.Vector3()
+                        GLOBALS.MAIN_CAMERA.getWorldDirection(cameraForward)
+                        cameraForward.normalize()
+                        let cameraRight = cameraForward.clone().cross(up).normalize()
+                        let cameraUp = cameraRight.clone().cross(cameraForward).normalize()
+                        let cameraMat = new THREE.Matrix4().makeBasis(cameraRight, cameraUp, cameraForward.negate())
+                        GLOBALS.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat)
+    
+                        GLOBALS.TARGET_ROTATION_X = GLOBALS.MAIN_CAMERA.rotation.y;
+                        GLOBALS.TARGET_ROTATION_Y = GLOBALS.MAIN_CAMERA.rotation.x;
+    
+                        GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
+                    }
+    
+                    d.collisionFilterMask |= GLOBALS.PORTALS[p].hostObjects.collisionFilterGroup
+                    d.collisionFilterMask &= ~GLOBALS.PORTALS[1 - p].hostObjects.collisionFilterGroup
+                }
             }
         }
-
         dd++;
     }
 }

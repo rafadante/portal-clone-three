@@ -56,6 +56,17 @@ function viewFPS() {
 
         GLOBALS.RENDERER.setPixelRatio(window.devicePixelRatio * GLOBALS.PIXEL_RATIO);
 
+        //if(localStorage.getItem("shadows-resolution-select"))
+        //    $("#shadows-resolution-select").val(localStorage.getItem("shadows-resolution-select")).change();
+        if(localStorage.getItem("option-stats"))
+            $("#option-stats").prop('checked', localStorage.getItem("option-stats") == 'true');
+        if(localStorage.getItem("fov-val-range"))
+            $("#fov-val-range").val(localStorage.getItem("fov-val-range")).trigger("input");
+        if(localStorage.getItem("mouse-val-range"))
+            $("#mouse-val-range").val(localStorage.getItem("mouse-val-range")).trigger("input");
+        if(localStorage.getItem("quality-select"))
+            $("#quality-select").val(localStorage.getItem("quality-select")).change();
+
         //
         GLOBALS.EXIT_ROOM.visible = true;
 
@@ -370,11 +381,15 @@ function viewFPS() {
     }, 500);
 };
 
+
+
 function addColliderItem(items, type, mass, offset) {
 
     let PHYSICS_MATERIAL = new CANNON.Material();
     PHYSICS_MATERIAL.friction = 0.4; //0.01
     PHYSICS_MATERIAL.restitution = 0; //0.1
+
+    console.log(PHYSICS_MATERIAL)
 
     for (var i = 0; i < items.length; i++) {
         if (items[i].length != 0) {
@@ -483,7 +498,7 @@ function addColliderItem(items, type, mass, offset) {
                 box.spawnPosition = items[i].position.clone();
                 box.allowSleep = false;
                 box.sleepSpeedLimit = 0.1;
-                box.sleepTimeLimit = 5.0;
+                box.sleepTimeLimit = 1.0;
                 box.mass = 0;
 
                 GLOBALS.DYNAMIC_OBJECTS.push(box);
@@ -497,6 +512,7 @@ function addColliderItem(items, type, mass, offset) {
 
                 box.addEventListener("sleep", function (event) {
                     box.sleeping = true;
+                    console.log("111111111")
                 });
 
                 box.addEventListener('wakeup', (event) => {

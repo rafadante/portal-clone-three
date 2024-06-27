@@ -19,7 +19,7 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
     mobile = false;
     pixelRatio = 0.5;
     shadowMap = true;
-    portalsRecursive = 3;
+    portalsRecursive = 2;
     fov = 60;
     antialias = true;
 }
@@ -51,7 +51,7 @@ renderer.shadowMap.enabled = shadowMap;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.shadowMap.needsUpdate = false;
 renderer.localClippingEnabled = false;
-renderer.physicallyCorrectLights = true;
+//renderer.physicallyCorrectLights = true;
 renderer.domElement.id = "viewer-3d";
 renderer.shadowMap.autoUpdate = false;
 
@@ -107,6 +107,7 @@ var GLOBALS = {
     PORTAL_HEIGHT: 0.0,
     PORTAL_RING_THICKNESS: 0.3,
     PORTAL_SHADER: [],
+    PORTAL_BOX: [],
 
     /**********************************************************
      * PHYSICS
@@ -302,7 +303,9 @@ var GLOBALS = {
     PORTAL_GUN_CLONE_STATE: true,
     PLAYER_CLONE_STATE: true,
     FLASH: null,
-    FLASH_CLONE: null
+    FLASH_CLONE: null,
+    PORTAL_GUN_FLASH: null,
+    PORTAL_RENDER_LEVEL: 0
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)

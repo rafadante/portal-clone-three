@@ -578,22 +578,16 @@
             <span class="option-name" id="">Quality</span>
             <div class="option-value">
               <select name="quality" id="quality-select">
-                <option value="1">Epic</option>
-                <option value="0.75">High</option>
-                <option value="0.5">Medium</option>
-                <option value="0.5">Low</option>
-                <option value="0.5">Potato</option>
+                <option value="epic">Epic</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+                <option value="very_low">Very Low</option>
+                <option value="potato">Potato</option>
               </select>
             </div>
           </div>
-          <!--DEBUG-->
-          <div class="options-row">
-            <span class="option-name" id="">Debug Collisions</span>
-            <div class="option-value">
-              <input id="debug-input" type="checkbox" />
-            </div>
-          </div>
-          <!--PORTAL RECURSIOrlgN-->
+          <!--PORTAL RECURSION-->
           <div class="options-row">
             <span class="option-name" id="">Recursive Portals</span>
             <div class="option-value">
@@ -606,10 +600,64 @@
                 <option value="5">5</option>
                 <option value="6">6</option>
                 <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
               </select>
+            </div>
+          </div>
+          <!--PORTAL RECURSION RENDER-->
+          <div class="options-row">
+            <span class="option-name" id="">Recursive Portals Render</span>
+            <div class="option-value">
+              <select name="recursive" id="recursive-render-select">
+                <option value="0">1</option>
+                <option value="1">2</option>
+                <option value="2">3</option>
+                <option value="100">all</option>
+              </select>
+            </div>
+          </div>
+          <!--RESOLUTION-->
+          <div class="options-row">
+            <span class="option-name" id="">Resolution</span>
+            <div class="option-value">
+              <select name="resolution" id="resolution-select">
+                <option value="1">1x</option>
+                <option value="0.9">0.9x</option>
+                <option value="0.8">0.8x</option>
+                <option value="0.7">0.7x</option>
+                <option value="0.6">0.6x</option>
+                <option value="0.5">0.5x</option>
+              </select>
+            </div>
+          </div>
+          <!--SHADOW RESOLUTIONS-->
+          <div class="options-row">
+            <span class="option-name" id="">Shadows Resolution</span>
+            <div class="option-value">
+              <select name="shadows-resolution" id="shadows-resolution-select">
+                <option value="256">256</option>
+                <option value="512">512</option>
+                <option value="1024">1024</option>
+                <option value="2048">2048</option>
+                <option value="4096">4096</option>
+              </select>
+            </div>
+          </div>
+          <!--FPS-->
+          <div class="options-row">
+            <span class="option-name" id="">Fps</span>
+            <div class="option-value">
+              <select name="fps" id="fps-select">
+                <option value="60">60</option>
+                <option value="30">30</option>
+                <option value="unlocked">Unlocked</option>
+              </select>
+            </div>
+          </div>
+          <!--ANTIALISING-->
+          <div class="options-row">
+            <span class="option-name" id="">Antialising</span>
+            <div class="option-value">
+              <input id="antialising" checked type="checkbox" />
             </div>
           </div>
           <!--STATS-->
@@ -633,77 +681,20 @@
               <input id="option-player-clone" checked type="checkbox" />
             </div>
           </div>
-          <!--FPS-->
-          <!--<div class="options-row">
-            <span class="option-name" id="">Fps</span>
-            <div class="option-value">
-              <select name="fps" id="fps-select">
-                <option value="60">60</option>
-                <option value="30">30</option>
-                <option value="unlocked">Unlocked</option>
-              </select>
-            </div>
-          </div>-->
-          <!--ANTIALISING-->
-          <!--<div class="options-row">
-            <span class="option-name" id="">Antialising</span>
-            <div class="option-value">
-              <select name="antialising" id="antialising-select">
-                <option value="none">None</option>
-                <option value="MSAA">MSAA</option>
-              </select>
-            </div>
-          </div>-->
-          <!--RESOLUTION-->
+          <!--GOO REFLECTIONS-->
           <div class="options-row">
-            <span class="option-name" id="">Resolution</span>
+            <span class="option-name" id="">Goo Reflections</span>
             <div class="option-value">
-              <select name="resolution" id="resolution-select">
-                <option value="1">1x</option>
-                <option value="0.9">0.9x</option>
-                <option value="0.8">0.8x</option>
-                <option value="0.7">0.7x</option>
-                <option value="0.6">0.6x</option>
-                <option value="0.5">0.5x</option>
-                <option value="0.4">0.4x</option>
-                <option value="0.3">0.3x</option>
-              </select>
+              <input id="option-goo-reflections" type="checkbox" />
             </div>
           </div>
-          <!--SHADOWS-->
-          <!--<div class="options-row">
-            <span class="option-name" id="">Shadows</span>
-            <div class="option-value">
-              <input id="option-shadow" checked type="checkbox" />
-            </div>
-          </div>-->
-          <!--SHADOW RESOLUTIONS-->
+          <!--DEBUG-->
           <div class="options-row">
-            <span class="option-name" id="">Shadows Resolution</span>
+            <span class="option-name" id="">Debug Collisions</span>
             <div class="option-value">
-              <select name="shadows-resolution" id="shadows-resolution-select">
-                <option value="512">512</option>
-                <option value="256">256</option>
-                <option value="1024">1024</option>
-                <option value="2048">2048</option>
-                <option value="4096">4096</option>
-              </select>
+              <input id="debug-input" type="checkbox" />
             </div>
           </div>
-          <!--POST PROCESSING-->
-          <!--<div class="options-row">
-            <span class="option-name" id=">Post Processing</span>
-            <div class="option-value">
-              <input checked type="checkbox" />
-            </div>
-          </div>-->
-          <!--BLOOM-->
-          <!--<div class="options-row">
-            <span class="option-name" id="">Bloom</span>
-            <div class="option-value">
-              <input checked type="checkbox" />
-            </div>
-          </div>-->
         </div>
       </div>
       <div id="settings-menu">
