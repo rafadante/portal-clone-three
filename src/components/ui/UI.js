@@ -45,31 +45,37 @@ $('#quality-select').on('change', function () {
         $("#recursive-render-select").val(0).change();
         $("#resolution-select").val(0.5).change();
         $("#shadows-resolution-select").val(512).change();
+        localStorage.setItem("antialising", false);
     }else if($(this).val() == "very_low"){
         $("#recursive-select").val(3).change();
         $("#recursive-render-select").val(0).change();
         $("#resolution-select").val(0.5).change();
         $("#shadows-resolution-select").val(512).change();
+        localStorage.setItem("antialising", false);
     }else if($(this).val() == "low"){
         $("#recursive-select").val(3).change();
         $("#recursive-render-select").val(0).change();
-        $("#resolution-select").val(0.7).change();
+        $("#resolution-select").val(0.8).change();
         $("#shadows-resolution-select").val(1024).change();
+        localStorage.setItem("antialising", false);
     }else if($(this).val() == "medium"){
         $("#recursive-select").val(3).change();
         $("#recursive-render-select").val(0).change();
         $("#resolution-select").val(1).change();
         $("#shadows-resolution-select").val(1024).change();
+        localStorage.setItem("antialising", true);
     }else if($(this).val() == "high"){
         $("#recursive-select").val(3).change();
         $("#recursive-render-select").val(100).change();
         $("#resolution-select").val(1).change();
         $("#shadows-resolution-select").val(2048).change();
+        localStorage.setItem("antialising", true);
     }else if($(this).val() == "epic"){
         $("#recursive-select").val(7).change();
         $("#recursive-render-select").val(100).change();
         $("#resolution-select").val(1).change();
         $("#shadows-resolution-select").val(4096).change();
+        localStorage.setItem("antialising", true);
     }
 
     allowUpdate = true;
@@ -78,23 +84,19 @@ $('#quality-select').on('change', function () {
 
 //RECURSIVE PORTALS
 $('#recursive-select').on('change', function () {
-    localStorage.setItem("recursive-select", $(this).val());
     GLOBALS.PORTAL_RECURSION_LEVELS = $(this).val();
     update();
 });
 
 //RECURSIVE PORTALS RENDER
 $('#recursive-render-select').on('change', function () {
-    localStorage.setItem("recursive-render-select", $(this).val());
     GLOBALS.PORTAL_RENDER_LEVEL = $(this).val();
     update();
 });
 
 //RESOLUTION
 $('#resolution-select').on('change', function () {
-    console.log($(this).val())
     GLOBALS.PIXEL_RATIO = $(this).val();
-    localStorage.setItem("resolution-select", $(this).val());
 
     if(allowUpdate){
         GLOBALS.RENDERER.setPixelRatio(window.devicePixelRatio * $(this).val());
@@ -104,7 +106,6 @@ $('#resolution-select').on('change', function () {
 
 //SHADOW RESOLUTION
 $('#shadows-resolution-select').on('change', function () {
-    localStorage.setItem("shadows-resolution-select", $(this).val());
 
     if(allowUpdate){
         GLOBALS.SPOTLIGHT.shadow.mapSize.width = $(this).val();
@@ -134,6 +135,8 @@ $('#fov-val-range').on('input', function () {
     $("#fov-val-number").val($(this).val());
     GLOBALS.MAIN_CAMERA.fov = $(this).val();
     GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
+
+    update();
 });
 
 //MOUSE
@@ -143,6 +146,14 @@ $('#mouse-val-range').on('input', function () {
 
     if (!GLOBALS.MOBILE)
         GLOBALS.POINTER_CONTROLS.pointerSpeed = $(this).val();
+
+    update();
+});
+
+//RESET CONTROLS
+$('#reset-control').on('click', function () {
+    $("#fov-val-range").val(60).trigger("input");
+    $("#mouse-val-range").val(0.5).trigger("input");
 });
 
 //BUTTON OPACITY
@@ -218,7 +229,6 @@ function update(){
         }, 100);
 
         localStorage.setItem("saved", true);
-        console.log("999999999999")
     }
 }
 

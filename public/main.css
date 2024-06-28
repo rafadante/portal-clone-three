@@ -898,3 +898,11 @@ input[type=range]::-webkit-slider-runnable-track {
 }
 
 button:focus {outline:0;}
+
+#reset-control{
+	background-color: white;
+	padding: 10px;
+	border: none;
+    margin: 10px;
+    font-weight: bolder;
+}

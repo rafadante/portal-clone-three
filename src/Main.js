@@ -1,3 +1,4 @@
+/* eslint-disable */
 import $ from 'jquery';
 import "./components/materials/Materials.js"
 import "./components/ui/UI.js";
@@ -264,6 +265,7 @@ function onWindowResize() {
 let clock2 = new THREE.Clock();
 let clockPortal = new THREE.Clock();
 let deltaPortal = 0;
+let frames = 0, prevTime = performance.now();
 
 function animate(time) {
 
@@ -290,15 +292,29 @@ function animate(time) {
 }
 
 let previousTime = 0;
+var fps = 0;
 
 function fixedUpdate() { //60 fps always for physics
-    //const deltaTime = clock2.getElapsedTime();
 
-    const elapsedTime = clock2.getElapsedTime()
-    // Delta Time - デルタタイム
-    const deltaTime = elapsedTime - previousTime;
-    previousTime = elapsedTime
-    updatePlayer(deltaTime);
+    
+    frames ++;
+    const time2 = performance.now();
+        
+    if ( time2 >= prevTime + 100 ) {
+        
+
+        fps = Math.round( ( frames * 100 ) / ( time2 - prevTime ) ) * 10;
+        //console.log( fps );
+        
+        frames = 0;
+        prevTime = time2;
+        
+        
+    }
+    
+    const deltaTime = clock2.getDelta();
+    if(fps > 15)
+        updatePlayer(deltaTime);
 
     if (Date.now() >= timeTarget && !GLOBALS.STOP_TIME) {
 
@@ -318,9 +334,9 @@ function render(time) {
     GLOBALS.STATS.begin();
     fixedUpdate();
     animatePortal();
-    updateRay();
-    animateShader();
-    renderGoo();
+    //updateRay();
+    //animateShader();
+    //renderGoo();
     updateEvents();
     updatePhysics();
     //updateGels();
@@ -354,6 +370,8 @@ function tweenCamera(duration, ini, final) {
         .start();
 }
 
+var angleHolder = 0;
+
 function animatePortal() {
 
     // only show player model when rendering portals
@@ -382,10 +400,22 @@ function animatePortal() {
     window.hand.getWorldPosition(positionBoneHand);
 
     GLOBALS.GUN_CLONE.position.copy(positionBoneHand);
-    GLOBALS.GUN_CLONE.rotation.copy(GLOBALS.MAIN_CAMERA.rotation);
+    GLOBALS.GUN_CLONE.rotation.y = GLOBALS.MAIN_CAMERA.rotation.y;
+    //GLOBALS.GUN_CLONE.rotation.z = GLOBALS.MAIN_CAMERA.rotation.z;
+    //GLOBALS.GUN_CLONE.rotation.copy(GLOBALS.MAIN_CAMERA.rotation);
 
-    window.neck.rotation.y = -GLOBALS.MAIN_CAMERA.rotation.x;
-    window.handLeft.rotation.z = GLOBALS.MAIN_CAMERA.rotation.x + Math.PI/2.1;
+    //APPLY ROTATION TO THE PORTAL GUN AND PLAYER HAND AND NECK
+    const angle = (GLOBALS.MAIN_CAMERA.rotation.x * 180)/Math.PI;
+    if(angle > -20 && angle < 30){
+        //GLOBALS.GUN_CLONE.rotation.x = GLOBALS.MAIN_CAMERA.rotation.x;
+        window.neck.rotation.y = -GLOBALS.MAIN_CAMERA.rotation.x;
+        //window.handLeft.rotation.z += GLOBALS.MAIN_CAMERA.rotation.x * 1;
+        angleHolder = GLOBALS.MAIN_CAMERA.rotation.x;
+    }else{
+        //GLOBALS.GUN_CLONE.rotation.x = angleHolder;
+        window.neck.rotation.y = -angleHolder;
+        //window.handLeft.rotation.z += angleHolder * 1;
+    }
 
     deltaPortal += clockPortal.getDelta();
 
@@ -460,8 +490,8 @@ function renderPortal2(thisIndex, pairIndex) {
                 setTimeout(() => {
                     GLOBALS.PORTALS[1].mesh.material.uniforms.tone.value = true;
                     window.portalTone = true;
-                }, 5000);
-            }, 5000);
+                }, 2500);
+            }, 2500);
 
             setTimeout(() => {
                 renderSecondPortal = true;

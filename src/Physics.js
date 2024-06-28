@@ -63,11 +63,24 @@ const cannonDebugger = new CannonDebugger(GLOBALS.SCENE, world, {
     }
 })
 
+var coords = new THREE.Vector3();
+var raycaster2 = new THREE.Raycaster();
+
 function updatePhysics() {
     if (GLOBALS.HOLDING_ITEM) {
         // Project the mouse onto the movement plane
         var hitPoint = new THREE.Vector3(); // create once an reuse it
         GLOBALS.MAIN_CAMERA.getObjectByName("cubeHolder").getWorldPosition(hitPoint);
+
+        raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
+        var intersects = raycaster2.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
+
+        if (intersects.length > 0 && !GLOBALS.CURRENT_ITEM.body.teleportingHolding) {
+            //console.log(intersects)
+            if(intersects[0].distance < 1.25){
+                hitPoint = intersects[0].point;
+            }
+        }
 
         if (!getObject) {
             getObject = true;

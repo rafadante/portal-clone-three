@@ -711,10 +711,11 @@ function portalCollision() {
 
                 if(d.name != "player"){
                     //d.allowSleep = false;
-                    console.log("777777777777")
+                    //console.log("777777777777")
                 }
 
                 //GLOBALS.CURRENT_ITEM.body.holding
+                d.teleportingHolding = false;
                 if(d.holding){
                     d.teleportingHolding = true;
                 }else{

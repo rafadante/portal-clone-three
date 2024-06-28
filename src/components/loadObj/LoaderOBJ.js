@@ -1025,9 +1025,7 @@ function loadMuzzleFlashManager(scene){
     //scene.position.set(0.011, -0.012, -0.05);
     //scene.children[0].material.envMap = GLOBALS.ENV_MAP;
 
-    GLOBALS.FLASH = new THREE.PointLight( 0xff0000, 10);
-    GLOBALS.SCENE.add( GLOBALS.FLASH );
-    GLOBALS.FLASH.visible = false;
+    
     //light.position.set(0,1,-1);
 
     if (GLOBALS.LOADED_LEVEL) {
@@ -1038,6 +1036,20 @@ function loadMuzzleFlashManager(scene){
     }
     animate();
 }
+
+GLOBALS.LIGHT_PORTAL_0 = new THREE.PointLight( new THREE.Color( 1, 0.25, 0 ), 3, 2);
+GLOBALS.LIGHT_PORTAL_1 = new THREE.PointLight( new THREE.Color( 0, 0.3, 1 ), 3, 2);
+//GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
+//GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
+
+GLOBALS.FLASH = new THREE.PointLight( 0xff0000, 10);
+//GLOBALS.SCENE_CHILDREN.add( GLOBALS.FLASH );
+
+setTimeout(() => {
+    GLOBALS.LIGHT_PORTAL_0.visible = false;
+    GLOBALS.LIGHT_PORTAL_1.visible = false;
+    GLOBALS.FLASH.visible = false;
+}, 3000);
 
 export {
     loadCube

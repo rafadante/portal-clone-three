@@ -45,10 +45,10 @@ const animateShader2 = (time) => {
         GLOBALS.PORTALS[1].portalShader.material.uniforms.iTime.value += val;
 
     //GELS
-    GLOBALS.UNIFORMS_GEL.time.value = .00025 * (Date.now() - start)
+    //GLOBALS.UNIFORMS_GEL.time.value = .00025 * (Date.now() - start)
 
     //EXIT ROOM WALL
-    GLOBALS.MATERIAL_EXIT_ROOM.uniforms.iTime.value += val;
+    //GLOBALS.MATERIAL_EXIT_ROOM.uniforms.iTime.value += val;
 
     //LIGHT BRIDGES
     let t = clock.getElapsedTime();

@@ -21,7 +21,12 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
     shadowMap = true;
     portalsRecursive = 2;
     fov = 60;
-    antialias = true;
+
+    if(localStorage.getItem("antialising") == "true"){
+        antialias = true;
+    }else{
+        antialias = false;
+    }
 }
 
 //MAIN CAMERA
@@ -305,7 +310,10 @@ var GLOBALS = {
     FLASH: null,
     FLASH_CLONE: null,
     PORTAL_GUN_FLASH: null,
-    PORTAL_RENDER_LEVEL: 0
+    PORTAL_RENDER_LEVEL: 0,
+
+    LIGHT_PORTAL_0: null,
+    LIGHT_PORTAL_1: null,
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)

@@ -338,8 +338,8 @@ function deletePortal(portalIndex) {
     if (GLOBALS.PORTALS[portalIndex] === null)
         return;
 
-    GLOBALS.PORTALS[portalIndex].mesh.geometry.dispose();
-    GLOBALS.PORTALS[portalIndex].mesh.material.dispose();
+    //GLOBALS.PORTALS[portalIndex].mesh.geometry.dispose();
+    //GLOBALS.PORTALS[portalIndex].mesh.material.dispose();
     if (GLOBALS.PORTALS[portalIndex].hostObjects !== null) {
         // mark this object as collideable with portal 0 bb objects
         GLOBALS.PORTALS[portalIndex].hostObjects.collisionFilterGroup &= ~GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[portalIndex]

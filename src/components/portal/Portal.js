@@ -141,19 +141,21 @@ class Portal extends Group {
             this.mesh.userData.this = 0;
             this.mesh.userData.other = 1;
 
-            light = new THREE.PointLight( new THREE.Color( 1, 0.25, 0 ), 1, 2);
+            light = GLOBALS.LIGHT_PORTAL_0;
         } else {
             this.mesh.userData.this = 1;
             this.mesh.userData.other = 0;
 
-            light = new THREE.PointLight( new THREE.Color( 0, 0.3, 1 ), 1, 2);
+            light = GLOBALS.LIGHT_PORTAL_1;
         }
 
-        light.applyMatrix4(this.transform)
-        light.updateMatrix()
-        light.matrixAutoUpdate = true;
-        light.matrixAutoUpdate = true;
+        //light.applyMatrix4(this.transform)
+        //light.updateMatrix()
+        //light.matrixAutoUpdate = true;
+        //light.matrixAutoUpdate = true;
         //this.add( light );
+        light.position.copy(this.mesh.position)
+        light.visible = true;
 
         var parent = GLOBALS.PORTAL_SHADER[index].parent;
         if (parent) {

@@ -12,10 +12,6 @@ import {
     animate
 } from '../../Main.js';
 import {
-    newPortal,
-    deletePortal
-} from '../portal/CreatePortal.js';
-import {
     GLOBALS
 } from '../../Globals.js';
 

@@ -244,7 +244,7 @@
 
   <div id="load-level-panel">
     <span id="close-load-level-panel">X</span>
-    <input type="file" id="input-level" />
+    <input type="file" id="input-level" accept="application/json"/>
   </div>
 
   <div id="loading-parent">
@@ -554,6 +554,10 @@
               <input id="fov-val-number" type="number" min="45" max="90" value="60" />
             </div>
           </div>
+          <!--RESET-->
+          <div class="options-row">
+            <button id="reset-control">RESET CONTROL SETTINGS</button>
+          </div>
 
           <!--CAMERA FOV-->
           <div class="options-row mobile">
@@ -642,43 +646,11 @@
               </select>
             </div>
           </div>
-          <!--FPS-->
-          <div class="options-row">
-            <span class="option-name" id="">Fps</span>
-            <div class="option-value">
-              <select name="fps" id="fps-select">
-                <option value="60">60</option>
-                <option value="30">30</option>
-                <option value="unlocked">Unlocked</option>
-              </select>
-            </div>
-          </div>
-          <!--ANTIALISING-->
-          <div class="options-row">
-            <span class="option-name" id="">Antialising</span>
-            <div class="option-value">
-              <input id="antialising" checked type="checkbox" />
-            </div>
-          </div>
           <!--STATS-->
           <div class="options-row">
             <span class="option-name" id="">Stats</span>
             <div class="option-value">
               <input id="option-stats" checked type="checkbox" />
-            </div>
-          </div>
-          <!--CLONE ARMA-->
-          <div class="options-row">
-            <span class="option-name" id="">Portal Gun Clone</span>
-            <div class="option-value">
-              <input id="option-portal-gun-clone" checked type="checkbox" />
-            </div>
-          </div>
-          <!--CLONE PLAYER-->
-          <div class="options-row">
-            <span class="option-name" id="">Player Clone</span>
-            <div class="option-value">
-              <input id="option-player-clone" checked type="checkbox" />
             </div>
           </div>
           <!--GOO REFLECTIONS-->
