@@ -101,7 +101,7 @@ function updatePhysics() {
                 var pWorld = pLocal.applyMatrix4(GLOBALS.MAIN_CAMERA.matrixWorld);
                 var dir = pWorld.sub(GLOBALS.MAIN_CAMERA.position).normalize();
 
-                point.add(dir.clone().multiplyScalar(-0.5));
+                point.add(dir.clone().multiplyScalar(-GLOBALS.CURRENT_ITEM.body.offset));
                 hitPoint = point;
 
                 console.log("22222222222222")
@@ -142,6 +142,11 @@ function updatePhysics() {
 
             if (GLOBALS.DYMANIC_ITEMS[property][i].length != 0) {
 
+                if(property == "radio"){
+                    GLOBALS.RADIO_MUSIC[i].position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
+                    GLOBALS.RADIO_MUSIC[i].quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
+                }
+
                 /*if (i == GLOBALS.CURRENT_ITEM_ID) {
                     if (GLOBALS.CURRENT_INSTANCED.name == property)
                         continue;
@@ -157,6 +162,16 @@ function updatePhysics() {
                 instanced.computeBoundingSphere();
             }
 
+        }
+    }
+
+    for (var i = 0; i < GLOBALS.CAMERAS.length; i++) {
+        if(!GLOBALS.CAMERAS[i].fixed){
+            GLOBALS.CAMERAS[i].position.copy(GLOBALS.CAMERAS[i].body.position);
+            GLOBALS.CAMERAS[i].quaternion.copy(GLOBALS.CAMERAS[i].body.quaternion);
+            GLOBALS.CAMERAS[i].cube.position.copy(GLOBALS.CAMERAS[i].body.position);
+            GLOBALS.CAMERAS[i].cube.quaternion.copy(GLOBALS.CAMERAS[i].body.quaternion);
+            GLOBALS.CAMERAS[i].translateY(0.22);
         }
     }
 

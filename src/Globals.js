@@ -315,6 +315,8 @@ var GLOBALS = {
 
     LIGHT_PORTAL_0: null,
     LIGHT_PORTAL_1: null,
+    RADIO_MUSIC: [],
+    CAMERAS: []
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)

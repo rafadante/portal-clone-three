@@ -141,7 +141,7 @@ function loadWindowIMG() {
         })
 
         gltf.scene.rotation.y = -Math.PI / 2;
-        gltf.scene.position.set(20, 7, 7);
+        gltf.scene.position.set(16, 7, 7);
         gltf.scene.translateY(-1)
         gltf.scene.translateX(-1)
         gltf.scene.name = "window";
@@ -340,6 +340,32 @@ function loadEnterDoor(scene) {
     const plane = new THREE.Mesh(geometry, material);
     door.add(plane);
 
+    const geometry3 = new THREE.BoxGeometry( 2, 2, 0.1 ); 
+    const material3 = new THREE.MeshBasicMaterial( {color: 0x00ff00} ); 
+    const cube = new THREE.Mesh( geometry3, material3 );
+    cube.visible = false; 
+    door.add( cube );
+    cube.translateZ(0.3);
+
+    var p = new THREE.Vector3();
+    cube.getWorldPosition(p);
+
+    var r = new THREE.Quaternion();
+    cube.getWorldQuaternion(r);
+
+    GLOBALS.SCENE.add(cube);
+    cube.position.copy(p);
+    cube.rotation.copy(r);
+
+    var bb = new THREE.Box3(); // for re-use
+    bb.setFromObject(cube);
+
+    GLOBALS.ENTER_DOOR.box3 = bb;
+
+    var map2 = new THREE.TextureLoader().load('./assets/textures/door.jpg');
+    //map.flipY = false;
+    map2.encoding = THREE.sRGBEncoding;
+
     door.traverse(child => {
 
         child.userData.wall = true;
@@ -357,6 +383,12 @@ function loadEnterDoor(scene) {
         if (child.material) {
             child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.5;
+            child.material.map = map2;
+
+            if(child.material.name == "portal_door_02"){
+                child.material.emissiveMap = null;
+                child.material.emissiveIntensity = 0;
+            }
         }
     })
     //
@@ -614,7 +646,7 @@ function loadCameraManager(scene) {
         }
     })
 
-    loadRadio()
+    loadRadio();
 }
 
 function loadRadio() {

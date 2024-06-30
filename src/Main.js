@@ -344,15 +344,19 @@ function render(time) {
     TWEEN.update();
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {
-        GLOBALS.CAMERA_OBJ_HORIZONTAL[i].lookAt(GLOBALS.MAIN_CAMERA.position);
-        GLOBALS.CAMERA_OBJ_HORIZONTAL[i].rotation.x = Math.PI / 2;
-        GLOBALS.CAMERA_OBJ_HORIZONTAL[i].rotation.y = 0;
+        if(GLOBALS.CAMERAS[i].fixed){
+            GLOBALS.CAMERA_OBJ_HORIZONTAL[i].lookAt(GLOBALS.MAIN_CAMERA.position);
+            GLOBALS.CAMERA_OBJ_HORIZONTAL[i].rotation.x = Math.PI / 2;
+            GLOBALS.CAMERA_OBJ_HORIZONTAL[i].rotation.y = 0;
+        }
     }
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_VERTICAL.length; i++) {
-        GLOBALS.CAMERA_OBJ_VERTICAL[i].lookAt(GLOBALS.MAIN_CAMERA.position);
-        GLOBALS.CAMERA_OBJ_VERTICAL[i].rotation.z = 0;
-        GLOBALS.CAMERA_OBJ_VERTICAL[i].rotation.y = 0;
+        if(GLOBALS.CAMERAS[i].fixed){
+            GLOBALS.CAMERA_OBJ_VERTICAL[i].lookAt(GLOBALS.MAIN_CAMERA.position);
+            GLOBALS.CAMERA_OBJ_VERTICAL[i].rotation.z = 0;
+            GLOBALS.CAMERA_OBJ_VERTICAL[i].rotation.y = 0;
+        }
     }
 
     // finally, render to screen

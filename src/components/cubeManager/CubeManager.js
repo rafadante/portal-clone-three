@@ -270,15 +270,15 @@ function buildIniCubes(obj) {
         }
 
         //GROUND
-        buildLayer(-1, -1, 0, 'x', 'z', 'y', 6, 10, "down", new THREE.Vector3(-Math.PI / 2, 0, 0));
+        buildLayer(-1, -1, 0, 'x', 'z', 'y', 6, 8, "down", new THREE.Vector3(-Math.PI / 2, 0, 0));
         //CEILING
-        buildLayer(-1, -1, 8, 'x', 'z', 'y', 6, 10, "up", new THREE.Vector3(Math.PI / 2, 0, 0));
+        buildLayer(-1, -1, 8, 'x', 'z', 'y', 6, 8, "up", new THREE.Vector3(Math.PI / 2, 0, 0));
         //WALL FRONT
-        buildLayer(-1, -1, 0, 'x', 'y', 'z', 4, 10, "front", new THREE.Vector3(0, 0, 0));
+        buildLayer(-1, -1, 0, 'x', 'y', 'z', 4, 8, "front", new THREE.Vector3(0, 0, 0));
         //WALL BACK
-        buildLayer(-1, -1, 12, 'x', 'y', 'z', 4, 10, "back", new THREE.Vector3(0, Math.PI, 0));
+        buildLayer(-1, -1, 12, 'x', 'y', 'z', 4, 8, "back", new THREE.Vector3(0, Math.PI, 0));
         //WALL RIGHT
-        buildLayer(-1, -1, 20, 'z', 'y', 'x', 4, 6, "right", new THREE.Vector3(0, -Math.PI / 2, 0));
+        buildLayer(-1, -1, 16, 'z', 'y', 'x', 4, 6, "right", new THREE.Vector3(0, -Math.PI / 2, 0));
         //WALL LEFT
         buildLayer(-1, -1, 0, 'z', 'y', 'x', 4, 6, "left", new THREE.Vector3(0, Math.PI / 2, 0));
 
@@ -358,8 +358,8 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
                 portal = false;
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new THREE.Color().setHex(0x808080));
             } else {
-                portal = false;
-                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new THREE.Color().setHex(0x808080));
+                portal = true;
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new THREE.Color().setHex(0xffffff));
             }
 
             var hasItem = false;
@@ -371,10 +371,12 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
             } else if (clone.position.equals(new THREE.Vector3(13, 1, 0))) {
                 hasItem = true;
                 itemName = "exitDoor";
-            } else if (clone.position.equals(new THREE.Vector3(20, 7, 7)) ||
-                clone.position.equals(new THREE.Vector3(20, 7, 5))) {
+            } else if (clone.position.equals(new THREE.Vector3(16, 7, 7)) ||
+                clone.position.equals(new THREE.Vector3(16, 7, 5))) {
                 hasItem = true;
                 itemName = "window";
+
+                console.log("xxxxxxxxxxxxxxx")
             }
 
             //ADD USERDATA TO ARRAY LINKED WITH THE INSTANCED ID

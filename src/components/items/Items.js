@@ -1,3 +1,4 @@
+/* eslint-disable */
 import * as THREE from 'three';
 import $ from 'jquery';
 import {
@@ -292,7 +293,36 @@ function addItem(found, loaded) {
                 item.beam = beamType;
 
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
+
+                console.log(item)
+                item.translateY(1)
+                item.translateZ(0.3)
+
+                const geometry = new THREE.BoxGeometry( 0.6, 0.6, 0.6 ); 
+                const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} ); 
+                const cube = new THREE.Mesh( geometry, material ); 
+                cube.name = "camera";
+                cube.visible = false;
+
+                var holder = new THREE.Vector3();
+                item.children[1].getWorldPosition(holder)
+                holder.y -= 0.25;
+
+                cube.position.copy(holder)
+                GLOBALS.SCENE.add( cube );
+
+                var bb = new THREE.Box3(); // for re-use
+                bb.setFromObject(cube);
+                item.box3 = bb;
+                item.fixed = true;
+                item.cube = cube;
+
+
+                GLOBALS.CAMERAS.push(item);
                 GLOBALS.ITEMS_ADDED.add(item);
+
+                console.log(GLOBALS.CAMERAS)
+
             } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
                 item.translateY(0.025);
 
@@ -780,9 +810,13 @@ function interactWithItem() {
         GLOBALS.PLAYER.velocity.set(0, 0, 0);
         GLOBALS.PLAYER.angularVelocity.set(0, 0, 0);*/
 
-        itemHolder.gelJumping = false;
+        console.log(GLOBALS.CURRENT_ITEM)
 
-        itemHolder.sleeping = false;
+        if(itemHolder){
+            itemHolder.gelJumping = false;
+            itemHolder.sleeping = false;
+        }
+        
 
         //GLOBALS.CANNON_WORLD.addBody(itemHolder);
         GLOBALS.CURRENT_ITEM.body.holding = false;
@@ -794,6 +828,8 @@ function interactWithItem() {
         //GLOBALS.MAIN_CAMERA.getObjectByName("cubeHolder").position.z = -1;
 
         removeJointConstraint();
+
+        
     } else if (intersects.length > 0) {
 
         if (intersects[0].object.name == "pedestal_button") {
@@ -821,23 +857,35 @@ function interactWithItem() {
         } else {
             if (intersects[0].distance < 2) {
                 GLOBALS.HOLDING_ITEM = true;
-                var instancedId = intersects[0].instanceId;
-                var name = intersects[0].object.name;
 
-                GLOBALS.CURRENT_ITEM = GLOBALS.DYMANIC_ITEMS[name][instancedId];
-                GLOBALS.CURRENT_INSTANCED = GLOBALS.ITEMS_ADDED.getObjectByName(name);
-                GLOBALS.CURRENT_ITEM_ID = instancedId;
+                console.log(intersects[0].object.name)
 
-                itemHolder = GLOBALS.DYMANIC_ITEMS[name][instancedId].body;
-                //GLOBALS.CANNON_WORLD.removeBody(GLOBALS.DYMANIC_ITEMS[name][instancedId].body);
-                GLOBALS.CURRENT_ITEM.body.angularDamping = 1;
-                GLOBALS.CURRENT_ITEM.body.allowSleep = false;
-                GLOBALS.CURRENT_ITEM.body.holding = true;
-                //GLOBALS.CURRENT_ITEM.body.quaternion.setZero();
-
-                if (GLOBALS.DYMANIC_ITEMS[name][instancedId].body.placed) {
-                    revert(GLOBALS.DYMANIC_ITEMS[name][instancedId].body)
+                if(intersects[0].object.name != "camera"){
+                    var instancedId = intersects[0].instanceId;
+                    var name = intersects[0].object.name;
+    
+                    GLOBALS.CURRENT_ITEM = GLOBALS.DYMANIC_ITEMS[name][instancedId];
+                    GLOBALS.CURRENT_INSTANCED = GLOBALS.ITEMS_ADDED.getObjectByName(name);
+                    GLOBALS.CURRENT_ITEM_ID = instancedId;
+    
+                    itemHolder = GLOBALS.DYMANIC_ITEMS[name][instancedId].body;
+                    //GLOBALS.CANNON_WORLD.removeBody(GLOBALS.DYMANIC_ITEMS[name][instancedId].body);
+                    GLOBALS.CURRENT_ITEM.body.angularDamping = 1;
+                    GLOBALS.CURRENT_ITEM.body.allowSleep = false;
+                    GLOBALS.CURRENT_ITEM.body.holding = true;
+                    //GLOBALS.CURRENT_ITEM.body.quaternion.setZero();
+    
+                    if (GLOBALS.DYMANIC_ITEMS[name][instancedId].body.placed) {
+                        revert(GLOBALS.DYMANIC_ITEMS[name][instancedId].body)
+                    }
+                }else{
+                    GLOBALS.CURRENT_ITEM = intersects[0].object;
+                    GLOBALS.CURRENT_ITEM.body.angularDamping = 1;
+                    GLOBALS.CURRENT_ITEM.body.allowSleep = false;
+                    GLOBALS.CURRENT_ITEM.body.holding = true;
                 }
+
+                
             }
         }
     }

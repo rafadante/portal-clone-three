@@ -33,7 +33,38 @@ $("body").on('click', '#view-fps', function () {
     viewFPS();
 })
 
+function addRadioAudio(){
+    // create an AudioListener and add it to the camera
+    const listener = new THREE.AudioListener();
+    GLOBALS.MAIN_CAMERA.add( listener );
+
+    // create the PositionalAudio object (passing in the listener)
+    const sound = new THREE.PositionalAudio( listener );
+
+    // load a sound and set it as the PositionalAudio object's buffer
+    const audioLoader = new THREE.AudioLoader();
+    audioLoader.load( 'audio/radio.mp3', function( buffer ) {
+        sound.setBuffer( buffer );
+        sound.setRefDistance( 1 );
+        sound.setMaxDistance( 8 );
+        //sound.setRolloffFactor( 20 );
+        sound.setDistanceModel("linear");
+        sound.play();
+        sound.loop = true;
+        sound.source.loop = true;
+    });
+
+    // finally add the sound to the mesh
+    GLOBALS.RADIO_MUSIC.push(sound)
+    GLOBALS.SCENE.add(sound)
+    //mesh.add( sound );
+}
+
 function viewFPS() {
+
+    var ambient = new Audio('audio/ambient.ogg');
+    ambient.loop = true;
+    //ambient.play();
 
     GLOBALS.ITEM_CUBE.visible = false;
     GLOBALS.SPOTLIGHT.intensity = 0;
@@ -175,8 +206,6 @@ function viewFPS() {
         GLOBALS.GUN_SPHERE.material = GLOBALS.MATERIAL_GUN;
         GLOBALS.GUN_CYLINDER.material = GLOBALS.MATERIAL_GUN;
         //GLOBALS.MAIN_CAMERA.add(GLOBALS.GUN)
-
-        console.log(GLOBALS.GUN)
 
 
         //CORRIDOR ENTER COLLIDERS
@@ -371,8 +400,7 @@ function viewFPS() {
        }
 
        //GLOBALS.RENDERER.renderLists.dispose();
-       console.log(GLOBALS.SCENE)
-       GLOBALS.SCENE.background = new THREE.Color(0xff0000);
+       GLOBALS.SCENE.background = new THREE.Color(0x000000);//0xff0000
        GLOBALS.FLASH.visible = false;
     }, 500);
 };
@@ -385,7 +413,7 @@ function addColliderItem(items, type, mass, offset) {
     PHYSICS_MATERIAL.friction = 0.4; //0.01
     PHYSICS_MATERIAL.restitution = 0; //0.1
 
-    console.log(PHYSICS_MATERIAL)
+    var offset;
 
     for (var i = 0; i < items.length; i++) {
         if (items[i].length != 0) {
@@ -408,11 +436,13 @@ function addColliderItem(items, type, mass, offset) {
                 var vec = new THREE.Quaternion();
                 items[i].children[1].getWorldQuaternion(vec)
                 var rot = vec;
-            } else if (type == "cube" || type == "laser_cube")
+            } else if (type == "cube" || type == "laser_cube"){
                 var shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.3, 0.3));
-            else if (type == "sphere")
+                offset = 0.5;
+            }else if (type == "sphere"){
                 var shape = new CANNON.Sphere(0.3);
-            else if (type == "gel_gun_blue" || type == "gel_gun_orange" || type == "gel_gun_white") {
+                offset = 0.5;
+            }else if (type == "gel_gun_blue" || type == "gel_gun_orange" || type == "gel_gun_white") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.5, 0.1));
                 items[i].position.y += 0.5;
             } else if (type == "pedestal_button") {
@@ -420,6 +450,8 @@ function addColliderItem(items, type, mass, offset) {
                 items[i].position.y += 0.35;
             } else if (type == "radio") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.11, 0.07, 0.049));
+                offset = 0.07;
+                addRadioAudio()
             } else if (type == "button_weight") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.117, 0.5));
                 items[i].position.y += 0.117;
@@ -481,26 +513,29 @@ function addColliderItem(items, type, mass, offset) {
 
             if (mass > 0) {
 
-
-
                 if ((type == "cube" || type == "laser_cube" || type == "sphere") && items[i].hasDispenser) {
 
+                    box.mass = 0;
+                    box.allowSleep = false;
                     box.position.copy(new THREE.Vector3(items[i].dispenserPosition.x,
                         items[i].dispenserPosition.y - 1,
                         items[i].dispenserPosition.z));
                     items[i].position.copy(box.position)
+                    GLOBALS.BOX_BODY.push(box);
+                }else{
+                    box.allowSleep = true;
                 }
 
                 box.spawnPosition = items[i].position.clone();
-                box.allowSleep = false;
+                
                 box.sleepSpeedLimit = 0.1;
                 box.sleepTimeLimit = 2.0;
-                box.mass = 0;
 
                 GLOBALS.DYNAMIC_OBJECTS.push(box);
                 box.gelJumping = false;
                 box.waiting = false;
-                GLOBALS.BOX_BODY.push(box);
+                box.offset = offset;
+                
 
                 box.arrayPos = [];
                 box.arrayRot = [];
@@ -508,7 +543,6 @@ function addColliderItem(items, type, mass, offset) {
 
                 box.addEventListener("sleep", function (event) {
                     box.sleeping = true;
-                    console.log("111111111")
                 });
 
                 box.addEventListener('wakeup', (event) => {
@@ -680,12 +714,20 @@ function corridorCollider(parent, name, x, y, z, state) {
     parent.getObjectByName(name).material.visible = state;
     parent.getObjectByName(name).getWorldPosition(target);
 
+    var shape;
+
     const result = threeToCannon(parent.getObjectByName(name), {
         type: ShapeType.BOX
     });
 
+    shape = result.shape;
+
+    if (name == "front"){
+        shape = new CANNON.Box(new CANNON.Vec3(1, 0.01, 1));
+    }
+
     var wall = new CANNON.Body({
-        shape: result.shape,
+        shape: shape,
         mass: 0,
         material: GLOBALS.PHYSICS_MATERIAL
     })
