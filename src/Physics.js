@@ -65,6 +65,7 @@ const cannonDebugger = new CannonDebugger(GLOBALS.SCENE, world, {
 
 var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
+var raycaster3 = new THREE.Raycaster();
 
 function updatePhysics() {
     if (GLOBALS.HOLDING_ITEM) {
@@ -72,13 +73,40 @@ function updatePhysics() {
         var hitPoint = new THREE.Vector3(); // create once an reuse it
         GLOBALS.MAIN_CAMERA.getObjectByName("cubeHolder").getWorldPosition(hitPoint);
 
-        raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
-        var intersects = raycaster2.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
+        var ff = false;
 
-        if (intersects.length > 0 && !GLOBALS.CURRENT_ITEM.body.teleportingHolding) {
-            //console.log(intersects)
-            if(intersects[0].distance < 1.25){
-                hitPoint = intersects[0].point;
+        raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
+        raycaster3.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
+        
+        if(GLOBALS.PORTAL_INNER_BOX[0] != null && GLOBALS.PORTAL_INNER_BOX[1] != null){
+            //console.log(GLOBALS.PORTALS)
+            var intersects = raycaster2.intersectObjects(GLOBALS.PORTAL_INNER_BOX);
+            if(intersects.length > 0){
+                if(intersects[0].distance < 1.25){
+                    ff = true;
+                    console.log("55555555555555555")
+                }
+            }
+        }
+
+        var intersects2 = raycaster3.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
+
+        if (intersects2.length > 0) {//&& !GLOBALS.CURRENT_ITEM.body.teleportingHolding && !ff
+            
+            if(intersects2[0].distance < 1.25 && !ff){
+
+                var point = intersects2[0].point;
+
+                var pLocal = new THREE.Vector3(0, 0, -1);
+                var pWorld = pLocal.applyMatrix4(GLOBALS.MAIN_CAMERA.matrixWorld);
+                var dir = pWorld.sub(GLOBALS.MAIN_CAMERA.position).normalize();
+
+                point.add(dir.clone().multiplyScalar(-0.5));
+                hitPoint = point;
+
+                console.log("22222222222222")
+
+                GLOBALS.CURRENT_ITEM.body.position.copy(point);
             }
         }
 
@@ -186,7 +214,6 @@ function addJointConstraint(position, constrainedBody) {
 
 // Remove constraint from world
 function removeJointConstraint() {
-    console.log("000000000000")
     world.removeConstraint(jointConstraint)
     jointConstraint = undefined;
     getObject = false;

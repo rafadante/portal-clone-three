@@ -372,7 +372,7 @@ function viewFPS() {
 
        //GLOBALS.RENDERER.renderLists.dispose();
        console.log(GLOBALS.SCENE)
-       GLOBALS.SCENE.background = new THREE.Color(0x000000);
+       GLOBALS.SCENE.background = new THREE.Color(0xff0000);
        GLOBALS.FLASH.visible = false;
     }, 500);
 };
@@ -494,7 +494,7 @@ function addColliderItem(items, type, mass, offset) {
                 box.spawnPosition = items[i].position.clone();
                 box.allowSleep = false;
                 box.sleepSpeedLimit = 0.1;
-                box.sleepTimeLimit = 1.0;
+                box.sleepTimeLimit = 2.0;
                 box.mass = 0;
 
                 GLOBALS.DYNAMIC_OBJECTS.push(box);

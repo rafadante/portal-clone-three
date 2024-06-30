@@ -35,7 +35,7 @@ $("body").on('click', '#done', function () {
 //QUALITY
 $('#quality-select').on('change', function () {
 
-    allowUpdate = false;
+    //allowUpdate = false;
     localStorage.setItem("quality-select", $(this).val());
 
     console.log($(this).data("recursive"))
@@ -50,7 +50,7 @@ $('#quality-select').on('change', function () {
         $("#recursive-select").val(3).change();
         $("#recursive-render-select").val(0).change();
         $("#resolution-select").val(0.5).change();
-        $("#shadows-resolution-select").val(512).change();
+        $("#shadows-resolution-select").val(256).change();
         localStorage.setItem("antialising", false);
     }else if($(this).val() == "low"){
         $("#recursive-select").val(3).change();

@@ -113,6 +113,7 @@ var GLOBALS = {
     PORTAL_RING_THICKNESS: 0.3,
     PORTAL_SHADER: [],
     PORTAL_BOX: [],
+    PORTAL_INNER_BOX: [],
 
     /**********************************************************
      * PHYSICS

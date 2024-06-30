@@ -650,8 +650,8 @@ function portalCollision() {
             if (GLOBALS.PORTALS[p].CDBB.containsPoint(pos)) {
 
                 if(d.name != "player"){
-                    //d.allowSleep = false;
-                    //console.log("9999999999999")
+                    //console.log("999999999999")
+                    d.wakeUp();
                 }
 
                 if ((d.name == "gel" || d.name == "gel-orange") && !d.disabled) {
@@ -715,9 +715,11 @@ function portalCollision() {
                 }
 
                 //GLOBALS.CURRENT_ITEM.body.holding
-                d.teleportingHolding = false;
+                
                 if(d.holding){
+                    //console.log("1111111111111")
                     d.teleportingHolding = true;
+                    //d.portal = p;
                 }else{
                     teleportPhysicalObject(d, GLOBALS.PORTALS[p])
 
@@ -746,6 +748,9 @@ function portalCollision() {
                     d.collisionFilterMask |= GLOBALS.PORTALS[p].hostObjects.collisionFilterGroup
                     d.collisionFilterMask &= ~GLOBALS.PORTALS[1 - p].hostObjects.collisionFilterGroup
                 }
+            }else{
+                if(d.portal == p && d.teleportingHolding)
+                    d.teleportingHolding = false;
             }
         }
         dd++;

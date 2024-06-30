@@ -200,6 +200,16 @@ class Portal extends Group {
         GLOBALS.PORTAL_BOX[index].visible = false;
         this.add( GLOBALS.PORTAL_BOX[index] );
 
+        //
+        const geometry4 = new THREE.BoxGeometry( 0.75, 1.2, 0.1 ); 
+        GLOBALS.PORTAL_INNER_BOX[index] = new THREE.Mesh( geometry4, material3 ); 
+        GLOBALS.PORTAL_INNER_BOX[index].applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
+        GLOBALS.PORTAL_INNER_BOX[index].applyMatrix4(this.transform)
+        GLOBALS.PORTAL_INNER_BOX[index].updateMatrix()
+        GLOBALS.PORTAL_INNER_BOX[index].matrixAutoUpdate = true;
+        GLOBALS.PORTAL_INNER_BOX[index].visible = false;
+        this.add( GLOBALS.PORTAL_INNER_BOX[index] );
+
         // CDBB: collision disable BB
         // STBB: should teleport BB
 
@@ -213,6 +223,7 @@ class Portal extends Group {
 
         this.CDBB = new GeneralBB(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_CDBB_HEIGHT, GLOBALS.PORTAL_DEPTH, tCDBB, 0xff0000)
         this.STBB = new GeneralBB(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_CDBB_HEIGHT / 2, GLOBALS.PORTAL_DEPTH, tSTBB, 0x00ff00)
+        //this.LEFT = new GeneralBB(GLOBALS.PORTAL_WIDTH * 0.1, GLOBALS.PORTAL_CDBB_HEIGHT / 2, GLOBALS.PORTAL_DEPTH, tSTBB, 0x000000)
 
         this.debugMeshes.add(this.CDBB.helper)
         this.debugMeshes.add(this.STBB.helper)
