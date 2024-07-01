@@ -34,7 +34,6 @@ import {
 } from './components/ray/Ray.js';
 import './components/test/Test.js';
 import {
-    itemUpdate,
     addItem,
     hoverItem
 } from './components/items/Items.js';
@@ -60,6 +59,7 @@ import {
 } from './Globals.js';
 
 //VARIABLES
+var angleHolder = 0;
 var raycaster = new THREE.Raycaster();
 let pmremGenerator, currentRenderTarget;
 let timeTarget = 0;
@@ -247,7 +247,6 @@ function raycastManager(event, type) {
                     top: event.pageY - 25
                 });
 
-                //itemUpdate(found, event, type);
                 hoverItem(intersection);
             }
         }
@@ -278,42 +277,25 @@ function animate(time) {
     if (!GLOBALS.FPS_MODE) {
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
     } else if (!GLOBALS.PAUSED) {
-
         render(time);
-
-        /*delta2 += clock3.getDelta();
-
-        if (delta2 > 1 / 60) {
-            // The draw or time dependent code are here
-            fixedUpdate();
-            delta2 = delta2 % 60;
-        }*/
     }
 }
 
-let previousTime = 0;
 var fps = 0;
 
 function fixedUpdate() { //60 fps always for physics
 
-    
     frames ++;
     const time2 = performance.now();
         
     if ( time2 >= prevTime + 100 ) {
-        
-
         fps = Math.round( ( frames * 100 ) / ( time2 - prevTime ) ) * 10;
-        //console.log( fps );
-        
         frames = 0;
         prevTime = time2;
-        
-        
     }
     
     const deltaTime = clock2.getDelta();
-    if(fps > 15)
+    if(fps > 15)//IF FPS IS LOWER THAN 15, AVOID THE PLAYER TO CONTROL THE CHARACTER TO AVOID PHYSICS ERRORS
         updatePlayer(deltaTime);
 
     if (Date.now() >= timeTarget && !GLOBALS.STOP_TIME) {
@@ -327,16 +309,14 @@ function fixedUpdate() { //60 fps always for physics
     }
 }
 
-const STEPS_PER_FRAME = 1;
-
 function render(time) {
 
     GLOBALS.STATS.begin();
     fixedUpdate();
     animatePortal();
-    //updateRay();
-    //animateShader();
-    //renderGoo();
+    updateRay();
+    animateShader();
+    renderGoo();
     updateEvents();
     updatePhysics();
     //updateGels();
@@ -373,8 +353,6 @@ function tweenCamera(duration, ini, final) {
         //.easing(TWEEN.Easing.Quadratic.Out)
         .start();
 }
-
-var angleHolder = 0;
 
 function animatePortal() {
 

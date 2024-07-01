@@ -38,7 +38,6 @@ function loadMaterial(material, base, normal, ao, rough, metal, roughValue) {
 
     if (normal) {
         map = new THREE.TextureLoader().load('./assets/textures/' + normal);
-        //map.encoding = THREE.sRGBEncoding;
         material.normalMap = map;
     }
 

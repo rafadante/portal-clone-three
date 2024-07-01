@@ -31,7 +31,6 @@ world.broadphase = new CANNON.NaiveBroadphase();
 
 //PHYSICS INTERACTIONS
 var getObject = false;
-var recordingPosition = true;
 var debugColision = true;
 let jointBody;
 let jointConstraint;
@@ -51,7 +50,6 @@ world.addBody(jointBody)
 const planeGeometry = new THREE.PlaneGeometry(100, 100)
 movementPlane = new THREE.Mesh(planeGeometry, new THREE.MeshBasicMaterial())
 movementPlane.visible = false // Hide it..
-//GLOBALS.SCENE_CHILDREN.add(movementPlane)
 
 const cannonDebugger = new CannonDebugger(GLOBALS.SCENE, world, {
     onInit(body, mesh) {
@@ -64,8 +62,7 @@ const cannonDebugger = new CannonDebugger(GLOBALS.SCENE, world, {
 })
 
 var coords = new THREE.Vector3();
-var raycaster2 = new THREE.Raycaster();
-var raycaster3 = new THREE.Raycaster();
+var raycaster = new THREE.Raycaster();
 
 function updatePhysics() {
     if (GLOBALS.HOLDING_ITEM) {
@@ -73,29 +70,27 @@ function updatePhysics() {
         var hitPoint = new THREE.Vector3(); // create once an reuse it
         GLOBALS.MAIN_CAMERA.getObjectByName("cubeHolder").getWorldPosition(hitPoint);
 
-        var ff = false;
+        var portalInFront = false;
 
-        raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
-        raycaster3.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
+        raycaster.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
         
+        //DETECT IF THE CAMERA IS IN FRONT OF A PORTAL
         if(GLOBALS.PORTAL_INNER_BOX[0] != null && GLOBALS.PORTAL_INNER_BOX[1] != null){
-            //console.log(GLOBALS.PORTALS)
-            var intersects = raycaster2.intersectObjects(GLOBALS.PORTAL_INNER_BOX);
-            if(intersects.length > 0){
-                if(intersects[0].distance < 1.25){
-                    ff = true;
-                    console.log("55555555555555555")
-                }
+            var intersectPortal = raycaster.intersectObjects(GLOBALS.PORTAL_INNER_BOX);
+            if(intersectPortal.length > 0){
+                if(intersectPortal[0].distance < 1.25)
+                    portalInFront = true;
             }
         }
 
-        var intersects2 = raycaster3.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
-
-        if (intersects2.length > 0) {//&& !GLOBALS.CURRENT_ITEM.body.teleportingHolding && !ff
+        //TO AVOID THE HOLDING OBJECT TO GO OFF WALLS, DETECT IF THE CAMERA IS CLOSE TO A WALL
+        //IF TRUE, PLACE THE HOLDING ITEM AT A FIXED POSITION
+        var intersectWall = raycaster.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
+        if (intersectWall.length > 0) {//&& !GLOBALS.CURRENT_ITEM.body.teleportingHolding && !ff
             
-            if(intersects2[0].distance < 1.25 && !ff){
+            if(intersectWall[0].distance < 1.25 && !portalInFront){
 
-                var point = intersects2[0].point;
+                var point = intersectWall[0].point;
 
                 var pLocal = new THREE.Vector3(0, 0, -1);
                 var pWorld = pLocal.applyMatrix4(GLOBALS.MAIN_CAMERA.matrixWorld);
@@ -103,8 +98,6 @@ function updatePhysics() {
 
                 point.add(dir.clone().multiplyScalar(-GLOBALS.CURRENT_ITEM.body.offset));
                 hitPoint = point;
-
-                console.log("22222222222222")
 
                 GLOBALS.CURRENT_ITEM.body.position.copy(point);
             }
@@ -121,8 +114,7 @@ function updatePhysics() {
         }
 
         // Move the cannon constraint on the contact point
-        //if (!GLOBALS.CURRENT_ITEM.body.inArea)
-            moveJoint(hitPoint);
+        moveJoint(hitPoint);
     }
 
     for (const property in GLOBALS.DYMANIC_ITEMS) {
@@ -147,11 +139,6 @@ function updatePhysics() {
                     GLOBALS.RADIO_MUSIC[i].quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
                 }
 
-                /*if (i == GLOBALS.CURRENT_ITEM_ID) {
-                    if (GLOBALS.CURRENT_INSTANCED.name == property)
-                        continue;
-                }*/
-
                 var item = new THREE.Object3D();
                 item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
                 item.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
@@ -161,7 +148,6 @@ function updatePhysics() {
                 instanced.instanceMatrix.needsUpdate = true;
                 instanced.computeBoundingSphere();
             }
-
         }
     }
 
@@ -173,13 +159,6 @@ function updatePhysics() {
             GLOBALS.CAMERAS[i].cube.quaternion.copy(GLOBALS.CAMERAS[i].body.quaternion);
             GLOBALS.CAMERAS[i].translateY(0.22);
         }
-    }
-
-    if (recordingPosition) {
-        recordingPosition = false;
-        setTimeout(() => {
-            recordingPosition = true;
-        }, 10);
     }
 
     if (debugColision)
@@ -206,7 +185,6 @@ function moveMovementPlane(point, camera) {
 // in the initeraction position
 function addJointConstraint(position, constrainedBody) {
 
-    //
     constrainedBody.position.copy(position)
     // Vector that goes from the body to the clicked point
     const vector = new CANNON.Vec3().copy(position).vsub(constrainedBody.position)
@@ -218,7 +196,6 @@ function addJointConstraint(position, constrainedBody) {
     // Move the cannon click marker body to the click position
     jointBody.position.copy(position)
     
-
     // Create a new constraint
     // The pivot for the jointBody is zero
     jointConstraint = new CANNON.PointToPointConstraint(constrainedBody, pivot, jointBody, new CANNON.Vec3(0, 0, 0))

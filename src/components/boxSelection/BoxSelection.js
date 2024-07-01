@@ -214,10 +214,8 @@ $("body").on('click', '#rotate-item', function () {
             GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation.copy(dummy.rotation);
         }
     }
+    
     animate();
-
-
-
 });
 
 $("body").on('click', '#delete', function () {

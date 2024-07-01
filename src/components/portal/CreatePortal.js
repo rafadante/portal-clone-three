@@ -21,7 +21,7 @@ var allowPortal = true;
 
 function portalButton(button) {
 
-    if(!allowPortal)
+    if(!allowPortal || GLOBALS.HOLDING_ITEM)
         return;
 
     if (GLOBALS.FPS_MODE && (button == 2 || button == 0 || button == 1) && GLOBALS.ALLOW_PLACE_PORTALS) {

@@ -82,24 +82,16 @@ async function handleZip(path, obj) {
                     loadLaserCubeManager(result.scene)
                 else if (obj == "loadFaithPlate")
                     loadFaithPlateManager(result.scene)
-                else if (obj == "loadDoorNormal")
-                    loadDoorNormalManager(result.scene)
                 else if (obj == "loadLight")
                     loadLightManager(result.scene)
                 else if (obj == "loadLightEmissive")
                     loadLightEmissiveManager(result.scene)
                 else if (obj == "loadLightStripe")
                     loadLightStripeManager(result.scene)
-                else if (obj == "loadGelBlue")
-                    loadGelBlueManager(result.scene)
                 else if (obj == "loadElevatorRoom")
                     loadElevatorRoomManager(result.scene)
-                else if (obj == "loadGelOrange")
-                    loadGelOrangeManager(result.scene)
                 else if (obj == "loadMuzzleFlash")
                     loadMuzzleFlashManager(result.scene)
-
-                
             });
         }
     });
@@ -123,7 +115,7 @@ function loadCube() {
 }
 
 function loadWindowIMG() {
-    loader.load('/3ds/WINDOW_IMG.glb', (gltf) => {
+    loader.load('/3ds/glb/WINDOW_IMG.glb', (gltf) => {
 
         gltf.scene.traverse(child => {
 
@@ -498,7 +490,7 @@ function loadPortalSphereManager(scene) {
 
 function loadHalfWindow() {
     //HALF WINDOW IMG
-    loader.load('/3ds/WINDOW_HALF_IMG.glb', (gltf) => {
+    loader.load('/3ds/glb/WINDOW_HALF_IMG.glb', (gltf) => {
         gltf.scene.name = "observation_room";
         gltf.scene.userData.wall = true;
         gltf.scene.userData.ground = false;
@@ -664,7 +656,7 @@ function loadRadioManager(scene) {
 }
 
 function loadGelRecharger() {
-    loader.load('/3ds/portal_gun_recharger.glb', (gltf) => {
+    loader.load('/3ds/glb/portal_gun_recharger.glb', (gltf) => {
 
         gltf.scene.traverse(child => {
             if (child.material)
@@ -682,42 +674,6 @@ function loadGelRecharger() {
         item.userData.ceiling = false;
 
         var item = instancedTransform(gltf.scene, "gel_gun_white", true, 0.1, 0.5)
-        item.userData.wall = false;
-        item.userData.ground = true;
-        item.userData.ceiling = false;
-
-        loadRamp();
-    });
-}
-
-function loadRamp() {
-    loader.load('/3ds/ramp.glb', (gltf) => {
-
-        var item = instancedTransform(gltf.scene, "ramp", false, 0.5, 0.5)
-        item.userData.wall = false;
-        item.userData.ground = true;
-        item.userData.ceiling = false;
-
-        loadRampHalf();
-    });
-}
-
-function loadRampHalf() {
-    loader.load('/3ds/ramp_half.glb', (gltf) => {
-
-        var item = instancedTransform(gltf.scene, "ramp_half", false, 0.5, 0.5)
-        item.userData.wall = false;
-        item.userData.ground = true;
-        item.userData.ceiling = false;
-
-        loadRampHalf2()
-    });
-}
-
-function loadRampHalf2() {
-    loader.load('/3ds/ramp_half2.glb', (gltf) => {
-
-        var item = instancedTransform(gltf.scene, "ramp_half2", false, 0.5, 0.5)
         item.userData.wall = false;
         item.userData.ground = true;
         item.userData.ceiling = false;
@@ -813,29 +769,6 @@ function loadFaithPlateManager(scene) {
         }
     })
 
-    loadDoorNormal();
-}
-
-function loadDoorNormal() {
-    handleZip('./assets/3ds/door.zip', "loadDoorNormal");
-}
-
-function loadDoorNormalManager(scene) {
-    scene.name = "door";
-    scene.userData.wall = false;
-    scene.userData.ground = true;
-    scene.userData.ceiling = false;
-    GLOBALS.ITEMS.add(scene);
-    scene.traverse(child => {
-        child.receiveShadow = true;
-        child.castShadow = true;
-        if (child.material) {
-            child.material.envMap = GLOBALS.ENV_MAP;
-            child.material.envMapIntensity = 0.5;
-            child.material.roughness = 0.2;
-        }
-    })
-
     loadLight()
 }
 
@@ -874,36 +807,6 @@ function loadLightStripeManager(scene) {
     item.userData.wall = true;
     item.userData.ground = true;
     item.userData.ceiling = true;
-
-    loadGelBlue()
-}
-
-function loadGelBlue() {
-    handleZip('./assets/3ds/gel_blue.zip', "loadGelBlue");
-}
-
-function loadGelBlueManager(scene) {
-    var item = instancedTransform(scene, "gel_blue", false, 0.2, 1)
-    item.visible = false;
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
-
-    loadGelOrange()
-}
-
-function loadGelOrange() {
-    handleZip('./assets/3ds/gel_orange.zip', "loadGelOrange");
-}
-
-function loadGelOrangeManager(scene) {
-    var item = instancedTransform(scene, "gel_orange", false, 0.2, 1)
-    item.visible = false;
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
 
     loadElevatorRoom()
 }
@@ -1071,11 +974,11 @@ function loadMuzzleFlashManager(scene){
 
 GLOBALS.LIGHT_PORTAL_0 = new THREE.PointLight( new THREE.Color( 1, 0.25, 0 ), 3, 2);
 GLOBALS.LIGHT_PORTAL_1 = new THREE.PointLight( new THREE.Color( 0, 0.3, 1 ), 3, 2);
-//GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
-//GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
+GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
+GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
 
 GLOBALS.FLASH = new THREE.PointLight( 0xff0000, 10);
-//GLOBALS.SCENE_CHILDREN.add( GLOBALS.FLASH );
+GLOBALS.SCENE_CHILDREN.add( GLOBALS.FLASH );
 
 setTimeout(() => {
     GLOBALS.LIGHT_PORTAL_0.visible = false;

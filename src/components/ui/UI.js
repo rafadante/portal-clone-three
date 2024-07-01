@@ -35,10 +35,7 @@ $("body").on('click', '#done', function () {
 //QUALITY
 $('#quality-select').on('change', function () {
 
-    //allowUpdate = false;
     localStorage.setItem("quality-select", $(this).val());
-
-    console.log($(this).data("recursive"))
 
     if($(this).val() == "potato"){
         $("#recursive-select").val(0).change();
@@ -78,7 +75,6 @@ $('#quality-select').on('change', function () {
         localStorage.setItem("antialising", true);
     }
 
-    allowUpdate = true;
     update();
 });
 
@@ -233,22 +229,11 @@ function update(){
 }
 
 //VERIFY IF THE PLAYER HAS SETTINGS SAVED ON THE LOCALSTORAGE
-if(localStorage.getItem("saved")){
-
-    //if(localStorage.getItem("recursive-select"))
-    //    $("#recursive-select").val(localStorage.getItem("recursive-select")).change();
-    //if(localStorage.getItem("recursive-render-select"))
-    //    $("#recursive-render-select").val(localStorage.getItem("recursive-render-select")).change();
-    //if(localStorage.getItem("resolution-select"))
-    //    $("#resolution-select").val(localStorage.getItem("resolution-select")).change();
-
-}else{
+if(!localStorage.getItem("saved")){
     $("#recursive-select").val(GLOBALS.PORTAL_RECURSION_LEVELS).change();
     $("#resolution-select").val(0.5).change();
     $("#shadows-resolution-select").val(512).change();
-
-    //$("#quality-select").val("low").change();
 }
 
 allowUpdate = true;
-console.log(localStorage)
+console.log(localStorage);

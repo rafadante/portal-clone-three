@@ -22,11 +22,10 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
     portalsRecursive = 2;
     fov = 60;
 
-    if(localStorage.getItem("antialising") == "true"){
+    if(localStorage.getItem("antialising") == "true")
         antialias = true;
-    }else{
+    else
         antialias = false;
-    }
 }
 
 //MAIN CAMERA
