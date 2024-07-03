@@ -16,12 +16,28 @@ function loadMaterials() {
 
     //MATERIAL WALL PORTAL
     GLOBALS.MATERIAL_WALL_PORTAL = new THREE.MeshStandardMaterial();
-    loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL, 'portal/wall2.jpg', 'portal/wall2_normal.jpg',
+    loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL, 'portal/wall1.jpg', 'portal/wall1_normal.jpg',
+        null, null, null, 1);
+
+    GLOBALS.MATERIAL_WALL_PORTAL2 = new THREE.MeshStandardMaterial();
+    loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL2, 'portal/wall2.jpg', 'portal/wall2_normal.jpg',
+        null, null, null, 1);
+
+    GLOBALS.MATERIAL_WALL_PORTAL3 = new THREE.MeshStandardMaterial();
+    loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL3, 'portal/wall3.jpg', 'portal/wall3_normal.jpg',
+        null, null, null, 1);
+
+    GLOBALS.MATERIAL_WALL_PORTAL4 = new THREE.MeshStandardMaterial();
+    loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL4, 'portal/wall4.jpg', 'portal/wall4_normal.jpg',
         null, null, null, 1);
 
     //MATERIAL WALL NON PORTAL
     GLOBALS.MATERIAL_WALL_NON_PORTAL = GLOBALS.MATERIAL_WALL_PORTAL.clone();
-    loadMaterial(GLOBALS.MATERIAL_WALL_NON_PORTAL, 'metal/wall2.jpg', 'metal/wall2_normal.jpg',
+    loadMaterial(GLOBALS.MATERIAL_WALL_NON_PORTAL, 'metal/wall1.jpg', 'metal/wall1_normal.jpg',
+        null, null, null, 1);
+
+    GLOBALS.MATERIAL_WALL_NON_PORTAL2 = GLOBALS.MATERIAL_WALL_PORTAL.clone();
+    loadMaterial(GLOBALS.MATERIAL_WALL_NON_PORTAL2, 'metal/wall2.jpg', 'metal/wall2_normal.jpg',
         null, null, null, 1);
 }
 
@@ -32,7 +48,7 @@ function loadMaterial(material, base, normal, ao, rough, metal, roughValue) {
 
     if (base) {
         map = new THREE.TextureLoader().load('./assets/textures/' + base);
-        map.encoding = THREE.sRGBEncoding;
+        map.colorSpace = THREE.SRGBColorSpace;
         material.map = map;
     }
 
@@ -64,7 +80,7 @@ function loadMaterial(material, base, normal, ao, rough, metal, roughValue) {
 const textureLoader = new THREE.TextureLoader();
 const map = textureLoader.load('./assets/textures/decal/base2.png');
 //decalDiffuse.colorSpace = THREE.SRGBColorSpace;
-map.encoding = THREE.sRGBEncoding;
+map.colorSpace = THREE.SRGBColorSpace;
 const normal = textureLoader.load('./assets/textures/decal/normal.jpg');
 
 GLOBALS.INK_MATERIAL = new THREE.MeshStandardMaterial({
@@ -82,14 +98,14 @@ GLOBALS.INK_MATERIAL = new THREE.MeshStandardMaterial({
 
 //
 var texture = new THREE.TextureLoader().load("./assets/textures/tilePortal.jpg");
-texture.encoding = THREE.sRGBEncoding;
+map.colorSpace = THREE.SRGBColorSpace;
 GLOBALS.MATERIAL_PORTAL_EDITOR = new THREE.MeshStandardMaterial({
     map: texture,
     transparent: true
 })
 //
 var texture = new THREE.TextureLoader().load("./assets/textures/tileNonPortal.jpg");
-texture.encoding = THREE.sRGBEncoding;
+map.colorSpace = THREE.SRGBColorSpace;
 GLOBALS.MATERIAL_NON_PORTAL_EDITOR = new THREE.MeshStandardMaterial({
     map: texture,
     transparent: true

@@ -1,6 +1,9 @@
 import $ from 'jquery';
 import * as THREE from 'three';
 import { GLOBALS } from '../../Globals.js';
+import {
+    animate
+} from '../../Main.js';
 
 if (!GLOBALS.MOBILE)
     $(".mobile").css("display", "none");
@@ -167,30 +170,62 @@ $("body").on('click', '#back-editor', function () {
     GLOBALS.CONTROLS.enabled = true;
     GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;
     GLOBALS.LIGHT_GROUP.visible = false;
+    GLOBALS.SCENE.background = null;
+    GLOBALS.CORRIDOR_ENTER.visible = false;
+    GLOBALS.SCENE.getObjectByName("window").visible = true;
+    GLOBALS.OBSERVATION_ROOM.visible = false;
+    GLOBALS.SCENE.remove(GLOBALS.SCENE_FPS);
+    GLOBALS.SCENE_FPS = null;
+    GLOBALS.LEVEL_ENTERED = false;
+    GLOBALS.DOOR_OPEN_STATE = false;
+    GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
 
     $("#ui").css("display", "block");
     $(".img").removeClass("image");
     $("#mobile-controls").css("display", "none");
+    $("#container").css("filter", "none");
 
-    var bb = new THREE.Box3()
-    bb.setFromObject(GLOBALS.ROOM);
-    bb.getCenter(GLOBALS.CONTROLS.target);
 
-    GLOBALS.CONTROLS.target.set(GLOBALS.CONTROLS.target.x + 0, GLOBALS.CONTROLS.target.y + 0, GLOBALS.CONTROLS.target.z + 0);
-    GLOBALS.MAIN_CAMERA.position.set(-4.2, 13, 22.5)
-    GLOBALS.CONTROLS.update();
     $("#blocker").css("display", "none");
     $("#blocker").css("pointer-events", "none");
     $("#reticle").css("display", "none");
     GLOBALS.MAIN_CAMERA.remove(GLOBALS.GUN);
 
     if (GLOBALS.PORTALS.length == 1) {
-        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PORTALS[0]);
+        GLOBALS.SCENE.remove(GLOBALS.PORTALS[0]);
     } else if (GLOBALS.PORTALS.length == 2) {
-        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PORTALS[1]);
-        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PORTALS[0]);
+        GLOBALS.SCENE.remove(GLOBALS.PORTALS[1]);
+        GLOBALS.SCENE.remove(GLOBALS.PORTALS[0]);
     }
     GLOBALS.PORTALS = [null, null];
+
+    console.log(GLOBALS.MAIN_CAMERA.position)
+    GLOBALS.MAIN_CAMERA.position.set(-12.2, 17.4, 26.3)
+
+    GLOBALS.LIGHT_PORTAL_0.visible = false;
+    GLOBALS.LIGHT_PORTAL_1.visible = false;
+    GLOBALS.FLASH.visible = false;
+
+    //GLOBALS.CANNON_BODIES
+
+    console.log(GLOBALS.CANNON_BODIES)
+
+    for(var i=GLOBALS.CANNON_BODIES.length-1; i>=0; i--){
+        GLOBALS.CANNON_WORLD.remove(GLOBALS.CANNON_BODIES[i]);
+    }
+
+    for(var i=0; i<GLOBALS.RADIO_MUSIC.length; i++){
+        GLOBALS.RADIO_MUSIC[i].stop();
+    }
+    
+
+    GLOBALS.CANNON_BODIES = [];
+    GLOBALS.RADIO_MUSIC = [];
+    
+    //setTimeout(() => {
+        GLOBALS.CONTROLS.update();
+        animate()
+    //}, 100);
 });
 
 $("#arrow-menu").click(function () {

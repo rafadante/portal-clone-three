@@ -111,6 +111,8 @@ function init() {
     GLOBALS.ROOM.add(GLOBALS.CUBES);
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.ITEM_CUBE);
 
+    console.log(GLOBALS.ROOM)
+
     console.log(GLOBALS.SCENE)
     // CAMERA
     GLOBALS.SCENE.add(GLOBALS.MAIN_CAMERA);
@@ -464,7 +466,7 @@ function renderPortal2(thisIndex, pairIndex) {
 
     if (GLOBALS.PORTALS[thisIndex] === null || GLOBALS.PORTALS[pairIndex] === null)
         return
-    else{
+    /*else{
         if(waitToActivateToneForPortalTexture){
             waitToActivateToneForPortalTexture = false;
             setTimeout(() => {
@@ -482,7 +484,7 @@ function renderPortal2(thisIndex, pairIndex) {
     }
 
     if(thisIndex == 1 && !renderSecondPortal)
-        return;
+        return;*/
 
     let portalCamera = GLOBALS.MAIN_CAMERA.clone()
 

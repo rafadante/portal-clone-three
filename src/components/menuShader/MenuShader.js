@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import $ from 'jquery';
 import {
     addItem,
-    findPath
 } from '../items/Items';
 import {
     AddGoo
@@ -13,7 +12,8 @@ import {
 import {
     GLOBALS
 } from '../../Globals.js';
-import '../shaders/MainMenu/MainMenu.js'
+import '../shaders/MainMenu/MainMenu.js';
+import { findPath } from '../findPath/FindPath.js';
 
 var plane1;
 var plane2;

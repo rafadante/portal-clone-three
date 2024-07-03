@@ -356,7 +356,7 @@ function loadEnterDoor(scene) {
 
     var map2 = new THREE.TextureLoader().load('./assets/textures/door.jpg');
     //map.flipY = false;
-    map2.encoding = THREE.sRGBEncoding;
+    map2.colorSpace = THREE.SRGBColorSpace;
 
     door.traverse(child => {
 
@@ -387,7 +387,7 @@ function loadEnterDoor(scene) {
     door.getObjectByName("warning").material = new THREE.MeshStandardMaterial();
     var map = new THREE.TextureLoader().load('./assets/enter.jpg');
     map.flipY = false;
-    map.encoding = THREE.sRGBEncoding;
+    map.colorSpace = THREE.SRGBColorSpace;
     door.getObjectByName("warning").material.map = map;
     //
     loadCorridor()

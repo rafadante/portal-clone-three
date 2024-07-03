@@ -10,7 +10,6 @@ import { exitRoomCollider, corridorColliderNames } from "../test/Test.js";
 import { removeJointConstraint } from "../../Physics.js";
 import { func } from "three/examples/jsm/nodes/Nodes.js";
 
-var leveEntered = false;
 var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
 var DISPENSER_COVERS = [];
@@ -30,13 +29,13 @@ function updateEvents() {
       if (!d.repawning) respawn(d);
     }
 
-    if (GLOBALS.ELEVATOR_TRIGGER.containsPoint(pos) && d.name == "player") {
+    /*if (GLOBALS.ELEVATOR_TRIGGER.containsPoint(pos) && d.name == "player") {
       if (!d.exiting) {
         d.exiting = true;
         //d.mass = 0;
         elevator();
       }
-    }
+    }*/
 
     for (var j = 0; j < GLOBALS.GOO_BOXES.length; j++) {
       if (GLOBALS.GOO_BOXES[j].containsPoint(pos)) {
@@ -679,7 +678,7 @@ function addCameraBody(obj) {
 
   var box = new CANNON.Body({
     shape: shape,
-    mass: 5,
+    mass: 10,
     material: PHYSICS_MATERIAL,
   });
 
@@ -821,12 +820,20 @@ function portalCollision() {
               cameraUp,
               cameraForward.negate()
             );
-            GLOBALS.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat);
+
+            var q = new THREE.Quaternion()
+            q.setFromRotationMatrix(cameraMat);
+            window.q = q;
 
             GLOBALS.TARGET_ROTATION_X = GLOBALS.MAIN_CAMERA.rotation.y;
             GLOBALS.TARGET_ROTATION_Y = GLOBALS.MAIN_CAMERA.rotation.x;
 
             GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
+
+            window.CAMERA_ROTATING=true;
+            setTimeout(() => {
+              window.CAMERA_ROTATING=false;
+            }, 300);
           }
 
           d.collisionFilterMask |=
@@ -842,10 +849,12 @@ function portalCollision() {
   }
 }
 
+window.CAMERA_ROTATING = false;
+
 function levelEnteredFunction() {
-  if (!leveEntered) {
+  if (!GLOBALS.LEVEL_ENTERED) {
     if (GLOBALS.ENTER_DOOR.box3.containsPoint(GLOBALS.PLAYER.position)) {
-      leveEntered = true;
+      GLOBALS.LEVEL_ENTERED = true;
       GLOBALS.WALL_CORRIDOR_ENTER.position.y = 0;
 
       setTimeout(() => {
@@ -853,7 +862,7 @@ function levelEnteredFunction() {
         GLOBALS.RENDERER.shadowMap.autoUpdate = true;
 
         setTimeout(() => {
-          GLOBALS.RENDERER.shadowMap.autoUpdate = false;
+          //GLOBALS.RENDERER.shadowMap.autoUpdate = false;
 
           for (var i = 0; i < DISPENSER_COVERS.length; i++)
             tweenCamera(

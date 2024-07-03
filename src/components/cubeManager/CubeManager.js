@@ -16,8 +16,8 @@ function cubeState(button) {
         //
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
 
-            /*if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == 22 ||
-                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == -16) {
+            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == 6 ||
+                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == -30) {
                 warning();
                 return;
             } else if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.x == 28 ||
@@ -28,7 +28,7 @@ function cubeState(button) {
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.z == 26) {
                 warning();
                 return;
-            }*/
+            }
 
             trasnlatePlane(GLOBALS.SELECTED_ID[i], -1, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal);
         }

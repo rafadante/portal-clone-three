@@ -77,10 +77,10 @@ class Portal extends Group {
         void main() {
             gl_FragColor = texture2D(texture1, gl_FragCoord.xy / vec2(ww, wh));
 
-            if(tone){
-                #include <tonemapping_fragment>
-                #include <colorspace_fragment>
-            }
+            //if(tone){
+            #include <tonemapping_fragment>
+            #include <colorspace_fragment>
+            //}
             
         }
         `

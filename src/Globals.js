@@ -50,14 +50,14 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;;
-renderer.toneMappingExposure = 0.6;
+renderer.toneMappingExposure = 1;
 renderer.shadowMap.enabled = shadowMap;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.shadowMap.needsUpdate = false;
 renderer.localClippingEnabled = false;
 //renderer.physicallyCorrectLights = true;
 renderer.domElement.id = "viewer-3d";
-renderer.shadowMap.autoUpdate = false;
+renderer.shadowMap.autoUpdate = true;
 
 //CONTROLS
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -255,7 +255,7 @@ var GLOBALS = {
     IMG_CHECK: null,
     IMG_CLOSE: null,
 
-    SMOOTHNESS: 0.15,
+    SMOOTHNESS: 0.1,
 
     GOO_PLANES: [],
     GOO_BOXES: [],
@@ -285,7 +285,11 @@ var GLOBALS = {
     MATERIAL_FLOOR_PORTAL: null,
     MATERIAL_FLOOR_NON_PORTAL: null,
     MATERIAL_WALL_PORTAL: null,
+    MATERIAL_WALL_PORTAL2: null,
+    MATERIAL_WALL_PORTAL3: null,
+    MATERIAL_WALL_PORTAL4: null,
     MATERIAL_WALL_NON_PORTAL: null,
+    MATERIAL_WALL_NON_PORTAL2: null,
     MATERIAL_GUN: null,
     MATERIAL_EXIT_ROOM: null,
     MATERIAL_MAIN_MENU: null,
@@ -315,7 +319,123 @@ var GLOBALS = {
     LIGHT_PORTAL_0: null,
     LIGHT_PORTAL_1: null,
     RADIO_MUSIC: [],
-    CAMERAS: []
+    CAMERAS: [],
+
+    ITEMS_COUNT: {
+        cube: {
+            count: 0,
+            max: 10
+        },
+        sphere: {
+            count: 0,
+            max: 10
+        },
+        gel_gun_blue: {
+            count: 0,
+            max: 10
+        },
+        gel_gun_orange: {
+            count: 0,
+            max: 10
+        },
+        gel_gun_white: {
+            count: 0,
+            max: 10
+        },
+        pedestal_button: {
+            count: 0,
+            max: 10
+        },
+        radio: {
+            count: 0,
+            max: 10
+        },
+        button_weight: {
+            count: 0,
+            max: 10
+        },
+        button_box: {
+            count: 0,
+            max: 10
+        },
+        button_circle: {
+            count: 0,
+            max: 10
+        },
+        dispenser: {
+            count: 0,
+            max: 10
+        },
+        ramp: {
+            count: 0,
+            max: 10
+        },
+        ramp_half: {
+            count: 0,
+            max: 10
+        },
+        ramp_half2: {
+            count: 0,
+            max: 10
+        },
+        stairs: {
+            count: 0,
+            max: 10
+        },
+        light_bridge: {
+            count: 0,
+            max: 10
+        },
+        tractor_beam: {
+            count: 0,
+            max: 10
+        },
+        laser_emitter: {
+            count: 0,
+            max: 10
+        },
+        laser_cube: {
+            count: 0,
+            max: 10
+        },
+        faith_plate: {
+            count: 0,
+            max: 10
+        },
+        door: {
+            count: 0,
+            max: 10
+        },
+        light: {
+            count: 0,
+            max: 10
+        },
+        lightEmissive: {
+            count: 0,
+            max: 10
+        },
+        stripe: {
+            count: 0,
+            max: 10
+        },
+        gel_blue: {
+            count: 0,
+            max: 10
+        },
+        gel_orange: {
+            count: 0,
+            max: 10
+        },
+        camera: {
+            count: 0,
+            max: 10
+        }
+    },
+    SCENE_FPS: null,
+    LISTENER: new THREE.AudioListener(),
+    CANNON_BODIES: [],
+    LEVEL_ENTERED: false,
+    DOOR_OPEN_STATE: false
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)

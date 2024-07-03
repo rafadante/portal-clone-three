@@ -15,7 +15,6 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import { add } from 'three/examples/jsm/libs/tween.module.js';
-import { newPortal, deletePortal } from '../portal/CreatePortal.js';
 
 var totalBodies = 0;
 var id = 0;
@@ -24,49 +23,35 @@ $("body").on('click', '#view-fps', function () {
     viewFPS();
 })
 
-function groupByPercentage(users, percentages) {
-    // Get percentage for 1 user:
-    let unit = 100 / users.length;
-    // Sort percentages by decreasing remainder (modulo unit) 
-    //   and get number of units covered by each percentage
-    let sorted = percentages.map((p, i) => [i, Math.floor(p / unit), p % unit])
-                            .sort((a, b) => b[2] - a[2]);
-    // Get how many units are not yet distributed:
-    let remain = users.length - sorted.reduce((sum, a) => sum += a[1], 0);
-    // Distribute those, giving priority to groups where the remainders are greatest
-    for (let i = 0; i < remain; i++) sorted[i][1]++;
-    // Build and return the chunks by filling the groups in their 
-    //    original order
-    let i = 0;
-    return sorted.sort((a, b) => a[0] - b[0]).map(a => users.slice(i, i+=a[1]));
-}
+// create an AudioListener and add it to the camera
+const listener = new THREE.AudioListener();
+GLOBALS.MAIN_CAMERA.add( listener );
 
-function shuffle(array) {
-    var array = array.slice(0);
-    let currentIndex = array.length;
-  
-    // While there remain elements to shuffle...
-    while (currentIndex != 0) {
-  
-      // Pick a remaining element...
-      let randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-  
-      // And swap it with the current element.
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex], array[currentIndex]];
-    }
+// create the PositionalAudio object (passing in the listener)
+const sound = new THREE.PositionalAudio( listener );
 
-    return array
-}
+// load a sound and set it as the PositionalAudio object's buffer
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load( 'audio/radio.mp3', function( buffer ) {
+    sound.setBuffer( buffer );
+    sound.setRefDistance( 1 );
+    sound.setMaxDistance( 8 );
+    //sound.setRolloffFactor( 20 );
+    sound.setDistanceModel("linear");
+    sound.play();
+    sound.loop = true;
+    sound.source.loop = true;
+});
+
+// finally add the sound to the mesh
+GLOBALS.RADIO_MUSIC.push(sound)
+GLOBALS.SCENE.add(sound)
+//mesh.add( sound );
 
 function addRadioAudio(){
-    // create an AudioListener and add it to the camera
-    const listener = new THREE.AudioListener();
-    GLOBALS.MAIN_CAMERA.add( listener );
-
+    
     // create the PositionalAudio object (passing in the listener)
-    const sound = new THREE.PositionalAudio( listener );
+    const sound = new THREE.PositionalAudio( GLOBALS.LISTENER );
 
     // load a sound and set it as the PositionalAudio object's buffer
     const audioLoader = new THREE.AudioLoader();
@@ -83,8 +68,10 @@ function addRadioAudio(){
 
     // finally add the sound to the mesh
     GLOBALS.RADIO_MUSIC.push(sound)
-    GLOBALS.SCENE_FPS.add(sound)
+    GLOBALS.SCENE_FPS.add(sound);
 }
+
+var addedListener = false;
 
 function viewFPS() {
     
@@ -98,6 +85,12 @@ function viewFPS() {
     var sideBack = [];
     var sideRight = [];
     var sideLeft = [];
+
+    if(!addedListener){
+        addedListener=true;
+        // create an AudioListener and add it to the camera
+        GLOBALS.MAIN_CAMERA.add( GLOBALS.LISTENER );
+    }
 
     GLOBALS.SCENE_FPS = new THREE.Group();
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.SCENE_FPS);
@@ -168,8 +161,8 @@ function viewFPS() {
                 if (GLOBALS.PLANE_USER_DATA[i].name != GLOBALS.ENTER_DOOR.namePosition &&
                     GLOBALS.PLANE_USER_DATA[i].name != GLOBALS.EXIT_DOOR.namePosition) {
 
-                        GLOBALS.PLANE_USER_DATA[i].checked=false;
-                        GLOBALS.PLANE_USER_DATA[i].position.checked=false;
+                        //GLOBALS.PLANE_USER_DATA[i].checked=false;
+                        //GLOBALS.PLANE_USER_DATA[i].position.checked=false;
 
                     if (GLOBALS.PLANE_USER_DATA[i].side == "front")
                         sideFront.push(GLOBALS.PLANE_USER_DATA[i])
@@ -266,24 +259,12 @@ function viewFPS() {
         GLOBALS.MAIN_CAMERA.rotation.z = 0;
 
         //
-        let percentages = [5, 85, 5, 5];
-        var arr = shuffle(meshesWallPortal);
-        let result = groupByPercentage(arr, percentages);
-        createInstances(result[0], GLOBALS.MATERIAL_WALL_PORTAL);
-        createInstances(result[1], GLOBALS.MATERIAL_WALL_PORTAL2);
-        createInstances(result[2], GLOBALS.MATERIAL_WALL_PORTAL3);
-        createInstances(result[3], GLOBALS.MATERIAL_WALL_PORTAL4);
-        //
-        percentages = [50, 50];
-        arr = shuffle(meshesWallNonPortal);
-        result = groupByPercentage(arr, percentages);
-        createInstances(result[0], GLOBALS.MATERIAL_WALL_NON_PORTAL)
-        createInstances(result[1], GLOBALS.MATERIAL_WALL_NON_PORTAL2)
-        //
+        createInstances(meshesWallPortal, GLOBALS.MATERIAL_WALL_PORTAL)
+        createInstances(meshesWallNonPortal, GLOBALS.MATERIAL_WALL_NON_PORTAL)
         createInstances(meshesFloorPortal, GLOBALS.MATERIAL_FLOOR_PORTAL)
         createInstances(meshesFloorNonPortal, GLOBALS.MATERIAL_FLOOR_NON_PORTAL)
 
-        //GLOBALS.SCENE_CHILDREN.remove(GLOBALS.ROOM);
+        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.ROOM);
         GLOBALS.RENDERER.renderLists.dispose();
         GLOBALS.ENTER_DOOR.children[1].visible = false;
 

@@ -264,6 +264,8 @@ function player() {
                 }
             }
         }
+
+        moving = GLOBALS.PLAYER.inJump;
     })
 
     GLOBALS.DYNAMIC_OBJECTS.push(GLOBALS.PLAYER);
@@ -318,8 +320,10 @@ $("body").on('click', '#settings-close', function () {
 
         $("#container").css("filter", "none");
 
-        if (!openedDoor) {
-            openedDoor = true;
+        if (!GLOBALS.DOOR_OPEN_STATE) {
+            GLOBALS.DOOR_OPEN_STATE = true;
+
+            console.log(GLOBALS.ENTER_DOOR)
 
             setTimeout(() => {
                 tweenCamera(500, GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_right_05").rotation, new THREE.Vector3(Math.PI,
@@ -331,6 +335,7 @@ $("body").on('click', '#settings-close', function () {
                     GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_left_07").rotation.z))
 
                 setTimeout(() => {
+                    console.log("yyyyyyyyyyyyyyy")
                     GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").position.z = -4;
                     tweenCamera(1000, GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").position, new THREE.Vector3(25, GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").position.y, GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").position.z))
 
@@ -395,7 +400,7 @@ document.addEventListener('keyup', (event) => {
         headBobTimer = 0;
         //headBobActive = false;
 
-        tweenCamera(100, GLOBALS.GUN.children[0].position, new THREE.Vector3(0, 0, 0))
+        tweenCamera(300, GLOBALS.GUN.children[0].position, new THREE.Vector3(0, 0, 0))
 
         if (crouched) {
             crouched = false;
@@ -620,7 +625,7 @@ const updatePlayer = function (deltaTime) {
         }
     }
 
-    updateHeadBob(deltaTime);[]
+    updateHeadBob(deltaTime);
 
     if (moving)
         GLOBALS.GUN.children[0].position.x += Math.sin(headBobTimer * headBobSpeed) * headBobHeight;
@@ -629,6 +634,11 @@ const updatePlayer = function (deltaTime) {
 var jumpPressed = false;
 
 const updateCamera = function (deltaTime) {
+
+    if(window.CAMERA_ROTATING){
+        GLOBALS.MAIN_CAMERA.quaternion.slerp(window.q, 0.1);
+    }
+
     // always look where the camera points
     GLOBALS.PLAYER.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion)
     GLOBALS.PLAYER.quaternion.x = 0
