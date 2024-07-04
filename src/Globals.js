@@ -29,7 +29,7 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
 }
 
 //MAIN CAMERA
-const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.005, 500);
+const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.001, 500);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 
@@ -53,8 +53,8 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;;
 renderer.toneMappingExposure = 1;
 renderer.shadowMap.enabled = shadowMap;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.shadowMap.needsUpdate = false;
-renderer.localClippingEnabled = false;
+renderer.shadowMap.needsUpdate = true;
+renderer.localClippingEnabled = true;
 //renderer.physicallyCorrectLights = true;
 renderer.domElement.id = "viewer-3d";
 renderer.shadowMap.autoUpdate = true;

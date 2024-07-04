@@ -315,15 +315,17 @@ function render(time) {
 
     GLOBALS.STATS.begin();
     fixedUpdate();
-    animatePortal();
     updateRay();
     animateShader();
     renderGoo();
-    updateEvents();
     updatePhysics();
     //updateGels();
     updateCamera(time);
+    updateEvents();
     TWEEN.update();
+
+
+    animatePortal();
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {
         if(GLOBALS.CAMERAS[i].fixed){
@@ -343,7 +345,7 @@ function render(time) {
 
     // finally, render to screen
     GLOBALS.RENDERER.setRenderTarget(currentRenderTarget);
-    //GLOBALS.RENDERER.localClippingEnabled = false
+    GLOBALS.RENDERER.localClippingEnabled = false
     GLOBALS.RENDERER.clippingPlanes = []
     GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
 
@@ -372,11 +374,6 @@ function animatePortal() {
     currentRenderTarget = GLOBALS.RENDERER.getRenderTarget();
     GLOBALS.RENDERER.xr.enabled = false;
 
-    // stencil optimization - only render parts of scene multiple
-    //GLOBALS.RENDERER.autoClear = true
-    // times when it is going to be viewed by the portal
-    GLOBALS.RENDERER.autoClearStencil = false;
-
     GLOBALS.GUN.visible = false;
     GLOBALS.GUN_CLONE.visible = true;
 
@@ -385,27 +382,21 @@ function animatePortal() {
 
     GLOBALS.GUN_CLONE.position.copy(positionBoneHand);
     GLOBALS.GUN_CLONE.rotation.y = GLOBALS.MAIN_CAMERA.rotation.y;
-    //GLOBALS.GUN_CLONE.rotation.z = GLOBALS.MAIN_CAMERA.rotation.z;
-    //GLOBALS.GUN_CLONE.rotation.copy(GLOBALS.MAIN_CAMERA.rotation);
 
     //APPLY ROTATION TO THE PORTAL GUN AND PLAYER HAND AND NECK
     const angle = (GLOBALS.MAIN_CAMERA.rotation.x * 180)/Math.PI;
     if(angle > -20 && angle < 30){
-        //GLOBALS.GUN_CLONE.rotation.x = GLOBALS.MAIN_CAMERA.rotation.x;
         window.neck.rotation.y = -GLOBALS.MAIN_CAMERA.rotation.x;
-        //window.handLeft.rotation.z += GLOBALS.MAIN_CAMERA.rotation.x * 1;
         angleHolder = GLOBALS.MAIN_CAMERA.rotation.x;
     }else{
-        //GLOBALS.GUN_CLONE.rotation.x = angleHolder;
         window.neck.rotation.y = -angleHolder;
-        //window.handLeft.rotation.z += angleHolder * 1;
     }
 
     deltaPortal += clockPortal.getDelta();
 
-    //CLONE STATE
-    GLOBALS.GUN_CLONE.visible = GLOBALS.PORTAL_GUN_CLONE_STATE;
-    GLOBALS.PLAYER_MODEL.visible = GLOBALS.PLAYER_CLONE_STATE;
+    // stencil optimization - only render parts of scene multiple
+    // times when it is going to be viewed by the portal
+    GLOBALS.RENDERER.autoClearStencil = false
     
     if(GLOBALS.PORTAL_RECURSION_LEVELS>0){
         renderPortal2(0, 1)
@@ -423,18 +414,15 @@ function animatePortal() {
     
     GLOBALS.SCENE_CHILDREN.visible = true;
     GLOBALS.RENDERER.autoClear = false;
-    GLOBALS.GUN.visible = false;
-    GLOBALS.GUN.children[0].children[0].scale.set(0.1, 0.1, 0.1)
-    GLOBALS.GUN.children[0].children[0].position.set(0.01, -0.012, -0.011);
+    GLOBALS.GUN.visible = true;
+
     GLOBALS.GUN_CLONE.visible = cloneVisible;
 
-    if (window.hand2) {
-        var positionBoneHand = new THREE.Vector3();
-        window.hand2.getWorldPosition(positionBoneHand);
-
-        GLOBALS.GUN_CLONE.position.copy(positionBoneHand);
-        GLOBALS.GUN_CLONE.rotation.y = GLOBALS.MAIN_CAMERA.rotation.y;
-        GLOBALS.GUN_CLONE.rotation.y += Math.PI
+    if(cloneVisible){
+        GLOBALS.GUN_CLONE.position.copy(window.posW);
+        GLOBALS.GUN_CLONE.quaternion.copy(GLOBALS.PLAYER_MODEL_CLONE.quaternion)
+        //GLOBALS.GUN_CLONE.quaternion.multiply(new THREE.Quaternion(0, 1, 0)).normalize()
+        GLOBALS.GUN_CLONE.rotation.y += Math.PI;
     }
 
     if (GLOBALS.PLAYER && GLOBALS.PLAYER_MODEL) {
@@ -452,8 +440,6 @@ function animatePortal() {
         GLOBALS.PORTALS[0].mesh.visible = true
         GLOBALS.PORTALS[1].mesh.visible = true
     }
-
-    GLOBALS.GUN.visible = true;
 
     //GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
 }
@@ -521,7 +507,7 @@ function renderPortal2(thisIndex, pairIndex) {
         GLOBALS.PORTALS[pairIndex].visible = false
     }
 
-    //GLOBALS.RENDERER.localClippingEnabled = true
+    GLOBALS.RENDERER.localClippingEnabled = true
 
     for (let level = GLOBALS.PORTAL_RECURSION_LEVELS - 1; level >= 0; level--) {
 

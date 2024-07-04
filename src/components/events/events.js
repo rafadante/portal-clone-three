@@ -751,16 +751,27 @@ function portalCollision() {
 
           // show the clone
           if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
+
+            //console.log(p)
+            
             CDBB_isOverlap = true;
             teleportObject3D(GLOBALS.PLAYER_MODEL_CLONE, GLOBALS.PORTALS[p]);
-            //GLOBALS.PLAYER_MODEL_CLONE.visible = true;
+            GLOBALS.PLAYER_MODEL_CLONE.visible = true;
+            //GLOBALS.GUN_CLONE.visible = true;
 
             GLOBALS.PLAYER_MODEL_CLONE.traverse((c) => {
               if (c.isBone) {
                 if (c.name == "wrist_R") {
-                  window.hand2 = c;
+                  //window.hand2 = c;
                   //console.log("1111111111111")
-                  //window.hand2.add(GLOBALS.GUN_CLONE);
+                  //c.add(GLOBALS.GUN_CLONE);
+
+                  var positionBoneHand = new THREE.Vector3();
+                  c.getWorldPosition(positionBoneHand);
+
+                  window.posW = positionBoneHand;
+
+                  //GLOBALS.GUN_CLONE.position.copy(window.posW);
                 }
               }
             });
@@ -768,23 +779,7 @@ function portalCollision() {
             //GLOBALS.GUN_CLONE.visible = true;
           }
         }
-      } else {
-        if ((d.name == "gel" || d.name == "gel-orange") && d.disabled) {
-          //d.position.y = d.posIni;
-          d.disabled = false;
-          GLOBALS.CANNON_WORLD.addBody(d);
-        }
-
-        d.inArea = false;
-
-        if (d.name != "player") {
-          //d.allowSleep = true;
-        }
-      }
-
-      if (d.name == "gel") {
-        continue;
-      }
+      } 
 
       // should teleport
       if (GLOBALS.PORTALS[p].STBB.containsPoint(pos)) {

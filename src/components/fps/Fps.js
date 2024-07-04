@@ -209,7 +209,7 @@ function player() {
 
     let sphereShape = new CANNON.Sphere(0.3);
     // define shape
-    let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 2, 2 / 2.3, 0.5 / 2));
+    let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 2, 2 / 3.2, 0.5 / 2));
 
     // define the physical body attributes
     GLOBALS.PLAYER = new CANNON.Body({
@@ -647,6 +647,7 @@ const updateCamera = function (deltaTime) {
 
     // set camera position to be at player
     GLOBALS.MAIN_CAMERA.position.copy(GLOBALS.PLAYER.position);
+    GLOBALS.MAIN_CAMERA.translateY(0.2)
     GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
     GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.SMOOTHNESS);
 
@@ -659,6 +660,7 @@ const updateCamera = function (deltaTime) {
     // copy position and rotation so player model aligns with the physical body
     if (GLOBALS.PLAYER_MODEL) {
         GLOBALS.PLAYER_MODEL.position.copy(GLOBALS.PLAYER.position).add(new THREE.Vector3(0, -1, 0))
+        GLOBALS.PLAYER_MODEL.translateY(0.2)
         GLOBALS.PLAYER_MODEL.quaternion.copy(GLOBALS.PLAYER.quaternion)
         GLOBALS.PLAYER_MODEL.quaternion.multiply(new THREE.Quaternion(0, 50, 0)).normalize()
 

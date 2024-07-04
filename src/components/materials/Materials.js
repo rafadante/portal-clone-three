@@ -74,7 +74,7 @@ function loadMaterial(material, base, normal, ao, rough, metal, roughValue) {
     }
 
     material.envMap = GLOBALS.ENV_MAP;
-    material.envMapIntensity = 0.15;
+    material.envMapIntensity = 0.05;
 }
 
 const textureLoader = new THREE.TextureLoader();

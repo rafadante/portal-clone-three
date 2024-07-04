@@ -117,6 +117,10 @@ class Portal extends Group {
             stencilFunc: THREE.EqualStencilFunc,
             stencilRef: 1,
             stencilFail: THREE.ReplaceStencilOp,
+            depthTest: true,
+            depthWrite: false,
+            polygonOffset: true,
+            polygonOffsetFactor: -10,
             //polygonOffset: true,
             //polygonOffsetFactor: -1
         });
@@ -241,6 +245,12 @@ function teleportObject3D(object, portal) {
 }
 
 function teleportPhysicalObject(object, portal) {
+
+    // Force
+    /*object.force.setZero();
+    object.torque.setZero();
+    object.velocity.setZero();*/
+
     let f = new THREE.Matrix4().makeScale(-1, -1, 1)
     let m = portal.CDBB.inverse_t.clone().premultiply(f).premultiply(portal.output.CDBB.t)
     //object.mesh.applyMatrix4(m)
@@ -258,22 +268,27 @@ function teleportPhysicalObject(object, portal) {
     velocity = getTeleportedDirectionalVector(velocity, portal)
     force = getTeleportedDirectionalVector(force, portal)
 
-    if(velocity.x > 15){
-        velocity.x = 15;
-    }else if(velocity.x < -15){
-        velocity.x = -15;
+    if(velocity.x > 10){
+        velocity.x = 10;
+    }else if(velocity.x < -10){
+        velocity.x = -10;
     }
 
-    if(velocity.y > 15){
-        velocity.y = 15;
-    }else if(velocity.y < -15){
-        velocity.y = -15;
+    if(velocity.y > 10){
+        velocity.y = 10;
+    }else if(velocity.y < -10){
+        velocity.y = -10;
     }
 
-    if(velocity.z > 15){
-        velocity.z = 15;
-    }else if(velocity.z < -15){
-        velocity.z = -15;
+    if(velocity.z > 10){
+        velocity.z = 10;
+    }else if(velocity.z < -10){
+        velocity.z = -10;
+    }
+
+    if(Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1){
+        velocity.x *= 0.5;
+        velocity.z *= 0.5;
     }
 
     object.position.copy(position)

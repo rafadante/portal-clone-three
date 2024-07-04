@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import $ from 'jquery';
+import $, { globalEval } from 'jquery';
 import * as CANNON from 'cannon';
 import {
     threeToCannon,
@@ -437,13 +437,22 @@ function viewFPS() {
 
         /*setTimeout(() => {
             newPortal(0, 1, new THREE.Vector3(3, 1, 0), new THREE.Vector3(0, 0, 1), obj, new THREE.Vector3(0, 1, 0), vec)
-            newPortal(1, 0, new THREE.Vector3(5.6, 1, 0), new THREE.Vector3(0, 0, 1), obj, new THREE.Vector3(0, 1, 0), vec)
+            
+
             setTimeout(() => {
-                deletePortal(0);
-                deletePortal(1);
-                GLOBALS.EXIT_ROOM.visible = false;
-            }, 1000);
-        }, 1000);*/
+
+                newPortal(1, 0, new THREE.Vector3(5.6, 1, 0), new THREE.Vector3(0, 0, 1), obj, new THREE.Vector3(0, 1, 0), vec)
+                GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA)
+                
+                setTimeout(() => {
+                    deletePortal(0);
+                    deletePortal(1);
+                    //GLOBALS.EXIT_ROOM.visible = false;
+                    
+                }, 5000);
+            }, 5000);
+            
+        }, 5000);*/
 
         GLOBALS.EXIT_ROOM.visible = false;
 

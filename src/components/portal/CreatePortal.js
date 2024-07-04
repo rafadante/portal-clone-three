@@ -21,7 +21,7 @@ var allowPortal = true;
 
 function portalButton(button) {
 
-    if(!allowPortal || GLOBALS.HOLDING_ITEM)
+    if (!allowPortal || GLOBALS.HOLDING_ITEM)
         return;
 
     if (GLOBALS.FPS_MODE && (button == 2 || button == 0 || button == 1) && GLOBALS.ALLOW_PLACE_PORTALS) {
@@ -46,29 +46,19 @@ function portalButton(button) {
 
             //PORTAL GUN FLASH
             if (button == 0) { // left click
-                //GLOBALS.FLASH.children[0].material.color = new THREE.Color( 1, 0.25, 0 );
-                //GLOBALS.FLASH.children[0].material.emissive = new THREE.Color( 1, 0.25, 0 );
-                GLOBALS.FLASH.color = new THREE.Color( 1, 0.25, 0 );
+                GLOBALS.FLASH.color = new THREE.Color(1, 0.25, 0);
             } else if (button == 2) { // left click
-                //GLOBALS.FLASH.children[0].material.color = new THREE.Color( 0, 0.3, 1 );
-                //GLOBALS.FLASH.children[0].material.emissive = new THREE.Color( 0, 0.3, 1 ); 
-                GLOBALS.FLASH.color = new THREE.Color( 0, 0.3, 1 );
+                GLOBALS.FLASH.color = new THREE.Color(0, 0.3, 1);
             }
-
-            //GLOBALS.PORTAL_GUN_FLASH
 
             var positionGun = new THREE.Vector3();
             GLOBALS.PORTAL_GUN_FLASH.getWorldPosition(positionGun);
 
-            if(button==0 || button ==2){
+            if (button == 0 || button == 2) {
 
                 GLOBALS.FLASH.position.copy(positionGun);
-                //GLOBALS.FLASH.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
-
                 GLOBALS.FLASH.visible = true;
-                //GLOBALS.FLASH.children[3].visible = true;
 
-                //tweenCamera(100, GLOBALS.FLASH.scale, new THREE.Vector3(0.25,0.25,0.25));
                 tweenCamera(300, GLOBALS.FLASH.position, new THREE.Vector3(x, y, z));
 
                 allowPortal = false;
@@ -83,108 +73,14 @@ function portalButton(button) {
             }
 
             setTimeout(() => {
-                //tweenCamera(100, GLOBALS.FLASH.scale, new THREE.Vector3(0,0,0));
-                GLOBALS.FLASH.scale.set(0.02,0.02,0.02)
-                //GLOBALS.FLASH.children[3].visible = false;
+                GLOBALS.FLASH.scale.set(0.02, 0.02, 0.02);
                 GLOBALS.FLASH.visible = false;
-                //GLOBALS.FLASH.visible = false;
                 allowPortal = true;
             }, 300);
 
-            //
             if (GLOBALS.GUN_MODE == 1) {
 
                 if (userData.portal) {
-
-                    //-------------------------------------------------
-                    var boxUpName = userData.position.x + "/" +
-                        (userData.position.y + 2) + "/" +
-                        userData.position.z;
-
-                    if (getPlaneByName(boxUpName).length == 0) {
-                        if (intersects[0].uv.y >= 0.5)
-                            y = userData.position.y;
-                    } else {
-                        if (intersects[0].uv.y >= 0.5 && !getPlaneByName(boxUpName)[0].portal)
-                            y = userData.position.y;
-                    }
-                    //-------------------------------------------------
-                    var boxDownName = userData.position.x + "/" +
-                        (userData.position.y - 2) + "/" +
-                        userData.position.z;
-
-                    if (getPlaneByName(boxDownName).length == 0) {
-                        if (intersects[0].uv.y <= 0.5)
-                            y = userData.position.y;
-                    } else {
-                        if (intersects[0].uv.y <= 0.5 && !getPlaneByName(boxDownName)[0].portal)
-                            y = userData.position.y;
-                    }
-                    //-------------------------------------------------
-                    var boxLeftName = (userData.position.x + 2) + "/" +
-                        userData.position.y + "/" +
-                        userData.position.z;
-
-                    if (getPlaneByName(boxLeftName).length == 0) {
-                        if (userData.side == "front") {
-                            if (intersects[0].uv.x >= 0.75)
-                                x = userData.position.x + 0.5;
-                        } else if (userData.side == "back") {
-                            if (intersects[0].uv.x <= 0.25)
-                                x = userData.position.x + 0.5;
-                        } else {
-                            x = userData.position.x;
-                        }
-                    }
-                    //-------------------------------------------------
-                    var boxRightName = (userData.position.x - 2) + "/" +
-                        userData.position.y + "/" +
-                        userData.position.z;
-
-                    if (getPlaneByName(boxRightName).length == 0) {
-                        if (userData.side == "front") {
-                            if (intersects[0].uv.x <= 0.25)
-                                x = userData.position.x - 0.5;
-                        } else if (userData.side == "back") {
-                            if (intersects[0].uv.x >= 0.75)
-                                x = userData.position.x - 0.5;
-                        } else {
-                            x = userData.position.x;
-                        }
-                    }
-                    //-------------------------------------------------
-                    var boxFrontName = userData.position.x + "/" +
-                        userData.position.y + "/" +
-                        (userData.position.z + 2);
-
-                    if (getPlaneByName(boxFrontName).length == 0) {
-                        if (userData.side == "left") {
-                            if (intersects[0].uv.x <= 0.25)
-                                z = userData.position.z + 0.5;
-                        } else if (userData.side == "right") {
-                            if (intersects[0].uv.x >= 0.75)
-                                z = userData.position.z + 0.5;
-                        } else {
-                            z = userData.position.z;
-                        }
-                    }
-                    //-------------------------------------------------
-                    var boxBackName = userData.position.x + "/" +
-                        userData.position.y + "/" +
-                        (userData.position.z - 2);
-
-                    if (getPlaneByName(boxBackName).length == 0) {
-                        if (userData.side == "left") {
-                            if (intersects[0].uv.x >= 0.75)
-                                z = userData.position.z - 0.5;
-                        } else if (userData.side == "right") {
-                            if (intersects[0].uv.x <= 0.25)
-                                z = userData.position.z - 0.5;
-                        } else {
-                            z = userData.position.z;
-                        }
-                    }
-                    //-------------------------------------------------
                     const point = new THREE.Vector3(x, y, z);
                     // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                     // define playerUpDirection
@@ -211,7 +107,9 @@ function portalButton(button) {
                     var pWorld = pLocal.applyMatrix4(GLOBALS.MAIN_CAMERA.matrixWorld);
                     var dir = pWorld.sub(GLOBALS.MAIN_CAMERA.position).normalize();
 
-                    point.add(dir.clone().multiplyScalar(-0.01));
+                    //const normal = geometry.attributes.normal.clone();
+                    //const normalMatrix = new Matrix3().getNormalMatrix( instanceMatrix );
+                    //normal.applyNormalMatrix( normalMatrix );
 
                     // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                     //const objectMatrix = new THREE.Matrix3().getNormalMatrix(intersects[0].object.matrixWorld)
@@ -223,43 +121,62 @@ function portalButton(button) {
 
                     let EPS = -GLOBALS.PORTAL_EPS * 3;
                     let portalPoints = [point.clone().add(depthDir.clone().multiplyScalar(portal_depth / 2 + EPS).add(widthDir.clone().multiplyScalar(portal_width / 2 + EPS))),
-                        point.clone().add(depthDir.clone().multiplyScalar(-portal_depth / 2 - EPS).add(widthDir.clone().multiplyScalar(portal_width / 2 + EPS))),
-                        point.clone().add(depthDir.clone().multiplyScalar(-portal_depth / 2 - EPS).add(widthDir.clone().multiplyScalar(-portal_width / 2 - EPS))),
-                        point.clone().add(depthDir.clone().multiplyScalar(portal_depth / 2 + EPS).add(widthDir.clone().multiplyScalar(-portal_width / 2 - EPS)))
+                    point.clone().add(depthDir.clone().multiplyScalar(-portal_depth / 2 - EPS).add(widthDir.clone().multiplyScalar(portal_width / 2 + EPS))),
+                    point.clone().add(depthDir.clone().multiplyScalar(-portal_depth / 2 - EPS).add(widthDir.clone().multiplyScalar(-portal_width / 2 - EPS))),
+                    point.clone().add(depthDir.clone().multiplyScalar(portal_depth / 2 + EPS).add(widthDir.clone().multiplyScalar(-portal_width / 2 - EPS)))
                     ]
 
-                    /*let portalPoints = [
-                        new THREE.Vector3(x - 0.48, y - 0.98, z),
-                        new THREE.Vector3(x + 0.48, y - 0.98, z),
-                        new THREE.Vector3(x - 0.48, y + 0.98, z),
-                        new THREE.Vector3(x + 0.48, y + 0.98, z)
-                    ]*/
-
-                    //console.log(portalPoints)
-
-                    var ii;
+                    //IF THE PORTAL IS SPAWNING IN THE SAME POSITION OF ANOTHER PORTAL RETURN
+                    var portalID;
                     if (button == 0)
-                        ii = 1;
-                    else if (button == 2) 
-                        ii = 0;
+                        portalID = 1;
+                    else if (button == 2)
+                        portalID = 0;
 
-                    if(GLOBALS.PORTAL_BOX[ii]){
-                    for (let p of portalPoints) {
-                        if (!validPortalPoint(p, normal, intersects[0].object, ii)) {
-                            return;
+                    if (GLOBALS.PORTAL_BOX[portalID]) {
+                        for (let p of portalPoints) {
+                            if (!isInOtherPortalArea(p, normal, intersects[0].object, portalID)) {
+                                return;
+                            }
                         }
-                    }}
+                    }
+
+                    //CHECK IF THE PORTAL IS GOING OUT OF BOUNDS AND REPOSITIONING IT
+                    pointsChecked = [];
+
+                    for (let p of portalPoints)
+                        validPortalPoint(p, normal, intersects[0].object);
+
+                    console.log(pointsChecked)
+
+                    if(userData.side == "up" || userData.side == "down"){
+                        if(pointsChecked[1].length==0 || pointsChecked[1].length==0 ||
+                            pointsChecked[2].length==0 || pointsChecked[3].length==0
+                        ){
+                            point.z = userData.position.z;
+                            point.x = userData.position.x;
+                        }
+                    }else{
+                        if(pointsChecked[1].length==0 || pointsChecked[1].length==0 ||
+                            pointsChecked[2].length==0 || pointsChecked[3].length==0
+                        ){
+                            point.y = userData.position.y;
+                        }
+    
+                        if(pointsChecked[0].length==0 || pointsChecked[3].length==0){
+                            point.x = userData.position.x;
+                            point.z = userData.position.z;
+                        }
+                    }
+
+                    point.add(dir.clone().multiplyScalar(-0.01));
 
                     if (button == 0) { // left click
 
-                        if (GLOBALS.PORTALS[1] === null) {
+                        if (GLOBALS.PORTALS[1] === null)
                             document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
-                        } else {
+                        else
                             document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
-
-                            //if (point.distanceTo(GLOBALS.PORTALS[1].pos) < 2)
-                            //    return;
-                        }
 
                         // delete the old portal this new one is replacing
                         if (GLOBALS.PORTALS[0] !== null)
@@ -274,16 +191,14 @@ function portalButton(button) {
                                 value: 0.5
                             }, 300).start();
                         }
+
+                        GLOBALS.PORTALS[0].normal = normal;
                     } else if (button == 2) { // left click
 
-                        if (GLOBALS.PORTALS[0] === null) {
+                        if (GLOBALS.PORTALS[0] === null)
                             document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
-                        } else {
+                        else
                             document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
-
-                            //if (point.distanceTo(GLOBALS.PORTALS[0].pos) < 2)
-                            //    return;
-                        }
 
                         // delete the old portal this new one is replacing
                         if (GLOBALS.PORTALS[1] !== null)
@@ -298,6 +213,8 @@ function portalButton(button) {
                                 value: 0.5
                             }, 300).start();
                         }
+
+                        GLOBALS.PORTALS[1].normal = normal;
                     }
 
                     setTimeout(() => {
@@ -315,21 +232,46 @@ function portalButton(button) {
                     //NONPORTABLE WALL
                 }
             }
-
         }
     }
 }
 
-function validPortalPoint(point, normal, object,i) {
+function isInOtherPortalArea(point, normal, object, i) {
 
-    var bb = new THREE.Box3(); // for re-use
-    bb.setFromObject(GLOBALS.PORTAL_BOX[i]);
+    var box = new THREE.Box3(); // for re-use
+    box.setFromObject(GLOBALS.PORTAL_BOX[i]);
 
-    if (bb.containsPoint(point)) {
+    if (box.containsPoint(point))
         return false
-    }else{
-        return true
+    
+    return true
+}
+
+var pointsChecked = [];
+
+function validPortalPoint(point, normal, object) {
+
+    // check that no intersectable objects are directly in front of point
+    let frontPoint = point.clone().add(normal.clone().multiplyScalar(1))
+    const raycaster = new THREE.Raycaster(frontPoint, normal.clone().multiplyScalar(-1), 0, 1000);
+    let intersects = raycaster.intersectObject( GLOBALS.PLANE_LEVEL_INSTANCED );
+
+    if (intersects.length == 0){
+        pointsChecked.push([])
+        return false
     }
+
+    if(intersects.length>0){
+        var userData = GLOBALS.PLANE_USER_DATA[intersects[0].instanceId];
+        if (!userData.portal || intersects[0].distance > 1.1){
+            pointsChecked.push([])
+            return false
+        }
+    }
+
+    pointsChecked.push(intersects)
+
+    return true;
 }
 
 // deletes the portal with index portalIndex from the scene
@@ -338,8 +280,6 @@ function deletePortal(portalIndex) {
     if (GLOBALS.PORTALS[portalIndex] === null)
         return;
 
-    //GLOBALS.PORTALS[portalIndex].mesh.geometry.dispose();
-    //GLOBALS.PORTALS[portalIndex].mesh.material.dispose();
     if (GLOBALS.PORTALS[portalIndex].hostObjects !== null) {
         // mark this object as collideable with portal 0 bb objects
         GLOBALS.PORTALS[portalIndex].hostObjects.collisionFilterGroup &= ~GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[portalIndex]
@@ -391,14 +331,6 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
         GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value = 1;
         GLOBALS.PORTALS[1].portalShader.material.uniforms.iOpened.value = 1;
     }
-}
-
-function getPlaneByName(name) {
-    return GLOBALS.PLANE_USER_DATA.filter(
-        function (data) {
-            return data.name == name
-        }
-    );
 }
 
 export {

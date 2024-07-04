@@ -174,11 +174,13 @@ $("body").on('click', '#back-editor', function () {
     GLOBALS.CORRIDOR_ENTER.visible = false;
     GLOBALS.SCENE.getObjectByName("window").visible = true;
     GLOBALS.OBSERVATION_ROOM.visible = false;
-    GLOBALS.SCENE.remove(GLOBALS.SCENE_FPS);
+    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.SCENE_FPS);
     GLOBALS.SCENE_FPS = null;
     GLOBALS.LEVEL_ENTERED = false;
     GLOBALS.DOOR_OPEN_STATE = false;
     GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
+
+    console.log(GLOBALS.SCENE_FPS)
 
     $("#ui").css("display", "block");
     $(".img").removeClass("image");

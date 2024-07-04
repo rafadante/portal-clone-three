@@ -22,6 +22,7 @@ import {
 import {
     FBXLoader
 } from 'three/addons/loaders/FBXLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
 async function handleZip(path, obj) {
     await JSZipUtils.getBinaryContent(path, function (err, data) {
@@ -914,13 +915,16 @@ function loadAvatar() {
         GLOBALS.GUN_CLONE.scale.setScalar(0.7);
 
         GLOBALS.PLAYER_MODEL = fbx;
-        GLOBALS.PLAYER_MODEL_CLONE = GLOBALS.PLAYER_MODEL.clone();
+        GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
 
         GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL);
         GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE);
 
         GLOBALS.PLAYER_MODEL.animationActions = {};
         GLOBALS.PLAYER_MODEL.modelReady = true;
+
+        console.log("yyyyyyyyyyyyyyyyyyyyyyy")
+        console.log(GLOBALS.PLAYER_MODEL_CLONE)
     }).then(() => {
         let animationPromises = []
         for (let index in GLOBALS.PLAYER_ANIMATIONS) {
