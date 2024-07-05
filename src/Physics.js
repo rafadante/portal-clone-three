@@ -106,9 +106,6 @@ function updatePhysics() {
         if (!getObject) {
             getObject = true;
 
-            // Move the movement plane on the z-plane of the hit
-            moveMovementPlane(hitPoint, GLOBALS.MAIN_CAMERA)
-
             // Create the constraint between the cube body and the joint body
             addJointConstraint(hitPoint, GLOBALS.CURRENT_ITEM.body)
         }
@@ -168,17 +165,9 @@ function updatePhysics() {
 // This functions moves the joint body to a new postion in space
 // and updates the constraint
 function moveJoint(position) {
-    jointBody.position.copy(position)
-    jointConstraint.update()
-}
-
-// This function moves the virtual movement plane for the mouseJoint to move in
-function moveMovementPlane(point, camera) {
-    // Center at mouse position
-    movementPlane.position.copy(point)
-
-    // Make it face toward the camera
-    movementPlane.quaternion.copy(camera.quaternion)
+    jointBody.position.copy(position);
+    GLOBALS.CURRENT_ITEM.body.quaternion.copy(GLOBALS.PLAYER.quaternion);
+    jointConstraint.update();
 }
 
 // Add a constraint between the cube and the jointBody
@@ -201,7 +190,7 @@ function addJointConstraint(position, constrainedBody) {
     jointConstraint = new CANNON.PointToPointConstraint(constrainedBody, pivot, jointBody, new CANNON.Vec3(0, 0, 0))
 
     // Add the constraint to world
-    world.addConstraint(jointConstraint)
+    world.addConstraint(jointConstraint);
 }
 
 // Remove constraint from world

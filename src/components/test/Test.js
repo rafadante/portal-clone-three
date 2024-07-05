@@ -16,6 +16,7 @@ import {
 } from '../../Globals.js';
 import { add } from 'three/examples/jsm/libs/tween.module.js';
 import { newPortal, deletePortal } from '../portal/CreatePortal.js';
+import { addRadioAudio, AUDIO } from '../audio/Audio.js';
 
 var totalBodies = 0;
 var id = 0;
@@ -60,34 +61,12 @@ function shuffle(array) {
     return array
 }
 
-function addRadioAudio(){
-    // create an AudioListener and add it to the camera
-    const listener = new THREE.AudioListener();
-    GLOBALS.MAIN_CAMERA.add( listener );
-
-    // create the PositionalAudio object (passing in the listener)
-    const sound = new THREE.PositionalAudio( listener );
-
-    // load a sound and set it as the PositionalAudio object's buffer
-    const audioLoader = new THREE.AudioLoader();
-    audioLoader.load( 'audio/radio.mp3', function( buffer ) {
-        sound.setBuffer( buffer );
-        sound.setRefDistance( 1 );
-        sound.setMaxDistance( 8 );
-        //sound.setRolloffFactor( 20 );
-        sound.setDistanceModel("linear");
-        sound.play();
-        sound.loop = true;
-        sound.source.loop = true;
-    });
-
-    // finally add the sound to the mesh
-    GLOBALS.RADIO_MUSIC.push(sound)
-    GLOBALS.SCENE_FPS.add(sound)
-}
-
 function viewFPS() {
+
+    GLOBALS.MAIN_CAMERA.near = 0.01;
+    GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
     
+    AUDIO.EDITOR.pause();
     var meshesWallPortal = [];
     var meshesWallNonPortal = [];
     var meshesFloorPortal = [];
@@ -101,10 +80,6 @@ function viewFPS() {
 
     GLOBALS.SCENE_FPS = new THREE.Group();
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.SCENE_FPS);
-
-    var ambient = new Audio('audio/ambient.ogg');
-    ambient.loop = true;
-    //ambient.play();
 
     GLOBALS.ITEM_CUBE.visible = false;
     GLOBALS.SPOTLIGHT.intensity = 0;
@@ -242,6 +217,7 @@ function viewFPS() {
 
         GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").target = obj;
         GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE);
+        GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE2);
         
         GLOBALS.GUN.children[0].add(GLOBALS.LIGHTNIN_STRIKE_1,
             GLOBALS.LIGHTNIN_STRIKE_2, GLOBALS.LIGHTNIN_STRIKE_3);

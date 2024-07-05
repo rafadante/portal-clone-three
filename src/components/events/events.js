@@ -507,7 +507,7 @@ function tractorBeam() {
           // Calculate the time of flight to reach the desired final position
           const timeToReachDestination = Math.sqrt(
             (2 * Math.abs(finalPosition.z - initialPosition.z)) /
-              gravity.length()
+            gravity.length()
           );
 
           // Calculate the required constant force to achieve the desired initial velocity
@@ -578,11 +578,11 @@ function tractorBeam() {
             if (!d.inArea) {
               var center = new THREE.Vector3(
                 Math.abs(vec.x - 1) * GLOBALS.TRACTOR_BEAM[j].position.x +
-                  d.position.x * vec.x,
+                d.position.x * vec.x,
                 Math.abs(vec.y - 1) * GLOBALS.TRACTOR_BEAM[j].position.y +
-                  d.position.y * vec.y,
+                d.position.y * vec.y,
                 Math.abs(vec.z - 1) * GLOBALS.TRACTOR_BEAM[j].position.z +
-                  d.position.z * vec.z
+                d.position.z * vec.z
               );
 
               tweenCamera(500, d.position, center);
@@ -716,6 +716,28 @@ function portalCollision() {
     }
   }
 
+  if (GLOBALS.OBJ_HOLDED_CLONE && GLOBALS.HOLDING_ITEM) {
+
+    let pos = GLOBALS.CURRENT_ITEM.body.position;
+    let CDBB_isOverlap = false;
+    GLOBALS.OBJ_HOLDED_CLONE.visible = false;
+
+    for (let p = 0; p < GLOBALS.PORTALS.length; p++) {
+      // collision disable, might be partially intersecting with portal
+      if (GLOBALS.PORTALS[p].CDBB.containsPoint(pos)) {
+        // show the clone
+        if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
+          CDBB_isOverlap = true;
+          teleportObject3D(GLOBALS.OBJ_HOLDED_CLONE, GLOBALS.PORTALS[p]);
+          GLOBALS.OBJ_HOLDED_CLONE.visible = true;
+
+          if (!GLOBALS.OBJ_HOLDED_CLONE.userData.instanced)
+            GLOBALS.OBJ_HOLDED_CLONE.translateY(0.25)
+        }
+      }
+    }
+  }
+
   for (let d of GLOBALS.DYNAMIC_OBJECTS) {
     let pos = new THREE.Vector3(d.position.x, d.position.y, d.position.z);
 
@@ -726,6 +748,7 @@ function portalCollision() {
 
     GLOBALS.PLAYER_MODEL_CLONE.visible = false;
     GLOBALS.GUN_CLONE.visible = false;
+    GLOBALS.GUN_CLONE2.visible = false;
     let CDBB_isOverlap = false;
 
     for (let p = 0; p < GLOBALS.PORTALS.length; p++) {
@@ -752,34 +775,22 @@ function portalCollision() {
           // show the clone
           if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
 
-            //console.log(p)
-            
             CDBB_isOverlap = true;
             teleportObject3D(GLOBALS.PLAYER_MODEL_CLONE, GLOBALS.PORTALS[p]);
             GLOBALS.PLAYER_MODEL_CLONE.visible = true;
-            //GLOBALS.GUN_CLONE.visible = true;
 
             GLOBALS.PLAYER_MODEL_CLONE.traverse((c) => {
               if (c.isBone) {
                 if (c.name == "wrist_R") {
-                  //window.hand2 = c;
-                  //console.log("1111111111111")
-                  //c.add(GLOBALS.GUN_CLONE);
-
                   var positionBoneHand = new THREE.Vector3();
                   c.getWorldPosition(positionBoneHand);
-
                   window.posW = positionBoneHand;
-
-                  //GLOBALS.GUN_CLONE.position.copy(window.posW);
                 }
               }
             });
-
-            //GLOBALS.GUN_CLONE.visible = true;
           }
         }
-      } 
+      }
 
       // should teleport
       if (GLOBALS.PORTALS[p].STBB.containsPoint(pos)) {
@@ -798,6 +809,10 @@ function portalCollision() {
           teleportPhysicalObject(d, GLOBALS.PORTALS[p]);
 
           if (dd == 0) {
+
+            GLOBALS.PLAYER_MODEL.visible = false
+            GLOBALS.PLAYER_MODEL_CLONE.visible = false;
+
             removeJointConstraint();
             teleportObject3D(GLOBALS.MAIN_CAMERA, GLOBALS.PORTALS[p]);
 
@@ -825,9 +840,9 @@ function portalCollision() {
 
             GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
 
-            window.CAMERA_ROTATING=true;
+            window.CAMERA_ROTATING = true;
             setTimeout(() => {
-              window.CAMERA_ROTATING=false;
+              window.CAMERA_ROTATING = false;
             }, 300);
           }
 
@@ -892,77 +907,86 @@ function levelEnteredFunction() {
         }, 1000);
       }, 1000);
 
-      setTimeout(() => {
-        GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").position.z =
-          -4;
-        tweenCamera(
-          1000,
-          GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").position,
-          new THREE.Vector3(
-            -65,
-            GLOBALS.ENTER_DOOR.getObjectByName(
-              "portal_door_right_04"
-            ).position.y,
-            GLOBALS.ENTER_DOOR.getObjectByName(
-              "portal_door_right_04"
-            ).position.z
-          )
-        );
-
-        GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position.z =
-          -4;
-        tweenCamera(
-          1000,
-          GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position,
-          new THREE.Vector3(
-            65,
-            GLOBALS.ENTER_DOOR.getObjectByName(
-              "portal_door_left_06"
-            ).position.y,
-            GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position.z
-          )
-        );
-
-        setTimeout(() => {
-          tweenCamera(
-            500,
-            GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_right_05")
-              .rotation,
-            new THREE.Vector3(
-              0,
-              GLOBALS.ENTER_DOOR.getObjectByName(
-                "central_spinner_right_05"
-              ).rotation.y,
-              GLOBALS.ENTER_DOOR.getObjectByName(
-                "central_spinner_right_05"
-              ).rotation.z
-            )
-          );
-
-          tweenCamera(
-            500,
-            GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_left_07")
-              .rotation,
-            new THREE.Vector3(
-              0,
-              GLOBALS.ENTER_DOOR.getObjectByName(
-                "central_spinner_left_07"
-              ).rotation.y,
-              GLOBALS.ENTER_DOOR.getObjectByName(
-                "central_spinner_left_07"
-              ).rotation.z
-            )
-          );
-
-          setTimeout(() => {
-            GLOBALS.CORRIDOR_ENTER.visible = false;
-            GLOBALS.EXIT_DOOR.add(GLOBALS.CORRIDOR_ENTER);
-            corridorColliderNames(false);
-          }, 500);
-        }, 1000);
-      }, 3000);
+      closeDoor(500,1000,2000)
     }
   }
 }
 
-export { updateEvents };
+function closeDoor(a,b,c){
+  setTimeout(() => {
+    GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").position.z =
+      -4;
+    tweenCamera(
+      b,
+      GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").position,
+      new THREE.Vector3(
+        -65,
+        GLOBALS.ENTER_DOOR.getObjectByName(
+          "portal_door_right_04"
+        ).position.y,
+        GLOBALS.ENTER_DOOR.getObjectByName(
+          "portal_door_right_04"
+        ).position.z
+      )
+    );
+
+    GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position.z =
+      -4;
+    tweenCamera(
+      b,
+      GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position,
+      new THREE.Vector3(
+        65,
+        GLOBALS.ENTER_DOOR.getObjectByName(
+          "portal_door_left_06"
+        ).position.y,
+        GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position.z
+      )
+    );
+
+    setTimeout(() => {
+      tweenCamera(
+        a,
+        GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_right_05")
+          .rotation,
+        new THREE.Vector3(
+          0,
+          GLOBALS.ENTER_DOOR.getObjectByName(
+            "central_spinner_right_05"
+          ).rotation.y,
+          GLOBALS.ENTER_DOOR.getObjectByName(
+            "central_spinner_right_05"
+          ).rotation.z
+        )
+      );
+
+      tweenCamera(
+        a,
+        GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_left_07")
+          .rotation,
+        new THREE.Vector3(
+          0,
+          GLOBALS.ENTER_DOOR.getObjectByName(
+            "central_spinner_left_07"
+          ).rotation.y,
+          GLOBALS.ENTER_DOOR.getObjectByName(
+            "central_spinner_left_07"
+          ).rotation.z
+        )
+      );
+
+      if (GLOBALS.FPS_MODE) {
+        setTimeout(() => {
+          GLOBALS.CORRIDOR_ENTER.visible = false;
+          GLOBALS.EXIT_DOOR.add(GLOBALS.CORRIDOR_ENTER);
+          corridorColliderNames(false);
+        }, a);
+      }else{
+        GLOBALS.CORRIDOR_ENTER.visible = false;
+        GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
+      }
+    }, a);
+  }, c);
+}
+
+export { updateEvents,closeDoor };

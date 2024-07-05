@@ -207,7 +207,9 @@ function loadGunManager(scene) {
     //gunClone.rotation.y = THREE.MathUtils.degToRad(38);
     gunClone.rotation.x = THREE.MathUtils.degToRad(10);
     gunClone.position.set(-0.05, 0.075, -0.1)
-    GLOBALS.GUN_CLONE.add(gunClone)
+    GLOBALS.GUN_CLONE.add(gunClone);
+
+    GLOBALS.GUN_CLONE2 = GLOBALS.GUN_CLONE.clone();
 
     scene.traverse(child => {
         if (child.material) {
@@ -240,7 +242,11 @@ function loadGunManager(scene) {
 
     //gltf.scene.position.set(0.12, -0.14, -0.13);
     scene.scale.set(0.1, 0.1, 0.1)
-    scene.position.set(0.01, -0.012, -0.011);
+    scene.position.set(0.009, -0.013, -0.012);
+    //scene.scale.set(1, 1, 1)
+    //scene.position.set(0.1, -0.13, -0.13);//-0.15
+    console.log("9999999999999999")
+    console.log(scene)
     loadDoor()
 
     const geometry = new THREE.SphereGeometry(0.01, 32, 16);
@@ -432,6 +438,10 @@ function loadPortalCubeManager(scene) {
     item.userData.wall = false;
     item.userData.ground = true;
     item.userData.ceiling = false;
+    item.userData.obj = scene;
+    item.userData.obj.children[0].material.envMap =  GLOBALS.ENV_MAP;
+    item.userData.obj.children[0].material.envMapIntensity = 0.5;
+    item.userData.obj.children[0].material.roughness = 0.2;
     loadPortalSphere()
 }
 
@@ -486,6 +496,10 @@ function loadPortalSphereManager(scene) {
     item.userData.wall = false;
     item.userData.ground = true;
     item.userData.ceiling = false;
+    item.userData.obj = scene;
+    item.userData.obj.children[0].material.envMap =  GLOBALS.ENV_MAP;
+    item.userData.obj.children[0].material.envMapIntensity = 0.5;
+    item.userData.obj.children[0].material.roughness = 0.2;
     loadHalfWindow()
 }
 
@@ -652,6 +666,10 @@ function loadRadioManager(scene) {
     item.userData.wall = false;
     item.userData.ground = true;
     item.userData.ceiling = false;
+    item.userData.obj = scene;
+    item.userData.obj.children[0].material.envMap =  GLOBALS.ENV_MAP;
+    item.userData.obj.children[0].material.envMapIntensity = 0.5;
+    item.userData.obj.children[0].material.roughness = 0.2;
 
     loadGelRecharger();
 }
@@ -913,6 +931,7 @@ function loadAvatar() {
         })
 
         GLOBALS.GUN_CLONE.scale.setScalar(0.7);
+        GLOBALS.GUN_CLONE2.scale.setScalar(0.7);
 
         GLOBALS.PLAYER_MODEL = fbx;
         GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);

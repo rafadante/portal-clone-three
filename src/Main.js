@@ -168,7 +168,7 @@ function onDocumentMouseDown(event) {
     }
 }
 
-function onDocumentMouseWheel(){
+function onDocumentMouseWheel() {
     animate();
 }
 
@@ -287,17 +287,17 @@ var fps = 0;
 
 function fixedUpdate() { //60 fps always for physics
 
-    frames ++;
+    frames++;
     const time2 = performance.now();
-        
-    if ( time2 >= prevTime + 100 ) {
-        fps = Math.round( ( frames * 100 ) / ( time2 - prevTime ) ) * 10;
+
+    if (time2 >= prevTime + 100) {
+        fps = Math.round((frames * 100) / (time2 - prevTime)) * 10;
         frames = 0;
         prevTime = time2;
     }
-    
+
     const deltaTime = clock2.getDelta();
-    if(fps > 15)//IF FPS IS LOWER THAN 15, AVOID THE PLAYER TO CONTROL THE CHARACTER TO AVOID PHYSICS ERRORS
+    if (fps > 15)//IF FPS IS LOWER THAN 15, AVOID THE PLAYER TO CONTROL THE CHARACTER TO AVOID PHYSICS ERRORS
         updatePlayer(deltaTime);
 
     if (Date.now() >= timeTarget && !GLOBALS.STOP_TIME) {
@@ -328,7 +328,7 @@ function render(time) {
     animatePortal();
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {
-        if(GLOBALS.CAMERAS[i].fixed){
+        if (GLOBALS.CAMERAS[i].fixed) {
             GLOBALS.CAMERA_OBJ_HORIZONTAL[i].lookAt(GLOBALS.MAIN_CAMERA.position);
             GLOBALS.CAMERA_OBJ_HORIZONTAL[i].rotation.x = Math.PI / 2;
             GLOBALS.CAMERA_OBJ_HORIZONTAL[i].rotation.y = 0;
@@ -336,7 +336,7 @@ function render(time) {
     }
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_VERTICAL.length; i++) {
-        if(GLOBALS.CAMERAS[i].fixed){
+        if (GLOBALS.CAMERAS[i].fixed) {
             GLOBALS.CAMERA_OBJ_VERTICAL[i].lookAt(GLOBALS.MAIN_CAMERA.position);
             GLOBALS.CAMERA_OBJ_VERTICAL[i].rotation.z = 0;
             GLOBALS.CAMERA_OBJ_VERTICAL[i].rotation.y = 0;
@@ -377,6 +377,14 @@ function animatePortal() {
     GLOBALS.GUN.visible = false;
     GLOBALS.GUN_CLONE.visible = true;
 
+    let cloneItemHolded = false;
+
+    if (GLOBALS.OBJ_HOLDED_CLONE){
+        cloneItemHolded = GLOBALS.OBJ_HOLDED_CLONE.visible;
+        GLOBALS.OBJ_HOLDED_CLONE.visible = true;
+    }
+    //GLOBALS.GUN_CLONE2.visible = true;
+
     var positionBoneHand = new THREE.Vector3();
     window.hand.getWorldPosition(positionBoneHand);
 
@@ -384,11 +392,11 @@ function animatePortal() {
     GLOBALS.GUN_CLONE.rotation.y = GLOBALS.MAIN_CAMERA.rotation.y;
 
     //APPLY ROTATION TO THE PORTAL GUN AND PLAYER HAND AND NECK
-    const angle = (GLOBALS.MAIN_CAMERA.rotation.x * 180)/Math.PI;
-    if(angle > -20 && angle < 30){
+    const angle = (GLOBALS.MAIN_CAMERA.rotation.x * 180) / Math.PI;
+    if (angle > -20 && angle < 30) {
         window.neck.rotation.y = -GLOBALS.MAIN_CAMERA.rotation.x;
         angleHolder = GLOBALS.MAIN_CAMERA.rotation.x;
-    }else{
+    } else {
         window.neck.rotation.y = -angleHolder;
     }
 
@@ -397,13 +405,13 @@ function animatePortal() {
     // stencil optimization - only render parts of scene multiple
     // times when it is going to be viewed by the portal
     GLOBALS.RENDERER.autoClearStencil = false
-    
-    if(GLOBALS.PORTAL_RECURSION_LEVELS>0){
+
+    if (GLOBALS.PORTAL_RECURSION_LEVELS > 0) {
         renderPortal2(0, 1)
         renderPortal2(1, 0)
-    }else{
-        if(GLOBALS.PORTALS[0] && GLOBALS.PORTALS[1]){
-            if(GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value == 1){
+    } else {
+        if (GLOBALS.PORTALS[0] && GLOBALS.PORTALS[1]) {
+            if (GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value == 1) {
                 GLOBALS.PORTALS[0].mesh.material.uniforms.texture1.value = null;
                 GLOBALS.PORTALS[1].mesh.material.uniforms.texture1.value = null;
                 GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value = 0;
@@ -411,18 +419,21 @@ function animatePortal() {
             }
         }
     }
-    
+
     GLOBALS.SCENE_CHILDREN.visible = true;
     GLOBALS.RENDERER.autoClear = false;
     GLOBALS.GUN.visible = true;
 
-    GLOBALS.GUN_CLONE.visible = cloneVisible;
+    GLOBALS.GUN_CLONE.visible = false;
+    GLOBALS.GUN_CLONE2.visible = cloneVisible;
 
-    if(cloneVisible){
-        GLOBALS.GUN_CLONE.position.copy(window.posW);
-        GLOBALS.GUN_CLONE.quaternion.copy(GLOBALS.PLAYER_MODEL_CLONE.quaternion)
-        //GLOBALS.GUN_CLONE.quaternion.multiply(new THREE.Quaternion(0, 1, 0)).normalize()
-        GLOBALS.GUN_CLONE.rotation.y += Math.PI;
+    if (GLOBALS.OBJ_HOLDED_CLONE)
+        GLOBALS.OBJ_HOLDED_CLONE.visible = cloneItemHolded;
+
+    if (cloneVisible) {
+        GLOBALS.GUN_CLONE2.position.copy(window.posW);
+        GLOBALS.GUN_CLONE2.quaternion.copy(GLOBALS.PLAYER_MODEL_CLONE.quaternion);
+        GLOBALS.GUN_CLONE2.rotation.y += Math.PI;
     }
 
     if (GLOBALS.PLAYER && GLOBALS.PLAYER_MODEL) {
@@ -511,7 +522,7 @@ function renderPortal2(thisIndex, pairIndex) {
 
     for (let level = GLOBALS.PORTAL_RECURSION_LEVELS - 1; level >= 0; level--) {
 
-        if(level>GLOBALS.PORTAL_RENDER_LEVEL)
+        if (level > GLOBALS.PORTAL_RENDER_LEVEL)
             GLOBALS.SCENE_CHILDREN.visible = false;
         else
             GLOBALS.SCENE_CHILDREN.visible = true;

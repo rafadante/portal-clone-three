@@ -522,9 +522,20 @@
         <div id="options-settings" class="option-main">
           <span class="option selected" id="settings-controls">CONTROLS</span>
           <span class="option" id="settings-video">GRAPHICS</span>
-          <!--<span class="option" id="settings-audio">Audio</span>
-          <span class="option" id="settings-language">Language</span>-->
+          <span class="option" id="settings-audio">AUDIO</span>
+          <!--<span class="option" id="settings-language">Language</span>-->
           <span class="option" id="back-editor">BACK TO EDITOR</span>
+        </div>
+
+        <div id="options-audio">
+          <!--VOLUME-->
+          <div class="options-row">
+            <span class="option-name" id="">VOLUME</span>
+            <div class="option-value">
+              <input step="0.1" id="vol-val-range" type="range" min="0" max="1" value="0.5" />
+              <input step="0.1" id="vol-val-number" type="number" min="0" max="1" value="0.5" />
+            </div>
+          </div>
         </div>
 
         <div id="options-controls">
@@ -763,6 +774,10 @@
   display: flex;
   justify-content: center;
   align-items: center;"></span>
+
+  <div id="placeholder">
+    <button id="start-place-holder">START</button>
+  </div>
 
 </body>
 

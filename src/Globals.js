@@ -29,9 +29,11 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
 }
 
 //MAIN CAMERA
-const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.001, 500);
+const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
+
+console.log(camera)
 
 //POINT OF OBJECTS WHILE HOLDING WITH THE GUN
 const cubeHolder = new THREE.Object3D()
@@ -213,7 +215,9 @@ var GLOBALS = {
 
     GUN: null,
     GUN_CLONE: null,
+    GUN_CLONE2: null,
     GUN_MODE: 1,
+    OBJ_HOLDED_CLONE: null,
 
     ENV_MAP: null,
     STATS: null,
@@ -435,7 +439,8 @@ var GLOBALS = {
     LISTENER: new THREE.AudioListener(),
     CANNON_BODIES: [],
     LEVEL_ENTERED: false,
-    DOOR_OPEN_STATE: false
+    DOOR_OPEN_STATE: false,
+    AMBIENT_AUDIO: null
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)

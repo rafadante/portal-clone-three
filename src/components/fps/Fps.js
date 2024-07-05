@@ -22,6 +22,7 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+import { AUDIO } from '../audio/Audio.js';
 
 //
 let shouldJump = false;
@@ -367,6 +368,7 @@ function controlsLock() {
     GLOBALS.POINTER_CONTROLS.pointerSpeed = 0.5;
 
     GLOBALS.POINTER_CONTROLS.addEventListener('lock', function () {
+        AUDIO.AMBIENT.play();
         document.getElementById('blocker').style.display = 'none';
         GLOBALS.PAUSED = false;
 
@@ -376,7 +378,6 @@ function controlsLock() {
     });
 
     GLOBALS.POINTER_CONTROLS.addEventListener('unlock', function () {
-
         $("#container").css("filter", "blur(2px)")
         document.getElementById('blocker').style.display = 'block';
         GLOBALS.ALLOW_PLACE_PORTALS = false;
@@ -647,6 +648,7 @@ const updateCamera = function (deltaTime) {
 
     // set camera position to be at player
     GLOBALS.MAIN_CAMERA.position.copy(GLOBALS.PLAYER.position);
+    //GLOBALS.MAIN_CAMERA.translateZ(0.2)
     GLOBALS.MAIN_CAMERA.translateY(0.2)
     GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
     GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.SMOOTHNESS);
@@ -669,6 +671,11 @@ const updateCamera = function (deltaTime) {
         GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLAYER_MODEL_CLONE)
         GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
         GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE)
+    }
+
+    if(GLOBALS.OBJ_HOLDED_CLONE){
+        GLOBALS.OBJ_HOLDED_CLONE.position.copy(GLOBALS.CURRENT_ITEM.body.position)
+        GLOBALS.OBJ_HOLDED_CLONE.quaternion.copy(GLOBALS.CURRENT_ITEM.body.quaternion)
     }
 
     // handle model movements

@@ -4,9 +4,25 @@ import { GLOBALS } from '../../Globals.js';
 import {
     animate
 } from '../../Main.js';
+import { AUDIO, volume } from '../audio/Audio.js';
+import { closeDoor } from '../events/events.js';
 
 if (!GLOBALS.MOBILE)
     $(".mobile").css("display", "none");
+
+
+$("body").on('click', '#start-place-holder', function () {
+    AUDIO.EDITOR.play();
+    $("#placeholder").css("display", "none");
+});
+
+$("body").on('click', '#settings-audio', function () {
+    $("#options-audio").css("display", "block");
+    $("#options-settings").css("display", "none");
+    $(".settings-menu").css("width", "50%");
+    $("#settings-menu-title").text("AUDIO");
+    $("#done").css("display", "block");
+});
 
 $("body").on('click', '#settings-video', function () {
     $("#options-video").css("display", "block");
@@ -29,6 +45,7 @@ $("body").on('click', '#settings-controls', function () {
 $("body").on('click', '#done', function () {
     $("#options-video").css("display", "none");
     $("#options-controls").css("display", "none");
+    $("#options-audio").css("display", "none");
     $("#options-settings").css("display", "block");
     $(".settings-menu").css("width", "25%");
     $("#settings-menu-title").text("OPTIONS");
@@ -40,37 +57,37 @@ $('#quality-select').on('change', function () {
 
     localStorage.setItem("quality-select", $(this).val());
 
-    if($(this).val() == "potato"){
+    if ($(this).val() == "potato") {
         $("#recursive-select").val(0).change();
         $("#recursive-render-select").val(0).change();
         $("#resolution-select").val(0.5).change();
         $("#shadows-resolution-select").val(512).change();
         localStorage.setItem("antialising", false);
-    }else if($(this).val() == "very_low"){
+    } else if ($(this).val() == "very_low") {
         $("#recursive-select").val(3).change();
         $("#recursive-render-select").val(0).change();
         $("#resolution-select").val(0.5).change();
         $("#shadows-resolution-select").val(256).change();
         localStorage.setItem("antialising", false);
-    }else if($(this).val() == "low"){
+    } else if ($(this).val() == "low") {
         $("#recursive-select").val(3).change();
         $("#recursive-render-select").val(0).change();
         $("#resolution-select").val(0.8).change();
         $("#shadows-resolution-select").val(1024).change();
         localStorage.setItem("antialising", false);
-    }else if($(this).val() == "medium"){
+    } else if ($(this).val() == "medium") {
         $("#recursive-select").val(3).change();
         $("#recursive-render-select").val(0).change();
         $("#resolution-select").val(1).change();
         $("#shadows-resolution-select").val(1024).change();
         localStorage.setItem("antialising", true);
-    }else if($(this).val() == "high"){
+    } else if ($(this).val() == "high") {
         $("#recursive-select").val(3).change();
         $("#recursive-render-select").val(100).change();
         $("#resolution-select").val(1).change();
         $("#shadows-resolution-select").val(2048).change();
         localStorage.setItem("antialising", true);
-    }else if($(this).val() == "epic"){
+    } else if ($(this).val() == "epic") {
         $("#recursive-select").val(7).change();
         $("#recursive-render-select").val(100).change();
         $("#resolution-select").val(1).change();
@@ -97,7 +114,7 @@ $('#recursive-render-select').on('change', function () {
 $('#resolution-select').on('change', function () {
     GLOBALS.PIXEL_RATIO = $(this).val();
 
-    if(allowUpdate){
+    if (allowUpdate) {
         GLOBALS.RENDERER.setPixelRatio(window.devicePixelRatio * $(this).val());
         update();
     }
@@ -106,14 +123,14 @@ $('#resolution-select').on('change', function () {
 //SHADOW RESOLUTION
 $('#shadows-resolution-select').on('change', function () {
 
-    if(allowUpdate){
+    if (allowUpdate) {
         GLOBALS.SPOTLIGHT.shadow.mapSize.width = $(this).val();
         GLOBALS.SPOTLIGHT.shadow.mapSize.height = $(this).val();
     }
 
     GLOBALS.RENDERER.shadowMap.autoUpdate = true;
-        GLOBALS.RENDERER.shadowMap.autoUpdate = false;
-    
+    GLOBALS.RENDERER.shadowMap.autoUpdate = false;
+
     update()
 });
 
@@ -126,6 +143,13 @@ $("body").on('input', '#option-stats', function () {
         $("#main-container").css("display", "block");
 
     update()
+});
+
+//VLOUME
+$('#vol-val-range').on('input', function () {
+    localStorage.setItem("vol-val-range", $(this).val());
+    $("#vol-val-number").val($(this).val());
+    volume($(this).val());
 });
 
 //FOV
@@ -212,22 +236,40 @@ $("body").on('click', '#back-editor', function () {
 
     console.log(GLOBALS.CANNON_BODIES)
 
-    for(var i=GLOBALS.CANNON_BODIES.length-1; i>=0; i--){
+    for (var i = GLOBALS.CANNON_BODIES.length - 1; i >= 0; i--) {
         GLOBALS.CANNON_WORLD.remove(GLOBALS.CANNON_BODIES[i]);
     }
 
-    for(var i=0; i<GLOBALS.RADIO_MUSIC.length; i++){
+    for (var i = 0; i < GLOBALS.RADIO_MUSIC.length; i++) {
         GLOBALS.RADIO_MUSIC[i].stop();
     }
-    
+
 
     GLOBALS.CANNON_BODIES = [];
     GLOBALS.RADIO_MUSIC = [];
-    
+
     //setTimeout(() => {
-        GLOBALS.CONTROLS.update();
-        animate()
+    GLOBALS.CONTROLS.update();
+    animate()
     //}, 100);
+
+    AUDIO.EDITOR.play();
+    AUDIO.AMBIENT.pause();
+
+    GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").scale.set(0, 0, 0);
+    GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").scale.set(0, 0, 0);
+    GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").scale.set(0, 0, 0);
+    GLOBALS.EXIT_DOOR.getObjectByName("portal_door_left_06").scale.set(0, 0, 0);
+
+    GLOBALS.ENTER_DOOR.getObjectByName("warning").visible = true;
+    GLOBALS.EXIT_DOOR.getObjectByName("warning").visible = true;
+
+    setTimeout(() => {
+        closeDoor(0,0,0)
+    }, 1000);
+
+    GLOBALS.MAIN_CAMERA.near = 0.1;
+    GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
 });
 
 $("#arrow-menu").click(function () {
@@ -254,8 +296,8 @@ $(".item").mouseleave(function () {
 
 var allowUpdate = false;
 
-function update(){
-    if(allowUpdate){
+function update() {
+    if (allowUpdate) {
         GLOBALS.PAUSED = false;
         setTimeout(() => {
             GLOBALS.PAUSED = true;
@@ -266,11 +308,16 @@ function update(){
 }
 
 //VERIFY IF THE PLAYER HAS SETTINGS SAVED ON THE LOCALSTORAGE
-if(!localStorage.getItem("saved")){
+if (!localStorage.getItem("saved")) {
     $("#recursive-select").val(GLOBALS.PORTAL_RECURSION_LEVELS).change();
     $("#resolution-select").val(0.5).change();
     $("#shadows-resolution-select").val(512).change();
 }
+
+if (localStorage.getItem("vol-val-range")){
+    $("#vol-val-range").val(localStorage.getItem("vol-val-range")).trigger("input");
+}
+    //volume(localStorage.getItem("vol-val-range"));
 
 allowUpdate = true;
 console.log(localStorage);
