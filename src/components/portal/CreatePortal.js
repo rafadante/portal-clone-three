@@ -14,6 +14,7 @@ import {
 import {
     GLOBALS
 } from '../../Globals.js';
+import { AUDIO, addRadioAudio } from '../audio/Audio.js';
 
 var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
@@ -136,6 +137,9 @@ function portalButton(button) {
                     if (GLOBALS.PORTAL_BOX[portalID]) {
                         for (let p of portalPoints) {
                             if (!isInOtherPortalArea(p, normal, intersects[0].object, portalID)) {
+                                AUDIO.PORTAL_INVALID.pause();
+                                AUDIO.PORTAL_INVALID.currentTime = 0;
+                                AUDIO.PORTAL_INVALID.play();
                                 return;
                             }
                         }
@@ -149,21 +153,21 @@ function portalButton(button) {
 
                     console.log(pointsChecked)
 
-                    if(userData.side == "up" || userData.side == "down"){
-                        if(pointsChecked[1].length==0 || pointsChecked[1].length==0 ||
-                            pointsChecked[2].length==0 || pointsChecked[3].length==0
-                        ){
+                    if (userData.side == "up" || userData.side == "down") {
+                        if (pointsChecked[1].length == 0 || pointsChecked[1].length == 0 ||
+                            pointsChecked[2].length == 0 || pointsChecked[3].length == 0
+                        ) {
                             point.z = userData.position.z;
                             point.x = userData.position.x;
                         }
-                    }else{
-                        if(pointsChecked[1].length==0 || pointsChecked[1].length==0 ||
-                            pointsChecked[2].length==0 || pointsChecked[3].length==0
-                        ){
+                    } else {
+                        if (pointsChecked[1].length == 0 || pointsChecked[1].length == 0 ||
+                            pointsChecked[2].length == 0 || pointsChecked[3].length == 0
+                        ) {
                             point.y = userData.position.y;
                         }
-    
-                        if(pointsChecked[0].length==0 || pointsChecked[3].length==0){
+
+                        if (pointsChecked[0].length == 0 || pointsChecked[3].length == 0) {
                             point.x = userData.position.x;
                             point.z = userData.position.z;
                         }
@@ -193,6 +197,10 @@ function portalButton(button) {
                         }
 
                         GLOBALS.PORTALS[0].normal = normal;
+
+                        AUDIO.PORTAL_GUN_ORANGE.pause();
+                        AUDIO.PORTAL_GUN_ORANGE.currentTime = 0;
+                        AUDIO.PORTAL_GUN_ORANGE.play();
                     } else if (button == 2) { // left click
 
                         if (GLOBALS.PORTALS[0] === null)
@@ -215,6 +223,10 @@ function portalButton(button) {
                         }
 
                         GLOBALS.PORTALS[1].normal = normal;
+
+                        AUDIO.PORTAL_GUN_BLUE.pause();
+                        AUDIO.PORTAL_GUN_BLUE.currentTime = 0;
+                        AUDIO.PORTAL_GUN_BLUE.play();
                     }
 
                     setTimeout(() => {
@@ -230,6 +242,9 @@ function portalButton(button) {
                     }, 300);
                 } else {
                     //NONPORTABLE WALL
+                    AUDIO.PORTAL_INVALID.pause();
+                    AUDIO.PORTAL_INVALID.currentTime = 0;
+                    AUDIO.PORTAL_INVALID.play();
                 }
             }
         }
@@ -243,7 +258,7 @@ function isInOtherPortalArea(point, normal, object, i) {
 
     if (box.containsPoint(point))
         return false
-    
+
     return true
 }
 
@@ -254,16 +269,16 @@ function validPortalPoint(point, normal, object) {
     // check that no intersectable objects are directly in front of point
     let frontPoint = point.clone().add(normal.clone().multiplyScalar(1))
     const raycaster = new THREE.Raycaster(frontPoint, normal.clone().multiplyScalar(-1), 0, 1000);
-    let intersects = raycaster.intersectObject( GLOBALS.PLANE_LEVEL_INSTANCED );
+    let intersects = raycaster.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
 
-    if (intersects.length == 0){
+    if (intersects.length == 0) {
         pointsChecked.push([])
         return false
     }
 
-    if(intersects.length>0){
+    if (intersects.length > 0) {
         var userData = GLOBALS.PLANE_USER_DATA[intersects[0].instanceId];
-        if (!userData.portal || intersects[0].distance > 1.1){
+        if (!userData.portal || intersects[0].distance > 1.1) {
             pointsChecked.push([])
             return false
         }
@@ -331,6 +346,11 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
         GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value = 1;
         GLOBALS.PORTALS[1].portalShader.material.uniforms.iOpened.value = 1;
     }
+
+
+    GLOBALS.PORTALS[thisPortalIndex].add(GLOBALS.PORTAL_AUDIO[thisPortalIndex])
+
+    //GLOBALS.PORTAL_AUDIO[thisPortalIndex].play();
 }
 
 export {

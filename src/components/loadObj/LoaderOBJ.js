@@ -134,7 +134,7 @@ function loadWindowIMG() {
         })
 
         gltf.scene.rotation.y = -Math.PI / 2;
-        gltf.scene.position.set(16, 7, 7);
+        gltf.scene.position.set(16, 8, 8);
         gltf.scene.translateY(-1)
         gltf.scene.translateX(-1)
         gltf.scene.name = "window";
@@ -245,8 +245,6 @@ function loadGunManager(scene) {
     scene.position.set(0.009, -0.013, -0.012);
     //scene.scale.set(1, 1, 1)
     //scene.position.set(0.1, -0.13, -0.13);//-0.15
-    console.log("9999999999999999")
-    console.log(scene)
     loadDoor()
 
     const geometry = new THREE.SphereGeometry(0.01, 32, 16);
@@ -344,22 +342,8 @@ function loadEnterDoor(scene) {
     const cube = new THREE.Mesh( geometry3, material3 );
     cube.visible = false; 
     door.add( cube );
+    door.cube = cube;
     cube.translateZ(0.3);
-
-    var p = new THREE.Vector3();
-    cube.getWorldPosition(p);
-
-    var r = new THREE.Quaternion();
-    cube.getWorldQuaternion(r);
-
-    GLOBALS.SCENE.add(cube);
-    cube.position.copy(p);
-    cube.rotation.copy(r);
-
-    var bb = new THREE.Box3(); // for re-use
-    bb.setFromObject(cube);
-
-    GLOBALS.ENTER_DOOR.box3 = bb;
 
     var map2 = new THREE.TextureLoader().load('./assets/textures/door.jpg');
     //map.flipY = false;
@@ -941,9 +925,6 @@ function loadAvatar() {
 
         GLOBALS.PLAYER_MODEL.animationActions = {};
         GLOBALS.PLAYER_MODEL.modelReady = true;
-
-        console.log("yyyyyyyyyyyyyyyyyyyyyyy")
-        console.log(GLOBALS.PLAYER_MODEL_CLONE)
     }).then(() => {
         let animationPromises = []
         for (let index in GLOBALS.PLAYER_ANIMATIONS) {

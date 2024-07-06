@@ -364,19 +364,23 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
 
             var hasItem = false;
             var itemName = null;
+            var canRotate = false;
+            var floor = false;
+            var ceiling = false;
+            var walls = false;
 
             if (clone.position.equals(new THREE.Vector3(3, 1, 12))) {
                 hasItem = true;
                 itemName = "enterDoor";
+                walls=true;
             } else if (clone.position.equals(new THREE.Vector3(13, 1, 0))) {
                 hasItem = true;
                 itemName = "exitDoor";
-            } else if (clone.position.equals(new THREE.Vector3(16, 7, 7)) ||
-                clone.position.equals(new THREE.Vector3(16, 7, 5))) {
+                walls=true;
+            } else if (clone.position.equals(new THREE.Vector3(16, 7, 7))) {
                 hasItem = true;
                 itemName = "window";
-
-                console.log("xxxxxxxxxxxxxxx")
+                walls=true;
             }
 
             //ADD USERDATA TO ARRAY LINKED WITH THE INSTANCED ID
@@ -396,7 +400,12 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
                 hasItem: hasItem,
                 itemName: itemName,
                 merged: false,
-                checked: false
+                checked: false,
+
+                canRotate: canRotate,
+                floor: floor,
+                walls: walls,
+                ceiling: ceiling,
             }
 
             GLOBALS.BUDGET -= 1;

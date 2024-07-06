@@ -17,6 +17,7 @@ import {
 import { add } from 'three/examples/jsm/libs/tween.module.js';
 import { newPortal, deletePortal } from '../portal/CreatePortal.js';
 import { addRadioAudio, AUDIO } from '../audio/Audio.js';
+import { func } from 'three/examples/jsm/nodes/Nodes.js';
 
 var totalBodies = 0;
 var id = 0;
@@ -31,7 +32,7 @@ function groupByPercentage(users, percentages) {
     // Sort percentages by decreasing remainder (modulo unit) 
     //   and get number of units covered by each percentage
     let sorted = percentages.map((p, i) => [i, Math.floor(p / unit), p % unit])
-                            .sort((a, b) => b[2] - a[2]);
+        .sort((a, b) => b[2] - a[2]);
     // Get how many units are not yet distributed:
     let remain = users.length - sorted.reduce((sum, a) => sum += a[1], 0);
     // Distribute those, giving priority to groups where the remainders are greatest
@@ -39,23 +40,23 @@ function groupByPercentage(users, percentages) {
     // Build and return the chunks by filling the groups in their 
     //    original order
     let i = 0;
-    return sorted.sort((a, b) => a[0] - b[0]).map(a => users.slice(i, i+=a[1]));
+    return sorted.sort((a, b) => a[0] - b[0]).map(a => users.slice(i, i += a[1]));
 }
 
 function shuffle(array) {
     var array = array.slice(0);
     let currentIndex = array.length;
-  
+
     // While there remain elements to shuffle...
     while (currentIndex != 0) {
-  
-      // Pick a remaining element...
-      let randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-  
-      // And swap it with the current element.
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex], array[currentIndex]];
+
+        // Pick a remaining element...
+        let randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
     }
 
     return array
@@ -65,7 +66,7 @@ function viewFPS() {
 
     GLOBALS.MAIN_CAMERA.near = 0.01;
     GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
-    
+
     AUDIO.EDITOR.pause();
     var meshesWallPortal = [];
     var meshesWallNonPortal = [];
@@ -94,19 +95,23 @@ function viewFPS() {
     $(".img").addClass("image");
     GLOBALS.FLASH.visible = true;
 
+    //ADD PORTAL AMBIENT AUDIO
+    addRadioAudio('audio/portal_ambient_loop1.wav', GLOBALS.PORTAL_AUDIO,false);
+    addRadioAudio('audio/portal_ambient_loop1.wav', GLOBALS.PORTAL_AUDIO,false);
+
     setTimeout(() => {
 
         GLOBALS.RENDERER.setPixelRatio(window.devicePixelRatio * GLOBALS.PIXEL_RATIO);
 
         //if(localStorage.getItem("shadows-resolution-select"))
         //    $("#shadows-resolution-select").val(localStorage.getItem("shadows-resolution-select")).change();
-        if(localStorage.getItem("option-stats"))
+        if (localStorage.getItem("option-stats"))
             $("#option-stats").prop('checked', localStorage.getItem("option-stats") == 'true');
-        if(localStorage.getItem("fov-val-range"))
+        if (localStorage.getItem("fov-val-range"))
             $("#fov-val-range").val(localStorage.getItem("fov-val-range")).trigger("input");
-        if(localStorage.getItem("mouse-val-range"))
+        if (localStorage.getItem("mouse-val-range"))
             $("#mouse-val-range").val(localStorage.getItem("mouse-val-range")).trigger("input");
-        if(localStorage.getItem("quality-select"))
+        if (localStorage.getItem("quality-select"))
             $("#quality-select").val(localStorage.getItem("quality-select")).change();
 
         //
@@ -117,6 +122,26 @@ function viewFPS() {
         GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").scale.set(1, 1, 1);
         GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").scale.set(1, 1, 1);
         GLOBALS.EXIT_DOOR.getObjectByName("portal_door_left_06").scale.set(1, 1, 1);
+
+        //DOOR ENTER TRIGGER
+        const cube = GLOBALS.ENTER_DOOR.cube.clone();
+
+        var p = new THREE.Vector3();
+        GLOBALS.ENTER_DOOR.cube.getWorldPosition(p);
+
+        var r = new THREE.Quaternion();
+        GLOBALS.ENTER_DOOR.cube.getWorldQuaternion(r);
+
+        //GLOBALS.SCENE.add(cube);
+        cube.position.copy(p);
+        cube.rotation.copy(r);
+
+        var bb = new THREE.Box3(); // for re-use
+        bb.setFromObject(cube);
+
+        GLOBALS.ENTER_DOOR.box3 = bb;
+
+        //----------------------------------------------
 
         GLOBALS.EXIT_DOOR.getObjectByName("warning").visible = false;
 
@@ -138,13 +163,13 @@ function viewFPS() {
 
         //SEPARETE MESHS FOR INSTANCING
         for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
-           
+
             if (GLOBALS.PLANE_USER_DATA[i].exists) {
                 if (GLOBALS.PLANE_USER_DATA[i].name != GLOBALS.ENTER_DOOR.namePosition &&
                     GLOBALS.PLANE_USER_DATA[i].name != GLOBALS.EXIT_DOOR.namePosition) {
 
-                        GLOBALS.PLANE_USER_DATA[i].checked=false;
-                        GLOBALS.PLANE_USER_DATA[i].position.checked=false;
+                    GLOBALS.PLANE_USER_DATA[i].checked = false;
+                    GLOBALS.PLANE_USER_DATA[i].position.checked = false;
 
                     if (GLOBALS.PLANE_USER_DATA[i].side == "front")
                         sideFront.push(GLOBALS.PLANE_USER_DATA[i])
@@ -159,14 +184,14 @@ function viewFPS() {
                         if (GLOBALS.PLANE_USER_DATA[i].side == "up" || GLOBALS.PLANE_USER_DATA[i].side == "down") {
                             sideUp.push(GLOBALS.PLANE_USER_DATA[i])
                             meshesFloorPortal.push(GLOBALS.PLANE_USER_DATA[i]);
-                        }  else {
+                        } else {
                             meshesWallPortal.push(GLOBALS.PLANE_USER_DATA[i]);
                         }
                     } else {
                         if (GLOBALS.PLANE_USER_DATA[i].side == "up" || GLOBALS.PLANE_USER_DATA[i].side == "down") {
                             meshesFloorNonPortal.push(GLOBALS.PLANE_USER_DATA[i])
                             sideUp.push(GLOBALS.PLANE_USER_DATA[i])
-                        }  else {
+                        } else {
                             meshesWallNonPortal.push(GLOBALS.PLANE_USER_DATA[i]);
                         }
                     }
@@ -174,14 +199,14 @@ function viewFPS() {
             }
         }
 
-         // Floor
-         /*const floorShape = new CANNON.Plane()
-         const floorBody = new CANNON.Body({ mass: 0 })
-         floorBody.addShape(floorShape)
-         floorBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0)
-         floorBody.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
-         floorBody.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC
-         GLOBALS.CANNON_WORLD.addBody(floorBody)*/
+        // Floor
+        /*const floorShape = new CANNON.Plane()
+        const floorBody = new CANNON.Body({ mass: 0 })
+        floorBody.addShape(floorShape)
+        floorBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0)
+        floorBody.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
+        floorBody.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC
+        GLOBALS.CANNON_WORLD.addBody(floorBody)*/
 
         colliderRoom(sideDown, "down", "z", "x", "y", "x");
         colliderRoom(sideUp, "up", "z", "x", "y", "x");
@@ -208,17 +233,9 @@ function viewFPS() {
         GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").translateY(-1);
         GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").translateX(-0.5);
 
-        var target = new THREE.Vector3(); // create once an reuse it
-        GLOBALS.OBSERVATION_ROOM_IMG.getObjectByName("target_light").getWorldPosition(target);
-
-        var obj = new THREE.Object3D();
-        obj.position.copy(target);
-        GLOBALS.SCENE_FPS.add(obj);
-
-        GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").target = obj;
         GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE);
         GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE2);
-        
+
         GLOBALS.GUN.children[0].add(GLOBALS.LIGHTNIN_STRIKE_1,
             GLOBALS.LIGHTNIN_STRIKE_2, GLOBALS.LIGHTNIN_STRIKE_3);
         GLOBALS.GUN.visible = true;
@@ -401,11 +418,11 @@ function viewFPS() {
         }
 
         //setTimeout(() => {
-            window['createBlueGel']()
-            window['createOrangeGel']()
+        window['createBlueGel']()
+        window['createOrangeGel']()
         //}, 10000);
 
-        
+
 
 
         var vec = new THREE.Vector3(0, 0, 0);
@@ -432,14 +449,14 @@ function viewFPS() {
 
         GLOBALS.EXIT_ROOM.visible = false;
 
-        for( var i = GLOBALS.SCENE.children.length - 1; i >= 0; i--) { 
+        for (var i = GLOBALS.SCENE.children.length - 1; i >= 0; i--) {
             var obj = GLOBALS.SCENE.children[i];
             //GLOBALS.SCENE_CHILDREN.remove(obj); 
-       }
+        }
 
-       //GLOBALS.RENDERER.renderLists.dispose();
-       GLOBALS.SCENE.background = new THREE.Color(0x000000);//0xff0000
-       GLOBALS.FLASH.visible = false;
+        //GLOBALS.RENDERER.renderLists.dispose();
+        GLOBALS.SCENE.background = new THREE.Color(0x000000);//0xff0000
+        GLOBALS.FLASH.visible = false;
     }, 500);
 };
 
@@ -474,13 +491,13 @@ function addColliderItem(items, type, mass, offset) {
                 var vec = new THREE.Quaternion();
                 items[i].children[1].getWorldQuaternion(vec)
                 var rot = vec;
-            } else if (type == "cube" || type == "laser_cube"){
+            } else if (type == "cube" || type == "laser_cube") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.3, 0.3));
                 offset = 0.5;
-            }else if (type == "sphere"){
+            } else if (type == "sphere") {
                 var shape = new CANNON.Sphere(0.3);
                 offset = 0.5;
-            }else if (type == "gel_gun_blue" || type == "gel_gun_orange" || type == "gel_gun_white") {
+            } else if (type == "gel_gun_blue" || type == "gel_gun_orange" || type == "gel_gun_white") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.5, 0.1));
                 items[i].position.y += 0.5;
             } else if (type == "pedestal_button") {
@@ -489,7 +506,7 @@ function addColliderItem(items, type, mass, offset) {
             } else if (type == "radio") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.11, 0.07, 0.049));
                 offset = 0.07;
-                addRadioAudio()
+                addRadioAudio('audio/radio.mp3', GLOBALS.RADIO_MUSIC,true)
             } else if (type == "button_weight") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.117, 0.5));
                 items[i].position.y += 0.117;
@@ -528,7 +545,7 @@ function addColliderItem(items, type, mass, offset) {
                     type: ShapeType.HULL
                 });
                 var shape = result.shape;
-               // PHYSICS_MATERIAL.friction = 0.3; //0.01
+                // PHYSICS_MATERIAL.friction = 0.3; //0.01
             }
 
             var box = new CANNON.Body({
@@ -560,12 +577,12 @@ function addColliderItem(items, type, mass, offset) {
                         items[i].dispenserPosition.z));
                     items[i].position.copy(box.position)
                     GLOBALS.BOX_BODY.push(box);
-                }else{
+                } else {
                     box.allowSleep = true;
                 }
 
                 box.spawnPosition = items[i].position.clone();
-                
+
                 box.sleepSpeedLimit = 0.1;
                 box.sleepTimeLimit = 2.0;
 
@@ -573,7 +590,7 @@ function addColliderItem(items, type, mass, offset) {
                 box.gelJumping = false;
                 box.waiting = false;
                 box.offset = offset;
-                
+
 
                 box.arrayPos = [];
                 box.arrayRot = [];
@@ -692,7 +709,7 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
             GLOBALS.CANNON_BODIES.push(box)
             totalBodies++;
 
-            
+
         }
     }
 }
@@ -711,12 +728,23 @@ function createInstances(meshes, material) {
     GLOBALS.SCENE_FPS.add(mesh);
     id++;
 
+    var leftWindowObsRoom = new THREE.Object3D();
+    leftWindowObsRoom.position.copy(GLOBALS.OBSERVATION_ROOM_IMG.position);
+    leftWindowObsRoom.rotation.copy(GLOBALS.OBSERVATION_ROOM_IMG.rotation);
+    leftWindowObsRoom.translateX(-2);
+
     for (var i = 0; i < meshes.length; i++) {
 
         var dummy = new THREE.Object3D();
 
-        if (meshes[i].itemName == "window")
+        if (meshes[i].itemName == "window" || (
+            meshes[i].position.x == leftWindowObsRoom.position.x &&
+            meshes[i].position.y == leftWindowObsRoom.position.y &&
+            meshes[i].position.z == leftWindowObsRoom.position.z
+        )){
             dummy.scale.set(0, 0, 0);
+        }
+            
 
         dummy.rotation.set(0, 0, 0);
         dummy.position.copy(meshes[i].position);
@@ -748,7 +776,7 @@ function corridorColliderNames(first) {
     corridorCollider(GLOBALS.CORRIDOR_ENTER, "front", 1, 1, 0.001, false);
 
     if (!first)
-        GLOBALS.WALL_CORRIDOR_ENTER.position.y = 0;
+        GLOBALS.WALL_CORRIDOR_ENTER.position.copy(GLOBALS.ENTER_DOOR.position);
 }
 
 function corridorCollider(parent, name, x, y, z, state) {
@@ -764,7 +792,7 @@ function corridorCollider(parent, name, x, y, z, state) {
 
     shape = result.shape;
 
-    if (name == "front"){
+    if (name == "front") {
         shape = new CANNON.Box(new CANNON.Vec3(1, 0.01, 1));
     }
 

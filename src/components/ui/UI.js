@@ -204,8 +204,6 @@ $("body").on('click', '#back-editor', function () {
     GLOBALS.DOOR_OPEN_STATE = false;
     GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
 
-    console.log(GLOBALS.SCENE_FPS)
-
     $("#ui").css("display", "block");
     $(".img").removeClass("image");
     $("#mobile-controls").css("display", "none");
@@ -225,16 +223,11 @@ $("body").on('click', '#back-editor', function () {
     }
     GLOBALS.PORTALS = [null, null];
 
-    console.log(GLOBALS.MAIN_CAMERA.position)
     GLOBALS.MAIN_CAMERA.position.set(-12.2, 17.4, 26.3)
 
     GLOBALS.LIGHT_PORTAL_0.visible = false;
     GLOBALS.LIGHT_PORTAL_1.visible = false;
     GLOBALS.FLASH.visible = false;
-
-    //GLOBALS.CANNON_BODIES
-
-    console.log(GLOBALS.CANNON_BODIES)
 
     for (var i = GLOBALS.CANNON_BODIES.length - 1; i >= 0; i--) {
         GLOBALS.CANNON_WORLD.remove(GLOBALS.CANNON_BODIES[i]);
@@ -243,7 +236,6 @@ $("body").on('click', '#back-editor', function () {
     for (var i = 0; i < GLOBALS.RADIO_MUSIC.length; i++) {
         GLOBALS.RADIO_MUSIC[i].stop();
     }
-
 
     GLOBALS.CANNON_BODIES = [];
     GLOBALS.RADIO_MUSIC = [];
@@ -320,4 +312,3 @@ if (localStorage.getItem("vol-val-range")){
     //volume(localStorage.getItem("vol-val-range"));
 
 allowUpdate = true;
-console.log(localStorage);

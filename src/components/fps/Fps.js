@@ -257,7 +257,7 @@ function player() {
 
                     GLOBALS.PLAYER.inJump = (contactNormal.dot(upVector) <= 0.5);
 
-                    if(!GLOBALS.PLAYER.inJump){
+                    if (!GLOBALS.PLAYER.inJump) {
                         window.PLAYER_JUMPING_FROM_BLUE_GEL = false;
                     }
 
@@ -267,6 +267,22 @@ function player() {
         }
 
         moving = GLOBALS.PLAYER.inJump;
+
+        /*if(GLOBALS.PLAYER.inJump && !audioFallingPlayed){
+
+            timeFalling++;
+
+            if(timeFalling > 70){
+                audioFallingPlayed = true;
+                AUDIO.FALLING.pause();
+                AUDIO.FALLING.currentTime = 0;
+                AUDIO.FALLING.play();
+            }
+        }else if(!GLOBALS.PLAYER.inJump && audioFallingPlayed){
+            audioFallingPlayed = false;
+            timeFalling = 0;
+            AUDIO.FALLING.pause();
+        }*/
     })
 
     GLOBALS.DYNAMIC_OBJECTS.push(GLOBALS.PLAYER);
@@ -276,6 +292,9 @@ function player() {
         d.collisionFilterMask = GLOBALS.CGROUP_ALL
     }
 }
+
+var audioFallingPlayed = true;
+var timeFalling = 0;
 
 document.addEventListener('keydown', (event) => {
 
@@ -324,9 +343,10 @@ $("body").on('click', '#settings-close', function () {
         if (!GLOBALS.DOOR_OPEN_STATE) {
             GLOBALS.DOOR_OPEN_STATE = true;
 
-            console.log(GLOBALS.ENTER_DOOR)
-
             setTimeout(() => {
+                AUDIO.DOOR_MOVE.pause();
+                AUDIO.DOOR_MOVE.currentTime = 0;
+                AUDIO.DOOR_MOVE.play();
                 tweenCamera(500, GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_right_05").rotation, new THREE.Vector3(Math.PI,
                     GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_right_05").rotation.y,
                     GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_right_05").rotation.z))
@@ -369,6 +389,7 @@ function controlsLock() {
 
     GLOBALS.POINTER_CONTROLS.addEventListener('lock', function () {
         AUDIO.AMBIENT.play();
+        AUDIO.PORTAL_GUN_LOOP.play();
         document.getElementById('blocker').style.display = 'none';
         GLOBALS.PAUSED = false;
 
@@ -378,6 +399,7 @@ function controlsLock() {
     });
 
     GLOBALS.POINTER_CONTROLS.addEventListener('unlock', function () {
+        AUDIO.PORTAL_GUN_LOOP.pause();
         $("#container").css("filter", "blur(2px)")
         document.getElementById('blocker').style.display = 'block';
         GLOBALS.ALLOW_PLACE_PORTALS = false;
@@ -607,14 +629,14 @@ const updatePlayer = function (deltaTime) {
             shouldJump = false;
             // handle jumping when space bar is pressed
 
-            if(!controller["Space"].pressed){
+            if (!controller["Space"].pressed) {
                 jumpPressed = false;
             }
 
             if (controllerIndex !== null) {
                 if (gamepad.buttons[0].value > 0 && !GLOBALS.PLAYER.inJump)
                     shouldJump = true;
-            } else if (controller["Space"].pressed && !GLOBALS.PLAYER.inJump){
+            } else if (controller["Space"].pressed && !GLOBALS.PLAYER.inJump) {
                 shouldJump = true;
             }
 
@@ -636,7 +658,7 @@ var jumpPressed = false;
 
 const updateCamera = function (deltaTime) {
 
-    if(window.CAMERA_ROTATING){
+    if (window.CAMERA_ROTATING) {
         GLOBALS.MAIN_CAMERA.quaternion.slerp(window.q, 0.1);
     }
 
@@ -673,7 +695,7 @@ const updateCamera = function (deltaTime) {
         GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE)
     }
 
-    if(GLOBALS.OBJ_HOLDED_CLONE){
+    if (GLOBALS.OBJ_HOLDED_CLONE) {
         GLOBALS.OBJ_HOLDED_CLONE.position.copy(GLOBALS.CURRENT_ITEM.body.position)
         GLOBALS.OBJ_HOLDED_CLONE.quaternion.copy(GLOBALS.CURRENT_ITEM.body.quaternion)
     }

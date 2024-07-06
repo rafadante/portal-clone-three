@@ -110,10 +110,6 @@ function init() {
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.ITEMS_ADDED);
     GLOBALS.ROOM.add(GLOBALS.CUBES);
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.ITEM_CUBE);
-
-    console.log(GLOBALS.ROOM)
-
-    console.log(GLOBALS.SCENE)
     // CAMERA
     GLOBALS.SCENE.add(GLOBALS.MAIN_CAMERA);
     //LIGHT GROUP
@@ -194,7 +190,13 @@ function onDocumentMouseUp(event) {
         }
 
         GLOBALS.ITEM_HOLDED_NAME = null;
+        GLOBALS.DRAGGED_ITEM_ELEMENT = null;
         $("#follow").css("display", "none");
+
+        if(GLOBALS.DRAGGING){
+            GLOBALS.SELECTED_ID = [];
+            GLOBALS.DRAGGING = false;
+        }
 
         if (GLOBALS.SELECTED) {
             if (!GLOBALS.SELECTED.userData.hasItem)
@@ -319,12 +321,9 @@ function render(time) {
     animateShader();
     renderGoo();
     updatePhysics();
-    //updateGels();
     updateCamera(time);
     updateEvents();
     TWEEN.update();
-
-
     animatePortal();
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {
@@ -348,7 +347,6 @@ function render(time) {
     GLOBALS.RENDERER.localClippingEnabled = false
     GLOBALS.RENDERER.clippingPlanes = []
     GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
-
     GLOBALS.STATS.end();
 }
 
@@ -369,8 +367,8 @@ function animatePortal() {
         GLOBALS.PLAYER_MODEL_CLONE.visible = false;
     }
 
-    //const currentShadowAutoUpdate = GLOBALS.RENDERER.shadowMap.autoUpdate;
-    //GLOBALS.RENDERER.shadowMap.autoUpdate = false;
+    const currentShadowAutoUpdate = GLOBALS.RENDERER.shadowMap.autoUpdate;
+    GLOBALS.RENDERER.shadowMap.autoUpdate = false;
     currentRenderTarget = GLOBALS.RENDERER.getRenderTarget();
     GLOBALS.RENDERER.xr.enabled = false;
 
@@ -452,36 +450,14 @@ function animatePortal() {
         GLOBALS.PORTALS[1].mesh.visible = true
     }
 
-    //GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
+    GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
 }
-
-var waitToActivateToneForPortalTexture = true;
-var renderSecondPortal = false;
 
 // Render loop
 function renderPortal2(thisIndex, pairIndex) {
 
     if (GLOBALS.PORTALS[thisIndex] === null || GLOBALS.PORTALS[pairIndex] === null)
         return
-    /*else{
-        if(waitToActivateToneForPortalTexture){
-            waitToActivateToneForPortalTexture = false;
-            setTimeout(() => {
-                GLOBALS.PORTALS[0].mesh.material.uniforms.tone.value = true;
-                setTimeout(() => {
-                    GLOBALS.PORTALS[1].mesh.material.uniforms.tone.value = true;
-                    window.portalTone = true;
-                }, 2500);
-            }, 2500);
-
-            setTimeout(() => {
-                renderSecondPortal = true;
-            }, 500);
-        }
-    }
-
-    if(thisIndex == 1 && !renderSecondPortal)
-        return;*/
 
     let portalCamera = GLOBALS.MAIN_CAMERA.clone()
 
@@ -499,10 +475,10 @@ function renderPortal2(thisIndex, pairIndex) {
     GLOBALS.PORTALS[thisIndex].mesh.material.stencilWrite = true
     GLOBALS.RENDERER.clearStencil()
     GLOBALS.RENDERER.setRenderTarget(null)
-    GLOBALS.RENDERER.render(GLOBALS.PORTALS[pairIndex].mesh, GLOBALS.MAIN_CAMERA)
+    //GLOBALS.RENDERER.render(GLOBALS.PORTALS[pairIndex].mesh, GLOBALS.MAIN_CAMERA)
 
     let shouldRender = new Array(GLOBALS.PORTAL_RECURSION_LEVELS + 1)
-    shouldRender[0] = portalIsVisibleInCamera(GLOBALS.MAIN_CAMERA, GLOBALS.PORTALS[thisIndex], null)
+    shouldRender[0] = portalIsVisibleInCamera(portalCamera, GLOBALS.PORTALS[thisIndex], null)
     for (let i = 0; i < GLOBALS.PORTAL_RECURSION_LEVELS; i++) {
         shouldRender[i + 1] = portalIsVisibleInCamera(portalCamera, GLOBALS.PORTALS[thisIndex], GLOBALS.PORTALS[pairIndex].plane) && shouldRender[i]
         //shouldRender[i + 1] = shouldRender[i]

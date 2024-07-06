@@ -33,8 +33,6 @@ const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.inner
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 
-console.log(camera)
-
 //POINT OF OBJECTS WHILE HOLDING WITH THE GUN
 const cubeHolder = new THREE.Object3D()
 cubeHolder.position.z = -1.25;
@@ -440,7 +438,10 @@ var GLOBALS = {
     CANNON_BODIES: [],
     LEVEL_ENTERED: false,
     DOOR_OPEN_STATE: false,
-    AMBIENT_AUDIO: null
+    AMBIENT_AUDIO: null,
+    PORTAL_AUDIO: [],
+    DRAGGING: false,
+    DRAGGED_ITEM_ELEMENT: null
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)

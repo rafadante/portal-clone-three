@@ -9,6 +9,7 @@ import { GLOBALS } from "../../Globals.js";
 import { exitRoomCollider, corridorColliderNames } from "../test/Test.js";
 import { removeJointConstraint } from "../../Physics.js";
 import { func } from "three/examples/jsm/nodes/Nodes.js";
+import { AUDIO } from '../audio/Audio.js';
 
 var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
@@ -739,9 +740,11 @@ function portalCollision() {
   }
 
   for (let d of GLOBALS.DYNAMIC_OBJECTS) {
+
     let pos = new THREE.Vector3(d.position.x, d.position.y, d.position.z);
 
     d.collisionFilterMask = GLOBALS.CGROUP_ALL;
+
     if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null) continue;
 
     var inArea = 0;
@@ -757,12 +760,6 @@ function portalCollision() {
         if (d.name != "player") {
           //console.log("999999999999")
           d.wakeUp();
-        }
-
-        if ((d.name == "gel" || d.name == "gel-orange") && !d.disabled) {
-          d.disabled = true;
-          GLOBALS.CANNON_WORLD.removeBody(d);
-          //d.position.y = d.posMinus;
         }
 
         d.collisionFilterMask &=
@@ -794,21 +791,23 @@ function portalCollision() {
 
       // should teleport
       if (GLOBALS.PORTALS[p].STBB.containsPoint(pos)) {
-        if (d.name != "player") {
-          //d.allowSleep = false;
-          //console.log("777777777777")
-        }
-
-        //GLOBALS.CURRENT_ITEM.body.holding
 
         if (d.holding) {
-          //console.log("1111111111111")
           d.teleportingHolding = true;
-          //d.portal = p;
         } else {
           teleportPhysicalObject(d, GLOBALS.PORTALS[p]);
 
           if (dd == 0) {
+
+            AUDIO.PORTAL_ENTER.pause();
+            AUDIO.PORTAL_ENTER.currentTime = 0;
+            AUDIO.PORTAL_ENTER.play();
+
+            //setTimeout(() => {
+              AUDIO.PORTAL_EXIT.pause();
+              AUDIO.PORTAL_EXIT.currentTime = 0;
+              AUDIO.PORTAL_EXIT.play();
+            //}, 100);
 
             GLOBALS.PLAYER_MODEL.visible = false
             GLOBALS.PLAYER_MODEL_CLONE.visible = false;
@@ -907,13 +906,16 @@ function levelEnteredFunction() {
         }, 1000);
       }, 1000);
 
-      closeDoor(500,1000,2000)
+      closeDoor(500, 1000, 2000)
     }
   }
 }
 
-function closeDoor(a,b,c){
+function closeDoor(a, b, c) {
   setTimeout(() => {
+    AUDIO.DOOR_MOVE.pause();
+    AUDIO.DOOR_MOVE.currentTime = 0;
+    AUDIO.DOOR_MOVE.play();
     GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").position.z =
       -4;
     tweenCamera(
@@ -981,7 +983,7 @@ function closeDoor(a,b,c){
           GLOBALS.EXIT_DOOR.add(GLOBALS.CORRIDOR_ENTER);
           corridorColliderNames(false);
         }, a);
-      }else{
+      } else {
         GLOBALS.CORRIDOR_ENTER.visible = false;
         GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
       }
@@ -989,4 +991,4 @@ function closeDoor(a,b,c){
   }, c);
 }
 
-export { updateEvents,closeDoor };
+export { updateEvents, closeDoor };
