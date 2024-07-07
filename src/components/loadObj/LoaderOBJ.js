@@ -182,7 +182,11 @@ function loadWindowManager(scene) {
     scene.name = "OBSERVATION_ROOM";
     GLOBALS.SCENE_CHILDREN.add(scene);
 
+    GLOBALS.SPOTLIGHT.target = scene.getObjectByName("lightTarget");
+    console.log(scene.getObjectByName("lightTarget"))
+
     GLOBALS.OBSERVATION_ROOM = scene;
+    GLOBALS.OBSERVATION_ROOM.add(GLOBALS.LIGHT_GROUP);
     loadGun();
 }
 
@@ -193,6 +197,7 @@ function loadGun() {
 function loadGunManager(scene) {
 
     GLOBALS.GUN = new THREE.Group();
+    console.log(GLOBALS.GUN)
     GLOBALS.GUN.visible = false;
 
     var newGroup = new THREE.Group();
@@ -263,17 +268,17 @@ function loadGunManager(scene) {
     var target = new THREE.Vector3(); // create once an reuse it
     cube_1.getWorldPosition(target);
     sphere1.position.copy(target)
-    GLOBALS.GUN.add(sphere1)
+    GLOBALS.GUN.children[0].children[0].add(sphere1)
 
     var target = new THREE.Vector3(); // create once an reuse it
     cube_2.getWorldPosition(target);
     sphere2.position.copy(target)
-    GLOBALS.GUN.add(sphere2)
+    GLOBALS.GUN.children[0].children[0].add(sphere2)
 
     var target = new THREE.Vector3(); // create once an reuse it
     cube_3.getWorldPosition(target);
     sphere3.position.copy(target)
-    GLOBALS.GUN.add(sphere3)
+    GLOBALS.GUN.children[0].children[0].add(sphere3)
 }
 
 function loadDoor() {

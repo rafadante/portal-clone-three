@@ -406,6 +406,7 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
                 floor: floor,
                 walls: walls,
                 ceiling: ceiling,
+                isInstanced: false
             }
 
             GLOBALS.BUDGET -= 1;

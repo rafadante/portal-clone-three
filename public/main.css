@@ -825,7 +825,7 @@ input[type=range]::-webkit-slider-runnable-track {
 	-webkit-tap-highlight-color: transparent;
 }
 
-#camera {
+#camera2 {
 	width: 50%;
 	height: 100%;
 	position: absolute;

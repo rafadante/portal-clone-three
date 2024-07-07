@@ -58,19 +58,23 @@
       <div class="body">
         <div id="items">
           <img data-content="Can be linked to an object to form a trigger. This button only accepts spheres."
-            data-title="BUTTON SPHERE" class="item" data-name="button_circle"
+            data-title="BUTTON SPHERE" class="item" data-name="button_circle"  id="button_circle"
+            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true"
             src="../assets/ui/items/button_sphere.png" />
 
           <img data-content="Can be linked to an object to form a trigger. This button only accepts cubes."
-            data-title="BUTTON CUBE" class="item" data-name="button_box" src="../assets/ui/items/button_cube.png" />
+            data-title="BUTTON CUBE" class="item" data-name="button_box" src="../assets/ui/items/button_cube.png" 
+            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="button_box"/>
 
           <img data-content="Can be linked to an object to form a trigger. This button accepts spheres and cubes."
-            data-title="BUTTON WEIGHT" class="item" data-name="button_weight" src="../assets/ui/items/button.png" />
+            data-title="BUTTON WEIGHT" class="item" data-name="button_weight" src="../assets/ui/items/button.png" 
+            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="button_weight"/>
 
           <img
             data-content="Can be linked to an object to form a trigger. The player can click on the button and it will activate the function that it is connected to. You can add a timer to your button through the properties menu."
             data-title="PEDESTAL BUTTON" class="item" data-name="pedestal_button"
-            src="../assets/ui/items/pedestal_button.png" />
+            src="../assets/ui/items/pedestal_button.png" 
+            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="pedestal_button"/>
 
           <!--<img
             data-content="Once the laser emitter hits the catcher you can have it trigger a function such as opening a door, or enabling a set of stairs."
@@ -106,17 +110,21 @@
 
           <img
             data-content="A dropper will come with it. If the player loses the cube the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
-            data-title="CUBE" class="item" data-name="cube" src="../assets/ui/items/cube_blue.png" />
+            data-title="CUBE" class="item" data-name="cube" src="../assets/ui/items/cube_blue.png" 
+            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="cube"/>
 
           <img
             data-content="A dropper will come with it. If the player loses the sphere the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
-            data-title="SPHERE" class="item" data-name="sphere" src="../assets/ui/items/sphere.png" />
+            data-title="SPHERE" class="item" data-name="sphere" src="../assets/ui/items/sphere.png" 
+            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="sphere"/>
 
           <img data-content="Purely cosmetic, it will play a radio music." data-title="RADIO" class="item"
-            data-name="radio" src="../assets/ui/items/radio.png" />
+            data-name="radio" src="../assets/ui/items/radio.png" 
+            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="radio"/>
 
           <img data-content="Purely cosmetic, it will look at the player." data-title="CAMERA" class="item"
-            data-name="camera" src="../assets/ui/items/camera.png" />
+            data-name="camera" src="../assets/ui/items/camera.png" 
+            data-rotate="false" data-floor="false" data-ceiling="false" data-walls="true" data-instanced="false" id="camera"/>
 
           <!--<img
             data-content="Whenever the player walks through a Tractor Beam they will float through the beam it emits. The blue beam pushes the player forward, away from the receptacle, and the orange beam pulls the player in towards it. The properties menu allows you to start the beam in reversed mode or completely off."
@@ -171,14 +179,16 @@
 
           <img
             data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
-            data-title="LIGHT TOP" class="item" data-name="light" src="../assets/ui/items/light.png" />
+            data-title="LIGHT TOP" class="item" data-name="light" src="../assets/ui/items/light.png" 
+            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" id="light"/>
 
           <!--<img
             data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
             data-title="LIGHT STRIPS" class="item" data-name="stripe" src="../assets/ui/items/stripe.png" />-->
 
           <img data-content="You can link a trigger to it to open the door." data-title="DOOR" class="item"
-            data-name="door" src="../assets/ui/items/door.png" />
+            data-name="door" src="../assets/ui/items/door.png" 
+            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="false" id="door"/>
 
           <!--<img
             data-content="You can place automatic portals on the scene, it can be static or activated by a trigger. You can choose which portal color on the level editor. If the player has a portal gun and shoots a portal with the same color as the automatic portal, the automatic portal will be destroyed and vice versa."
@@ -748,7 +758,7 @@
     transform: rotate(88deg);
     filter: drop-shadow(2px 4px 6px black);
     opacity: 0.8;" id="portal_r" src="./assets/ui/mobile/portalBlue2.png" />
-    <div id="camera"></div>
+    <div id="camera2"></div>
   </div>
 
   <div id="death-screen" style="width: 100%;

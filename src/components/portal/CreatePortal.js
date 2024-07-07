@@ -63,14 +63,14 @@ function portalButton(button) {
                 tweenCamera(300, GLOBALS.FLASH.position, new THREE.Vector3(x, y, z));
 
                 allowPortal = false;
-                tweenCamera(100, GLOBALS.GUN.children[0].position, new THREE.Vector3(GLOBALS.GUN.children[0].position.x,
+                tweenCamera(150, GLOBALS.GUN.children[0].position, new THREE.Vector3(GLOBALS.GUN.children[0].position.x,
                     GLOBALS.GUN.children[0].position.y,
                     0.005));
                 setTimeout(() => {
-                    tweenCamera(100, GLOBALS.GUN.children[0].position, new THREE.Vector3(GLOBALS.GUN.children[0].position.x,
+                    tweenCamera(150, GLOBALS.GUN.children[0].position, new THREE.Vector3(GLOBALS.GUN.children[0].position.x,
                         GLOBALS.GUN.children[0].position.y,
                         0));
-                }, 100);
+                }, 150);
             }
 
             setTimeout(() => {
@@ -81,7 +81,9 @@ function portalButton(button) {
 
             if (GLOBALS.GUN_MODE == 1) {
 
-                if (userData.portal) {
+                console.log(userData)
+
+                if (userData.portal && (!userData.hasItem || userData.itemName.includes("camera"))) {
                     const point = new THREE.Vector3(x, y, z);
                     // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                     // define playerUpDirection
@@ -150,8 +152,6 @@ function portalButton(button) {
 
                     for (let p of portalPoints)
                         validPortalPoint(p, normal, intersects[0].object);
-
-                    console.log(pointsChecked)
 
                     if (userData.side == "up" || userData.side == "down") {
                         if (pointsChecked[1].length == 0 || pointsChecked[1].length == 0 ||

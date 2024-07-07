@@ -10,11 +10,11 @@ const Lights = function (THREE) {
 
     var spotLight = new THREE.SpotLight(0xffffff, 20);
     spotLight.name = "spotLightMain";
-    spotLight.position.set(22, 7.5, 6);
-    spotLight.angle = Math.PI / 2.25;
+    spotLight.position.set(-1, 0, -2);
+    spotLight.angle = Math.PI / 3;
     spotLight.penumbra = 1;
     spotLight.decay = 1; //2
-    spotLight.distance = 20000;
+    spotLight.distance = 0;
 
     spotLight.castShadow = true;
 
@@ -35,9 +35,6 @@ const Lights = function (THREE) {
     GLOBALS.SPOTLIGHT = spotLight;
 
     lightGroup.add(spotLight);
-
-    var lightHelper = new THREE.SpotLightHelper(spotLight);
-    //lightGroup.add(lightHelper);
 
     return lightGroup;
 };

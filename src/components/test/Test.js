@@ -134,7 +134,7 @@ function viewFPS() {
 
         //GLOBALS.SCENE.add(cube);
         cube.position.copy(p);
-        cube.rotation.copy(r);
+        cube.quaternion.copy(r);
 
         var bb = new THREE.Box3(); // for re-use
         bb.setFromObject(cube);
@@ -225,13 +225,7 @@ function viewFPS() {
         //--------------------------------------------------------------------------
         GLOBALS.OBSERVATION_ROOM.position.copy(GLOBALS.OBSERVATION_ROOM_IMG.position);
         GLOBALS.OBSERVATION_ROOM.rotation.copy(GLOBALS.OBSERVATION_ROOM_IMG.rotation);
-        //---------------------------------------------------------
-        var target = new THREE.Vector3(); // create once an reuse it
-        GLOBALS.OBSERVATION_ROOM.getObjectByName("room_light").getWorldPosition(target);
-
-        GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").position.copy(target);
-        GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").translateY(-1);
-        GLOBALS.LIGHT_GROUP.getObjectByName("spotLightMain").translateX(-0.5);
+        //--------------------------------------------------------------------------
 
         GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE);
         GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE2);
@@ -459,8 +453,6 @@ function viewFPS() {
         GLOBALS.FLASH.visible = false;
     }, 500);
 };
-
-
 
 function addColliderItem(items, type, mass, offset) {
 
@@ -731,6 +723,7 @@ function createInstances(meshes, material) {
     var leftWindowObsRoom = new THREE.Object3D();
     leftWindowObsRoom.position.copy(GLOBALS.OBSERVATION_ROOM_IMG.position);
     leftWindowObsRoom.rotation.copy(GLOBALS.OBSERVATION_ROOM_IMG.rotation);
+    GLOBALS.SCENE.add(leftWindowObsRoom)
     leftWindowObsRoom.translateX(-2);
 
     for (var i = 0; i < meshes.length; i++) {
@@ -738,11 +731,12 @@ function createInstances(meshes, material) {
         var dummy = new THREE.Object3D();
 
         if (meshes[i].itemName == "window" || (
-            meshes[i].position.x == leftWindowObsRoom.position.x &&
-            meshes[i].position.y == leftWindowObsRoom.position.y &&
-            meshes[i].position.z == leftWindowObsRoom.position.z
+            meshes[i].position.x == Math.round(leftWindowObsRoom.position.x) &&
+            meshes[i].position.y == Math.round(leftWindowObsRoom.position.y) &&
+            meshes[i].position.z == Math.round(leftWindowObsRoom.position.z)
         )){
             dummy.scale.set(0, 0, 0);
+            meshes[i].portal = false;
         }
             
 
@@ -753,30 +747,25 @@ function createInstances(meshes, material) {
 
         mesh.setMatrixAt(i, dummy.matrix);
     }
+
+    GLOBALS.SCENE.remove(leftWindowObsRoom)
 }
 
 var corridor_colliders = [];
 
 function corridorColliderNames(first) {
 
-    if (!first) {
-        for (var i = 0; i < corridor_colliders.length; i++) {
-            //GLOBALS.CANNON_WORLD.removeBody(corridor_colliders[i])
-        }
 
-        corridor_colliders = [];
-    } else {
-        corridorCollider(GLOBALS.CORRIDOR_ENTER, "back", 1.5, 1.5, 0.001, true);
-    }
 
+    corridorCollider(GLOBALS.CORRIDOR_ENTER, "back", 1.5, 1.5, 0.001, true);
     corridorCollider(GLOBALS.CORRIDOR_ENTER, "down", 1, 0.001, 3.5, false);
     corridorCollider(GLOBALS.CORRIDOR_ENTER, "up", 1, 0.001, 3.5, false);
     corridorCollider(GLOBALS.CORRIDOR_ENTER, "left", 0.001, 1, 3.5, false);
     corridorCollider(GLOBALS.CORRIDOR_ENTER, "right", 0.001, 1, 3.5, false);
     corridorCollider(GLOBALS.CORRIDOR_ENTER, "front", 1, 1, 0.001, false);
 
-    if (!first)
-        GLOBALS.WALL_CORRIDOR_ENTER.position.copy(GLOBALS.ENTER_DOOR.position);
+    //if (!first)
+    //    GLOBALS.WALL_CORRIDOR_ENTER.position.copy(GLOBALS.ENTER_DOOR.position);
 }
 
 function corridorCollider(parent, name, x, y, z, state) {
@@ -813,8 +802,10 @@ function corridorCollider(parent, name, x, y, z, state) {
     GLOBALS.CANNON_WORLD.addBody(wall);
     GLOBALS.CANNON_BODIES.push(wall)
 
-    if (name == "front")
+    if (name == "front"){
         GLOBALS.WALL_CORRIDOR_ENTER = wall;
+        console.log(wall)
+    }
 
     corridor_colliders.push(wall)
 }

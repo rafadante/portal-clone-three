@@ -15,6 +15,7 @@ import {
 } from '../../Physics.js';
 import { findPath } from '../findPath/FindPath.js';
 import { AUDIO } from '../audio/Audio.js';
+import { floor, func } from 'three/examples/jsm/nodes/Nodes.js';
 
 var beamType;
 let lineFollow;
@@ -30,10 +31,7 @@ const materialLine = new THREE.LineBasicMaterial({
 
 $("body").on('pointerdown', '.item', function (event) {
     event.preventDefault();
-    GLOBALS.ITEM_HOLDED_NAME = $(this).data("name");
-    beamType = $(this).data("beam");
-    $("#follow").attr("src", $(this).attr("src"));
-    GLOBALS.DRAGGED_ITEM_ELEMENT = $(this);
+    clickItem($(this))
 });
 
 $("body").on('pointerdown', '.dispenser-once', function (event) {
@@ -50,6 +48,9 @@ $("body").on('pointerdown', '.dispenser-always', function (event) {
 });
 
 function addItem(found, loaded) {
+
+    if (!GLOBALS.ITEM_CUBE.place)
+        return
 
 
     if (GLOBALS.ITEM_HOLDED_NAME == "goo") {
@@ -112,8 +113,6 @@ function addItem(found, loaded) {
                 return;
             }
 
-            console.log(GLOBALS.ITEMS_COUNT)
-
             /*userData.hasItem = true;
             userData.itemName = GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount;
             userData.item = item;
@@ -129,13 +128,13 @@ function addItem(found, loaded) {
                 GLOBALS.DRAGGED_ITEM_ELEMENT.data('rotate'),
                 GLOBALS.DRAGGED_ITEM_ELEMENT.data('floor'),
                 GLOBALS.DRAGGED_ITEM_ELEMENT.data('ceiling'),
-                GLOBALS.DRAGGED_ITEM_ELEMENT.data('walls')
+                GLOBALS.DRAGGED_ITEM_ELEMENT.data('walls'),
+                GLOBALS.DRAGGED_ITEM_ELEMENT.data('instanced'),
+                GLOBALS.ITEM_HOLDED_NAME,
             );
 
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
                 var target = new THREE.Vector3(); // create once an reuse it
-
-                console.log(found)
 
                 if (loaded)
                     target = found.position;
@@ -264,7 +263,6 @@ function addItem(found, loaded) {
 
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
 
-                console.log(item)
                 item.translateY(1)
                 item.translateZ(0.3)
 
@@ -291,8 +289,6 @@ function addItem(found, loaded) {
 
                 GLOBALS.CAMERAS.push(item);
                 GLOBALS.ITEMS_ADDED.add(item);
-
-                console.log(GLOBALS.CAMERAS)
 
             } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
                 item.translateY(0.025);
@@ -471,6 +467,19 @@ function hoverItem(found) {
 
     var userData = GLOBALS.PLANE_USER_DATA[found[0].instanceId];
 
+    if (userData.hasItem ||
+        (userData.side == "down" && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("floor")) ||
+        (userData.side == "up" && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("ceiling")) ||
+        ((userData.side == "front" || userData.side == "back" || userData.side == "left" || userData.side == "right")
+            && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("walls"))
+    ) {
+        GLOBALS.ITEM_CUBE.material.color = new THREE.Color(0xff0000)
+        GLOBALS.ITEM_CUBE.place = false;
+    } else {
+        GLOBALS.ITEM_CUBE.material.color = new THREE.Color(0x00ff00)
+        GLOBALS.ITEM_CUBE.place = true;
+    }
+
     GLOBALS.ITEM_CUBE.position.copy(userData.position);
     GLOBALS.ITEM_CUBE.visible = true;
 }
@@ -480,6 +489,7 @@ var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
 
 function interactWithItem() {
+
     raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
     var intersects = raycaster2.intersectObjects(GLOBALS.INTERACTIVE);
 
@@ -630,7 +640,7 @@ function revert(d) {
     }
 }
 
-function planeInstanceReset(planeInstance, hasItem, itemName, item, state, canRotate, floor, ceiling, walls) {
+function planeInstanceReset(planeInstance, hasItem, itemName, item, state, canRotate, floor, ceiling, walls, isInstanced, instancedName) {
     planeInstance.hasItem = hasItem;
     planeInstance.itemName = itemName;
     planeInstance.item = item;
@@ -639,11 +649,47 @@ function planeInstanceReset(planeInstance, hasItem, itemName, item, state, canRo
     planeInstance.floor = floor;
     planeInstance.ceiling = ceiling;
     planeInstance.walls = walls;
+    planeInstance.isInstanced = isInstanced;
+    planeInstance.instancedName = instancedName;
+}
+
+function deleteItemInstanced(item, moving) {
+    GLOBALS.ITEMS_COUNT[item.instancedName]["count"] -= 1;
+    var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(item.instancedName);
+    var dummy = new THREE.Object3D();
+    dummy.scale.set(0, 0, 0);
+    dummy.updateMatrix();
+    instanced.setMatrixAt(item.item.userData.id, dummy.matrix);
+    instanced.instanceMatrix.needsUpdate = true;
+
+    if (item.instancedName == "cube" || item.instancedName == "sphere") {
+        console.log(item.item.dispenserID)
+        var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
+        var dummy = new THREE.Object3D();
+        dummy.scale.set(0, 0, 0);
+        dummy.updateMatrix();
+        instanced.setMatrixAt(item.item.dispenserID, dummy.matrix);
+        instanced.instanceMatrix.needsUpdate = true;
+        GLOBALS.DYMANIC_ITEMS["dispenser"][item.item.dispenserID] = [];
+    }
+
+    GLOBALS.DYMANIC_ITEMS[item.instancedName][item.item.userData.id] = [];
+
+    if (moving)
+        clickItem($("#" + item.instancedName));
+}
+
+function clickItem(elem) {
+    GLOBALS.ITEM_HOLDED_NAME = elem.data("name");
+    beamType = elem.data("beam");
+    $("#follow").attr("src", elem.attr("src"));
+    GLOBALS.DRAGGED_ITEM_ELEMENT = elem;
 }
 
 export {
     addItem,
     hoverItem,
     interactWithItem,
-    planeInstanceReset
+    planeInstanceReset,
+    deleteItemInstanced
 };

@@ -115,7 +115,7 @@ function init() {
     //LIGHT GROUP
     GLOBALS.LIGHT_GROUP = new Lights(THREE);
     GLOBALS.LIGHT_GROUP.name = "LIGHT_GROUP";
-    GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_GROUP);
+    //GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_GROUP);
     //HDR
     pmremGenerator = new THREE.PMREMGenerator(GLOBALS.RENDERER);
     const environment = new RoomEnvironment(GLOBALS.RENDERER);
@@ -367,8 +367,8 @@ function animatePortal() {
         GLOBALS.PLAYER_MODEL_CLONE.visible = false;
     }
 
-    const currentShadowAutoUpdate = GLOBALS.RENDERER.shadowMap.autoUpdate;
-    GLOBALS.RENDERER.shadowMap.autoUpdate = false;
+    //const currentShadowAutoUpdate = GLOBALS.RENDERER.shadowMap.autoUpdate;
+    //GLOBALS.RENDERER.shadowMap.autoUpdate = false;
     currentRenderTarget = GLOBALS.RENDERER.getRenderTarget();
     GLOBALS.RENDERER.xr.enabled = false;
 
@@ -450,7 +450,7 @@ function animatePortal() {
         GLOBALS.PORTALS[1].mesh.visible = true
     }
 
-    GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
+    //GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
 }
 
 // Render loop
