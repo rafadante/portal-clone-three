@@ -193,7 +193,7 @@ function onDocumentMouseUp(event) {
         GLOBALS.DRAGGED_ITEM_ELEMENT = null;
         $("#follow").css("display", "none");
 
-        if(GLOBALS.DRAGGING){
+        if (GLOBALS.DRAGGING) {
             GLOBALS.SELECTED_ID = [];
             GLOBALS.DRAGGING = false;
         }
@@ -251,8 +251,11 @@ function raycastManager(event, type) {
                     top: event.pageY - 25
                 });
 
-                hoverItem(intersection);
+                hoverItem(intersection, false);
             }
+        } else {
+            if (type == "down")
+                document.querySelector('.menu').classList.remove('menu-show');
         }
     }
 }
@@ -299,8 +302,10 @@ function fixedUpdate() { //60 fps always for physics
     }
 
     const deltaTime = clock2.getDelta();
-    if (fps > 15)//IF FPS IS LOWER THAN 15, AVOID THE PLAYER TO CONTROL THE CHARACTER TO AVOID PHYSICS ERRORS
+    if (fps > 15) {//IF FPS IS LOWER THAN 15, AVOID THE PLAYER TO CONTROL THE CHARACTER TO AVOID PHYSICS ERRORS
         updatePlayer(deltaTime);
+        updateRay(deltaTime);
+    }
 
     if (Date.now() >= timeTarget && !GLOBALS.STOP_TIME) {
 
@@ -317,7 +322,6 @@ function render(time) {
 
     GLOBALS.STATS.begin();
     fixedUpdate();
-    updateRay();
     animateShader();
     renderGoo();
     updatePhysics();
@@ -377,7 +381,7 @@ function animatePortal() {
 
     let cloneItemHolded = false;
 
-    if (GLOBALS.OBJ_HOLDED_CLONE){
+    if (GLOBALS.OBJ_HOLDED_CLONE) {
         cloneItemHolded = GLOBALS.OBJ_HOLDED_CLONE.visible;
         GLOBALS.OBJ_HOLDED_CLONE.visible = true;
     }

@@ -146,6 +146,27 @@ function trasnlatePlane(id, val, portal) {
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
 
+        if (GLOBALS.PLANE_USER_DATA[id].hasItem) {
+            console.log(GLOBALS.PLANE_USER_DATA[id]);
+
+            var plane = GLOBALS.PLANE_USER_DATA[id];
+
+            if (GLOBALS.PLANE_USER_DATA[id].isInstanced) {
+                var item = new THREE.Object3D();
+                item.position.copy(plane.position);
+                item.rotation.copy(plane.item.rotation);
+
+                if (plane.instancedName == "cube" || plane.instancedName == "sphere") {
+                    item.translateY(1);
+                }
+
+                item.updateMatrix();
+                GLOBALS.ITEMS_ADDED.getObjectByName(plane.instancedName).setMatrixAt(plane.item.userData.id, item.matrix);
+                GLOBALS.ITEMS_ADDED.getObjectByName(plane.instancedName).instanceMatrix.needsUpdate = true;
+            } else {
+                plane.item.position.copy(plane.position);
+            }
+        }
     }
 }
 
@@ -368,19 +389,26 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
             var floor = false;
             var ceiling = false;
             var walls = false;
+            var item = null;
+            var allowconnection = false;
 
             if (clone.position.equals(new THREE.Vector3(3, 1, 12))) {
                 hasItem = true;
                 itemName = "enterDoor";
-                walls=true;
+                walls = true;
+                item = GLOBALS.ENTER_DOOR;
+                allowconnection = true;
             } else if (clone.position.equals(new THREE.Vector3(13, 1, 0))) {
                 hasItem = true;
                 itemName = "exitDoor";
-                walls=true;
+                walls = true;
+                item = GLOBALS.EXIT_DOOR;
+                allowconnection = true;
             } else if (clone.position.equals(new THREE.Vector3(16, 7, 7))) {
                 hasItem = true;
                 itemName = "window";
-                walls=true;
+                walls = true;
+                item = GLOBALS.OBSERVATION_ROOM_IMG;
             }
 
             //ADD USERDATA TO ARRAY LINKED WITH THE INSTANCED ID
@@ -406,7 +434,9 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot) {
                 floor: floor,
                 walls: walls,
                 ceiling: ceiling,
-                isInstanced: false
+                isInstanced: false,
+                item: item,
+                allowconnection: allowconnection
             }
 
             GLOBALS.BUDGET -= 1;

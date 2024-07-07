@@ -162,7 +162,12 @@ var GLOBALS = {
     MIXERS: null,
     BOX_BODY: [],
     SPHERE_BODY: [],
-    TRIGGER: [],
+    TRIGGER: {
+        button_weight: [],
+        button_box: [],
+        button_circle: [],
+        pedestal_button: [],
+    },
 
     //ITEMS
     DYMANIC_ITEMS: {
@@ -328,6 +333,10 @@ var GLOBALS = {
             count: 0,
             max: 10
         },
+        door: {
+            count: 0,
+            max: 10
+        },
         sphere: {
             count: 0,
             max: 10
@@ -441,7 +450,8 @@ var GLOBALS = {
     AMBIENT_AUDIO: null,
     PORTAL_AUDIO: [],
     DRAGGING: false,
-    DRAGGED_ITEM_ELEMENT: null
+    DRAGGED_ITEM_ELEMENT: null,
+    CURRENT_LINE: null
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)

@@ -49,8 +49,19 @@ function updateEvents() {
       }
     }
 
-    for (let trigger of GLOBALS.TRIGGER) {
-      if (trigger && d.name != "player" && !exit && !d.placed) {
+    for (const property in GLOBALS.TRIGGER) {
+      for(var i=0; i<GLOBALS.TRIGGER[property].length;i++){
+        if (GLOBALS.TRIGGER[property][i].containsPoint(pos) && GLOBALS.TRIGGER[property][i].activate.includes(d.name)) {
+          console.log("trigger")
+        }
+      }
+    }
+
+    /*iffor (let trigger of GLOBALS.TRIGGER) {
+      if (trigger.containsPoint(pos)){
+        console.log("trigger")
+      }
+       (trigger && d.name != "player" && !exit && !d.placed) {
         if (trigger.containsPoint(pos)) {
           var goal = GLOBALS.PLANE_USER_DATA[trigger.id];
           goal.circle.material.color = new THREE.Color(0xfcba03);
@@ -97,12 +108,6 @@ function updateEvents() {
 
               deletePortal(0);
               deletePortal(1);
-
-              /*setTimeout(() => {
-                                GLOBALS.CANNON_WORLD.addBody(goal.trigger.item.body);
-                                tweenCamera(1000, doorLeft.position, new THREE.Vector3(doorLeft.position.x + 1, doorLeft.position.y, doorLeft.position.z))
-                                tweenCamera(1000, doorRight.position, new THREE.Vector3(doorRight.position.x - 1, doorRight.position.y, doorRight.position.z))
-                            }, 10000);*/
             }, 1000);
           } else {
             exit = true;
@@ -184,7 +189,7 @@ function updateEvents() {
           }
         }
       }
-    }
+    }*/
   }
 }
 
@@ -749,9 +754,13 @@ function portalCollision() {
 
     var inArea = 0;
 
-    GLOBALS.PLAYER_MODEL_CLONE.visible = false;
-    GLOBALS.GUN_CLONE.visible = false;
-    GLOBALS.GUN_CLONE2.visible = false;
+
+    if(dd==0){
+      GLOBALS.PLAYER_MODEL_CLONE.visible = false;
+      GLOBALS.GUN_CLONE.visible = false;
+      GLOBALS.GUN_CLONE2.visible = false;
+    }
+    
     let CDBB_isOverlap = false;
 
     for (let p = 0; p < GLOBALS.PORTALS.length; p++) {

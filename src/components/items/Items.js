@@ -5,6 +5,7 @@ import {
     AddGoo
 } from '../goo/Goo.js';
 import {
+    animate,
     tweenCamera
 } from '../../Main.js';
 import {
@@ -16,6 +17,7 @@ import {
 import { findPath } from '../findPath/FindPath.js';
 import { AUDIO } from '../audio/Audio.js';
 import { floor, func } from 'three/examples/jsm/nodes/Nodes.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
 var beamType;
 let lineFollow;
@@ -93,8 +95,30 @@ function addItem(found, loaded) {
                     else if (child.name == "vertical")
                         GLOBALS.CAMERA_OBJ_VERTICAL.push(child)
                 })
-            } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate" || GLOBALS.ITEM_HOLDED_NAME == "door") {
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
                 var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
+
+                var item = new THREE.Group();
+
+                const geometry = new THREE.CircleGeometry(0.25, 32);
+                const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+                const circle = new THREE.Mesh(geometry, material);
+                circle.rotation.x = -Math.PI / 2;
+                circle.name = "circle_rotation";
+                item.add(circle);
+                circle.translateZ(0.01);
+
+                const door = SkeletonUtils.clone(GLOBALS.ENTER_DOOR);
+                door.position.set(0, 0, 0);
+                door.rotation.set(0, 0, 0);
+                item.add(door);
+                door.translateZ(-1);
+                door.translateY(1);
+
+                item.getObjectByName("portal_door_right_04").scale.set(1, 1, 1);
+                item.getObjectByName("portal_door_left_06").scale.set(1, 1, 1);
+                item.getObjectByName("warning").visible = false;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_blue2") {
                 GLOBALS.ITEM_HOLDED_NAME = "dispenser";
                 var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
@@ -131,6 +155,7 @@ function addItem(found, loaded) {
                 GLOBALS.DRAGGED_ITEM_ELEMENT.data('walls'),
                 GLOBALS.DRAGGED_ITEM_ELEMENT.data('instanced'),
                 GLOBALS.ITEM_HOLDED_NAME,
+                GLOBALS.DRAGGED_ITEM_ELEMENT.data('allowconnection')
             );
 
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
@@ -191,27 +216,13 @@ function addItem(found, loaded) {
 
             if (GLOBALS.ITEM_HOLDED_NAME == "button_box") {
 
-                const geometry = new THREE.BoxGeometry(1, 1, 1);
-                const material = new THREE.MeshBasicMaterial({
-                    color: 0x00ff00
-                });
-                const cube = new THREE.Mesh(geometry, material);
-                cube.position.copy(item.position)
-
-                var bb = new THREE.Box3(); // for re-use
-                bb.setFromObject(cube);
-
-                if (loaded)
-                    bb.id = found.id_instanced;
-                else
-                    bb.id = found[i].instanceId;
-
-                GLOBALS.TRIGGER.push(bb);
+                
             }
 
             if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
 
                 var idInstanced;
+                userData.dispenser = true;
 
                 for (var j = 0; j < GLOBALS.DYMANIC_ITEMS["dispenser"].length; j++) {
                     if (GLOBALS.DYMANIC_ITEMS["dispenser"][j].length == 0) {
@@ -309,6 +320,8 @@ function addItem(found, loaded) {
 
                 GLOBALS.ITEMS_ADDED.add(item);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
+                //item.rotation.copy(userData.rotation);
+                console.log(item)
                 GLOBALS.ITEMS_ADDED.add(item);
                 GLOBALS.DOORS.push(item)
             } else {
@@ -411,6 +424,7 @@ $("body").on('click', '#conection', function (event) {
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
     lineFollow = new THREE.Line(geometry, materialLine);
+    GLOBALS.CURRENT_LINE = lineFollow;
     GLOBALS.SCENE_CHILDREN.add(lineFollow);
 
     isDrawStart = true;
@@ -424,6 +438,8 @@ $("body").on('click', '#conection', function (event) {
     addPoint(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.x,
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.y,
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.z);
+
+        console.log("11111111111")
 
     //addPoint(GLOBALS.SELECTED.parent.position.x, GLOBALS.SELECTED.parent.position.y - 1, GLOBALS.SELECTED.parent.position.z);
     //addPoint(GLOBALS.SELECTED.parent.position.x, GLOBALS.SELECTED.parent.position.y - 1, GLOBALS.SELECTED.parent.position.z);
@@ -439,6 +455,9 @@ function addPoint(x, y, z) {
 
 document.body.addEventListener('mousemove', onPointerMove);
 
+var raycaster = new THREE.Raycaster();
+const mouse2 = new THREE.Vector2(1, 1);
+
 function onPointerMove(event) {
 
     if (!GLOBALS.CONNECTING)
@@ -451,6 +470,14 @@ function onPointerMove(event) {
     if (count !== 0 && GLOBALS.CONNECTING) {
         updateLine();
     }
+
+    mouse2.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse2.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse2, GLOBALS.MAIN_CAMERA);
+    var intersects = raycaster.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
+
+    hoverItem(intersects, true)
 }
 
 function updateLine() {
@@ -460,28 +487,41 @@ function updateLine() {
     lineFollow.geometry.attributes.position.needsUpdate = true;
 }
 
-function hoverItem(found) {
+function hoverItem(found, connecting) {
 
     if (found.length == 0)
         return
 
     var userData = GLOBALS.PLANE_USER_DATA[found[0].instanceId];
 
-    if (userData.hasItem ||
-        (userData.side == "down" && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("floor")) ||
-        (userData.side == "up" && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("ceiling")) ||
-        ((userData.side == "front" || userData.side == "back" || userData.side == "left" || userData.side == "right")
-            && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("walls"))
-    ) {
-        GLOBALS.ITEM_CUBE.material.color = new THREE.Color(0xff0000)
-        GLOBALS.ITEM_CUBE.place = false;
+    if (connecting) {
+        if(userData.allowconnection){
+            GLOBALS.ITEM_CUBE.material.color = new THREE.Color(0x00ff00)
+            GLOBALS.ITEM_CUBE.place = true;
+        }else{
+            GLOBALS.ITEM_CUBE.material.color = new THREE.Color(0xff0000)
+            GLOBALS.ITEM_CUBE.place = false;
+        }
     } else {
-        GLOBALS.ITEM_CUBE.material.color = new THREE.Color(0x00ff00)
-        GLOBALS.ITEM_CUBE.place = true;
+        if (userData.hasItem ||
+            (userData.side == "down" && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("floor")) ||
+            (userData.side == "up" && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("ceiling")) ||
+            ((userData.side == "front" || userData.side == "back" || userData.side == "left" || userData.side == "right")
+                && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("walls"))
+        ) {
+            GLOBALS.ITEM_CUBE.material.color = new THREE.Color(0xff0000)
+            GLOBALS.ITEM_CUBE.place = false;
+        } else {
+            GLOBALS.ITEM_CUBE.material.color = new THREE.Color(0x00ff00)
+            GLOBALS.ITEM_CUBE.place = true;
+        }
     }
 
     GLOBALS.ITEM_CUBE.position.copy(userData.position);
     GLOBALS.ITEM_CUBE.visible = true;
+
+    if (connecting)
+        animate();
 }
 
 var itemHolder = null;
@@ -640,7 +680,7 @@ function revert(d) {
     }
 }
 
-function planeInstanceReset(planeInstance, hasItem, itemName, item, state, canRotate, floor, ceiling, walls, isInstanced, instancedName) {
+function planeInstanceReset(planeInstance, hasItem, itemName, item, state, canRotate, floor, ceiling, walls, isInstanced, instancedName,allowconnection) {
     planeInstance.hasItem = hasItem;
     planeInstance.itemName = itemName;
     planeInstance.item = item;
@@ -651,6 +691,7 @@ function planeInstanceReset(planeInstance, hasItem, itemName, item, state, canRo
     planeInstance.walls = walls;
     planeInstance.isInstanced = isInstanced;
     planeInstance.instancedName = instancedName;
+    planeInstance.allowconnection = allowconnection;
 }
 
 function deleteItemInstanced(item, moving) {

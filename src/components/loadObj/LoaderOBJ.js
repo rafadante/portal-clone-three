@@ -111,7 +111,6 @@ function loadCube() {
     GLOBALS.MAIN_CAMERA.position.set(-12.2, 17.4, 26.3)
     GLOBALS.CONTROLS.update();
 
-    buildIniCubes();
     loadWindowIMG()
 }
 
@@ -183,7 +182,6 @@ function loadWindowManager(scene) {
     GLOBALS.SCENE_CHILDREN.add(scene);
 
     GLOBALS.SPOTLIGHT.target = scene.getObjectByName("lightTarget");
-    console.log(scene.getObjectByName("lightTarget"))
 
     GLOBALS.OBSERVATION_ROOM = scene;
     GLOBALS.OBSERVATION_ROOM.add(GLOBALS.LIGHT_GROUP);
@@ -229,13 +227,19 @@ function loadGunManager(scene) {
             GLOBALS.GUN_SPHERE = child;
         else if (child.name == "cylinder")
             GLOBALS.GUN_CYLINDER = child;
-        else if (child.name == "cube_1")
+        else if (child.name == "cube_1"){
+            //child.scale.set(0.01,0.01,0.01)
+            //child.material.side = 2;
             cube_1 = child;
-        else if (child.name == "cube_2")
+        }else if (child.name == "cube_2"){
+            //child.scale.set(0.01,0.01,0.01)
+            //child.material.side = 2;
             cube_2 = child;
-        else if (child.name == "cube_3")
+        }else if (child.name == "cube_3"){
+            //child.scale.set(0.01,0.01,0.01)
+            //child.material.side = 2;
             cube_3 = child;
-        else if (child.name == "cube_4")
+        }else if (child.name == "cube_4")
             window.gun_holder = child;
         else if (child.name == "cube_5")
             GLOBALS.PORTAL_GUN_FLASH = child;
@@ -252,10 +256,9 @@ function loadGunManager(scene) {
     //scene.position.set(0.1, -0.13, -0.13);//-0.15
     loadDoor()
 
-    const geometry = new THREE.SphereGeometry(0.01, 32, 16);
+    /*const geometry = new THREE.SphereGeometry(0.01, 32, 16);
     const material = new THREE.MeshBasicMaterial({
         color: 0xffff00,
-        visible: false
     });
     const sphere = new THREE.Mesh(geometry, material);
     const sphere1 = sphere.clone();
@@ -278,7 +281,7 @@ function loadGunManager(scene) {
     var target = new THREE.Vector3(); // create once an reuse it
     cube_3.getWorldPosition(target);
     sphere3.position.copy(target)
-    GLOBALS.GUN.children[0].children[0].add(sphere3)
+    GLOBALS.GUN.children[0].children[0].add(sphere3)*/
 }
 
 function loadDoor() {
@@ -371,12 +374,12 @@ function loadEnterDoor(scene) {
         if (child.material) {
             child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.5;
-            child.material.map = map2;
+            /*child.material.map = map2;
 
             if(child.material.name == "portal_door_02"){
                 child.material.emissiveMap = null;
                 child.material.emissiveIntensity = 0;
-            }
+            }*/
         }
     })
     //
@@ -431,7 +434,8 @@ function loadPortalCubeManager(scene) {
     item.userData.obj.children[0].material.envMap =  GLOBALS.ENV_MAP;
     item.userData.obj.children[0].material.envMapIntensity = 0.5;
     item.userData.obj.children[0].material.roughness = 0.2;
-    loadPortalSphere()
+    loadPortalSphere();
+    buildIniCubes();
 }
 
 function instancedTransform(scene, name, interactive, roughness, envIntensity) {
