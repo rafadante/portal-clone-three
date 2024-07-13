@@ -108,7 +108,7 @@ var GLOBALS = {
     PORTAL_EPS: 0.01,
     PORTAL_COLORS: [0x00e1ff, 0xffc600],
     PORTAL_CDBB_HEIGHT: 3,
-    PORTAL_HEIGHT: 0.0,
+    PORTAL_HEIGHT: 0.5,
     PORTAL_RING_THICKNESS: 0.3,
     PORTAL_SHADER: [],
     PORTAL_BOX: [],
@@ -227,6 +227,7 @@ var GLOBALS = {
     INK_MATERIAL: null,
 
     CORRIDOR_ENTER: null,
+    CORRIDOR_EXIT: null,
     ENTER_DOOR: null,
     EXIT_DOOR: null,
 
@@ -451,7 +452,9 @@ var GLOBALS = {
     PORTAL_AUDIO: [],
     DRAGGING: false,
     DRAGGED_ITEM_ELEMENT: null,
-    CURRENT_LINE: null
+    CURRENT_LINE: null,
+
+    CONNECTIONS: []
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)

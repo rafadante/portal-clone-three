@@ -20,6 +20,8 @@ var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
 var allowPortal = true;
 
+var fffff = false;
+
 function portalButton(button) {
 
     if (!allowPortal || GLOBALS.HOLDING_ITEM)
@@ -173,7 +175,7 @@ function portalButton(button) {
                         }
                     }
 
-                    point.add(dir.clone().multiplyScalar(-0.01));
+                    //point.add(dir.clone().multiplyScalar(-0.02));
 
                     if (button == 0) { // left click
 

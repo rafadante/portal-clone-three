@@ -57,6 +57,7 @@ import {
 import {
     GLOBALS
 } from './Globals.js';
+import { func } from 'three/examples/jsm/nodes/Nodes.js';
 
 //VARIABLES
 var angleHolder = 0;
@@ -360,15 +361,25 @@ function tweenCamera(duration, ini, final) {
         .start();
 }
 
+function hideMaterial(obj, transparent, opacity){
+    obj.traverse(c => {
+        if (c.material) {
+            c.material.transparent = transparent;
+            c.material.opacity = opacity;
+        }
+    })
+}
+
+let cloneVisible;
+
 function animatePortal() {
 
     // only show player model when rendering portals
     // don't show the clone model when rendering portals
-    let cloneVisible = false
+    cloneVisible = false
     if (GLOBALS.PLAYER && GLOBALS.PLAYER_MODEL) {
-        GLOBALS.PLAYER_MODEL.visible = true
-        cloneVisible = GLOBALS.PLAYER_MODEL_CLONE.visible
-        GLOBALS.PLAYER_MODEL_CLONE.visible = false;
+        hideMaterial(GLOBALS.PLAYER_MODEL, false, 1);
+        cloneVisible = GLOBALS.PLAYER_MODEL_CLONE.visible;
     }
 
     //const currentShadowAutoUpdate = GLOBALS.RENDERER.shadowMap.autoUpdate;
@@ -432,14 +443,15 @@ function animatePortal() {
     if (GLOBALS.OBJ_HOLDED_CLONE)
         GLOBALS.OBJ_HOLDED_CLONE.visible = cloneItemHolded;
 
-    if (cloneVisible) {
+    if (cloneVisible && GLOBALS.GUN_CLONE2 && window.posW) {
         GLOBALS.GUN_CLONE2.position.copy(window.posW);
         GLOBALS.GUN_CLONE2.quaternion.copy(GLOBALS.PLAYER_MODEL_CLONE.quaternion);
         GLOBALS.GUN_CLONE2.rotation.y += Math.PI;
     }
 
     if (GLOBALS.PLAYER && GLOBALS.PLAYER_MODEL) {
-        GLOBALS.PLAYER_MODEL.visible = false;
+
+        hideMaterial(GLOBALS.PLAYER_MODEL, true, 0);
         GLOBALS.PLAYER_MODEL_CLONE.visible = cloneVisible;
     }
 
@@ -477,6 +489,7 @@ function renderPortal2(thisIndex, pairIndex) {
     GLOBALS.PORTAL_TMP_TARGETS[thisIndex].setSize(width, height)
 
     GLOBALS.PORTALS[thisIndex].mesh.material.stencilWrite = true
+    //GLOBALS.PORTALS[thisIndex].portalShader.material.stencilWrite = true
     GLOBALS.RENDERER.clearStencil()
     GLOBALS.RENDERER.setRenderTarget(null)
     //GLOBALS.RENDERER.render(GLOBALS.PORTALS[pairIndex].mesh, GLOBALS.MAIN_CAMERA)
@@ -501,6 +514,14 @@ function renderPortal2(thisIndex, pairIndex) {
     GLOBALS.RENDERER.localClippingEnabled = true
 
     for (let level = GLOBALS.PORTAL_RECURSION_LEVELS - 1; level >= 0; level--) {
+
+        if(level == 0){
+            GLOBALS.PLAYER_MODEL_CLONE.visible = false;
+            GLOBALS.GUN_CLONE2.visible = false;
+        }else{
+            GLOBALS.PLAYER_MODEL_CLONE.visible = cloneVisible;
+            GLOBALS.GUN_CLONE2.visible = cloneVisible;
+        }
 
         if (level > GLOBALS.PORTAL_RENDER_LEVEL)
             GLOBALS.SCENE_CHILDREN.visible = false;
@@ -539,6 +560,7 @@ function renderPortal2(thisIndex, pairIndex) {
     }
 
     GLOBALS.PORTALS[thisIndex].mesh.material.stencilWrite = false
+    //GLOBALS.PORTALS[thisIndex].portalShader.material.stencilWrite = false
 }
 
 // teleport a 3D object directly, returns nothing
@@ -569,5 +591,6 @@ function portalIsVisibleInCamera(camera, portal, clippingPlane) {
 
 export {
     tweenCamera,
-    animate
+    animate,
+    hideMaterial
 };

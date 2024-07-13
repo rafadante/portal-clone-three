@@ -37,7 +37,6 @@ a:hover {
 
 button {
 	cursor: pointer;
-	text-transform: uppercase;
 }
 
 #info {
@@ -918,4 +917,9 @@ button:focus {outline:0;}
 	left: 0px;
 	top: 0px;
 	position: fixed;
+}
+
+.disabled{
+	opacity: 0.5;
+	pointer-events: none;
 }

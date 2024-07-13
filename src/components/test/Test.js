@@ -18,6 +18,7 @@ import { add } from 'three/examples/jsm/libs/tween.module.js';
 import { newPortal, deletePortal } from '../portal/CreatePortal.js';
 import { addRadioAudio, AUDIO } from '../audio/Audio.js';
 import { func } from 'three/examples/jsm/nodes/Nodes.js';
+import { stateDoor } from '../events/events.js';
 
 var totalBodies = 0;
 var id = 0;
@@ -62,42 +63,11 @@ function shuffle(array) {
     return array
 }
 
-function addTriggers(item, name, activate) {
-    for (var i = 0; i < item.length; i++) {
-        if (item[i].length != 0) {
-            console.log(item[i]);
-
-            var planeInstanced = GLOBALS.PLANE_USER_DATA[GLOBALS.DYMANIC_ITEMS[name][i].planeInstancedId];
-
-            console.log(planeInstanced)
-
-            const geometry = new THREE.BoxGeometry(1, 1, 1);
-            const material = new THREE.MeshBasicMaterial({
-                color: 0x00ff00
-            });
-            const cube = new THREE.Mesh(geometry, material);
-            cube.position.copy(planeInstanced.position);
-            //cube.rotation.copy(planeInstanced.rotation);
-            //cube.translateY(0.5)
-            GLOBALS.SCENE.add(cube);
-
-            var bb = new THREE.Box3(); // for re-use
-            bb.setFromObject(cube);
-
-            //if (loaded)
-            //    bb.id = found.id_instanced;
-            //else
-            //bb.id = found[i].instanceId;
-
-            bb.activate = activate;
-            GLOBALS.TRIGGER[name].push(bb);
-        }
-    }
-}
-
 function viewFPS() {
 
-    GLOBALS.MAIN_CAMERA.near = 0.01;
+    console.log(GLOBALS.SCENE_CHILDREN)
+
+    GLOBALS.MAIN_CAMERA.near = 0.0095;
     GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
 
     AUDIO.EDITOR.pause();
@@ -132,7 +102,11 @@ function viewFPS() {
     addRadioAudio('audio/portal_ambient_loop1.wav', GLOBALS.PORTAL_AUDIO, false);
     addRadioAudio('audio/portal_ambient_loop1.wav', GLOBALS.PORTAL_AUDIO, false);
 
+
+
     setTimeout(() => {
+
+        GLOBALS.ENTER_DOOR.children[0].rotation.z += Math.PI;
 
         GLOBALS.RENDERER.setPixelRatio(window.devicePixelRatio * GLOBALS.PIXEL_RATIO);
 
@@ -234,6 +208,8 @@ function viewFPS() {
                             meshesWallNonPortal.push(GLOBALS.PLANE_USER_DATA[i]);
                         }
                     }
+                } else {
+                    console.log("99999999999999")
                 }
             }
         }
@@ -279,7 +255,13 @@ function viewFPS() {
         GLOBALS.GUN_CYLINDER.material = GLOBALS.MATERIAL_GUN;
 
         //CORRIDOR ENTER COLLIDERS
-        corridorColliderNames(true);
+        corridorColliderNames(true, GLOBALS.CORRIDOR_ENTER);
+
+
+        GLOBALS.CORRIDOR_EXIT = GLOBALS.CORRIDOR_ENTER.clone();
+        GLOBALS.EXIT_DOOR.add(GLOBALS.CORRIDOR_EXIT);
+        GLOBALS.CORRIDOR_EXIT.translateY(-0.1)
+        corridorColliderNames(false, GLOBALS.CORRIDOR_EXIT);
 
         /*var bb = new THREE.Box3(); // for re-use
         bb.setFromObject(GLOBALS.ELEVATOR_TRIGGER);
@@ -494,13 +476,10 @@ function viewFPS() {
         GLOBALS.SCENE.background = new THREE.Color(0x000000);//0xff0000
         GLOBALS.FLASH.visible = false;
 
-
-        addTriggers(GLOBALS.DYMANIC_ITEMS['button_box'], 'button_box', "cube")
-        addTriggers(GLOBALS.DYMANIC_ITEMS['button_circle'], 'button_circle', "sphere")
-        addTriggers(GLOBALS.DYMANIC_ITEMS['button_weight'], 'button_weight', "sphere-cube-player")
-
-        console.log(GLOBALS.TRIGGER)
-
+        if (GLOBALS.EXIT_DOOR.connections > 0)
+            stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
+        else
+            stateDoor(0, true, false, GLOBALS.EXIT_DOOR);
     }, 500);
 };
 
@@ -540,9 +519,11 @@ function addColliderItem(items, type, mass, offset) {
                 var rot = vec;
             } else if (type == "cube" || type == "laser_cube") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.3, 0.3));
+                shape.height = 0.6;
                 offset = 0.5;
             } else if (type == "sphere") {
                 var shape = new CANNON.Sphere(0.3);
+                shape.height = 0.6;
                 offset = 0.5;
             } else if (type == "gel_gun_blue" || type == "gel_gun_orange" || type == "gel_gun_white") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.5, 0.1));
@@ -613,7 +594,7 @@ function addColliderItem(items, type, mass, offset) {
 
             //GLOBALS.PLANE_USER_DATA[items[i].planeInstancedId].state = box.state;
 
-            box.updateMassProperties()
+            box.updateMassProperties();
 
             if (mass > 0) {
 
@@ -812,20 +793,20 @@ function createInstances(meshes, material) {
 
 var corridor_colliders = [];
 
-function corridorColliderNames(first) {
+function corridorColliderNames(first, corridor) {
 
-    corridorCollider(GLOBALS.CORRIDOR_ENTER, "back", 1.5, 1.5, 0.001, true);
-    corridorCollider(GLOBALS.CORRIDOR_ENTER, "down", 1, 0.001, 3.5, false);
-    corridorCollider(GLOBALS.CORRIDOR_ENTER, "up", 1, 0.001, 3.5, false);
-    corridorCollider(GLOBALS.CORRIDOR_ENTER, "left", 0.001, 1, 3.5, false);
-    corridorCollider(GLOBALS.CORRIDOR_ENTER, "right", 0.001, 1, 3.5, false);
-    corridorCollider(GLOBALS.CORRIDOR_ENTER, "front", 1, 1, 0.001, false);
+    corridorCollider(corridor, "back", 1.5, 1.5, 0.001, true, first);
+    corridorCollider(corridor, "down", 1, 0.001, 3.5, false, first);
+    corridorCollider(corridor, "up", 1, 0.001, 3.5, false, first);
+    corridorCollider(corridor, "left", 0.001, 1, 3.5, false, first);
+    corridorCollider(corridor, "right", 0.001, 1, 3.5, false, first);
+    corridorCollider(corridor, "front", 1, 1, 0.001, false, first);
 
     //if (!first)
     //    GLOBALS.WALL_CORRIDOR_ENTER.position.copy(GLOBALS.ENTER_DOOR.position);
 }
 
-function corridorCollider(parent, name, x, y, z, state) {
+function corridorCollider(parent, name, x, y, z, state, first) {
     var target = new THREE.Vector3(); // create once an reuse it
     parent.getObjectByName(name).material.visible = state;
     parent.getObjectByName(name).getWorldPosition(target);
@@ -860,8 +841,12 @@ function corridorCollider(parent, name, x, y, z, state) {
     GLOBALS.CANNON_BODIES.push(wall)
 
     if (name == "front") {
-        GLOBALS.WALL_CORRIDOR_ENTER = wall;
-        console.log(wall)
+        if (first) {
+            GLOBALS.WALL_CORRIDOR_ENTER = wall;
+        } else {
+            GLOBALS.WALL_CORRIDOR_BACK = wall;
+            GLOBALS.EXIT_DOOR.body = wall;
+        }
     }
 
     corridor_colliders.push(wall)
@@ -869,7 +854,7 @@ function corridorCollider(parent, name, x, y, z, state) {
 
 function exitRoomCollider() {
 
-    GLOBALS.WALL_CORRIDOR_BACK.visible = false;
+    /*GLOBALS.WALL_CORRIDOR_BACK.visible = false;
     var posExitRoom = new THREE.Vector3();
     GLOBALS.WALL_CORRIDOR_BACK.getWorldPosition(posExitRoom)
     GLOBALS.EXIT_ROOM.position.copy(posExitRoom)
@@ -901,7 +886,7 @@ function exitRoomCollider() {
 
         GLOBALS.CANNON_WORLD.addBody(wall);
         GLOBALS.CANNON_BODIES.push(wall)
-    }
+    }*/
 }
 
 function elevatorCollider() {

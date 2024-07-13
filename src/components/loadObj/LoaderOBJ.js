@@ -55,8 +55,6 @@ async function handleZip(path, obj) {
                     loadRadioManager(result.scene)
                 else if (obj == "loadCorridor")
                     loadCorridorEnter(result.scene)
-                else if (obj == "loadExitDoor")
-                    loadExitDoor(result.scene)
                 else if (obj == "loadEnterDoor")
                     loadEnterDoor(result.scene)
                 else if (obj == "loadDispenser")
@@ -215,35 +213,51 @@ function loadGunManager(scene) {
     GLOBALS.GUN_CLONE2 = GLOBALS.GUN_CLONE.clone();
 
     scene.traverse(child => {
+        child.castShadow=true;
         if (child.material) {
             child.receiveShadow = true;
             child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.5;
+            
+            /*child.material.stencilWrite= true // stencil optimization, only for culling portal
+            child.material.stencilFunc= THREE.EqualStencilFunc
+            child.material.stencilRef= 1
+            child.material.stencilFail= THREE.ReplaceStencilOp
+            child.material.depthTest= true
+            child.material.depthWrite= false
+            child.material.polygonOffset= true
+            child.material.polygonOffsetFactor= -1*/
         }
 
-        child.renderOrder = 10;
+        child.onAfterRender = function (renderer) {
+            renderer.clearStencil();
+        };
+
+        console.log(child)
+
+        child.renderOrder = 999;
 
         if (child.name == "sphere")
             GLOBALS.GUN_SPHERE = child;
         else if (child.name == "cylinder")
             GLOBALS.GUN_CYLINDER = child;
-        else if (child.name == "cube_1"){
+        else if (child.name == "cube_1") {
             //child.scale.set(0.01,0.01,0.01)
             //child.material.side = 2;
             cube_1 = child;
-        }else if (child.name == "cube_2"){
+        } else if (child.name == "cube_2") {
             //child.scale.set(0.01,0.01,0.01)
             //child.material.side = 2;
             cube_2 = child;
-        }else if (child.name == "cube_3"){
+        } else if (child.name == "cube_3") {
             //child.scale.set(0.01,0.01,0.01)
             //child.material.side = 2;
             cube_3 = child;
-        }else if (child.name == "cube_4")
+        } else if (child.name == "cube_4")
             window.gun_holder = child;
         else if (child.name == "cube_5")
             GLOBALS.PORTAL_GUN_FLASH = child;
-        
+
     });
 
     GLOBALS.GUN.name = "GUN";
@@ -285,46 +299,13 @@ function loadGunManager(scene) {
 }
 
 function loadDoor() {
-    handleZip('./assets/3ds/open.zip', "loadExitDoor");
-}
-
-function loadExitDoor(scene) {
-    //EXIT DOOR
-    var door = scene;
-
-    door.position.set(13, 1, -1)
-    door.translateZ(1);
-    door.name = "exitDoor";
-    GLOBALS.EXIT_DOOR = door;
-    GLOBALS.SCENE_CHILDREN.add(door);
-
-    door.traverse(child => {
-
-        child.userData.wall = true;
-        child.userData.ground = false;
-        child.userData.ceiling = false;
-
-        if (child.isBone) {
-            if (child.name == "portal_door_right_04") {
-                child.scale.set(0, 0, 0);
-            } else if (child.name == "portal_door_left_06") {
-                child.scale.set(0, 0, 0);
-            }
-        }
-
-        if (child.material) {
-            child.material.envMap = GLOBALS.ENV_MAP;
-            child.material.envMapIntensity = 0.5;
-        }
-    })
-    //
-    //loadEnterDoor(scene);
     handleZip('./assets/3ds/open.zip', "loadEnterDoor");
 }
 
 function loadEnterDoor(scene) {
 
     var door = scene;
+    door.connections = 0;
 
     //ENTER DOOR
     door.name = "enterDoor";
@@ -334,6 +315,8 @@ function loadEnterDoor(scene) {
     door.namePosition = door.position.x + "/" + door.position.y + "/" + door.position.z;
     GLOBALS.ENTER_DOOR = door;
     GLOBALS.SCENE_CHILDREN.add(door);
+
+    console.log(GLOBALS.ENTER_DOOR)
 
     //
     const geometry = new THREE.PlaneGeometry(2, 2);
@@ -345,11 +328,11 @@ function loadEnterDoor(scene) {
     const plane = new THREE.Mesh(geometry, material);
     door.add(plane);
 
-    const geometry3 = new THREE.BoxGeometry( 2, 2, 0.1 ); 
-    const material3 = new THREE.MeshBasicMaterial( {color: 0x00ff00} ); 
-    const cube = new THREE.Mesh( geometry3, material3 );
-    cube.visible = false; 
-    door.add( cube );
+    const geometry3 = new THREE.BoxGeometry(2, 2, 0.1);
+    const material3 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const cube = new THREE.Mesh(geometry3, material3);
+    cube.visible = false;
+    door.add(cube);
     door.cube = cube;
     cube.translateZ(0.3);
 
@@ -382,6 +365,29 @@ function loadEnterDoor(scene) {
             }*/
         }
     })
+    //
+    GLOBALS.EXIT_DOOR = SkeletonUtils.clone(GLOBALS.ENTER_DOOR);
+    GLOBALS.EXIT_DOOR.position.set(13, 1, 0);
+    GLOBALS.EXIT_DOOR.buttons = 0;
+    GLOBALS.EXIT_DOOR.connections = 0;
+    GLOBALS.EXIT_DOOR.name = "exitDoor";
+    GLOBALS.EXIT_DOOR.rotation.y += Math.PI;
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.EXIT_DOOR);
+    GLOBALS.EXIT_DOOR.namePosition = GLOBALS.EXIT_DOOR.position.x + "/" + GLOBALS.EXIT_DOOR.position.y + "/" + GLOBALS.EXIT_DOOR.position.z;
+    //
+    var map = new THREE.TextureLoader().load('./assets/exit.jpg');
+    //map.flipY = false;
+    map.colorSpace = THREE.SRGBColorSpace;
+
+    const geometryExitDoor = new THREE.PlaneGeometry(1, 1);
+    const materialExitDoor = new THREE.MeshBasicMaterial({ map: map });
+    const planeExitDoor = new THREE.Mesh(geometryExitDoor, materialExitDoor);
+    console.log(planeExitDoor)
+    planeExitDoor.position.set(0, 1.5, 0.01)
+    planeExitDoor.scale.set(1, 0.5, 1)
+    GLOBALS.EXIT_DOOR.add(planeExitDoor);
+
+
     //
     door.getObjectByName("warning").material = new THREE.MeshStandardMaterial();
     var map = new THREE.TextureLoader().load('./assets/enter.jpg');
@@ -431,7 +437,7 @@ function loadPortalCubeManager(scene) {
     item.userData.ground = true;
     item.userData.ceiling = false;
     item.userData.obj = scene;
-    item.userData.obj.children[0].material.envMap =  GLOBALS.ENV_MAP;
+    item.userData.obj.children[0].material.envMap = GLOBALS.ENV_MAP;
     item.userData.obj.children[0].material.envMapIntensity = 0.5;
     item.userData.obj.children[0].material.roughness = 0.2;
     loadPortalSphere();
@@ -490,7 +496,7 @@ function loadPortalSphereManager(scene) {
     item.userData.ground = true;
     item.userData.ceiling = false;
     item.userData.obj = scene;
-    item.userData.obj.children[0].material.envMap =  GLOBALS.ENV_MAP;
+    item.userData.obj.children[0].material.envMap = GLOBALS.ENV_MAP;
     item.userData.obj.children[0].material.envMapIntensity = 0.5;
     item.userData.obj.children[0].material.roughness = 0.2;
     loadHalfWindow()
@@ -660,7 +666,7 @@ function loadRadioManager(scene) {
     item.userData.ground = true;
     item.userData.ceiling = false;
     item.userData.obj = scene;
-    item.userData.obj.children[0].material.envMap =  GLOBALS.ENV_MAP;
+    item.userData.obj.children[0].material.envMap = GLOBALS.ENV_MAP;
     item.userData.obj.children[0].material.envMapIntensity = 0.5;
     item.userData.obj.children[0].material.roughness = 0.2;
 
@@ -900,7 +906,7 @@ function loadAvatar() {
 
         fbx.scale.setScalar(0.015);
         GLOBALS.MIXERS = new THREE.AnimationMixer(fbx)
-        fbx.visible = false;
+        //fbx.visible = false;
 
         fbx.traverse(c => {
             c.castShadow = true;
@@ -909,15 +915,17 @@ function loadAvatar() {
 
                 c.material.envMap = GLOBALS.ENV_MAP;
                 c.material.envMapIntensity = 0.5;
-
+                c.material.transparent = true;
+                c.material.opacity = 0;
+                c.material.side = 0;
             }
 
             if (c.isBone) {
                 if (c.name == "wrist_R") {
                     window.hand = c;
-                }else if (c.name == "elbow_L") {
+                } else if (c.name == "elbow_L") {
                     window.handLeft = c;
-                }else if (c.name == "neck1") {
+                } else if (c.name == "neck1") {
                     window.neck = c;
                 }
             }
@@ -959,13 +967,13 @@ function loadAvatar() {
     loadMuzzleFlash();
 }
 
-function loadMuzzleFlash(){
+function loadMuzzleFlash() {
     handleZip('./assets/3ds/muzzle_flash.zip', "loadMuzzleFlash");
 }
 
-function loadMuzzleFlashManager(scene){
+function loadMuzzleFlashManager(scene) {
 
-    
+
     //scene.visible = false;
     //GLOBALS.FLASH = scene;
     //GLOBALS.SCENE.add(GLOBALS.FLASH);
@@ -973,7 +981,7 @@ function loadMuzzleFlashManager(scene){
     //scene.position.set(0.011, -0.012, -0.05);
     //scene.children[0].material.envMap = GLOBALS.ENV_MAP;
 
-    
+
     //light.position.set(0,1,-1);
 
     if (GLOBALS.LOADED_LEVEL) {
@@ -985,13 +993,13 @@ function loadMuzzleFlashManager(scene){
     animate();
 }
 
-GLOBALS.LIGHT_PORTAL_0 = new THREE.PointLight( new THREE.Color( 1, 0.25, 0 ), 3, 2);
-GLOBALS.LIGHT_PORTAL_1 = new THREE.PointLight( new THREE.Color( 0, 0.3, 1 ), 3, 2);
+GLOBALS.LIGHT_PORTAL_0 = new THREE.PointLight(new THREE.Color(1, 0.25, 0), 3, 2);
+GLOBALS.LIGHT_PORTAL_1 = new THREE.PointLight(new THREE.Color(0, 0.3, 1), 3, 2);
 GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
 GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
 
-GLOBALS.FLASH = new THREE.PointLight( 0xff0000, 10);
-GLOBALS.SCENE_CHILDREN.add( GLOBALS.FLASH );
+GLOBALS.FLASH = new THREE.PointLight(0xff0000, 10);
+GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
 
 setTimeout(() => {
     GLOBALS.LIGHT_PORTAL_0.visible = false;

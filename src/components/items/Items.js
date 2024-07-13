@@ -16,8 +16,9 @@ import {
 } from '../../Physics.js';
 import { findPath } from '../findPath/FindPath.js';
 import { AUDIO } from '../audio/Audio.js';
-import { floor, func } from 'three/examples/jsm/nodes/Nodes.js';
+import { floor, func, userData } from 'three/examples/jsm/nodes/Nodes.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+import { stateDoor } from '../events/events.js';
 
 var beamType;
 let lineFollow;
@@ -84,6 +85,8 @@ function addItem(found, loaded) {
             userData.hasItem = false; //delete here
         }
 
+        console.log(found)
+
         if (!userData.hasItem || loaded) {
 
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
@@ -100,6 +103,8 @@ function addItem(found, loaded) {
             } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
 
                 var item = new THREE.Group();
+                item.buttons = 0;
+                item.connections = 0;
 
                 const geometry = new THREE.CircleGeometry(0.25, 32);
                 const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
@@ -170,12 +175,15 @@ function addItem(found, loaded) {
             } else
                 item.position.copy(userData.position);
 
+
+            console.log(userData.normal)
             item.position.copy(userData.position);
+            item.rotation.set(userData.normal.x, userData.normal.y,userData.normal.z)
             item.renderOrder = 2;
             item.name = GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount;
             item.planeInstancedId = userData.id_instanced;
 
-            if (loaded) {
+            /*if (loaded) {
                 item.rotation.copy(userData.itemRotation);
             } else if (userData.side == "front") {
                 if (GLOBALS.ITEM_HOLDED_NAME == "light")
@@ -210,19 +218,21 @@ function addItem(found, loaded) {
                     item.rotation.x = Math.PI;
                 else if (GLOBALS.ITEM_HOLDED_NAME == "stripe" || GLOBALS.ITEM_HOLDED_NAME == "tractor_beam")
                     item.rotation.x = Math.PI / 2;
-            }
+            }*/
 
-            userData.itemRotation = item.rotation;
+            //item.rotation.x = 
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "button_box") {
+            //userData.itemRotation = item.rotation;
 
-                
+            if (GLOBALS.ITEM_HOLDED_NAME == "radio") {
+                item.translateY(0.5);
             }
 
             if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
 
                 var idInstanced;
                 userData.dispenser = true;
+                item.translateY(1);
 
                 for (var j = 0; j < GLOBALS.DYMANIC_ITEMS["dispenser"].length; j++) {
                     if (GLOBALS.DYMANIC_ITEMS["dispenser"][j].length == 0) {
@@ -271,6 +281,38 @@ function addItem(found, loaded) {
 
             if (GLOBALS.ITEM_HOLDED_NAME == "tractor_beam")
                 item.beam = beamType;
+
+
+            if (GLOBALS.ITEM_HOLDED_NAME.includes("button")) {
+                const geometryBox3 = new THREE.BoxGeometry(1, 1.2, 1);
+                const materialBox3 = new THREE.MeshBasicMaterial({
+                    color: 0x00ff00
+                });
+                const cube = new THREE.Mesh(geometryBox3, materialBox3);
+                cube.position.copy(item.position);
+                //GLOBALS.SCENE.add(cube);
+
+                var bb = new THREE.Box3(); // for re-use
+                bb.setFromObject(cube);
+
+                if (userData.instancedName == "button_box") {
+                    bb.accept = "cube";
+                } else if (userData.instancedName == "button_circle") {
+                    bb.accept = "sphere";
+                } else if (userData.instancedName == "button_weight") {
+                    bb.accept = "sphere-cube-player";
+                }
+
+                userData.box3 = bb;
+
+                console.log(GLOBALS.PLANE_USER_DATA[userData.id_instanced])
+
+                //item.rotation.copy(userData.rotation)
+                //item.rotation.x += Math.PI/2;
+            }
+
+            item.pedestalInfinity = true;
+            item.pedestalValue = 3;
 
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
 
@@ -350,6 +392,8 @@ function addItem(found, loaded) {
                 }
 
                 item.userData.id = idInstanced;
+                item.idInstanced = idInstanced;
+                console.log(idInstanced)
                 item.scale.set(1, 1, 1);
                 item.updateMatrix();
                 instanced.setMatrixAt(idInstanced, item.matrix);
@@ -439,7 +483,7 @@ $("body").on('click', '#conection', function (event) {
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.y,
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.z);
 
-        console.log("11111111111")
+    console.log("11111111111")
 
     //addPoint(GLOBALS.SELECTED.parent.position.x, GLOBALS.SELECTED.parent.position.y - 1, GLOBALS.SELECTED.parent.position.z);
     //addPoint(GLOBALS.SELECTED.parent.position.x, GLOBALS.SELECTED.parent.position.y - 1, GLOBALS.SELECTED.parent.position.z);
@@ -495,10 +539,10 @@ function hoverItem(found, connecting) {
     var userData = GLOBALS.PLANE_USER_DATA[found[0].instanceId];
 
     if (connecting) {
-        if(userData.allowconnection){
+        if (userData.allowconnection) {
             GLOBALS.ITEM_CUBE.material.color = new THREE.Color(0x00ff00)
             GLOBALS.ITEM_CUBE.place = true;
-        }else{
+        } else {
             GLOBALS.ITEM_CUBE.material.color = new THREE.Color(0xff0000)
             GLOBALS.ITEM_CUBE.place = false;
         }
@@ -560,7 +604,46 @@ function interactWithItem() {
         if (intersects[0].object.name == "pedestal_button") {
 
             if (intersects[0].distance < 1) {
+
                 var item = GLOBALS.DYMANIC_ITEMS[intersects[0].object.name][intersects[0].instanceId];
+                var goal = GLOBALS.PLANE_USER_DATA[item.planeInstancedId];
+
+                //Go through each connection to check for triggers
+                for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+                    if (goal == GLOBALS.CONNECTIONS[i]['from']) {
+                        if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
+                            GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
+                            if (!GLOBALS.CONNECTIONS[i]['line'].active) {
+
+                                GLOBALS.CONNECTIONS[i]['to'].item.buttons += 1;
+                                GLOBALS.CONNECTIONS[i]['line'].active = true;
+                                GLOBALS.CONNECTIONS[i]['line'].material.color = new THREE.Color(0x0077B6);
+
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
+                                    stateDoor(0, true, false, GLOBALS.CONNECTIONS[i]['to'].item);
+                                }
+
+                                if (!GLOBALS.CONNECTIONS[i]['from'].item.pedestalInfinity) {
+
+                                    var holder = GLOBALS.CONNECTIONS[i];
+
+                                    setTimeout(() => {
+                                        holder['line'].active = false;
+                                        holder['to'].item.buttons -= 1;
+                                        holder['line'].material.color = new THREE.Color(0xffa500);
+
+                                        if (holder['to'].item.buttons < holder['to'].item.connections) {
+                                            stateDoor(0, false, false, holder['to'].item);
+                                        }
+                                    }, GLOBALS.CONNECTIONS[i]['from'].item.pedestalValue * 1000);
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                /*var item = GLOBALS.DYMANIC_ITEMS[intersects[0].object.name][intersects[0].instanceId];
                 var goal = GLOBALS.PLANE_USER_DATA[item.planeInstancedId];
 
                 if (goal.trigger.itemName.includes("exitDoor")) {
@@ -577,7 +660,9 @@ function interactWithItem() {
                     goal.circle.material.color = new THREE.Color(0x03e8fc);
                     goal.check.material.color = new THREE.Color(0x03e8fc);
                     goal.check.material.map = GLOBALS.CLOSE;
-                }, 2000);
+                }, 2000);*/
+
+
             }
         } else {
             if (intersects[0].distance < 1.5) {
@@ -598,8 +683,8 @@ function interactWithItem() {
                     GLOBALS.CURRENT_ITEM.body.allowSleep = false;
                     GLOBALS.CURRENT_ITEM.body.holding = true;
 
-                    if (GLOBALS.DYMANIC_ITEMS[name][instancedId].body.placed)
-                        revert(GLOBALS.DYMANIC_ITEMS[name][instancedId].body)
+                    //if (GLOBALS.DYMANIC_ITEMS[name][instancedId].body.placed)
+                    //    revert(GLOBALS.DYMANIC_ITEMS[name][instancedId].body)
 
                     GLOBALS.OBJ_HOLDED_CLONE = GLOBALS.CURRENT_ITEM.userData.obj;
                     GLOBALS.OBJ_HOLDED_CLONE.userData.instanced = true;
@@ -680,7 +765,7 @@ function revert(d) {
     }
 }
 
-function planeInstanceReset(planeInstance, hasItem, itemName, item, state, canRotate, floor, ceiling, walls, isInstanced, instancedName,allowconnection) {
+function planeInstanceReset(planeInstance, hasItem, itemName, item, state, canRotate, floor, ceiling, walls, isInstanced, instancedName, allowconnection) {
     planeInstance.hasItem = hasItem;
     planeInstance.itemName = itemName;
     planeInstance.item = item;
@@ -695,12 +780,13 @@ function planeInstanceReset(planeInstance, hasItem, itemName, item, state, canRo
 }
 
 function deleteItemInstanced(item, moving) {
+    console.log(item)
     GLOBALS.ITEMS_COUNT[item.instancedName]["count"] -= 1;
     var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(item.instancedName);
     var dummy = new THREE.Object3D();
     dummy.scale.set(0, 0, 0);
     dummy.updateMatrix();
-    instanced.setMatrixAt(item.item.userData.id, dummy.matrix);
+    instanced.setMatrixAt(item.item.idInstanced, dummy.matrix);
     instanced.instanceMatrix.needsUpdate = true;
 
     if (item.instancedName == "cube" || item.instancedName == "sphere") {
@@ -714,7 +800,7 @@ function deleteItemInstanced(item, moving) {
         GLOBALS.DYMANIC_ITEMS["dispenser"][item.item.dispenserID] = [];
     }
 
-    GLOBALS.DYMANIC_ITEMS[item.instancedName][item.item.userData.id] = [];
+    GLOBALS.DYMANIC_ITEMS[item.instancedName][item.item.idInstanced] = [];
 
     if (moving)
         clickItem($("#" + item.instancedName));

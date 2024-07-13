@@ -43,9 +43,9 @@ class Portal extends Group {
         this.portalPoints = portalPoints;
         if (portalPoints === undefined || portalPoints.length == 0) {
             this.portalPoints = [this.pos.clone().add(this.tz.clone().multiplyScalar(portal_depth / 2 + 2 * portal_eps).add(this.tx.clone().multiplyScalar(portal_width / 2 + 2 * portal_eps))),
-                this.pos.clone().add(this.tz.clone().multiplyScalar(-portal_depth / 2 - 2 * portal_eps).add(this.tx.clone().multiplyScalar(portal_width / 2 + 2 * portal_eps))),
-                this.pos.clone().add(this.tz.clone().multiplyScalar(-portal_depth / 2 - 2 * portal_eps).add(this.tx.clone().multiplyScalar(-portal_width / 2 - 2 * portal_eps))),
-                this.pos.clone().add(this.tz.clone().multiplyScalar(portal_depth / 2 + 2 * portal_eps).add(this.tx.clone().multiplyScalar(-portal_width / 2 - 2 * portal_eps)))
+            this.pos.clone().add(this.tz.clone().multiplyScalar(-portal_depth / 2 - 2 * portal_eps).add(this.tx.clone().multiplyScalar(portal_width / 2 + 2 * portal_eps))),
+            this.pos.clone().add(this.tz.clone().multiplyScalar(-portal_depth / 2 - 2 * portal_eps).add(this.tx.clone().multiplyScalar(-portal_width / 2 - 2 * portal_eps))),
+            this.pos.clone().add(this.tz.clone().multiplyScalar(portal_depth / 2 + 2 * portal_eps).add(this.tx.clone().multiplyScalar(-portal_width / 2 - 2 * portal_eps)))
             ]
         }
 
@@ -74,6 +74,7 @@ class Portal extends Group {
         uniform float ww;
         uniform float wh;
         uniform bool tone;
+        
         void main() {
             gl_FragColor = texture2D(texture1, gl_FragCoord.xy / vec2(ww, wh));
 
@@ -89,7 +90,7 @@ class Portal extends Group {
         //#include <colorspace_fragment>
 
 
-        const geometry = new THREE.CylinderGeometry(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_HEIGHT, 50);
+        const geometry = new THREE.CylinderGeometry(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_HEIGHT);
         const uniforms = {
             texture1: {
                 type: 't',
@@ -103,7 +104,7 @@ class Portal extends Group {
                 type: 'f',
                 value: 1
             },
-            tone:{
+            tone: {
                 type: 'Boolean',
                 value: window.portalTone
             }
@@ -120,7 +121,8 @@ class Portal extends Group {
             depthTest: true,
             depthWrite: false,
             polygonOffset: true,
-            polygonOffsetFactor: -10,
+            polygonOffsetFactor: -1,
+            side: THREE.DoubleSide
             //polygonOffset: true,
             //polygonOffsetFactor: -1
         });
@@ -134,6 +136,16 @@ class Portal extends Group {
         //this.mesh.scale.x *= 0.75;
         this.mesh.frustumCulled = true;
         this.add(this.mesh)
+
+
+        //var pLocal = new THREE.Vector3(0, 0, -1);
+        //var pWorld = pLocal.applyMatrix4(GLOBALS.MAIN_CAMERA.matrixWorld);
+        //var dir = pWorld.sub(GLOBALS.MAIN_CAMERA.position).normalize();
+        //this.mesh.position.add(dir.clone().multiplyScalar(0.25));
+
+        this.mesh.translateY(-0.25)
+
+        console.log(this)
 
         this.mesh.onAfterRender = function (renderer) {
             renderer.clearStencil();
@@ -175,6 +187,12 @@ class Portal extends Group {
         this.portalShader.frustumCulled = true;
         //GLOBALS.PORTAL_SHADER[index].scale.set(1.1,1.1,1.1)
         this.add(GLOBALS.PORTAL_SHADER[index])
+        //this.portalShader.translateZ(-0.01)
+
+        var pLocal = new THREE.Vector3(0, 0, -1);
+        var pWorld = pLocal.applyMatrix4(GLOBALS.MAIN_CAMERA.matrixWorld);
+        var dir = pWorld.sub(GLOBALS.MAIN_CAMERA.position).normalize();
+        //this.portalShader.position.add(dir.clone().multiplyScalar(-0.02));
 
         // constructing the portal borders
         const ringGeometry = new THREE.PlaneGeometry(GLOBALS.PORTAL_WIDTH + 2 * GLOBALS.PORTAL_RING_THICKNESS, GLOBALS.PORTAL_DEPTH + 2 * GLOBALS.PORTAL_RING_THICKNESS);
@@ -194,32 +212,32 @@ class Portal extends Group {
         this.ringMesh.matrixAutoUpdate = true;
         this.ringMesh.visible = false;
 
-        const geometry3 = new THREE.BoxGeometry( 1.4, 2, 0.1 ); 
-        const material3 = new THREE.MeshBasicMaterial( {color: 0x00ff00} ); 
-        GLOBALS.PORTAL_BOX[index] = new THREE.Mesh( geometry3, material3 ); 
+        const geometry3 = new THREE.BoxGeometry(1.4, 2, 0.1);
+        const material3 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        GLOBALS.PORTAL_BOX[index] = new THREE.Mesh(geometry3, material3);
         GLOBALS.PORTAL_BOX[index].applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
         GLOBALS.PORTAL_BOX[index].applyMatrix4(this.transform)
         GLOBALS.PORTAL_BOX[index].updateMatrix()
         GLOBALS.PORTAL_BOX[index].matrixAutoUpdate = true;
         GLOBALS.PORTAL_BOX[index].visible = false;
-        this.add( GLOBALS.PORTAL_BOX[index] );
+        this.add(GLOBALS.PORTAL_BOX[index]);
 
         //
-        const geometry4 = new THREE.BoxGeometry( 0.75, 1.2, 0.1 ); 
-        GLOBALS.PORTAL_INNER_BOX[index] = new THREE.Mesh( geometry4, material3 ); 
+        const geometry4 = new THREE.BoxGeometry(0.75, 1.2, 0.1);
+        GLOBALS.PORTAL_INNER_BOX[index] = new THREE.Mesh(geometry4, material3);
         GLOBALS.PORTAL_INNER_BOX[index].applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
         GLOBALS.PORTAL_INNER_BOX[index].applyMatrix4(this.transform)
         GLOBALS.PORTAL_INNER_BOX[index].updateMatrix()
         GLOBALS.PORTAL_INNER_BOX[index].matrixAutoUpdate = true;
         GLOBALS.PORTAL_INNER_BOX[index].visible = false;
-        this.add( GLOBALS.PORTAL_INNER_BOX[index] );
+        this.add(GLOBALS.PORTAL_INNER_BOX[index]);
 
         // CDBB: collision disable BB
         // STBB: should teleport BB
 
         // matrix for the CDBB
         // CDBB is centered at portal
-        let tCDBB = this.transform.clone()
+        let tCDBB = this.transform.clone();
         // STBB is centered at 1/4 height of CDBB behind the portal
         // because height of STBB is half height of CDBB
         let pSTBB = position.clone().add(normal.clone().multiplyScalar(-GLOBALS.PORTAL_CDBB_HEIGHT / 4))
@@ -229,8 +247,20 @@ class Portal extends Group {
         this.STBB = new GeneralBB(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_CDBB_HEIGHT / 2, GLOBALS.PORTAL_DEPTH, tSTBB, 0x00ff00)
         //this.LEFT = new GeneralBB(GLOBALS.PORTAL_WIDTH * 0.1, GLOBALS.PORTAL_CDBB_HEIGHT / 2, GLOBALS.PORTAL_DEPTH, tSTBB, 0x000000)
 
+
+        //var pLocal = new THREE.Vector3(0, 0, -1);
+        //var pWorld = pLocal.applyMatrix4(this.matrixWorld);
+        //var dir = pWorld.sub(this.position).normalize();
+        //this.CDBB.add(dir.clone().multiplyScalar(-1));
+
+        //CAMERA NEAR
+        let pSTBB2 = position.clone().add(normal.clone().multiplyScalar(-GLOBALS.PORTAL_CDBB_HEIGHT / 20))
+        let tSTBB2 = tRot.clone().setPosition(pSTBB2)
+        this.NEAR = new GeneralBB(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_CDBB_HEIGHT / 2, GLOBALS.PORTAL_DEPTH, tSTBB2, 0x0000ff)
+
         this.debugMeshes.add(this.CDBB.helper)
         this.debugMeshes.add(this.STBB.helper)
+        this.debugMeshes.add(this.NEAR.helper)
         this.debugMeshes.visible = false; //globals.DEBUG
         this.add(this.debugMeshes)
     }
@@ -268,25 +298,25 @@ function teleportPhysicalObject(object, portal) {
     velocity = getTeleportedDirectionalVector(velocity, portal)
     force = getTeleportedDirectionalVector(force, portal)
 
-    if(velocity.x > 10){
+    if (velocity.x > 10) {
         velocity.x = 10;
-    }else if(velocity.x < -10){
+    } else if (velocity.x < -10) {
         velocity.x = -10;
     }
 
-    if(velocity.y > 10){
+    if (velocity.y > 10) {
         velocity.y = 10;
-    }else if(velocity.y < -10){
+    } else if (velocity.y < -10) {
         velocity.y = -10;
     }
 
-    if(velocity.z > 10){
+    if (velocity.z > 10) {
         velocity.z = 10;
-    }else if(velocity.z < -10){
+    } else if (velocity.z < -10) {
         velocity.z = -10;
     }
 
-    if(Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1){
+    if (Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) {
         velocity.x *= 0.5;
         velocity.z *= 0.5;
     }

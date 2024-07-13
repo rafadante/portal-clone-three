@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import {
     PointerLockControls
-} from '../../PointerLockControls.js';
+} from 'three/addons/controls/PointerLockControls.js';
 import $ from 'jquery';
 import * as CANNON from 'cannon';
 import nipplejs from 'nipplejs';
@@ -23,6 +23,7 @@ import {
 } from '../../Globals.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { AUDIO } from '../audio/Audio.js';
+import { stateDoor } from '../events/events.js';
 
 //
 let shouldJump = false;
@@ -211,6 +212,7 @@ function player() {
     let sphereShape = new CANNON.Sphere(0.3);
     // define shape
     let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 2, 2 / 3.2, 0.5 / 2));
+    physicsShape.height = 1.25;
 
     // define the physical body attributes
     GLOBALS.PLAYER = new CANNON.Body({
@@ -220,7 +222,7 @@ function player() {
     GLOBALS.PLAYER.allowSleep = false;
     GLOBALS.PLAYER.addShape(physicsShape);
     GLOBALS.PLAYER.position.set(5, 5, 5);
-    GLOBALS.PLAYER.linearDamping = 0.9;
+    GLOBALS.PLAYER.linearDamping = 0.999;
     GLOBALS.PLAYER.name = "player";
 
     // keep the player upright
@@ -328,6 +330,27 @@ $("body").on('click', '#item', function () {
 $("body").on('click', '#settings-close', function () {
     if (GLOBALS.FPS_MODE && allowEnterFPS) {
 
+        controller = {
+            "KeyE": {
+                pressed: false
+            },
+            "KeyW": {
+                pressed: false
+            },
+            "KeyS": {
+                pressed: false
+            },
+            "KeyA": {
+                pressed: false
+            },
+            "KeyD": {
+                pressed: false
+            },
+            "Space": {
+                pressed: false
+            },
+        }
+
         GLOBALS.PAUSED = false;
 
         if (!GLOBALS.MOBILE) {
@@ -343,7 +366,9 @@ $("body").on('click', '#settings-close', function () {
         if (!GLOBALS.DOOR_OPEN_STATE) {
             GLOBALS.DOOR_OPEN_STATE = true;
 
-            setTimeout(() => {
+            stateDoor(1000, true, false, GLOBALS.ENTER_DOOR)
+
+            /*setTimeout(() => {
                 AUDIO.DOOR_MOVE.pause();
                 AUDIO.DOOR_MOVE.currentTime = 0;
                 AUDIO.DOOR_MOVE.play();
@@ -363,7 +388,7 @@ $("body").on('click', '#settings-close', function () {
                     GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position.z = -4;
                     tweenCamera(1000, GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position, new THREE.Vector3(-25, GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position.y, GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position.z))
                 }, 500);
-            }, 1000);
+            }, 1000);*/
         }
     }
 })
@@ -659,7 +684,7 @@ var jumpPressed = false;
 const updateCamera = function (deltaTime) {
 
     if (window.CAMERA_ROTATING) {
-        GLOBALS.MAIN_CAMERA.quaternion.slerp(window.q, 0.1);
+        //GLOBALS.MAIN_CAMERA.quaternion.slerp(window.q, 0.1);
     }
 
     // always look where the camera points
@@ -670,8 +695,9 @@ const updateCamera = function (deltaTime) {
 
     // set camera position to be at player
     GLOBALS.MAIN_CAMERA.position.copy(GLOBALS.PLAYER.position);
+
     //GLOBALS.MAIN_CAMERA.translateZ(0.2)
-    GLOBALS.MAIN_CAMERA.translateY(0.2)
+    GLOBALS.MAIN_CAMERA.translateY(0.3)
     GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
     GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.SMOOTHNESS);
 
@@ -692,7 +718,17 @@ const updateCamera = function (deltaTime) {
 
         GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLAYER_MODEL_CLONE)
         GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
-        GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE)
+        GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE);
+
+        GLOBALS.PLAYER_MODEL_CLONE.visible = false;
+        GLOBALS.PLAYER_MODEL_CLONE.traverse(c => {
+            if (c.material) {
+                const clone = c.material.clone();
+                c.material = clone;
+                c.material.transparent = false;
+                c.material.opacity = 1;
+            }
+        })
     }
 
     if (GLOBALS.OBJ_HOLDED_CLONE) {

@@ -59,22 +59,22 @@
         <div id="items">
           <img data-content="Can be linked to an object to form a trigger. This button only accepts spheres."
             data-title="BUTTON SPHERE" class="item" data-name="button_circle"  id="button_circle" data-allowconnection="false"
-            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true"
+            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true"
             src="../assets/ui/items/button_sphere.png" />
 
           <img data-content="Can be linked to an object to form a trigger. This button only accepts cubes."
             data-title="BUTTON CUBE" class="item" data-name="button_box" src="../assets/ui/items/button_cube.png" data-allowconnection="false"
-            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="button_box"/>
+            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" id="button_box"/>
 
           <img data-content="Can be linked to an object to form a trigger. This button accepts spheres and cubes."
             data-title="BUTTON WEIGHT" class="item" data-name="button_weight" src="../assets/ui/items/button.png" data-allowconnection="false"
-            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="button_weight"/>
+            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" id="button_weight"/>
 
           <img
             data-content="Can be linked to an object to form a trigger. The player can click on the button and it will activate the function that it is connected to. You can add a timer to your button through the properties menu."
             data-title="PEDESTAL BUTTON" class="item" data-name="pedestal_button" data-allowconnection="false"
             src="../assets/ui/items/pedestal_button.png" 
-            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="pedestal_button"/>
+            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" id="pedestal_button"/>
 
           <!--<img
             data-content="Once the laser emitter hits the catcher you can have it trigger a function such as opening a door, or enabling a set of stairs."
@@ -126,11 +126,13 @@
             data-name="camera" src="../assets/ui/items/camera.png" data-allowconnection="false"
             data-rotate="false" data-floor="false" data-ceiling="false" data-walls="true" data-instanced="false" id="camera"/>
 
-          <!--<img
+          <img
             data-content="Whenever the player walks through a Tractor Beam they will float through the beam it emits. The blue beam pushes the player forward, away from the receptacle, and the orange beam pulls the player in towards it. The properties menu allows you to start the beam in reversed mode or completely off."
             data-title="TRACTOR BEAM" class="item" data-name="tractor_beam" data-beam="blue"
+            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true"
+            data-allowconnection="true" id="tractor_beam"
             src="../assets/ui/items/tractor_beam.png" />
-
+<!--
           <img
             data-content="If a player walks onto a Faith Plate it will cause them to get bounced into the air. When you place a Faith Plate within the editor it will also create a bullseye and a yellow ball. The Bullseye is where the player will ultimately land, and the yellow ball is the trajectory the player will travel."
             data-title="FAITH PLATE" class="item" data-name="faith_plate" src="../assets/ui/items/faith_plate.png" />
@@ -271,7 +273,7 @@
         <span class="menu-text">Portalable</span>
       </a>
     </li>
-    <li id="conection" class="menu-item hasItem">
+    <li id="conection" class="menu-item hasItem buttons">
       <a href="#" class="menu-btn">
         <i class="" style="font-weight: bolder;">C</i>
         <span class="menu-text">Connect to...</span>
@@ -295,6 +297,29 @@
         <i class="fa fa-sync-alt"></i>
         <span class="menu-text">Rotate Item</span>
       </button>
+    </li>
+
+    <!---->
+
+    <li class="menu-item menu-item-submenu buttons hasItem">
+      <button type="button" class="menu-btn">
+        <i class="fas fa-plug"></i>
+        <span class="menu-text">Connections</span>
+      </button>
+      <ul class="menu" id="connections"></ul>
+    </li>
+
+    <li id="pedestal-inifinity" class="menu-item hasItem pedestal">
+      <a href="#" class="menu-btn">
+        <input type="checkbox" checked id="state-pedetsal-infinity"/>
+        <span class="menu-text">Infinity</span>
+      </a>
+    </li>
+    <li id="pedestal-timer" class="menu-item hasItem pedestal disabled">
+      <a href="#" class="menu-btn">
+        <input type="number" style="width: 30px;" max="30" min="3" value="3" id="pedestal-timer-value"/>
+        <span class="menu-text">Timer</span>
+      </a>
     </li>
 
     <!--<li class="menu-item menu-item-submenu">

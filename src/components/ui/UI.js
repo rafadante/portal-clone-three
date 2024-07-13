@@ -5,7 +5,7 @@ import {
     animate
 } from '../../Main.js';
 import { AUDIO, volume } from '../audio/Audio.js';
-import { closeDoor } from '../events/events.js';
+import { stateDoor } from '../events/events.js';
 
 if (!GLOBALS.MOBILE)
     $(".mobile").css("display", "none");
@@ -257,7 +257,7 @@ $("body").on('click', '#back-editor', function () {
     GLOBALS.EXIT_DOOR.getObjectByName("warning").visible = true;
 
     setTimeout(() => {
-        closeDoor(0,0,0)
+        stateDoor(1000, false, false, GLOBALS.ENTER_DOOR)
     }, 1000);
 
     GLOBALS.MAIN_CAMERA.near = 0.1;

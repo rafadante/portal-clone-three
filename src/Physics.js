@@ -198,6 +198,7 @@ function removeJointConstraint() {
     world.removeConstraint(jointConstraint)
     jointConstraint = undefined;
     getObject = false;
+    jointBody.position.set(10000,1000,1000)
 }
 
 GLOBALS.CANNON_WORLD = world;

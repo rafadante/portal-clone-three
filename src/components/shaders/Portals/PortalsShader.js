@@ -123,7 +123,7 @@ const generateMeshPortalShader = () => {
         side: 0,
         transparent: true,
         polygonOffset: true,
-        polygonOffsetFactor: -10
+            polygonOffsetFactor: -10,
     });
 
     var planegeometry = new THREE.CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
@@ -152,7 +152,7 @@ const generateMeshPortalShader = () => {
         side: 0,
         transparent: true,
         polygonOffset: true,
-        polygonOffsetFactor: -10
+            polygonOffsetFactor: -10,
     });
 
     var planegeometry = new THREE.CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);

@@ -7,6 +7,7 @@ import {
     animate
 } from '../../Main.js';
 import { planeInstanceReset, deleteItemInstanced } from '../items/Items.js';
+import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline';
 
 var color = new THREE.Color();
 const orange = new THREE.Color("rgb(255, 165, 0)");
@@ -24,10 +25,10 @@ function raycastSelected(found, event, type) {
 
     const instanceId = found.instanceId;
 
-    
+
 
     if (GLOBALS.CONNECTING) {
-        console.log("99999999999999")
+
         GLOBALS.CONNECTING = false;
 
         GLOBALS.MATERIAL_PORTAL_EDITOR.opacity = 1;
@@ -36,29 +37,47 @@ function raycastSelected(found, event, type) {
         GLOBALS.MATERIAL_NON_PORTAL_EDITOR.transparent = false;
         GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CURRENT_LINE);
 
-        if(GLOBALS.PLANE_USER_DATA[instanceId].allowconnection){
-            const material = new THREE.LineBasicMaterial({
-                color: 0x0000ff
-            });
-            
+        if (GLOBALS.PLANE_USER_DATA[instanceId].allowconnection) {
+
+            GLOBALS.PLANE_USER_DATA[instanceId].item.connections += 1;
+
             const points = [];
-            points.push( GLOBALS.SELECTED_FOR_CONNECTION.position );
-            points.push( GLOBALS.PLANE_USER_DATA[instanceId].position );
-            
-            const geometry = new THREE.BufferGeometry().setFromPoints( points );
-            
-            const line = new THREE.Line( geometry, material );
-            GLOBALS.SCENE_CHILDREN.add( line );
+            points.push(GLOBALS.SELECTED_FOR_CONNECTION.position);
+            points.push(GLOBALS.PLANE_USER_DATA[instanceId].position);
+
+            const geometry = new MeshLineGeometry()
+            geometry.setPoints(points)
+            const material = new MeshLineMaterial({
+                color: 0xffa500,
+                side: 2,
+                depthTest: true,
+                transparent: true
+            })
+            material.uniforms.alphaTest.value = 0;
+            material.uniforms.dashArray.value = 0.01;
+            material.uniforms.lineWidth.value = 0.1;
+            material.uniforms.useDash.value = 1;
+            const line = new THREE.Mesh(geometry, material)
+
+            GLOBALS.SCENE_CHILDREN.add(line);
+
+            GLOBALS.CONNECTIONS.push({
+                line: line,
+                from: GLOBALS.SELECTED_FOR_CONNECTION,
+                to: GLOBALS.PLANE_USER_DATA[instanceId]
+            })
+
+            console.log(GLOBALS.CONNECTIONS)
         }
-        
+
         GLOBALS.ITEM_CUBE.visible = false;
-        //GLOBALS.CURRENT_LINE = null;
+        GLOBALS.CURRENT_LINE = null;
 
         return;
     }
 
     if (event.button == 2) {
-        removeSelection();
+        //removeSelection();
         if (GLOBALS.PLANE_USER_DATA[instanceId].itemName != "exitDoor" &&
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "enterDoor" &&
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "window") {
@@ -85,9 +104,42 @@ function raycastSelected(found, event, type) {
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button")) {
-                    $("#conection").css("display", "block");
+                    $(".buttons").css("display", "block");
+
+                    $("#connections").empty();
+
+                    console.log(GLOBALS.PLANE_USER_DATA[instanceId])
+                    for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+
+                        if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[instanceId].itemName) {
+                            var elem = '<li data-id="' + i + '" class="menu-item removeConnection">' +
+                                '<button type="button" class="menu-btn">' +
+                                '<i class="fas fa-times"></i>' +
+                                '<span class="menu-text">' + GLOBALS.CONNECTIONS[i]["to"].itemName + '</span>' +
+                                '</button>' +
+                                '</li>';
+
+                            $("#connections").append(elem);
+                        }
+                    }
+
                 } else {
-                    $("#conection").css("display", "none");
+                    $(".buttons").css("display", "none");
+                }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal")) {
+                    console.log(GLOBALS.PLANE_USER_DATA[instanceId].item)
+                    $(".pedestal").css("display", "block");
+                    $("#state-pedetsal-infinity").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.pedestalInfinity);
+                    $("#pedestal-timer-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.pedestalValue);
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].item.pedestalInfinity) {
+                        $("#pedestal-timer").addClass("disabled");
+                    } else {
+                        $("#pedestal-timer").removeClass("disabled");
+                    }
+                } else {
+                    $(".pedestal").css("display", "none");
                 }
             }
 
@@ -116,7 +168,7 @@ function raycastSelected(found, event, type) {
                         if (planeInstanceOld.isInstanced) {
                             GLOBALS.DRAGGING = true;
                             deleteItemInstanced(planeInstanceOld, true);
-                            planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null,false);
+                            planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false);
                         } else {
                             //CHECK IF THE ITEM CAN BE MOVED ALONG DIRECTIONS
                             if (planeInstanceNew.side == "down") {
@@ -141,15 +193,15 @@ function raycastSelected(found, event, type) {
                             planeInstanceOld.item.namePosition = planeInstanceNew.position.x + "/" + planeInstanceNew.position.y + "/" + planeInstanceNew.position.z;
                             planeInstanceOld.item.position.copy(planeInstanceNew.position);
 
-                            if(!planeInstanceOld.item.name.includes("door-"))
+                            if (!planeInstanceOld.item.name.includes("door-"))
                                 planeInstanceOld.item.rotation.copy(planeInstanceNew.rotation);
 
                             //UPDATE PARAMETERS OF THE NEW PLACEMENT
                             planeInstanceReset(planeInstanceNew, true, planeInstanceOld.item.name, planeInstanceOld.item,
                                 planeInstanceOld.state, planeInstanceOld.canRotate, planeInstanceOld.floor,
-                                planeInstanceOld.ceiling, planeInstanceOld.walls, false, null,planeInstanceOld.allowconnection);
+                                planeInstanceOld.ceiling, planeInstanceOld.walls, false, null, planeInstanceOld.allowconnection);
                             //UPDATE PARAMETERS OF THE OLD PLACEMENT
-                            planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null,false)
+                            planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false)
 
                             /*if (planeInstanceNew.itemName.includes("door_enter") || planeInstanceNew.itemName.includes("door_exit")) {
                                 checkItemBoundingBox(planeInstanceNew.item, planeInstanceNew.item.cube)
@@ -343,9 +395,9 @@ $("body").on('click', '#delete', function () {
     } else {
         GLOBALS.ITEMS_COUNT[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName]["count"] -= 1;
         GLOBALS.ITEMS_ADDED.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item);
-        planeInstanceReset(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false, null, null, null, null, null, null, null, false, null,false);
     }
 
+    planeInstanceReset(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false, null, null, null, null, null, null, null, false, null, false);
     $(".menu").removeClass("menu-show");
 
     animate()
@@ -373,6 +425,62 @@ $("body").on('input', '#state-dispenser', function () {
     instanced.instanceMatrix.needsUpdate = true;
 
     animate();
+});
+
+$("body").on('input', '#state-pedetsal-infinity', function () {
+    if (this.checked) {
+        $("#pedestal-timer").addClass("disabled");
+    } else {
+        $("#pedestal-timer").removeClass("disabled");
+    }
+
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.pedestalInfinity = this.checked;
+
+    console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]])
+});
+
+$("body").on('input', '#pedestal-timer-value', function () {
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.pedestalValue = parseInt(this.value);
+});
+
+$("body").on('click', '.removeConnection', function () {
+
+    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[$(this).data("id")]["line"]);
+    GLOBALS.CONNECTIONS[$(this).data("id")]["to"].item.connections -= 1;
+
+    //RESET UI
+    GLOBALS.CONNECTIONS.splice($(this).data("id"), 1);
+    $("#connections").empty();
+    for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+
+        if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName) {
+            var elem = '<li data-id="' + i + '" class="menu-item removeConnection">' +
+                '<button type="button" class="menu-btn">' +
+                '<i class="fas fa-times"></i>' +
+                '<span class="menu-text">' + GLOBALS.CONNECTIONS[i]["to"].itemName + '</span>' +
+                '</button>' +
+                '</li>';
+
+            $("#connections").append(elem);
+        }
+    }
+
+    console.log(GLOBALS.CONNECTIONS)
+
+    animate();
+});
+
+$("body").on('mouseenter', '.removeConnection', function () {
+    GLOBALS.ITEM_CUBE.position.copy(GLOBALS.CONNECTIONS[$(this).data("id")]["to"].position);
+    GLOBALS.ITEM_CUBE.rotation.copy(GLOBALS.CONNECTIONS[$(this).data("id")]["to"].rotation);
+    GLOBALS.ITEM_CUBE.translateZ(1)
+    GLOBALS.ITEM_CUBE.material.color = new THREE.Color(0xff0000);
+    GLOBALS.ITEM_CUBE.visible = true;
+    animate();
+});
+
+$("body").on('mouseleave', '.removeConnection', function () {
+    GLOBALS.ITEM_CUBE.visible = false;
 });
 
 $("body").on('click', '.tile-nonPortal', function () {
