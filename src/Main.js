@@ -58,6 +58,7 @@ import {
     GLOBALS
 } from './Globals.js';
 import { func } from 'three/examples/jsm/nodes/Nodes.js';
+import { teleportationState } from './components/portal/Portal.js';
 
 //VARIABLES
 var angleHolder = 0;
@@ -327,6 +328,7 @@ function render(time) {
     renderGoo();
     updatePhysics();
     updateCamera(time);
+    teleportationState()
     updateEvents();
     TWEEN.update();
     animatePortal();
@@ -334,7 +336,7 @@ function render(time) {
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {
         if (GLOBALS.CAMERAS[i].fixed) {
             GLOBALS.CAMERA_OBJ_HORIZONTAL[i].lookAt(GLOBALS.MAIN_CAMERA.position);
-            GLOBALS.CAMERA_OBJ_HORIZONTAL[i].rotation.x = Math.PI / 2;
+            GLOBALS.CAMERA_OBJ_HORIZONTAL[i].rotation.x = 0;
             GLOBALS.CAMERA_OBJ_HORIZONTAL[i].rotation.y = 0;
         }
     }
@@ -362,10 +364,15 @@ function tweenCamera(duration, ini, final) {
 }
 
 function hideMaterial(obj, transparent, opacity){
+    //obj.visible=transparent;
     obj.traverse(c => {
         if (c.material) {
+            //c.material.visible = transparent
             c.material.transparent = transparent;
             c.material.opacity = opacity;
+            //c.material.depthTest = !transparent;
+            c.material.colorWrite = !transparent;
+            c.material.depthWrite = !transparent;
         }
     })
 }

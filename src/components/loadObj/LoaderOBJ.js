@@ -193,7 +193,6 @@ function loadGun() {
 function loadGunManager(scene) {
 
     GLOBALS.GUN = new THREE.Group();
-    console.log(GLOBALS.GUN)
     GLOBALS.GUN.visible = false;
 
     var newGroup = new THREE.Group();
@@ -229,13 +228,11 @@ function loadGunManager(scene) {
             child.material.polygonOffsetFactor= -1*/
         }
 
-        child.onAfterRender = function (renderer) {
+        /*child.onAfterRender = function (renderer) {
             renderer.clearStencil();
-        };
+        };*/
 
-        console.log(child)
-
-        child.renderOrder = 999;
+        //child.renderOrder = 999;
 
         if (child.name == "sphere")
             GLOBALS.GUN_SPHERE = child;
@@ -316,8 +313,6 @@ function loadEnterDoor(scene) {
     GLOBALS.ENTER_DOOR = door;
     GLOBALS.SCENE_CHILDREN.add(door);
 
-    console.log(GLOBALS.ENTER_DOOR)
-
     //
     const geometry = new THREE.PlaneGeometry(2, 2);
     const material = new THREE.MeshBasicMaterial({
@@ -382,7 +377,6 @@ function loadEnterDoor(scene) {
     const geometryExitDoor = new THREE.PlaneGeometry(1, 1);
     const materialExitDoor = new THREE.MeshBasicMaterial({ map: map });
     const planeExitDoor = new THREE.Mesh(geometryExitDoor, materialExitDoor);
-    console.log(planeExitDoor)
     planeExitDoor.position.set(0, 1.5, 0.01)
     planeExitDoor.scale.set(1, 0.5, 1)
     GLOBALS.EXIT_DOOR.add(planeExitDoor);
@@ -917,6 +911,8 @@ function loadAvatar() {
                 c.material.envMapIntensity = 0.5;
                 c.material.transparent = true;
                 c.material.opacity = 0;
+                c.material.colorWrite = false;
+                c.material.depthWrite = false;
                 c.material.side = 0;
             }
 

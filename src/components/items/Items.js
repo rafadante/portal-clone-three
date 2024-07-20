@@ -18,7 +18,10 @@ import { findPath } from '../findPath/FindPath.js';
 import { AUDIO } from '../audio/Audio.js';
 import { floor, func, userData } from 'three/examples/jsm/nodes/Nodes.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
-import { stateDoor } from '../events/events.js';
+import { stateDoor } from '../door/Door.js';
+import {
+    createLightBridges
+} from '../continuous/Continuous.js';
 
 var beamType;
 let lineFollow;
@@ -89,7 +92,40 @@ function addItem(found, loaded) {
 
         if (!userData.hasItem || loaded) {
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
+
+                var map2 = new THREE.TextureLoader().load(GLOBALS.DRAGGED_ITEM_ELEMENT.attr("src"));
+                map2.colorSpace = THREE.SRGBColorSpace;
+
+
+                const geometry = new THREE.BoxGeometry(2, 0, 2);
+                const material = new THREE.MeshBasicMaterial({ map: map2, transparent: true, visible: false });
+                const plane = new THREE.Mesh(geometry, material);
+
+                console.log(item)
+
+                var color;
+
+                if (GLOBALS.ITEM_HOLDED_NAME == "portal_0")
+                    color = new THREE.Color(0xff9a00);
+                else if (GLOBALS.ITEM_HOLDED_NAME == "portal_1")
+                    color = new THREE.Color(0x27a7d8);
+
+                const geometry2 = new THREE.BoxGeometry(0.1, 0.1, 2);
+                const material2 = new THREE.MeshStandardMaterial({ color: color, roughness: 0.2, envMap: GLOBALS.ENV_MAP });
+                const box = new THREE.Mesh(geometry2, material2);
+                const box2 = box.clone()
+                box.translateX(0.65)
+                box2.translateX(-0.65)
+
+
+                plane.add(box)
+                plane.add(box2)
+
+
+                var item = plane;
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
                 var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
 
                 item.traverse(child => {
@@ -103,8 +139,6 @@ function addItem(found, loaded) {
             } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
 
                 var item = new THREE.Group();
-                item.buttons = 0;
-                item.connections = 0;
 
                 const geometry = new THREE.CircleGeometry(0.25, 32);
                 const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
@@ -142,6 +176,10 @@ function addItem(found, loaded) {
                 return;
             }
 
+            item.buttons = 0;
+            item.connections = 0;
+            item.opened = true;
+
             /*userData.hasItem = true;
             userData.itemName = GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount;
             userData.item = item;
@@ -176,9 +214,9 @@ function addItem(found, loaded) {
                 item.position.copy(userData.position);
 
 
-            console.log(userData.normal)
+            console.log(userData)
             item.position.copy(userData.position);
-            item.rotation.set(userData.normal.x, userData.normal.y,userData.normal.z)
+            item.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
             item.renderOrder = 2;
             item.name = GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount;
             item.planeInstancedId = userData.id_instanced;
@@ -276,15 +314,22 @@ function addItem(found, loaded) {
                 instanced2.computeBoundingSphere();
             }
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "light_bridge")
-                item.position.y += 1;
+            if (GLOBALS.ITEM_HOLDED_NAME == "light_bridge") {
+                item.state = true;
+                item.triggers = "Middle Horizontal";
+                createLightBridges("light_bridge", GLOBALS.LIGHT_BRIDGE_RAYCASTER, item);
+            }
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "tractor_beam")
+            if (GLOBALS.ITEM_HOLDED_NAME == "tractor_beam") {
                 item.beam = beamType;
-
+                item.state = true;
+                item.reversed = false;
+                item.triggers = "State";
+                createLightBridges("tractor_beam", GLOBALS.TRACTOR_BEAM_RAYCASTER, item);
+            }
 
             if (GLOBALS.ITEM_HOLDED_NAME.includes("button")) {
-                const geometryBox3 = new THREE.BoxGeometry(1, 1.2, 1);
+                const geometryBox3 = new THREE.BoxGeometry(1, 0.5, 1);
                 const materialBox3 = new THREE.MeshBasicMaterial({
                     color: 0x00ff00
                 });
@@ -314,10 +359,13 @@ function addItem(found, loaded) {
             item.pedestalInfinity = true;
             item.pedestalValue = 3;
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
+                GLOBALS.ITEMS_ADDED.add(item);
+                item.translateY(0.01)
+                console.log(item)
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
 
-                item.translateY(1)
-                item.translateZ(0.3)
+                item.translateY(0.3)
 
                 const geometry = new THREE.BoxGeometry(0.6, 0.6, 0.6);
                 const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });

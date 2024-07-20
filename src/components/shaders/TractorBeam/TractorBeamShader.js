@@ -3,12 +3,40 @@ import { GLOBALS } from '../../../Globals';
 
 GLOBALS.UNIFORMS_TRACTOR_BEAM = {
     iTime: {
-        value: 0.0
+        type: 'f',
+        value: 1.0
     },
-    iResolution: {
+    iAlpha: {
+        type: 'f',
+        value: 0.3
+    },
+    iColor: {
+        type: 'v3',
+        value: new THREE.Vector3(0.0, 0.35, 0.75)
+    },
+    resolution: {
         type: "v2",
-        value: new THREE.Vector2(1000, 1000)
+        value: new THREE.Vector2(10, 1)
+    }
+};
+
+GLOBALS.UNIFORMS_TRACTOR_BEAM_ORANGE = {
+    iTime: {
+        type: 'f',
+        value: 1.0
     },
+    iAlpha: {
+        type: 'f',
+        value: 0.3
+    },
+    iColor: {
+        type: 'v3',
+        value: new THREE.Vector3(1.0, 0.5, 0.0)
+    },
+    resolution: {
+        type: "v2",
+        value: new THREE.Vector2(10, 1)
+    }
 };
 
 const vshader = `
@@ -23,100 +51,88 @@ void main()
 `;
 
 const fshader = `
+//
 uniform float iTime;
+uniform float iAlpha;
+uniform sampler2D iChannel0;
+uniform sampler2D iChannel1;
 uniform vec2 iResolution;
+uniform vec3 iColor;
 
-// Found this on GLSL sandbox. I really liked it, changed a few things and made it tileable.
-// :)
-// by David Hoskins.
-// Original water turbulence effect by joltz0r
+float height(in vec2 uv){
+    float speed = 6.0;
 
+    float topright=		sin(iTime*(speed+1.0)	-sin(length(uv-vec2(1.0,1.0)))*53.0);
+    float topleft=		sin(iTime*(speed+1.0)	-sin(length(uv-vec2(0.0,1.0)))*37.0);
+    float bottomright=	sin(iTime*(speed)    	-sin(length(uv-vec2(1.0,0.0)))*61.0);
+    float bottomleft=	sin(iTime*(speed+2.0)	-sin(length(uv-vec2(0.0,0.0)))*47.0);
 
-// Redefine below to see the tiling...
-//#define SHOW_TILING
-
-#define TAU 6.28318530718
-#define MAX_ITER 5
+    float horizontalWaves=sin(iTime*(speed+2.0)-sin(uv.y)*47.0);
+    
+    
+    float temp = horizontalWaves +bottomleft*0.4 +bottomright*0.2 +topleft*0.6 +topright*0.3;
+    
+    float b=smoothstep(-2.5,5.0,temp);
+    return b*3.0;
+}
 
 varying vec2 vUv;
 
-void main() 
+void main()
 {
-	float time = iTime * .5+23.0;
-    // uv should be the 0-1 uv of texture...
-	//vec2 uv = gl_FragCoord.xy / iResolution.y;
-  vec2 uv = -1.0 + 2.0 *vUv;
-    
-#ifdef SHOW_TILING
-	vec2 p = mod(uv*TAU*2.0, TAU)-250.0;
-#else
-    vec2 p = mod(uv*TAU, TAU)-250.0;
-#endif
-	vec2 i = vec2(p);
-	float c = 1.0;
-	float inten = .005;
+	//vec2 uv=gl_FragCoord.xy/iResolution.xy;
 
-	for (int n = 0; n < MAX_ITER; n++) 
-	{
-		float t = time * (1.0 - (3.5 / float(n+1)));
-		i = p + vec2(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));
-		c += 1.0/length(vec2(p.x / (sin(i.x+t)/inten),p.y / (cos(i.y+t)/inten)));
-	}
-	c /= float(MAX_ITER);
-	c = 1.17-pow(c, 1.4);
-	vec3 colour = vec3(pow(abs(c), 8.0));
-    colour = clamp(colour + vec3(0.0, 0.35, 0.5), 0.0, 1.0);
+    vec2 uv= 0.0 + 1.0 *vUv;
     
-	gl_FragColor = vec4(colour, 0.5);
+    float waveHeight=0.4+height(uv);
+    
+    //vec3 color=vec3(waveHeight*0.3,waveHeight*0.5,waveHeight);
+    vec3 color=vec3(waveHeight * iColor.x,waveHeight*iColor.y,waveHeight * iColor.z);
+    
+    gl_FragColor = vec4( color, iAlpha );
 }
 `;
 
 const fshaderOrange = `
+//
 uniform float iTime;
+uniform float iAlpha;
+uniform sampler2D iChannel0;
+uniform sampler2D iChannel1;
 uniform vec2 iResolution;
+uniform vec3 iColor;
 
-// Found this on GLSL sandbox. I really liked it, changed a few things and made it tileable.
-// :)
-// by David Hoskins.
-// Original water turbulence effect by joltz0r
+float height(in vec2 uv){
+    float speed = 6.0;
 
+    float topright=		sin(iTime*(speed+1.0)	-sin(length(uv-vec2(1.0,1.0)))*53.0);
+    float topleft=		sin(iTime*(speed+1.0)	-sin(length(uv-vec2(0.0,1.0)))*37.0);
+    float bottomright=	sin(iTime*(speed)    	-sin(length(uv-vec2(1.0,0.0)))*61.0);
+    float bottomleft=	sin(iTime*(speed+2.0)	-sin(length(uv-vec2(0.0,0.0)))*47.0);
 
-// Redefine below to see the tiling...
-//#define SHOW_TILING
-
-#define TAU 6.28318530718
-#define MAX_ITER 5
+    float horizontalWaves=sin(iTime*(speed+2.0)-sin(uv.y)*47.0);
+    
+    
+    float temp = horizontalWaves +bottomleft*0.4 +bottomright*0.2 +topleft*0.6 +topright*0.3;
+    
+    float b=smoothstep(-2.5,5.0,temp);
+    return b*3.0;
+}
 
 varying vec2 vUv;
 
-void main() 
+void main()
 {
-	float time = iTime * .5+23.0;
-    // uv should be the 0-1 uv of texture...
-	//vec2 uv = gl_FragCoord.xy / iResolution.y;
-  vec2 uv = -1.0 + 2.0 *vUv;
-    
-#ifdef SHOW_TILING
-	vec2 p = mod(uv*TAU*2.0, TAU)-250.0;
-#else
-    vec2 p = mod(uv*TAU, TAU)-250.0;
-#endif
-	vec2 i = vec2(p);
-	float c = 1.0;
-	float inten = .005;
+	//vec2 uv=gl_FragCoord.xy/iResolution.xy;
 
-	for (int n = 0; n < MAX_ITER; n++) 
-	{
-		float t = time * (1.0 - (3.5 / float(n+1)));
-		i = p + vec2(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));
-		c += 1.0/length(vec2(p.x / (sin(i.x+t)/inten),p.y / (cos(i.y+t)/inten)));
-	}
-	c /= float(MAX_ITER);
-	c = 1.17-pow(c, 1.4);
-	vec3 colour = vec3(pow(abs(c), 8.0));
-    colour = clamp(colour + vec3(1.0, 0.5, 0.0), 0.0, 1.0);
+    vec2 uv= 0.0 + 1.0 *-vUv;
     
-	gl_FragColor = vec4(colour, 0.5);
+    float waveHeight=0.4+height(uv);
+    
+    //vec3 color=vec3(waveHeight*0.3,waveHeight*0.5,waveHeight);
+    vec3 color=vec3(waveHeight * iColor.x,waveHeight*iColor.y,waveHeight * iColor.z);
+    
+    gl_FragColor = vec4( color, iAlpha );
 }
 `;
 
@@ -124,12 +140,19 @@ GLOBALS.MATERIAL_TRACTOR_BEAM = new THREE.ShaderMaterial({
     uniforms: GLOBALS.UNIFORMS_TRACTOR_BEAM,
     vertexShader: vshader,
     fragmentShader: fshader,
-    side: 2,
-    transparent: true,
-    depthWrite: false,
-    polygonOffset: true,
-    polygonOffsetFactor: -5
+    side: 0,
+    transparent: true
 });
+
+GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE = new THREE.ShaderMaterial({
+    uniforms: GLOBALS.UNIFORMS_TRACTOR_BEAM_ORANGE,
+    vertexShader: vshader,
+    fragmentShader: fshaderOrange,
+    side: 0,
+    transparent: true
+});
+
+console.log(GLOBALS.MATERIAL_TRACTOR_BEAM)
 
 /*window.materialBridgeOrange = new THREE.ShaderMaterial({
     uniforms: window.uniformsBridge,

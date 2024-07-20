@@ -6,9 +6,6 @@ import {
     ShapeType
 } from 'three-to-cannon';
 import {
-    createLightBridges
-} from '../continuous/Continuous.js';
-import {
     animate
 } from '../../Main.js';
 import {
@@ -18,7 +15,7 @@ import { add } from 'three/examples/jsm/libs/tween.module.js';
 import { newPortal, deletePortal } from '../portal/CreatePortal.js';
 import { addRadioAudio, AUDIO } from '../audio/Audio.js';
 import { func } from 'three/examples/jsm/nodes/Nodes.js';
-import { stateDoor } from '../events/events.js';
+import { stateDoor } from '../door/Door.js';
 
 var totalBodies = 0;
 var id = 0;
@@ -105,6 +102,11 @@ function viewFPS() {
 
 
     setTimeout(() => {
+
+        GLOBALS.MATERIAL_TRACTOR_BEAM.depthWrite = false;
+        GLOBALS.MATERIAL_TRACTOR_BEAM.side = 2;
+        GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE.depthWrite = false;
+        GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE.side = 2;
 
         GLOBALS.ENTER_DOOR.children[0].rotation.z += Math.PI;
 
@@ -321,9 +323,6 @@ function viewFPS() {
         addColliderItem(GLOBALS.DYMANIC_ITEMS['laser_cube'], "laser_cube", 5)
         addColliderItem(GLOBALS.DOORS, "door", 0)
         //
-        createLightBridges('light_bridge', GLOBALS.LIGHT_BRIDGE_RAYCASTER);
-        createLightBridges("tractor_beam", GLOBALS.TRACTOR_BEAM_RAYCASTER);
-        createLightBridges("laser_emitter", GLOBALS.LASER_EMITTER_RAYCASTER);
 
         for (var s = 0; s < GLOBALS.DYMANIC_ITEMS["tractor_beam"].length; s++) {
             if (GLOBALS.DYMANIC_ITEMS["tractor_beam"][s].length != 0)
@@ -520,10 +519,12 @@ function addColliderItem(items, type, mass, offset) {
             } else if (type == "cube" || type == "laser_cube") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.3, 0.3));
                 shape.height = 0.6;
+                shape.width = 0.6;
                 offset = 0.5;
             } else if (type == "sphere") {
                 var shape = new CANNON.Sphere(0.3);
                 shape.height = 0.6;
+                shape.width = 0.6;
                 offset = 0.5;
             } else if (type == "gel_gun_blue" || type == "gel_gun_orange" || type == "gel_gun_white") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.5, 0.1));
@@ -606,8 +607,12 @@ function addColliderItem(items, type, mass, offset) {
                         box.position.copy(new THREE.Vector3(items[i].dispenserPosition.x,
                             items[i].dispenserPosition.y - 1,
                             items[i].dispenserPosition.z));
-                        items[i].position.copy(box.position)
+                        items[i].position.copy(box.position);
+
+                        box.item = items[i];
                         GLOBALS.BOX_BODY.push(box);
+
+                        console.log(items[i])
                     } else {
                         box.allowSleep = true;
                     }

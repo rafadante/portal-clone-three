@@ -234,6 +234,21 @@ function checkSides(dummy, val, id, side, portal) {
         else if (direction.round().y == -1)
             side = "up"
 
+        var normal;
+
+        if (side == "down")
+            normal = new THREE.Vector3(0, 0, 0);
+        else if (side == "up")
+            normal = new THREE.Vector3(Math.PI, 0, 0);
+        else if (side == "front")
+            normal = new THREE.Vector3(Math.PI / 2, 0, 0);
+        else if (side == "back")
+            normal = new THREE.Vector3(-Math.PI / 2, 0, 0);
+        else if (side == "right")
+            normal = new THREE.Vector3(0, 0, Math.PI / 2);
+        else if (side == "left")
+            normal = new THREE.Vector3(0, 0, -Math.PI / 2);
+
         GLOBALS.PLANE_USER_DATA[idEmptyToFill] = {
             iniPos: dummy.position.clone(),
             base: true,
@@ -246,6 +261,7 @@ function checkSides(dummy, val, id, side, portal) {
             id_instanced: idEmptyToFill,
             portal: portal,
             tile: 1,
+            normal: normal
         };
 
         GLOBALS.BUDGET -= 1;
@@ -291,17 +307,17 @@ function buildIniCubes(obj) {
         }
 
         //GROUND
-        buildLayer(-1, -1, 0, 'x', 'z', 'y', 6, 8, "down", new THREE.Vector3(-Math.PI / 2, 0, 0), new THREE.Vector3(0,0,0));
+        buildLayer(-1, -1, 0, 'x', 'z', 'y', 6, 8, "down", new THREE.Vector3(-Math.PI / 2, 0, 0), new THREE.Vector3(0, 0, 0));
         //CEILING
-        buildLayer(-1, -1, 8, 'x', 'z', 'y', 6, 8, "up", new THREE.Vector3(Math.PI / 2, 0, 0), new THREE.Vector3(Math.PI,0,0));
+        buildLayer(-1, -1, 8, 'x', 'z', 'y', 6, 8, "up", new THREE.Vector3(Math.PI / 2, 0, 0), new THREE.Vector3(Math.PI, 0, 0));
         //WALL FRONT
-        buildLayer(-1, -1, 0, 'x', 'y', 'z', 4, 8, "front", new THREE.Vector3(0, 0, 0), new THREE.Vector3(Math.PI/2,0,0));
+        buildLayer(-1, -1, 0, 'x', 'y', 'z', 4, 8, "front", new THREE.Vector3(0, 0, 0), new THREE.Vector3(Math.PI / 2, 0, 0));
         //WALL BACK
-        buildLayer(-1, -1, 12, 'x', 'y', 'z', 4, 8, "back", new THREE.Vector3(0, Math.PI, 0), new THREE.Vector3(-Math.PI/2,0,0));
+        buildLayer(-1, -1, 12, 'x', 'y', 'z', 4, 8, "back", new THREE.Vector3(0, Math.PI, 0), new THREE.Vector3(-Math.PI / 2, Math.PI, 0));
         //WALL RIGHT
-        buildLayer(-1, -1, 16, 'z', 'y', 'x', 4, 6, "right", new THREE.Vector3(0, -Math.PI / 2, 0), new THREE.Vector3(0,0,Math.PI/2));
+        buildLayer(-1, -1, 16, 'z', 'y', 'x', 4, 6, "right", new THREE.Vector3(0, -Math.PI / 2, 0), new THREE.Vector3(Math.PI / 2, 0, Math.PI / 2));
         //WALL LEFT
-        buildLayer(-1, -1, 0, 'z', 'y', 'x', 4, 6, "left", new THREE.Vector3(0, Math.PI / 2, 0), new THREE.Vector3(0,0,-Math.PI/2));
+        buildLayer(-1, -1, 0, 'z', 'y', 'x', 4, 6, "left", new THREE.Vector3(0, Math.PI / 2, 0), new THREE.Vector3(Math.PI / 2, 0, -Math.PI / 2));
 
         $("#budget").text("BUDGET: " + GLOBALS.BUDGET);
     }
@@ -343,7 +359,7 @@ $("body").on('click', '#save-level', function () {
     dlAnchorElem.click();
 })
 
-function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot,normal) {
+function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
 
     var yo = y;
 

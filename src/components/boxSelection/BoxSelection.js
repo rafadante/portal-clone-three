@@ -9,13 +9,8 @@ import {
 import { planeInstanceReset, deleteItemInstanced } from '../items/Items.js';
 import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline';
 
-var color = new THREE.Color();
 const orange = new THREE.Color("rgb(255, 165, 0)");
-
 var initialPosition = null;
-var planeSelection = null;
-
-var dir;
 var currentID = null;
 
 function raycastSelected(found, event, type) {
@@ -24,8 +19,6 @@ function raycastSelected(found, event, type) {
     document.querySelector('.menu').classList.remove('menu-show');
 
     const instanceId = found.instanceId;
-
-
 
     if (GLOBALS.CONNECTING) {
 
@@ -41,9 +34,16 @@ function raycastSelected(found, event, type) {
 
             GLOBALS.PLANE_USER_DATA[instanceId].item.connections += 1;
 
+            var endPos = GLOBALS.PLANE_USER_DATA[instanceId].position;
+
+            if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere"))
+                endPos = GLOBALS.PLANE_USER_DATA[instanceId].item.dispenserPosition
+
             const points = [];
             points.push(GLOBALS.SELECTED_FOR_CONNECTION.position);
-            points.push(GLOBALS.PLANE_USER_DATA[instanceId].position);
+            points.push(endPos);
+
+            console.log(GLOBALS.PLANE_USER_DATA[instanceId])
 
             const geometry = new MeshLineGeometry()
             geometry.setPoints(points)
@@ -97,10 +97,12 @@ function raycastSelected(found, event, type) {
                 if ((GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_cube"))) {
-                    $("#dispenser").css("display", "block");
+                    $(".dispenser").css("display", "block");
                     $("#state-dispenser").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.hasDispenser);
+                    console.log(GLOBALS.PLANE_USER_DATA[instanceId].item.opened)
+                    $("#dispenser-opened").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.opened);
                 } else {
-                    $("#dispenser").css("display", "none");
+                    $(".dispenser").css("display", "none");
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button")) {
@@ -120,6 +122,8 @@ function raycastSelected(found, event, type) {
                                 '</li>';
 
                             $("#connections").append(elem);
+
+                            $("#state-lines").prop("checked", GLOBALS.CONNECTIONS[i]['line'].visible);
                         }
                     }
 
@@ -128,7 +132,7 @@ function raycastSelected(found, event, type) {
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal")) {
-                    console.log(GLOBALS.PLANE_USER_DATA[instanceId].item)
+
                     $(".pedestal").css("display", "block");
                     $("#state-pedetsal-infinity").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.pedestalInfinity);
                     $("#pedestal-timer-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.pedestalValue);
@@ -140,6 +144,25 @@ function raycastSelected(found, event, type) {
                     }
                 } else {
                     $(".pedestal").css("display", "none");
+                }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("tractor")) {
+                    $(".tractor").css("display", "block");
+
+                    $("#tractor-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.state)
+                    $("#tractor-direction-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.reversed)
+                    $("#tractor-trigger").find(".title").text("Triggers: " + GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
+                } else {
+                    $(".tractor").css("display", "none");
+                }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light_bridge")) {
+                    $(".light-bridge").css("display", "block");
+
+                    $("#light-bridge-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.state);
+                    $("#light-bridge-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
+                } else {
+                    $(".light-bridge").css("display", "none");
                 }
             }
 
@@ -167,6 +190,24 @@ function raycastSelected(found, event, type) {
 
                         if (planeInstanceOld.isInstanced) {
                             GLOBALS.DRAGGING = true;
+
+                            if (planeInstanceOld.item.continuous) {
+
+                                const index = GLOBALS.TRACTOR_BEAM.indexOf(planeInstanceOld.item.continuous);
+                                if (index > -1) { // only splice array when item is found
+                                    GLOBALS.TRACTOR_BEAM.splice(index, 1); // 2nd parameter means remove one item only
+                                    GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.splice(index, 1); // 2nd parameter means remove one item only
+                                }
+
+                                GLOBALS.SCENE_CHILDREN.remove(planeInstanceOld.item.continuous);
+                            }
+
+                            if (planeInstanceOld.item.bodyBridge) {
+                                GLOBALS.CANNON_WORLD.removeBody(planeInstanceOld.item.bodyBridge);
+                                planeInstanceOld.item.bodyBridge = null;
+                            }
+
+
                             deleteItemInstanced(planeInstanceOld, true);
                             planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false);
                         } else {
@@ -216,9 +257,8 @@ function raycastSelected(found, event, type) {
             }
         }
 
-        if (type == "down" && GLOBALS.SELECTED_ID.length > 0 && event.button == 0) {
+        if (type == "down" && GLOBALS.SELECTED_ID.length > 0 && event.button == 0)
             removeSelection()
-        }
 
         if (GLOBALS.DRAGGING)
             return;
@@ -268,9 +308,6 @@ function raycastSelected(found, event, type) {
                 var direction = new THREE.Vector3();
                 planeSelection.getWorldDirection(direction);
                 direction = new THREE.Vector3(Math.abs(direction.x - 1), Math.abs(direction.y - 1), Math.abs(direction.z - 1))
-                //xDir *= direction.x;
-                //yDir *= direction.y;
-                //zDir *= direction.z;
 
                 for (var w = 0, i = 0; w <= planeWidth / 2; w++, i += 2) {
 
@@ -340,25 +377,6 @@ $("body").on('click', '#side-bar-left, #ui-top', function () {
 });
 
 $("body").on('click', '#rotate-item', function () {
-    /*for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
-
-        var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("door");
-
-        var dummy = new THREE.Object3D();
-        dummy.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.position);
-        dummy.rotation.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation);
-
-        dummy.rotation.y += Math.PI / 2;
-
-        dummy.updateMatrix();
-        instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.userData.id, dummy.matrix)
-
-        instanced.instanceMatrix.needsUpdate = true;
-        instanced.computeBoundingSphere();
-
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation.copy(dummy.rotation);
-    }*/
-
     if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("door") ||
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("faith_plate")) {
 
@@ -407,11 +425,10 @@ $("body").on('input', '#state-dispenser', function () {
 
     var scale;
 
-    if (this.checked) {
+    if (this.checked)
         scale = new THREE.Vector3(1, 1, 1);
-    } else {
+    else
         scale = new THREE.Vector3(0, 0, 0);
-    }
 
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.hasDispenser = this.checked;
 
@@ -427,16 +444,27 @@ $("body").on('input', '#state-dispenser', function () {
     animate();
 });
 
-$("body").on('input', '#state-pedetsal-infinity', function () {
-    if (this.checked) {
-        $("#pedestal-timer").addClass("disabled");
-    } else {
-        $("#pedestal-timer").removeClass("disabled");
+$("body").on('input', '#dispenser-opened', function () {
+    console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]])
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.opened = this.checked;
+})
+
+$("body").on('input', '#state-lines', function () {
+    for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+        if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName)
+            GLOBALS.CONNECTIONS[i]["line"].visible = this.checked;
     }
 
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.pedestalInfinity = this.checked;
+    animate();
+})
 
-    console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]])
+$("body").on('input', '#state-pedetsal-infinity', function () {
+    if (this.checked)
+        $("#pedestal-timer").addClass("disabled");
+    else
+        $("#pedestal-timer").removeClass("disabled");
+
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.pedestalInfinity = this.checked;
 });
 
 $("body").on('input', '#pedestal-timer-value', function () {
@@ -464,8 +492,6 @@ $("body").on('click', '.removeConnection', function () {
             $("#connections").append(elem);
         }
     }
-
-    console.log(GLOBALS.CONNECTIONS)
 
     animate();
 });
@@ -503,28 +529,103 @@ $("body").on('click', '.tile-portal', function () {
     $(".menu").removeClass("menu-show");
 });
 
-$("body").on('click', '#dispenser-state', function () {
 
-    for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
+$("body").on('input', '#tractor-state-input, #light-bridge-state-input', function () {
 
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.hasDispenser = !GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.hasDispenser;
+    console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]])
 
-        var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
-        var item = new THREE.Object3D();
-        item.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.dispenserPosition);
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.state = this.checked;
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.visible = this.checked;
 
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.hasDispenser) {
-            item.scale.set(1, 1, 1);
-        } else {
-            item.scale.set(0, 0, 0);
-        }
-
-        item.updateMatrix();
-        instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.dispenserID, item.matrix);
-        instanced.instanceMatrix.needsUpdate = true;
-        instanced.computeBoundingSphere();
+    if ($(this).attr("id") == "light-bridge-state-input") {
+        if (this.checked)
+            GLOBALS.CANNON_WORLD.addBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
+        else
+            GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
     }
+
+    animate();
 });
+
+$("body").on('input', '#tractor-direction-input', function () {
+
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.reversed = this.checked;
+
+    if (this.checked)
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE;
+    else
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_TRACTOR_BEAM;
+
+    animate();
+});
+
+
+$("body").on('click', '.tractor-triggers', function () {
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.triggers = $(this).data("trigger");
+    $("#tractor-trigger").data("trigger", $(this).data("trigger"))
+    $("#tractor-trigger").find(".title").text("Triggers: " + $(this).data("trigger"));
+});
+
+$("body").on('click', '.light-bridge-triggers', function () {
+
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.triggers = $(this).data("trigger");
+    $("#light-bridge-trigger").data("trigger", $(this).data("trigger"))
+    $("#light-bridge-trigger").find(".title").text($(this).data("trigger"));
+
+    var dummy = new THREE.Object3D();
+    dummy.position.copy(new THREE.Vector3(
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.x,
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.y,
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.z
+    ));
+    dummy.rotation.set(
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].normal.x,
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].normal.y,
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].normal.z
+    );
+
+    if ($(this).data("trigger") == "Middle Vertical") {
+        dummy.rotateY(Math.PI / 2);
+    } else if ($(this).data("trigger") == "Top") {
+        dummy.translateZ(-0.8);
+    } else if ($(this).data("trigger") == "Bottom") {
+        dummy.translateZ(0.8);
+    } else if ($(this).data("trigger") == "Left") {
+        dummy.rotateY(Math.PI / 2);
+        dummy.translateZ(-0.8);
+    } else if ($(this).data("trigger") == "Right") {
+        dummy.rotateY(Math.PI / 2);
+        dummy.translateZ(0.8);
+    }
+
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.position.copy(dummy.position)
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.rotation.copy(dummy.rotation)
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.translateY(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.distance);
+
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.position)
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge.quaternion.copy(dummy.quaternion)
+    //GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge.translateY(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.distance);
+
+    dummy.updateMatrix();
+    var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("light_bridge");
+    instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.idInstanced, dummy.matrix)
+    instanced.instanceMatrix.needsUpdate = true;
+    instanced.computeBoundingSphere();
+
+    animate();
+});
+
+/*var dummy = new THREE.Object3D();
+            dummy.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.position);
+            dummy.rotation.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation);
+
+            dummy.rotation.y += Math.PI / 2;
+
+            dummy.updateMatrix();
+            instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.userData.id, dummy.matrix)
+
+            instanced.instanceMatrix.needsUpdate = true;
+            instanced.computeBoundingSphere();*/
 
 export {
     raycastSelected

@@ -22,9 +22,9 @@ var allowPortal = true;
 
 var fffff = false;
 
-function portalButton(button) {
+function portalButton(button, auto) {
 
-    if (!allowPortal || GLOBALS.HOLDING_ITEM)
+    if (!allowPortal)//|| GLOBALS.HOLDING_ITEM
         return;
 
     if (GLOBALS.FPS_MODE && (button == 2 || button == 0 || button == 1) && GLOBALS.ALLOW_PLACE_PORTALS) {
@@ -32,9 +32,21 @@ function portalButton(button) {
         raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
         var intersects = raycaster2.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
 
+        if (auto) {
+            auto.point = auto.position;
+            auto.instanceId = auto.planeInstancedId;
+            auto.object = auto;
+            intersects = [auto];
+            console.log("111111111111")
+            console.log(intersects)
+        }
+
+
         if (intersects.length > 0) {
 
             var userData = GLOBALS.PLANE_USER_DATA[intersects[0].instanceId];
+
+            console.log(userData)
 
             var obj = intersects[0].object;
             var target = new THREE.Vector3(); // create once an reuse it
@@ -48,44 +60,46 @@ function portalButton(button) {
             var z = intersects[0].point.z + offsetVector.z;
 
             //PORTAL GUN FLASH
-            if (button == 0) { // left click
-                GLOBALS.FLASH.color = new THREE.Color(1, 0.25, 0);
-            } else if (button == 2) { // left click
-                GLOBALS.FLASH.color = new THREE.Color(0, 0.3, 1);
-            }
+            if (!auto) {
+                if (button == 0) { // left click
+                    GLOBALS.FLASH.color = new THREE.Color(1, 0.25, 0);
+                } else if (button == 2) { // left click
+                    GLOBALS.FLASH.color = new THREE.Color(0, 0.3, 1);
+                }
 
-            var positionGun = new THREE.Vector3();
-            GLOBALS.PORTAL_GUN_FLASH.getWorldPosition(positionGun);
+                var positionGun = new THREE.Vector3();
+                GLOBALS.PORTAL_GUN_FLASH.getWorldPosition(positionGun);
 
-            if (button == 0 || button == 2) {
+                if (button == 0 || button == 2) {
 
-                GLOBALS.FLASH.position.copy(positionGun);
-                GLOBALS.FLASH.visible = true;
+                    GLOBALS.FLASH.position.copy(positionGun);
+                    GLOBALS.FLASH.visible = true;
 
-                tweenCamera(300, GLOBALS.FLASH.position, new THREE.Vector3(x, y, z));
+                    tweenCamera(300, GLOBALS.FLASH.position, new THREE.Vector3(x, y, z));
 
-                allowPortal = false;
-                tweenCamera(150, GLOBALS.GUN.children[0].position, new THREE.Vector3(GLOBALS.GUN.children[0].position.x,
-                    GLOBALS.GUN.children[0].position.y,
-                    0.005));
-                setTimeout(() => {
+                    allowPortal = false;
                     tweenCamera(150, GLOBALS.GUN.children[0].position, new THREE.Vector3(GLOBALS.GUN.children[0].position.x,
                         GLOBALS.GUN.children[0].position.y,
-                        0));
-                }, 150);
-            }
+                        0.005));
+                    setTimeout(() => {
+                        tweenCamera(150, GLOBALS.GUN.children[0].position, new THREE.Vector3(GLOBALS.GUN.children[0].position.x,
+                            GLOBALS.GUN.children[0].position.y,
+                            0));
+                    }, 150);
+                }
 
-            setTimeout(() => {
-                GLOBALS.FLASH.scale.set(0.02, 0.02, 0.02);
-                GLOBALS.FLASH.visible = false;
-                allowPortal = true;
-            }, 300);
+                setTimeout(() => {
+                    GLOBALS.FLASH.scale.set(0.02, 0.02, 0.02);
+                    GLOBALS.FLASH.visible = false;
+                    allowPortal = true;
+                }, 300);
+            }
 
             if (GLOBALS.GUN_MODE == 1) {
 
                 console.log(userData)
 
-                if (userData.portal && (!userData.hasItem || userData.itemName.includes("camera"))) {
+                if (auto || (userData.portal && (!userData.hasItem || userData.itemName.includes("camera")))) {
                     const point = new THREE.Vector3(x, y, z);
                     // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                     // define playerUpDirection
@@ -177,7 +191,11 @@ function portalButton(button) {
 
                     //point.add(dir.clone().multiplyScalar(-0.02));
 
+                    console.log("5555555555555555555555555")
+
                     if (button == 0) { // left click
+
+                        console.log("66666666666666666666666666")
 
                         if (GLOBALS.PORTALS[1] === null)
                             document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
@@ -204,6 +222,8 @@ function portalButton(button) {
                         AUDIO.PORTAL_GUN_ORANGE.currentTime = 0;
                         AUDIO.PORTAL_GUN_ORANGE.play();
                     } else if (button == 2) { // left click
+
+                        console.log("777777777777777777777")
 
                         if (GLOBALS.PORTALS[0] === null)
                             document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
@@ -353,6 +373,8 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
     GLOBALS.PORTALS[thisPortalIndex].add(GLOBALS.PORTAL_AUDIO[thisPortalIndex])
 
     //GLOBALS.PORTAL_AUDIO[thisPortalIndex].play();
+
+    console.log("xxxxxxxxxxxxxx")
 }
 
 export {

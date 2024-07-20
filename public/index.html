@@ -58,23 +58,25 @@
       <div class="body">
         <div id="items">
           <img data-content="Can be linked to an object to form a trigger. This button only accepts spheres."
-            data-title="BUTTON SPHERE" class="item" data-name="button_circle"  id="button_circle" data-allowconnection="false"
-            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true"
-            src="../assets/ui/items/button_sphere.png" />
+            data-title="BUTTON SPHERE" class="item" data-name="button_circle" id="button_circle"
+            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="true" src="../assets/ui/items/button_sphere.png" />
 
           <img data-content="Can be linked to an object to form a trigger. This button only accepts cubes."
-            data-title="BUTTON CUBE" class="item" data-name="button_box" src="../assets/ui/items/button_cube.png" data-allowconnection="false"
-            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" id="button_box"/>
+            data-title="BUTTON CUBE" class="item" data-name="button_box" src="../assets/ui/items/button_cube.png"
+            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="true" id="button_box" />
 
           <img data-content="Can be linked to an object to form a trigger. This button accepts spheres and cubes."
-            data-title="BUTTON WEIGHT" class="item" data-name="button_weight" src="../assets/ui/items/button.png" data-allowconnection="false"
-            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" id="button_weight"/>
+            data-title="BUTTON WEIGHT" class="item" data-name="button_weight" src="../assets/ui/items/button.png"
+            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="true" id="button_weight" />
 
           <img
             data-content="Can be linked to an object to form a trigger. The player can click on the button and it will activate the function that it is connected to. You can add a timer to your button through the properties menu."
             data-title="PEDESTAL BUTTON" class="item" data-name="pedestal_button" data-allowconnection="false"
-            src="../assets/ui/items/pedestal_button.png" 
-            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" id="pedestal_button"/>
+            src="../assets/ui/items/pedestal_button.png" data-rotate="false" data-floor="true" data-ceiling="true"
+            data-walls="true" data-instanced="true" id="pedestal_button" />
 
           <!--<img
             data-content="Once the laser emitter hits the catcher you can have it trigger a function such as opening a door, or enabling a set of stairs."
@@ -110,36 +112,42 @@
 
           <img
             data-content="A dropper will come with it. If the player loses the cube the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
-            data-title="CUBE" class="item" data-name="cube" src="../assets/ui/items/cube_blue.png" data-allowconnection="true"
-            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="cube"/>
+            data-title="CUBE" class="item" data-name="cube" src="../assets/ui/items/cube_blue.png"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
+            data-instanced="true" id="cube" />
 
           <img
             data-content="A dropper will come with it. If the player loses the sphere the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
-            data-title="SPHERE" class="item" data-name="sphere" src="../assets/ui/items/sphere.png" data-allowconnection="true"
-            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="sphere"/>
+            data-title="SPHERE" class="item" data-name="sphere" src="../assets/ui/items/sphere.png"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
+            data-instanced="true" id="sphere" />
 
           <img data-content="Purely cosmetic, it will play a radio music." data-title="RADIO" class="item"
-            data-name="radio" src="../assets/ui/items/radio.png" data-allowconnection="false"
-            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="radio"/>
+            data-name="radio" src="../assets/ui/items/radio.png" data-allowconnection="false" data-rotate="false"
+            data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="radio" />
 
           <img data-content="Purely cosmetic, it will look at the player." data-title="CAMERA" class="item"
-            data-name="camera" src="../assets/ui/items/camera.png" data-allowconnection="false"
-            data-rotate="false" data-floor="false" data-ceiling="false" data-walls="true" data-instanced="false" id="camera"/>
+            data-name="camera" src="../assets/ui/items/camera.png" data-allowconnection="false" data-rotate="false"
+            data-floor="false" data-ceiling="false" data-walls="true" data-instanced="false" id="camera" />
 
           <img
             data-content="Whenever the player walks through a Tractor Beam they will float through the beam it emits. The blue beam pushes the player forward, away from the receptacle, and the orange beam pulls the player in towards it. The properties menu allows you to start the beam in reversed mode or completely off."
-            data-title="TRACTOR BEAM" class="item" data-name="tractor_beam" data-beam="blue"
-            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true"
-            data-allowconnection="true" id="tractor_beam"
-            src="../assets/ui/items/tractor_beam.png" />
-<!--
+            data-title="TRACTOR BEAM" class="item" data-name="tractor_beam" data-beam="blue" data-rotate="false"
+            data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" data-allowconnection="true"
+            id="tractor_beam" src="../assets/ui/items/tractor_beam.png" />
+
+            <img
+            data-content="Players and objects will not pass through the surface of Light Bridges. Within the properties menu you're given the option to start the bridge enabled or disabled."
+            data-title="LIGHT BRIDGE" class="item" data-name="light_bridge" src="../assets/ui/items/light_bridge.png" 
+            data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" data-allowconnection="true"
+            id="light_bridge"
+            />
+          <!--
           <img
             data-content="If a player walks onto a Faith Plate it will cause them to get bounced into the air. When you place a Faith Plate within the editor it will also create a bullseye and a yellow ball. The Bullseye is where the player will ultimately land, and the yellow ball is the trajectory the player will travel."
             data-title="FAITH PLATE" class="item" data-name="faith_plate" src="../assets/ui/items/faith_plate.png" />
 
-          <img
-            data-content="Players and objects will not pass through the surface of Light Bridges. Within the properties menu you're given the option to start the bridge enabled or disabled."
-            data-title="LIGHT BRIDGE" class="item" data-name="light_bridge" src="../assets/ui/items/light_bridge.png" />
+          
 
           <img
             data-content="Can either start enabled or disabled through the properties menu. When enabled the player can walk up and down them."
@@ -181,16 +189,27 @@
 
           <img
             data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
-            data-title="LIGHT TOP" class="item" data-name="light" src="../assets/ui/items/light.png" data-allowconnection="true"
-            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" id="light"/>
+            data-title="LIGHT TOP" class="item" data-name="light" src="../assets/ui/items/light.png"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="true" id="light" />
 
           <!--<img
             data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
             data-title="LIGHT STRIPS" class="item" data-name="stripe" src="../assets/ui/items/stripe.png" />-->
 
           <img data-content="You can link a trigger to it to open the door." data-title="DOOR" class="item"
-            data-name="door" src="../assets/ui/items/door.png"  data-allowconnection="true"
-            data-rotate="true" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="false" id="door"/>
+            data-name="door" src="../assets/ui/items/door.png" data-allowconnection="true" data-rotate="true"
+            data-floor="true" data-ceiling="false" data-walls="false" data-instanced="false" id="door" />
+
+          <img data-content="You can link a trigger to it to open the door." data-title="PORTAL" class="item"
+            data-name="portal_0" src="../assets/ui/mobile/portalOrange.png" data-allowconnection="true"
+            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="false"
+            id="portal_0" />
+
+          <img data-content="You can link a trigger to it to open the door." data-title="PORTAL" class="item"
+            data-name="portal_1" src="../assets/ui/mobile/portalBlue.png" data-allowconnection="true"
+            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="false"
+            id="portal_1" />
 
           <!--<img
             data-content="You can place automatic portals on the scene, it can be static or activated by a trigger. You can choose which portal color on the level editor. If the player has a portal gun and shoots a portal with the same color as the automatic portal, the automatic portal will be destroyed and vice versa."
@@ -223,7 +242,7 @@
             data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
             data-title="GEL CLEAR" class="item" data-name="gel_new" src="../assets/ui/items/gel_new.png" />-->
 
-            <!--<img
+          <!--<img
             data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
             data-title="GEL CLEAR" class="item" data-name="ramp" src="../assets/ui/items/gel_new.png" />
 
@@ -246,7 +265,7 @@
 
   <div id="load-level-panel">
     <span id="close-load-level-panel">X</span>
-    <input type="file" id="input-level" accept="application/json"/>
+    <input type="file" id="input-level" accept="application/json" />
   </div>
 
   <div id="loading-parent">
@@ -286,9 +305,17 @@
       </a>
     </li>
     <li class="menu-separator"></li>
-    <li id="dispenser" class="menu-item hasItem">
+
+    <li id="lines" class="menu-item hasItem buttons">
       <a href="#" class="menu-btn">
-        <input type="checkbox" checked id="state-dispenser"/>
+        <input type="checkbox" checked id="state-lines" />
+        <span class="menu-text">Show Lines</span>
+      </a>
+    </li>
+
+    <li id="dispenser" class="menu-item hasItem dispenser">
+      <a href="#" class="menu-btn">
+        <input type="checkbox" checked id="state-dispenser" />
         <span class="menu-text">Dispenser</span>
       </a>
     </li>
@@ -300,6 +327,104 @@
     </li>
 
     <!---->
+    <li id="light-bridge-state" class="menu-item hasItem light-bridge">
+      <a href="#" class="menu-btn">
+        <input type="checkbox" checked id="light-bridge-state-input"/>
+        <span class="menu-text">State</span>
+      </a>
+    </li>
+    <li class="menu-item menu-item-submenu hasItem light-bridge" id="light-bridge-trigger" data-trigger="Middle Horizontal">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-crosshairs"></i>
+        <span class="menu-text title">Middle Horizontal</span>
+      </button>
+      <ul class="menu">
+        <li data-trigger="Middle Horizontal" class="menu-item light-bridge-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Middle Horizontal</span>
+          </button>
+        </li>
+        <li data-trigger="Middle Vertical" class="menu-item light-bridge-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Middle Vertical</span>
+          </button>
+        </li>
+        <li data-trigger="Top" class="menu-item light-bridge-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Top</span>
+          </button>
+        </li>
+        <li data-trigger="Bottom" class="menu-item light-bridge-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Bottom</span>
+          </button>
+        </li>
+        <li data-trigger="Left" class="menu-item light-bridge-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Left</span>
+          </button>
+        </li>
+        <li data-trigger="Right" class="menu-item light-bridge-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Right</span>
+          </button>
+        </li>
+      </ul>
+    </li>
+
+    <!---->
+    <li id="tractor-state" class="menu-item hasItem tractor">
+      <a href="#" class="menu-btn">
+        <input type="checkbox" checked id="tractor-state-input"/>
+        <span class="menu-text">State</span>
+      </a>
+    </li>
+    <li id="tractor-direction" class="menu-item hasItem tractor">
+      <a href="#" class="menu-btn">
+        <input type="checkbox" id="tractor-direction-input"/>
+        <span class="menu-text">Revert</span>
+      </a>
+    </li>
+    <li class="menu-item menu-item-submenu hasItem tractor" id="tractor-trigger" data-trigger="State">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-plug"></i>
+        <span class="menu-text title">Triggers: State</span>
+      </button>
+      <ul class="menu">
+        <li data-trigger="State" class="menu-item tractor-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-plug"></i>
+            <span class="menu-text">State</span>
+          </button>
+        </li>
+        <li data-trigger="Direction" class="menu-item tractor-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-plug"></i>
+            <span class="menu-text">Direction</span>
+          </button>
+        </li>
+        <li data-trigger="Both" class="menu-item tractor-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-plug"></i>
+            <span class="menu-text">Both</span>
+          </button>
+        </li>
+      </ul>
+    </li>
+    
+
+    <li id="dispenser-state" class="menu-item hasItem dispenser">
+      <a href="#" class="menu-btn">
+        <input type="checkbox" checked id="dispenser-opened" />
+        <span class="menu-text">Start Opened</span>
+      </a>
+    </li>
 
     <li class="menu-item menu-item-submenu buttons hasItem">
       <button type="button" class="menu-btn">
@@ -311,13 +436,13 @@
 
     <li id="pedestal-inifinity" class="menu-item hasItem pedestal">
       <a href="#" class="menu-btn">
-        <input type="checkbox" checked id="state-pedetsal-infinity"/>
+        <input type="checkbox" checked id="state-pedetsal-infinity" />
         <span class="menu-text">Infinity</span>
       </a>
     </li>
     <li id="pedestal-timer" class="menu-item hasItem pedestal disabled">
       <a href="#" class="menu-btn">
-        <input type="number" style="width: 30px;" max="30" min="3" value="3" id="pedestal-timer-value"/>
+        <input type="number" style="width: 30px;" max="30" min="3" value="3" id="pedestal-timer-value" />
         <span class="menu-text">Timer</span>
       </a>
     </li>
@@ -376,7 +501,7 @@
       </ul>
     </li>-->
 
-    
+
 
     <!--<li class="menu-item menu-item-submenu">
       <button type="button" class="menu-btn">
@@ -827,6 +952,8 @@
   <div id="placeholder">
     <button id="start-place-holder">START</button>
   </div>
+
+  <div id="panel-top"></div>
 
 </body>
 

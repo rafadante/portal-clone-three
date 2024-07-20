@@ -23,7 +23,7 @@ import {
 } from '../../Globals.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { AUDIO } from '../audio/Audio.js';
-import { stateDoor } from '../events/events.js';
+import { stateDoor } from '../door/Door.js';
 
 //
 let shouldJump = false;
@@ -213,6 +213,7 @@ function player() {
     // define shape
     let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 2, 2 / 3.2, 0.5 / 2));
     physicsShape.height = 1.25;
+    physicsShape.width = 0.5;
 
     // define the physical body attributes
     GLOBALS.PLAYER = new CANNON.Body({
@@ -741,7 +742,7 @@ const updateCamera = function (deltaTime) {
     lastTimeStamp = deltaTime;
     let action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
     if (GLOBALS.PLAYER_MODEL.modelReady) {
-        if (GLOBALS.PLAYER.inJump) {
+        if (GLOBALS.PLAYER.inJump && !GLOBALS.PLAYER.inTractor) {
             action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_JUMP
         } else if (controller["KeyW"].pressed && controller["KeyD"].pressed && controller["KeyA"].pressed && controller["KeyS"].pressed) {
             action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE

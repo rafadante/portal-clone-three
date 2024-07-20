@@ -197,7 +197,9 @@ var GLOBALS = {
         stripe: [],
         gel_blue: [],
         gel_orange: [],
-        camera: []
+        camera: [],
+        portal_0: [],
+        portal_1: []
     },
 
     INTERACTIVE: [],
@@ -274,6 +276,7 @@ var GLOBALS = {
     UNIFORMS_GEL: null,
     UNIFORMS_LIGHT_BRIDGE: null,
     UNIFORMS_TRACTOR_BEAM: null,
+    UNIFORMS_TRACTOR_BEAM_ORANGE: null,
     UNIFORMS_PORTAL_GUN_ENERGY: null,
 
     LIGHTNIN_STRIKE_1: null,
@@ -305,6 +308,7 @@ var GLOBALS = {
     TEXTURE_MENU_GRID: null,
 
     MATERIAL_TRACTOR_BEAM: null,
+    MATERIAL_TRACTOR_BEAM_REVERSE: null,
     MATERIAL_LIGHT_BRIDGERS: null,
 
     ELEVATOR: null,
@@ -441,7 +445,15 @@ var GLOBALS = {
         camera: {
             count: 0,
             max: 10
-        }
+        },
+        portal_0: {
+            count: 0,
+            max: 10
+        },
+        portal_1: {
+            count: 0,
+            max: 10
+        },
     },
     SCENE_FPS: null,
     LISTENER: new THREE.AudioListener(),

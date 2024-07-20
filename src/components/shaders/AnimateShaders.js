@@ -56,6 +56,7 @@ const animateShader2 = (time) => {
 
     //TRACTOR BEAM
     GLOBALS.UNIFORMS_TRACTOR_BEAM.iTime.value += val;
+    GLOBALS.UNIFORMS_TRACTOR_BEAM_ORANGE.iTime.value += val;
 };
 
 export {

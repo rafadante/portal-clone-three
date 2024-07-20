@@ -73,12 +73,12 @@ function updatePhysics() {
         var portalInFront = false;
 
         raycaster.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
-        
+
         //DETECT IF THE CAMERA IS IN FRONT OF A PORTAL
-        if(GLOBALS.PORTAL_INNER_BOX[0] != null && GLOBALS.PORTAL_INNER_BOX[1] != null){
+        if (GLOBALS.PORTAL_INNER_BOX[0] != null && GLOBALS.PORTAL_INNER_BOX[1] != null) {
             var intersectPortal = raycaster.intersectObjects(GLOBALS.PORTAL_INNER_BOX);
-            if(intersectPortal.length > 0){
-                if(intersectPortal[0].distance < 1.25)
+            if (intersectPortal.length > 0) {
+                if (intersectPortal[0].distance < 1.25)
                     portalInFront = true;
             }
         }
@@ -87,8 +87,8 @@ function updatePhysics() {
         //IF TRUE, PLACE THE HOLDING ITEM AT A FIXED POSITION
         var intersectWall = raycaster.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
         if (intersectWall.length > 0) {//&& !GLOBALS.CURRENT_ITEM.body.teleportingHolding && !ff
-            
-            if(intersectWall[0].distance < 1.25 && !portalInFront){
+
+            if (intersectWall[0].distance < 1.25 && !portalInFront) {
 
                 var point = intersectWall[0].point;
 
@@ -118,11 +118,13 @@ function updatePhysics() {
 
         var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(property);
 
+
+
         if (property == "gel_gun_blue" || property == "gel_gun_orange" || property == "gel_gun_white" ||
             property == "pedestal_button" || property == "button_weight" || property == "button_box" ||
             property == "button_circle" || property == "dispenser" || property == "ramp" ||
             property == "ramp_half" || property == "ramp_half2" || property == "stairs" ||
-            property == "light_bridge" | property == "tractor_beam" || property == "laser_emitter" ||
+            property == "light_bridge" || property == "laser_emitter" ||
             property == "door" || property == "light" || property == "stripe" || property == "gel_blue" ||
             property == "gel_orange")
             continue;
@@ -131,30 +133,58 @@ function updatePhysics() {
 
             if (GLOBALS.DYMANIC_ITEMS[property][i].length != 0) {
 
-                if(property == "radio"){
-                    GLOBALS.RADIO_MUSIC[i].position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
-                    GLOBALS.RADIO_MUSIC[i].quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
+                if (property == "tractor_beam") {
+                    if (GLOBALS.DYMANIC_ITEMS[property][i].state) {
+                        var dir = new THREE.Vector3(); // create once and reuse it
+                        dir.copy(GLOBALS.DYMANIC_ITEMS[property][i].up).applyQuaternion(GLOBALS.DYMANIC_ITEMS[property][i].quaternion);
+
+                        var val = -0.05;
+                        if (GLOBALS.DYMANIC_ITEMS[property][i].reversed)
+                            val = 0.05;
+
+                        if (Math.round(Math.abs(dir.z)) == 1)
+                            GLOBALS.DYMANIC_ITEMS[property][i].rotation.y += val;
+                        else if (Math.round(Math.abs(dir.x)) == 1)
+                            GLOBALS.DYMANIC_ITEMS[property][i].rotation.x += val;
+                        else if (Math.round(Math.abs(dir.y)) == 1)
+                            GLOBALS.DYMANIC_ITEMS[property][i].rotation.y += val;
+
+                        var item = new THREE.Object3D();
+                        item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].position);
+                        item.rotation.copy(GLOBALS.DYMANIC_ITEMS[property][i].rotation);
+
+                        item.updateMatrix();
+                        instanced.setMatrixAt(i, item.matrix)
+                        instanced.instanceMatrix.needsUpdate = true;
+                        instanced.computeBoundingSphere();
+                    }
+                } else {
+                    if (property == "radio") {
+                        GLOBALS.RADIO_MUSIC[i].position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
+                        GLOBALS.RADIO_MUSIC[i].quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
+                    }
+
+                    var item = new THREE.Object3D();
+                    item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
+                    item.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
+
+                    item.updateMatrix();
+                    instanced.setMatrixAt(i, item.matrix)
+                    instanced.instanceMatrix.needsUpdate = true;
+                    instanced.computeBoundingSphere();
                 }
-
-                var item = new THREE.Object3D();
-                item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
-                item.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
-
-                item.updateMatrix();
-                instanced.setMatrixAt(i, item.matrix)
-                instanced.instanceMatrix.needsUpdate = true;
-                instanced.computeBoundingSphere();
             }
         }
     }
 
     for (var i = 0; i < GLOBALS.CAMERAS.length; i++) {
-        if(!GLOBALS.CAMERAS[i].fixed){
+        if (!GLOBALS.CAMERAS[i].fixed) {
             GLOBALS.CAMERAS[i].position.copy(GLOBALS.CAMERAS[i].body.position);
             GLOBALS.CAMERAS[i].quaternion.copy(GLOBALS.CAMERAS[i].body.quaternion);
             GLOBALS.CAMERAS[i].cube.position.copy(GLOBALS.CAMERAS[i].body.position);
             GLOBALS.CAMERAS[i].cube.quaternion.copy(GLOBALS.CAMERAS[i].body.quaternion);
-            GLOBALS.CAMERAS[i].translateY(0.22);
+            //GLOBALS.CAMERAS[i].translateY(-0.22);
+            //GLOBALS.CAMERAS[i].translateZ(-0.1);
         }
     }
 
@@ -184,7 +214,7 @@ function addJointConstraint(position, constrainedBody) {
 
     // Move the cannon click marker body to the click position
     jointBody.position.copy(position)
-    
+
     // Create a new constraint
     // The pivot for the jointBody is zero
     jointConstraint = new CANNON.PointToPointConstraint(constrainedBody, pivot, jointBody, new CANNON.Vec3(0, 0, 0))
@@ -198,7 +228,7 @@ function removeJointConstraint() {
     world.removeConstraint(jointConstraint)
     jointConstraint = undefined;
     getObject = false;
-    jointBody.position.set(10000,1000,1000)
+    jointBody.position.set(10000, 1000, 1000)
 }
 
 GLOBALS.CANNON_WORLD = world;

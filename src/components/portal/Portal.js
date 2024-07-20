@@ -1,5 +1,4 @@
 /* eslint-disable */
-
 import * as THREE from 'three';
 import {
     GeneralBB
@@ -11,8 +10,10 @@ import {
 import {
     GLOBALS
 } from '../../Globals.js';
-
-window.portalTone = false;
+import * as CANNON from "cannon";
+import { AUDIO } from '../audio/Audio.js';
+import { hideMaterial } from "../../Main.js";
+import { removeJointConstraint } from "../../Physics.js";
 
 class Portal extends Group {
     // position - the center position (vector3)
@@ -73,23 +74,14 @@ class Portal extends Group {
         uniform sampler2D texture1;
         uniform float ww;
         uniform float wh;
-        uniform bool tone;
         
         void main() {
             gl_FragColor = texture2D(texture1, gl_FragCoord.xy / vec2(ww, wh));
 
-            //if(tone){
             #include <tonemapping_fragment>
             #include <colorspace_fragment>
-            //}
-            
         }
         `
-
-        //#include <tonemapping_fragment>
-        //#include <colorspace_fragment>
-
-
         const geometry = new THREE.CylinderGeometry(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_HEIGHT);
         const uniforms = {
             texture1: {
@@ -103,10 +95,6 @@ class Portal extends Group {
             wh: {
                 type: 'f',
                 value: 1
-            },
-            tone: {
-                type: 'Boolean',
-                value: window.portalTone
             }
         }
 
@@ -123,29 +111,17 @@ class Portal extends Group {
             polygonOffset: true,
             polygonOffsetFactor: -1,
             side: THREE.DoubleSide
-            //polygonOffset: true,
-            //polygonOffsetFactor: -1
         });
 
         this.mesh = new THREE.Mesh(geometry, material);
-        //this.mesh.applyMatrix4(new THREE.Matrix4().makeRotationY(-Math.PI / 6))
         this.mesh.applyMatrix4(this.transform)
         this.mesh.updateMatrix()
         this.mesh.matrixAutoUpdate = true;
         this.matrixAutoUpdate = true;
-        //this.mesh.scale.x *= 0.75;
         this.mesh.frustumCulled = true;
         this.add(this.mesh)
 
-
-        //var pLocal = new THREE.Vector3(0, 0, -1);
-        //var pWorld = pLocal.applyMatrix4(GLOBALS.MAIN_CAMERA.matrixWorld);
-        //var dir = pWorld.sub(GLOBALS.MAIN_CAMERA.position).normalize();
-        //this.mesh.position.add(dir.clone().multiplyScalar(0.25));
-
-        this.mesh.translateY(-0.25)
-
-        console.log(this)
+        this.mesh.translateY(-0.25);
 
         this.mesh.onAfterRender = function (renderer) {
             renderer.clearStencil();
@@ -165,11 +141,6 @@ class Portal extends Group {
             light = GLOBALS.LIGHT_PORTAL_1;
         }
 
-        //light.applyMatrix4(this.transform)
-        //light.updateMatrix()
-        //light.matrixAutoUpdate = true;
-        //light.matrixAutoUpdate = true;
-        //this.add( light );
         light.position.copy(this.mesh.position)
         light.visible = true;
 
@@ -179,39 +150,16 @@ class Portal extends Group {
             GLOBALS.PORTAL_SHADER[index].matrix.identity().decompose(GLOBALS.PORTAL_SHADER[index].position, GLOBALS.PORTAL_SHADER[index].quaternion, GLOBALS.PORTAL_SHADER[index].scale)
         }
 
+        //
         GLOBALS.PORTAL_SHADER[index].applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
         GLOBALS.PORTAL_SHADER[index].applyMatrix4(this.transform)
         GLOBALS.PORTAL_SHADER[index].updateMatrix()
         GLOBALS.PORTAL_SHADER[index].matrixAutoUpdate = true;
         this.portalShader = GLOBALS.PORTAL_SHADER[index];
         this.portalShader.frustumCulled = true;
-        //GLOBALS.PORTAL_SHADER[index].scale.set(1.1,1.1,1.1)
         this.add(GLOBALS.PORTAL_SHADER[index])
-        //this.portalShader.translateZ(-0.01)
 
-        var pLocal = new THREE.Vector3(0, 0, -1);
-        var pWorld = pLocal.applyMatrix4(GLOBALS.MAIN_CAMERA.matrixWorld);
-        var dir = pWorld.sub(GLOBALS.MAIN_CAMERA.position).normalize();
-        //this.portalShader.position.add(dir.clone().multiplyScalar(-0.02));
-
-        // constructing the portal borders
-        const ringGeometry = new THREE.PlaneGeometry(GLOBALS.PORTAL_WIDTH + 2 * GLOBALS.PORTAL_RING_THICKNESS, GLOBALS.PORTAL_DEPTH + 2 * GLOBALS.PORTAL_RING_THICKNESS);
-        // https://stackoverflow.com/questions/33571642/why-do-transparent-materials-result-in-occlusion
-        const ringMaterial = new THREE.MeshBasicMaterial({
-            color: ringColor,
-            side: THREE.FrontSide,
-            opacity: 1,
-            transparent: true,
-            depthWrite: false,
-        })
-        this.ringMesh = new THREE.Mesh(ringGeometry, ringMaterial)
-        this.ringMesh.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
-        this.ringMesh.applyMatrix4(this.transform)
-        this.ringMesh.position.add(normal.clone().multiplyScalar(GLOBALS.PORTAL_HEIGHT / 2 + 0.001))
-        this.ringMesh.updateMatrix()
-        this.ringMesh.matrixAutoUpdate = true;
-        this.ringMesh.visible = false;
-
+        //
         const geometry3 = new THREE.BoxGeometry(1.4, 2, 0.1);
         const material3 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         GLOBALS.PORTAL_BOX[index] = new THREE.Mesh(geometry3, material3);
@@ -234,7 +182,6 @@ class Portal extends Group {
 
         // CDBB: collision disable BB
         // STBB: should teleport BB
-
         // matrix for the CDBB
         // CDBB is centered at portal
         let tCDBB = this.transform.clone();
@@ -245,22 +192,9 @@ class Portal extends Group {
 
         this.CDBB = new GeneralBB(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_CDBB_HEIGHT, GLOBALS.PORTAL_DEPTH, tCDBB, 0xff0000)
         this.STBB = new GeneralBB(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_CDBB_HEIGHT / 2, GLOBALS.PORTAL_DEPTH, tSTBB, 0x00ff00)
-        //this.LEFT = new GeneralBB(GLOBALS.PORTAL_WIDTH * 0.1, GLOBALS.PORTAL_CDBB_HEIGHT / 2, GLOBALS.PORTAL_DEPTH, tSTBB, 0x000000)
-
-
-        //var pLocal = new THREE.Vector3(0, 0, -1);
-        //var pWorld = pLocal.applyMatrix4(this.matrixWorld);
-        //var dir = pWorld.sub(this.position).normalize();
-        //this.CDBB.add(dir.clone().multiplyScalar(-1));
-
-        //CAMERA NEAR
-        let pSTBB2 = position.clone().add(normal.clone().multiplyScalar(-GLOBALS.PORTAL_CDBB_HEIGHT / 20))
-        let tSTBB2 = tRot.clone().setPosition(pSTBB2)
-        this.NEAR = new GeneralBB(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_CDBB_HEIGHT / 2, GLOBALS.PORTAL_DEPTH, tSTBB2, 0x0000ff)
 
         this.debugMeshes.add(this.CDBB.helper)
         this.debugMeshes.add(this.STBB.helper)
-        this.debugMeshes.add(this.NEAR.helper)
         this.debugMeshes.visible = false; //globals.DEBUG
         this.add(this.debugMeshes)
     }
@@ -275,11 +209,6 @@ function teleportObject3D(object, portal) {
 }
 
 function teleportPhysicalObject(object, portal) {
-
-    // Force
-    /*object.force.setZero();
-    object.torque.setZero();
-    object.velocity.setZero();*/
 
     let f = new THREE.Matrix4().makeScale(-1, -1, 1)
     let m = portal.CDBB.inverse_t.clone().premultiply(f).premultiply(portal.output.CDBB.t)
@@ -300,21 +229,18 @@ function teleportPhysicalObject(object, portal) {
 
     if (velocity.x > 10) {
         velocity.x = 10;
-    } else if (velocity.x < -10) {
+    } else if (velocity.x < -10)
         velocity.x = -10;
-    }
 
     if (velocity.y > 10) {
         velocity.y = 10;
-    } else if (velocity.y < -10) {
+    } else if (velocity.y < -10)
         velocity.y = -10;
-    }
 
     if (velocity.z > 10) {
         velocity.z = 10;
-    } else if (velocity.z < -10) {
+    } else if (velocity.z < -10)
         velocity.z = -10;
-    }
 
     if (Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) {
         velocity.x *= 0.5;
@@ -368,8 +294,205 @@ function fourToThree(v) {
     return new THREE.Vector3(v.x, v.y, v.z).multiplyScalar(1 / v.w)
 }
 
+function teleportationState() {
+
+    GLOBALS.MAIN_CAMERA.position.copy(GLOBALS.PLAYER.position)
+    GLOBALS.MAIN_CAMERA.translateY(0.3)
+    GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
+
+    if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null) return;
+
+    var dd = 0;
+
+    for (var i = 0; i < GLOBALS.CAMERAS.length; i++) {
+        if (
+            (GLOBALS.CAMERAS[i].box3.containsPoint(GLOBALS.PORTAL_BOX[0].position) ||
+                GLOBALS.CAMERAS[i].box3.containsPoint(
+                    GLOBALS.PORTAL_BOX[1].position
+                )) &&
+            GLOBALS.CAMERAS[i].fixed
+        ) {
+            GLOBALS.CAMERAS[i].fixed = false;
+            addCameraBody(GLOBALS.CAMERAS[i]);
+        }
+    }
+
+    if (GLOBALS.OBJ_HOLDED_CLONE && GLOBALS.HOLDING_ITEM) {
+
+        let pos = GLOBALS.CURRENT_ITEM.body.position;
+        let CDBB_isOverlap = false;
+        GLOBALS.OBJ_HOLDED_CLONE.visible = false;
+
+        for (let p = 0; p < GLOBALS.PORTALS.length; p++) {
+            // collision disable, might be partially intersecting with portal
+            if (GLOBALS.PORTALS[p].CDBB.containsPoint(pos)) {
+                // show the clone
+                if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
+                    CDBB_isOverlap = true;
+                    teleportObject3D(GLOBALS.OBJ_HOLDED_CLONE, GLOBALS.PORTALS[p]);
+                    GLOBALS.OBJ_HOLDED_CLONE.visible = true;
+                }
+            }
+        }
+    }
+
+    for (let d of GLOBALS.DYNAMIC_OBJECTS) {
+
+        let pos = new THREE.Vector3(d.position.x, d.position.y, d.position.z);
+
+        if (dd == 0) {
+            //pos = new THREE.Vector3(GLOBALS.MAIN_CAMERA.position.x, d.position.y, GLOBALS.MAIN_CAMERA.position.z);
+        }
+
+        d.collisionFilterMask = GLOBALS.CGROUP_ALL;
+
+        if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null) continue;
+
+        var inArea = 0;
+
+        if (dd == 0) {
+            GLOBALS.PLAYER_MODEL_CLONE.visible = false;
+            GLOBALS.GUN_CLONE.visible = false;
+            GLOBALS.GUN_CLONE2.visible = false;
+        }
+
+        let CDBB_isOverlap = false;
+
+        for (let p = 0; p < GLOBALS.PORTALS.length; p++) {
+            // collision disable, might be partially intersecting with portal
+            if (GLOBALS.PORTALS[p].CDBB.containsPoint(pos)) {
+                if (d.name != "player") {
+                    d.wakeUp();
+                }
+
+                d.collisionFilterMask &=
+                    ~GLOBALS.PORTALS[p].hostObjects.collisionFilterGroup;
+                d.inArea = true;
+
+                if (dd == 0) {
+                    inArea++;
+
+                    // show the clone
+                    if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
+
+                        CDBB_isOverlap = true;
+                        teleportObject3D(GLOBALS.PLAYER_MODEL_CLONE, GLOBALS.PORTALS[p]);
+                        GLOBALS.PLAYER_MODEL_CLONE.visible = true;
+
+                        GLOBALS.PLAYER_MODEL_CLONE.traverse((c) => {
+                            if (c.isBone) {
+                                if (c.name == "wrist_R") {
+                                    var positionBoneHand = new THREE.Vector3();
+                                    c.getWorldPosition(positionBoneHand);
+                                    window.posW = positionBoneHand;
+                                }
+                            }
+                        });
+                    }
+                }
+            }else{
+                d.inArea = false;
+            }
+
+            // should teleport
+            if (GLOBALS.PORTALS[p].STBB.containsPoint(pos)) {
+
+                if (d.holding) {
+                    d.teleportingHolding = true;
+                } else {
+                    teleportPhysicalObject(d, GLOBALS.PORTALS[p]);
+
+                    if (dd == 0) {
+
+                        AUDIO.PORTAL_ENTER.pause();
+                        AUDIO.PORTAL_ENTER.currentTime = 0;
+                        AUDIO.PORTAL_ENTER.play();
+
+                        AUDIO.PORTAL_EXIT.pause();
+                        AUDIO.PORTAL_EXIT.currentTime = 0;
+                        AUDIO.PORTAL_EXIT.play();
+
+                        hideMaterial(GLOBALS.PLAYER_MODEL, true, 0)
+                        GLOBALS.PLAYER_MODEL_CLONE.visible = false;
+
+                        removeJointConstraint();
+                        teleportObject3D(GLOBALS.MAIN_CAMERA, GLOBALS.PORTALS[p]);
+
+                        // fix camera rotation
+                        // create a new basis with up as the up
+                        // https://danielilett.com/2020-01-03-tut4-4-portal-momentum/
+                        let up = new THREE.Vector3(0, 1, 0);
+                        let cameraForward = new THREE.Vector3();
+                        GLOBALS.MAIN_CAMERA.getWorldDirection(cameraForward);
+                        cameraForward.normalize();
+                        let cameraRight = cameraForward.clone().cross(up).normalize();
+                        let cameraUp = cameraRight.clone().cross(cameraForward).normalize();
+                        let cameraMat = new THREE.Matrix4().makeBasis(
+                            cameraRight,
+                            cameraUp,
+                            cameraForward.negate()
+                        );
+                        GLOBALS.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat);
+
+                        var q = new THREE.Quaternion()
+                        q.setFromRotationMatrix(cameraMat);
+                        window.q = q;
+
+                        GLOBALS.TARGET_ROTATION_X = GLOBALS.MAIN_CAMERA.rotation.y;
+                        GLOBALS.TARGET_ROTATION_Y = GLOBALS.MAIN_CAMERA.rotation.x;
+
+                        GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
+
+                        window.CAMERA_ROTATING = true;
+                        setTimeout(() => {
+                            window.CAMERA_ROTATING = false;
+                        }, 1000);
+                    }
+
+                    d.collisionFilterMask |=
+                        GLOBALS.PORTALS[p].hostObjects.collisionFilterGroup;
+                    d.collisionFilterMask &=
+                        ~GLOBALS.PORTALS[1 - p].hostObjects.collisionFilterGroup;
+
+                    break;
+                }
+            } else {
+                if (d.portal == p && d.teleportingHolding) d.teleportingHolding = false;
+            }
+        }
+        dd++;
+    }
+}
+
+function addCameraBody(obj) {
+    let PHYSICS_MATERIAL = new CANNON.Material();
+    PHYSICS_MATERIAL.friction = 0.4; //0.01
+    PHYSICS_MATERIAL.restitution = 0; //0.1
+  
+    var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.2, 0.2));
+  
+    var box = new CANNON.Body({
+      shape: shape,
+      mass: 10,
+      material: PHYSICS_MATERIAL,
+    });
+  
+    box.position.copy(obj.cube.position);
+    box.quaternion.copy(obj.quaternion);
+    box.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
+    box.collisionFilterMask = GLOBALS.CGROUP_ALL;
+    box.offset = 0.2;
+    obj.body = box;
+    obj.cube.body = box;
+    obj.name == "camera";
+    GLOBALS.DYNAMIC_OBJECTS.push(box);
+    GLOBALS.CANNON_WORLD.addBody(box);
+    GLOBALS.INTERACTIVE.push(obj.cube);
+  }
+
 export {
     Portal,
     teleportPhysicalObject,
-    teleportObject3D
+    teleportObject3D,
+    teleportationState
 }

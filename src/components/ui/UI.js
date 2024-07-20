@@ -5,7 +5,7 @@ import {
     animate
 } from '../../Main.js';
 import { AUDIO, volume } from '../audio/Audio.js';
-import { stateDoor } from '../events/events.js';
+import { stateDoor } from '../door/Door.js';
 
 if (!GLOBALS.MOBILE)
     $(".mobile").css("display", "none");

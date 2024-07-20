@@ -13,10 +13,6 @@ GLOBALS.MATERIAL_LIGHT_BRIDGERS = new THREE.MeshBasicMaterial({
     color: new THREE.Color(0, 0.75, 1),
     side: THREE.DoubleSide,
     transparent: true,
-
-    depthWrite: false,
-    polygonOffset: true,
-    polygonOffsetFactor: -5,
     onBeforeCompile: shader => {
         shader.uniforms.time = GLOBALS.UNIFORMS_LIGHT_BRIDGE.time;
         shader.fragmentShader = `
