@@ -22,6 +22,7 @@ import { stateDoor } from '../door/Door.js';
 import {
     createLightBridges
 } from '../continuous/Continuous.js';
+import { lightBridgeTrigger } from '../boxSelection/BoxSelection.js';
 
 var beamType;
 let lineFollow;
@@ -314,10 +315,19 @@ function addItem(found, loaded) {
                 instanced2.computeBoundingSphere();
             }
 
+            if (GLOBALS.ITEM_HOLDED_NAME == "laser_field") {
+                item.state = true;
+                item.triggers = GLOBALS.LASER_FIELD_TRIGGER;
+            }
+
             if (GLOBALS.ITEM_HOLDED_NAME == "light_bridge") {
                 item.state = true;
-                item.triggers = "Middle Horizontal";
+                item.triggers = GLOBALS.LIGHT_BRIDGE_TRIGGER;
                 createLightBridges("light_bridge", GLOBALS.LIGHT_BRIDGE_RAYCASTER, item);
+
+                setTimeout(() => {
+                    lightBridgeTrigger(userData, GLOBALS.LIGHT_BRIDGE_TRIGGER, $("#light-bridge-trigger"), "light_bridge");
+                }, 100);
             }
 
             if (GLOBALS.ITEM_HOLDED_NAME == "tractor_beam") {
@@ -459,6 +469,14 @@ function addItem(found, loaded) {
 
                 instanced.instanceMatrix.needsUpdate = true;
                 instanced.computeBoundingSphere();
+
+                if (GLOBALS.ITEM_HOLDED_NAME == "laser_field") {
+                    createLightBridges("laser_field", GLOBALS.LASER_FIELD_RAYCASTER, item, instanced);
+
+                    setTimeout(() => {
+                        lightBridgeTrigger(userData, GLOBALS.LASER_FIELD_TRIGGER, $("#laser-field-trigger"), "laser_field");
+                    }, 100);
+                }
             }
 
             itemCount++;

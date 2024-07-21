@@ -142,6 +142,12 @@
             data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" data-allowconnection="true"
             id="light_bridge"
             />
+
+            <img
+            data-content="Any contact with the lasers will result in instant death. However, the Field allows objects to pass through without harm."
+            data-title="LASER FIELD" class="item" data-name="laser_field" src="../assets/ui/items/laser_field.png" 
+            data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" data-allowconnection="true"
+            id="laser_field"/>
           <!--
           <img
             data-content="If a player walks onto a Faith Plate it will cause them to get bounced into the air. When you place a Faith Plate within the editor it will also create a bullseye and a yellow ball. The Bullseye is where the player will ultimately land, and the yellow ball is the trajectory the player will travel."
@@ -201,12 +207,12 @@
             data-name="door" src="../assets/ui/items/door.png" data-allowconnection="true" data-rotate="true"
             data-floor="true" data-ceiling="false" data-walls="false" data-instanced="false" id="door" />
 
-          <img data-content="You can link a trigger to it to open the door." data-title="PORTAL" class="item"
+          <img data-content="You can link a trigger to it to activate this portal without the need of the portal gun." data-title="PORTAL LEFT" class="item"
             data-name="portal_0" src="../assets/ui/mobile/portalOrange.png" data-allowconnection="true"
             data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="false"
             id="portal_0" />
 
-          <img data-content="You can link a trigger to it to open the door." data-title="PORTAL" class="item"
+          <img data-content="You can link a trigger to it to activate this portal without the need of the portal gun." data-title="PORTAL RIGHT" class="item"
             data-name="portal_1" src="../assets/ui/mobile/portalBlue.png" data-allowconnection="true"
             data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="false"
             id="portal_1" />
@@ -370,6 +376,59 @@
           </button>
         </li>
         <li data-trigger="Right" class="menu-item light-bridge-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Right</span>
+          </button>
+        </li>
+      </ul>
+    </li>
+
+    <!---->
+    <li id="laser-field-state" class="menu-item hasItem laser-field">
+      <a href="#" class="menu-btn">
+        <input type="checkbox" checked id="laser-field-state-input"/>
+        <span class="menu-text">State</span>
+      </a>
+    </li>
+
+    <li class="menu-item menu-item-submenu hasItem laser-field" id="laser-field-trigger" data-trigger="Middle Horizontal">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-crosshairs"></i>
+        <span class="menu-text title">Middle Horizontal</span>
+      </button>
+      <ul class="menu">
+        <li data-trigger="Middle Horizontal" class="menu-item laser-field-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Middle Horizontal</span>
+          </button>
+        </li>
+        <li data-trigger="Middle Vertical" class="menu-item laser-field-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Middle Vertical</span>
+          </button>
+        </li>
+        <li data-trigger="Top" class="menu-item laser-field-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Top</span>
+          </button>
+        </li>
+        <li data-trigger="Bottom" class="menu-item laser-field-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Bottom</span>
+          </button>
+        </li>
+        <li data-trigger="Left" class="menu-item laser-field-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Left</span>
+          </button>
+        </li>
+        <li data-trigger="Right" class="menu-item laser-field-triggers">
           <button type="button" class="menu-btn">
             <i class="fa fa-crosshairs"></i>
             <span class="menu-text">Right</span>

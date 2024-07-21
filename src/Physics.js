@@ -126,7 +126,7 @@ function updatePhysics() {
             property == "ramp_half" || property == "ramp_half2" || property == "stairs" ||
             property == "light_bridge" || property == "laser_emitter" ||
             property == "door" || property == "light" || property == "stripe" || property == "gel_blue" ||
-            property == "gel_orange")
+            property == "gel_orange" || property == "laser_field")
             continue;
 
         for (var i = 0; i < GLOBALS.DYMANIC_ITEMS[property].length; i++) {

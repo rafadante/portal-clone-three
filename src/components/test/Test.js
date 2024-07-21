@@ -103,6 +103,8 @@ function viewFPS() {
 
     setTimeout(() => {
 
+        GLOBALS.UNIFORMS_LASER_FIELD.fade = 1;
+        GLOBALS.MATERIAL_LIGHT_BRIDGERS.depthWrite = false;
         GLOBALS.MATERIAL_TRACTOR_BEAM.depthWrite = false;
         GLOBALS.MATERIAL_TRACTOR_BEAM.side = 2;
         GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE.depthWrite = false;
@@ -589,7 +591,6 @@ function addColliderItem(items, type, mass, offset) {
             box.collisionFilterMask = GLOBALS.CGROUP_ALL
             items[i].body = box;
             box.state = items[i].state;
-
             console.log(box)
 
 
@@ -738,6 +739,7 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
             box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
             box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC
             box.room = true;
+            box.side = side;
 
             for (var c = 0; c < columsNew[i][j].length; c++)
                 GLOBALS.PLANE_USER_DATA[columsNew[i][j][c].i].body = box;

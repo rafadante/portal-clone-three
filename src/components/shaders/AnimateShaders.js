@@ -6,6 +6,7 @@ import './PortalGun/PortalGunShaders.js';
 import './LightBridge/LightBridgerShader.js';
 import './TractorBeam/TractorBeamShader.js';
 import './ExitRoom/ExitRoomShader.js';
+import './LightBridge/LaserFieldShader.js';
 import {
     GLOBALS
 } from '../../Globals.js';
@@ -53,6 +54,7 @@ const animateShader2 = (time) => {
     //LIGHT BRIDGES
     let t = clock.getElapsedTime();
     GLOBALS.UNIFORMS_LIGHT_BRIDGE.time.value = t;
+    GLOBALS.UNIFORMS_LASER_FIELD.time.value = t;
 
     //TRACTOR BEAM
     GLOBALS.UNIFORMS_TRACTOR_BEAM.iTime.value += val;

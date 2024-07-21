@@ -206,7 +206,7 @@ function portalButton(button, auto) {
                         if (GLOBALS.PORTALS[0] !== null)
                             deletePortal(0);
 
-                        newPortal(0, 1, point, normal, userData.body, playerUpDirection, portalPoints)
+                        newPortal(0, 1, point, normal, userData.body, playerUpDirection, portalPoints, userData.side)
 
                         GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new THREE.Vector3(1.0, 0.25, 0.0);
 
@@ -234,7 +234,7 @@ function portalButton(button, auto) {
                         if (GLOBALS.PORTALS[1] !== null)
                             deletePortal(1);
 
-                        newPortal(1, 0, point, normal, userData.body, playerUpDirection, userData.rotation)
+                        newPortal(1, 0, point, normal, userData.body, playerUpDirection, userData.rotation, userData.side)
 
                         GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new THREE.Vector3(0.0, 0.3, 1.0);
 
@@ -318,13 +318,24 @@ function deletePortal(portalIndex) {
         return;
 
     if (GLOBALS.PORTALS[portalIndex].hostObjects !== null) {
-        // mark this object as collideable with portal 0 bb objects
+
+        for (var i = 0; i < GLOBALS.CANNON_BODIES.length; i++) {
+            // mark this object as collideable with portal 0 bb objects
+            GLOBALS.CANNON_BODIES[i].collisionFilterGroup &= ~GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[portalIndex]
+            // add back to environment group only if collideable with both portal objects
+            if (!(GLOBALS.CANNON_BODIES[i].collisionFilterGroup & GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[0]) &&
+                !(GLOBALS.CANNON_BODIES[i].collisionFilterGroup & GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[1])) {
+                    GLOBALS.CANNON_BODIES[i].collisionFilterGroup |= GLOBALS.CGROUP_ENVIRONMENT
+            }
+        }
+
+        /*// mark this object as collideable with portal 0 bb objects
         GLOBALS.PORTALS[portalIndex].hostObjects.collisionFilterGroup &= ~GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[portalIndex]
         // add back to environment group only if collideable with both portal objects
         if (!(GLOBALS.PORTALS[portalIndex].hostObjects.collisionFilterGroup & GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[0]) &&
             !(GLOBALS.PORTALS[portalIndex].hostObjects.collisionFilterGroup & GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[1])) {
             GLOBALS.PORTALS[portalIndex].hostObjects.collisionFilterGroup |= GLOBALS.CGROUP_ENVIRONMENT
-        }
+        }*/
     }
     GLOBALS.SCENE.remove(GLOBALS.PORTALS[portalIndex]);
     GLOBALS.PORTALS[portalIndex].portalShader.material.uniforms.iOpened.value = 0;
@@ -332,7 +343,7 @@ function deletePortal(portalIndex) {
 }
 
 // creates a new portal and adds it to the scene
-function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject, playerUpDirection, portalPoints) {
+function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject, playerUpDirection, portalPoints, side) {
 
     let color = GLOBALS.PORTAL_COLORS[thisPortalIndex]
 
@@ -350,9 +361,18 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
 
     GLOBALS.PORTALS[thisPortalIndex].hostObjects.portal = true;
 
-    GLOBALS.PORTALS[thisPortalIndex].hostObjects.collisionFilterGroup |= GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[thisPortalIndex]
+    //
+    for (var i = 0; i < GLOBALS.CANNON_BODIES.length; i++) {
+        if (GLOBALS.CANNON_BODIES[i].side == side) {
+            GLOBALS.CANNON_BODIES[i].collisionFilterGroup |= GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[thisPortalIndex]
+            // remove this object from the environment group
+            GLOBALS.CANNON_BODIES[i].collisionFilterGroup &= ~GLOBALS.CGROUP_ENVIRONMENT
+        }
+    }
+
+    //GLOBALS.PORTALS[thisPortalIndex].hostObjects.collisionFilterGroup |= GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[thisPortalIndex]
     // remove this object from the environment group
-    GLOBALS.PORTALS[thisPortalIndex].hostObjects.collisionFilterGroup &= ~GLOBALS.CGROUP_ENVIRONMENT
+    //GLOBALS.PORTALS[thisPortalIndex].hostObjects.collisionFilterGroup &= ~GLOBALS.CGROUP_ENVIRONMENT
 
     if (GLOBALS.PORTALS[otherPortalIndex] !== null)
         GLOBALS.PORTALS[otherPortalIndex].output = GLOBALS.PORTALS[thisPortalIndex]

@@ -8,6 +8,7 @@ import {
 } from '../../Main.js';
 import { planeInstanceReset, deleteItemInstanced } from '../items/Items.js';
 import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline';
+import { func } from 'three/examples/jsm/nodes/Nodes.js';
 
 const orange = new THREE.Color("rgb(255, 165, 0)");
 var initialPosition = null;
@@ -91,6 +92,8 @@ function raycastSelected(found, event, type) {
                 $("#rotate-item").css("display", "none");
             }
 
+            $(".hasItem").css("display", "none");
+
             if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem) {
                 $("#delete").css("display", "block");
 
@@ -142,8 +145,6 @@ function raycastSelected(found, event, type) {
                     } else {
                         $("#pedestal-timer").removeClass("disabled");
                     }
-                } else {
-                    $(".pedestal").css("display", "none");
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("tractor")) {
@@ -152,8 +153,7 @@ function raycastSelected(found, event, type) {
                     $("#tractor-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.state)
                     $("#tractor-direction-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.reversed)
                     $("#tractor-trigger").find(".title").text("Triggers: " + GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
-                } else {
-                    $(".tractor").css("display", "none");
+                    console.log("bbbbbbbbbbbbbbbbbb")
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light_bridge")) {
@@ -161,8 +161,13 @@ function raycastSelected(found, event, type) {
 
                     $("#light-bridge-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.state);
                     $("#light-bridge-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
-                } else {
-                    $(".light-bridge").css("display", "none");
+                }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_field")) {
+                    $(".laser-field").css("display", "block");
+
+                    $("#laser-field-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.state);
+                    $("#laser-field-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
                 }
             }
 
@@ -203,8 +208,13 @@ function raycastSelected(found, event, type) {
                             }
 
                             if (planeInstanceOld.item.bodyBridge) {
+                                GLOBALS.LIGHT_BRIDGE_TRIGGER = planeInstanceOld.item.triggers;
                                 GLOBALS.CANNON_WORLD.removeBody(planeInstanceOld.item.bodyBridge);
                                 planeInstanceOld.item.bodyBridge = null;
+                            }
+
+                            if(planeInstanceOld.item.cloneLaserID){
+                                GLOBALS.LASER_FIELD_TRIGGER = planeInstanceOld.item.triggers;
                             }
 
 
@@ -530,9 +540,7 @@ $("body").on('click', '.tile-portal', function () {
 });
 
 
-$("body").on('input', '#tractor-state-input, #light-bridge-state-input', function () {
-
-    console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]])
+$("body").on('input', '#tractor-state-input, #light-bridge-state-input, #laser-field-state-input', function () {
 
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.state = this.checked;
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.visible = this.checked;
@@ -567,66 +575,78 @@ $("body").on('click', '.tractor-triggers', function () {
 });
 
 $("body").on('click', '.light-bridge-triggers', function () {
+    lightBridgeTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], $(this).data("trigger"), $("#light-bridge-trigger"), "light_bridge")
+});
 
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.triggers = $(this).data("trigger");
-    $("#light-bridge-trigger").data("trigger", $(this).data("trigger"))
-    $("#light-bridge-trigger").find(".title").text($(this).data("trigger"));
+$("body").on('click', '.laser-field-triggers', function () {
+    lightBridgeTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], $(this).data("trigger"), $("#laser-field-trigger"), "laser_field")
+});
+
+function lightBridgeTrigger(obj, trigger, elem, name) {
+    obj.item.triggers = trigger;
+    elem.data("trigger", trigger)
+    elem.find(".title").text(trigger);
 
     var dummy = new THREE.Object3D();
     dummy.position.copy(new THREE.Vector3(
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.x,
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.y,
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.z
+        obj.position.x,
+        obj.position.y,
+        obj.position.z
     ));
     dummy.rotation.set(
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].normal.x,
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].normal.y,
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].normal.z
+        obj.normal.x,
+        obj.normal.y,
+        obj.normal.z
     );
 
-    if ($(this).data("trigger") == "Middle Vertical") {
+    if (trigger == "Middle Vertical") {
         dummy.rotateY(Math.PI / 2);
-    } else if ($(this).data("trigger") == "Top") {
+    } else if (trigger == "Top") {
         dummy.translateZ(-0.8);
-    } else if ($(this).data("trigger") == "Bottom") {
+    } else if (trigger == "Bottom") {
         dummy.translateZ(0.8);
-    } else if ($(this).data("trigger") == "Left") {
+    } else if (trigger == "Left") {
         dummy.rotateY(Math.PI / 2);
         dummy.translateZ(-0.8);
-    } else if ($(this).data("trigger") == "Right") {
+    } else if (trigger == "Right") {
         dummy.rotateY(Math.PI / 2);
         dummy.translateZ(0.8);
     }
 
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.position.copy(dummy.position)
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.rotation.copy(dummy.rotation)
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.translateY(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.distance);
+    obj.item.raycaster.ray.origin = dummy.position;
+    obj.item.continuous.position.copy(dummy.position)
+    obj.item.continuous.rotation.copy(dummy.rotation)
+    obj.item.continuous.translateY(obj.item.continuous.distance);
 
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.position)
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge.quaternion.copy(dummy.quaternion)
-    //GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge.translateY(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.distance);
+    if (name == "light_bridge") {
+        obj.item.bodyBridge.position.copy(obj.item.continuous.position)
+        obj.item.bodyBridge.quaternion.copy(dummy.quaternion)
+        //GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge.translateY(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.distance);
+    }
 
     dummy.updateMatrix();
-    var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("light_bridge");
-    instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.idInstanced, dummy.matrix)
+    var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(name);
+    instanced.setMatrixAt(obj.item.idInstanced, dummy.matrix);
+
+
+    if (name == "laser_field") {
+        obj.item.bodyLaserField.position.copy(obj.item.continuous.position)
+        obj.item.bodyLaserField.quaternion.copy(dummy.quaternion)
+
+        dummy.rotateX(Math.PI);
+        dummy.translateY(-obj.item.cloneLaserDistance);
+
+        dummy.updateMatrix();
+        instanced.setMatrixAt(obj.item.cloneLaserID, dummy.matrix);
+    }
+
     instanced.instanceMatrix.needsUpdate = true;
     instanced.computeBoundingSphere();
 
     animate();
-});
-
-/*var dummy = new THREE.Object3D();
-            dummy.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.position);
-            dummy.rotation.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation);
-
-            dummy.rotation.y += Math.PI / 2;
-
-            dummy.updateMatrix();
-            instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.userData.id, dummy.matrix)
-
-            instanced.instanceMatrix.needsUpdate = true;
-            instanced.computeBoundingSphere();*/
+}
 
 export {
-    raycastSelected
+    raycastSelected,
+    lightBridgeTrigger
 }

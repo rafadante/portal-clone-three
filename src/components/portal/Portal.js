@@ -109,7 +109,7 @@ class Portal extends Group {
             depthTest: true,
             depthWrite: false,
             polygonOffset: true,
-            polygonOffsetFactor: -1,
+            polygonOffsetFactor: -5,
             side: THREE.DoubleSide
         });
 

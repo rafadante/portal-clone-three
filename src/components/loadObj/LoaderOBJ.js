@@ -89,8 +89,8 @@ async function handleZip(path, obj) {
                     loadLightStripeManager(result.scene)
                 else if (obj == "loadElevatorRoom")
                     loadElevatorRoomManager(result.scene)
-                else if (obj == "loadMuzzleFlash")
-                    loadMuzzleFlashManager(result.scene)
+                else if (obj == "loadLaserField")
+                    loadLaserFieldManager(result.scene)
             });
         }
     });
@@ -960,25 +960,19 @@ function loadAvatar() {
         this.updateMatrixWorld(true);
     };
 
-    loadMuzzleFlash();
+    loadLaserField();
 }
 
-function loadMuzzleFlash() {
-    handleZip('./assets/3ds/muzzle_flash.zip', "loadMuzzleFlash");
+function loadLaserField() {
+    handleZip('./assets/3ds/laser_field.zip', "loadLaserField");
 }
 
-function loadMuzzleFlashManager(scene) {
+function loadLaserFieldManager(scene) {
 
-
-    //scene.visible = false;
-    //GLOBALS.FLASH = scene;
-    //GLOBALS.SCENE.add(GLOBALS.FLASH);
-    //scene.scale.set(0.02,0.02,0.02);
-    //scene.position.set(0.011, -0.012, -0.05);
-    //scene.children[0].material.envMap = GLOBALS.ENV_MAP;
-
-
-    //light.position.set(0,1,-1);
+    var item = instancedTransform(scene, "laser_field", false, 0.3, 1)
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
 
     if (GLOBALS.LOADED_LEVEL) {
         loadLevelJSON()

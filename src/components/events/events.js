@@ -25,8 +25,11 @@ function updateEvents() {
     for (var j = 0; j < GLOBALS.GOO_BOXES.length; j++) {
       if (GLOBALS.GOO_BOXES[j].containsPoint(pos)) {
         if (!d.repawning) {
-          if (d.name == "player")
+          if (d.name == "player"){
+            document.getElementById("death-screen").style.backgroundColor = "rgb(111, 55, 0)";
             document.getElementById("death-screen").style.opacity = 1;
+          }
+            
 
           respawn(d);
         }
@@ -72,7 +75,11 @@ function updateEvents() {
               if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
                 lightBridgeState(GLOBALS.CONNECTIONS[i]['to'])
               }
-            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
+            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field")) {
+              if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
+                laserFieldState(GLOBALS.CONNECTIONS[i]['to'])
+              }
+            }else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
               GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
 
               GLOBALS.CONNECTIONS[i]['to'].item.active = true;
@@ -105,7 +112,11 @@ function updateEvents() {
             if (GLOBALS.CONNECTIONS[i]['to'].item.buttons < GLOBALS.CONNECTIONS[i]['to'].item.connections) {
               lightBridgeState(GLOBALS.CONNECTIONS[i]['to']);
             }
-          } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
+          } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field")) {
+            if (GLOBALS.CONNECTIONS[i]['to'].item.buttons < GLOBALS.CONNECTIONS[i]['to'].item.connections) {
+              laserFieldState(GLOBALS.CONNECTIONS[i]['to'])
+            }
+          }else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
             GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
             GLOBALS.CONNECTIONS[i]['to'].item.active = false;
           }
@@ -115,6 +126,16 @@ function updateEvents() {
 
     id++;
   }
+}
+
+function laserFieldState(obj) {
+  obj.item.state = !obj.item.state;
+  obj.item.continuous.visible = !obj.item.continuous.visible;
+
+  if (obj.item.state)
+    GLOBALS.CANNON_WORLD.addBody(obj.item.bodyLaserField);
+  else
+    GLOBALS.CANNON_WORLD.removeBody(obj.item.bodyLaserField);
 }
 
 function lightBridgeState(obj) {
@@ -234,4 +255,4 @@ function dispenserSpawn(item) {
   item.body.wakeUp();
 }
 
-export { updateEvents, dispenserSpawn };
+export { updateEvents, dispenserSpawn, respawn };

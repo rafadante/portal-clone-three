@@ -199,7 +199,8 @@ var GLOBALS = {
         gel_orange: [],
         camera: [],
         portal_0: [],
-        portal_1: []
+        portal_1: [],
+        laser_field: []
     },
 
     INTERACTIVE: [],
@@ -248,6 +249,10 @@ var GLOBALS = {
     LIGHT_BRIDGE_RAYCASTER: [],
     LIGHT_BRIDGE_CLONE: [],
     LIGHT_BRIDGE_COLLIDER_CLONE: [],
+    LIGHT_BRIDGE_TRIGGER: "Middle Horizontal",
+    LASER_FIELD_TRIGGER: "Middle Vertical",
+
+    LASER_FIELD_RAYCASTER: [],
 
     LIGHT_GROUP: null,
     INTERVAL: 1 / 60,
@@ -310,6 +315,8 @@ var GLOBALS = {
     MATERIAL_TRACTOR_BEAM: null,
     MATERIAL_TRACTOR_BEAM_REVERSE: null,
     MATERIAL_LIGHT_BRIDGERS: null,
+    MATERIAL_LASER_FIELD: null,
+    UNIFORMS_LASER_FIELD: null,
 
     ELEVATOR: null,
     ELEVATOR_DOOR_LEFT: null,
@@ -451,6 +458,10 @@ var GLOBALS = {
             max: 10
         },
         portal_1: {
+            count: 0,
+            max: 10
+        },
+        laser_field: {
             count: 0,
             max: 10
         },
