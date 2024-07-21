@@ -169,6 +169,13 @@ function raycastSelected(found, event, type) {
                     $("#laser-field-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.state);
                     $("#laser-field-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
                 }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("fizzler")) {
+                    $(".fizzler").css("display", "block");
+
+                    $("#fizzler-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.state);
+                    $("#fizzler-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
+                }
             }
 
             GLOBALS.SELECTED_ID.push(instanceId);
@@ -213,8 +220,12 @@ function raycastSelected(found, event, type) {
                                 planeInstanceOld.item.bodyBridge = null;
                             }
 
-                            if(planeInstanceOld.item.cloneLaserID){
+                            if (planeInstanceOld.item.cloneLaserID) {
                                 GLOBALS.LASER_FIELD_TRIGGER = planeInstanceOld.item.triggers;
+                            }
+
+                            if (planeInstanceOld.item.cloneFizzlerID) {
+                                GLOBALS.FIZZLER_RAYCASTER = planeInstanceOld.item.triggers;
                             }
 
 
@@ -540,7 +551,7 @@ $("body").on('click', '.tile-portal', function () {
 });
 
 
-$("body").on('input', '#tractor-state-input, #light-bridge-state-input, #laser-field-state-input', function () {
+$("body").on('input', '#tractor-state-input, #light-bridge-state-input, #laser-field-state-input,#fizzler-state-input', function () {
 
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.state = this.checked;
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.visible = this.checked;
@@ -580,6 +591,10 @@ $("body").on('click', '.light-bridge-triggers', function () {
 
 $("body").on('click', '.laser-field-triggers', function () {
     lightBridgeTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], $(this).data("trigger"), $("#laser-field-trigger"), "laser_field")
+});
+
+$("body").on('click', '.fizzler-triggers', function () {
+    lightBridgeTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], $(this).data("trigger"), $("#fizzler-trigger"), "fizzler")
 });
 
 function lightBridgeTrigger(obj, trigger, elem, name) {
@@ -629,7 +644,7 @@ function lightBridgeTrigger(obj, trigger, elem, name) {
     instanced.setMatrixAt(obj.item.idInstanced, dummy.matrix);
 
 
-    if (name == "laser_field") {
+    if (name == "laser_field" || name == "fizzler") {
         obj.item.bodyLaserField.position.copy(obj.item.continuous.position)
         obj.item.bodyLaserField.quaternion.copy(dummy.quaternion)
 
@@ -637,7 +652,11 @@ function lightBridgeTrigger(obj, trigger, elem, name) {
         dummy.translateY(-obj.item.cloneLaserDistance);
 
         dummy.updateMatrix();
-        instanced.setMatrixAt(obj.item.cloneLaserID, dummy.matrix);
+
+        if (name == "laser_field")
+            instanced.setMatrixAt(obj.item.cloneLaserID, dummy.matrix);
+        else if (name == "fizzler")
+            instanced.setMatrixAt(obj.item.cloneFizzlerID, dummy.matrix);
     }
 
     instanced.instanceMatrix.needsUpdate = true;

@@ -220,6 +220,7 @@ function addItem(found, loaded) {
             item.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
             item.renderOrder = 2;
             item.name = GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount;
+            item.instancedName = GLOBALS.ITEM_HOLDED_NAME;
             item.planeInstancedId = userData.id_instanced;
 
             /*if (loaded) {
@@ -318,6 +319,11 @@ function addItem(found, loaded) {
             if (GLOBALS.ITEM_HOLDED_NAME == "laser_field") {
                 item.state = true;
                 item.triggers = GLOBALS.LASER_FIELD_TRIGGER;
+            }
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "fizzler") {
+                item.state = true;
+                item.triggers = GLOBALS.FIZZLER_TRIGGER;
             }
 
             if (GLOBALS.ITEM_HOLDED_NAME == "light_bridge") {
@@ -475,6 +481,12 @@ function addItem(found, loaded) {
 
                     setTimeout(() => {
                         lightBridgeTrigger(userData, GLOBALS.LASER_FIELD_TRIGGER, $("#laser-field-trigger"), "laser_field");
+                    }, 100);
+                }else if (GLOBALS.ITEM_HOLDED_NAME == "fizzler") {
+                    createLightBridges("fizzler", GLOBALS.FIZZLER_RAYCASTER, item, instanced);
+
+                    setTimeout(() => {
+                        lightBridgeTrigger(userData, GLOBALS.FIZZLER_TRIGGER, $("#laser-field-trigger"), "fizzler");
                     }, 100);
                 }
             }

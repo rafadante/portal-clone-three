@@ -249,6 +249,8 @@ function player() {
 
             for (let contact of GLOBALS.CANNON_WORLD.contacts) {
 
+                if(contact.bi.collisionResponse == 0 || contact.bj.collisionResponse == 0) continue;
+
                 if (contact.bi.id == GLOBALS.PLAYER.id || contact.bj.id == GLOBALS.PLAYER.id) {
                     if (contact.bi.id == GLOBALS.PLAYER.id) {
                         // contact.ni.negate(contactNormal);

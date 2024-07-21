@@ -8,6 +8,11 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import { respawn } from '../events/events.js';
+import {
+    tweenCamera
+} from '../../Main.js';
+import { interactWithItem } from '../items/Items.js';
+import { deletePortal } from '../portal/CreatePortal.js';
 
 function createLightBridges(item, rayItem, object, instanced) {
 
@@ -39,11 +44,18 @@ function createLightBridges(item, rayItem, object, instanced) {
         var geometry = new THREE.BoxGeometry(0.9, intersects[0].distance, 0.025);
         raycaster.name = "light_bridge";
         rayItem.push(raycaster);
-    } else if (item == "laser_field") {
+    } else if (item == "laser_field" || item == "fizzler") {
         var geometry = new THREE.BoxGeometry(2, intersects[0].distance, 0.025);
         raycaster.name = "light_bridge";
         rayItem.push(raycaster);
-        material = GLOBALS.MATERIAL_LASER_FIELD;
+
+        if (item == "laser_field") {
+            material = GLOBALS.MATERIAL_LASER_FIELD;
+            object.cloneLaserID = object.idInstanced + 10;
+        } else if (item == "fizzler") {
+            material = GLOBALS.MATERIAL_FIZZLER;
+            object.cloneFizzlerID = object.idInstanced + 10;
+        }
 
         //CREATE CLONE
         const cloneLaserField = new THREE.Object3D();
@@ -56,7 +68,7 @@ function createLightBridges(item, rayItem, object, instanced) {
         instanced.setMatrixAt(object.idInstanced + 10, cloneLaserField.matrix);
         instanced.instanceMatrix.needsUpdate = true;
         instanced.computeBoundingSphere();
-        object.cloneLaserID = object.idInstanced + 10;
+
         object.cloneLaserDistance = intersects[0].distance;
     } else if (item == "tractor_beam") {
         var geometry = new THREE.CylinderGeometry(0.9, 0.9, intersects[0].distance + 0, 32, 1, true);
@@ -100,7 +112,7 @@ function createLightBridges(item, rayItem, object, instanced) {
         plane.translateY(-0.6)
     }
 
-    if (item == "laser_field") {
+    if (item == "laser_field" || item == "fizzler") {
         plane.rotateX(Math.PI)
     }
 
@@ -129,21 +141,68 @@ function createLightBridges(item, rayItem, object, instanced) {
             box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC*/
         object.bodyBridge = box;
         GLOBALS.CANNON_WORLD.addBody(box);
-    } else if (item == "laser_field") {
+    } else if (item == "laser_field" || item == "fizzler") {
         box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
         box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
         box.collisionResponse = 0;
         object.bodyLaserField = box;
         GLOBALS.CANNON_WORLD.addBody(box);
-        box.addEventListener("collide", function (e) {
-            console.log(e);
-            if (e.body === GLOBALS.PLAYER) {
-                console.log('The sphere entered the trigger!', e);
-                document.getElementById("death-screen").style.backgroundColor = "rgb(255 0 0)";
-                document.getElementById("death-screen").style.opacity = 1;
-                respawn(e.body);
-            }
-        });
+
+        if (item == "laser_field") {
+            box.addEventListener("collide", function (e) {
+                console.log(e);
+                if (e.body === GLOBALS.PLAYER) {
+                    console.log('The sphere entered the trigger!', e);
+                    document.getElementById("death-screen").style.backgroundColor = "rgb(255 0 0)";
+                    document.getElementById("death-screen").style.opacity = 1;
+                    respawn(e.body);
+                }
+            });
+        } else if (item == "fizzler") {
+            box.addEventListener("collide", function (e) {
+                console.log(e);
+                if (e.body === GLOBALS.PLAYER) {
+                    deletePortal(0)
+                    deletePortal(1)
+                }else if (e.body.name == "sphere" || e.body.name == "cube" || e.body.name == "radio") {
+                    console.log('FIZZLER!', e.body);
+
+                    //CREATE A CLONE TO APPLY DISSOLVE SHADER
+                    const clone = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.name).scene.clone();
+                    clone.position.set(e.body.position.x, e.body.position.y, e.body.position.z);
+                    clone.quaternion.copy(e.body.quaternion);
+                    clone.visible=true;
+                    console.log(clone);
+
+                    if (GLOBALS.HOLDING_ITEM)
+                        interactWithItem()
+
+                    GLOBALS.UNIFORMS_DISSOLVER.diffuseMap.value = clone.material.map;
+                    clone.material = GLOBALS.MATERIAL_DISSOLVER;
+
+                    GLOBALS.SCENE.add(clone);
+
+                    var posClone = clone.position.clone();
+                    posClone.y += 2;
+
+                    GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value = posClone;
+
+                    var clone2 = clone.clone();
+                    clone2.position.y += 1;
+
+                    tweenCamera(2000, GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value, clone.position)
+                    tweenCamera(2000, clone.position, clone2.position)
+
+                    //GLOBALS.MATERIAL_DISSOLVER
+
+                    setTimeout(() => {
+                        GLOBALS.SCENE.remove(clone);
+                    }, 2000);
+
+                    respawn(e.body);
+                }
+            });
+        }
     } else if (item == "tractor_beam") {
         var bb = new THREE.Box3(); // for re-use
         bb.setFromObject(plane);

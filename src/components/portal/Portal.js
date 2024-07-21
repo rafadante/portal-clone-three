@@ -143,6 +143,7 @@ class Portal extends Group {
 
         light.position.copy(this.mesh.position)
         light.visible = true;
+        this.light = light;
 
         var parent = GLOBALS.PORTAL_SHADER[index].parent;
         if (parent) {

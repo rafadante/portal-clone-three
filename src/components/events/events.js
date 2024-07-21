@@ -25,11 +25,11 @@ function updateEvents() {
     for (var j = 0; j < GLOBALS.GOO_BOXES.length; j++) {
       if (GLOBALS.GOO_BOXES[j].containsPoint(pos)) {
         if (!d.repawning) {
-          if (d.name == "player"){
+          if (d.name == "player") {
             document.getElementById("death-screen").style.backgroundColor = "rgb(111, 55, 0)";
             document.getElementById("death-screen").style.opacity = 1;
           }
-            
+
 
           respawn(d);
         }
@@ -75,11 +75,12 @@ function updateEvents() {
               if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
                 lightBridgeState(GLOBALS.CONNECTIONS[i]['to'])
               }
-            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field")) {
+            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field") ||
+              GLOBALS.CONNECTIONS[i]['to'].itemName.includes("fizzler")) {
               if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
                 laserFieldState(GLOBALS.CONNECTIONS[i]['to'])
               }
-            }else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
+            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
               GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
 
               GLOBALS.CONNECTIONS[i]['to'].item.active = true;
@@ -112,11 +113,12 @@ function updateEvents() {
             if (GLOBALS.CONNECTIONS[i]['to'].item.buttons < GLOBALS.CONNECTIONS[i]['to'].item.connections) {
               lightBridgeState(GLOBALS.CONNECTIONS[i]['to']);
             }
-          } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field")) {
+          } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field") ||
+            GLOBALS.CONNECTIONS[i]['to'].itemName.includes("fizzler")) {
             if (GLOBALS.CONNECTIONS[i]['to'].item.buttons < GLOBALS.CONNECTIONS[i]['to'].item.connections) {
               laserFieldState(GLOBALS.CONNECTIONS[i]['to'])
             }
-          }else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
+          } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
             GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
             GLOBALS.CONNECTIONS[i]['to'].item.active = false;
           }
@@ -147,10 +149,10 @@ function lightBridgeState(obj) {
   else
     GLOBALS.CANNON_WORLD.removeBody(obj.item.bodyBridge);
 
-  if(obj.item.clone){
+  if (obj.item.clone) {
     if (obj.item.clone.bodyBridge) {
       obj.item.clone.visible = obj.item.continuous.visible;
-  
+
       if (obj.item.state)
         GLOBALS.CANNON_WORLD.addBody(obj.item.clone.bodyBridge);
       else
@@ -185,6 +187,12 @@ function respawn(d) {
   if (d.name.includes("gel")) return;
 
   d.repawning = true;
+
+  var time = 2000;
+
+  if (d.name == "player")
+    time = 1500;
+
   setTimeout(() => {
     d.repawning = false;
 
@@ -200,16 +208,25 @@ function respawn(d) {
 
     d.position.copy(d.spawnPosition);
 
-    if (d.name != "player") {
-      if (d.state == "once") {
-        d.mass = 0;
+    if (d.name != "player")
+      d.mass = 0;
+
+    setTimeout(() => {
+      
+      if (d.name != "player") {
+        if (d.state == "once") {
+          d.mass = 0;
+        } else {
+          d.mass = 5;
+        }
+
+        console.log(d.mass)
+        d.wakeUp()
       } else {
-        d.mass = 5;
+        document.getElementById("death-screen").style.opacity = 0;
       }
-    } else {
-      document.getElementById("death-screen").style.opacity = 0;
-    }
-  }, 1500);
+    }, time);
+  }, 0);
 }
 
 window.CAMERA_ROTATING = false;

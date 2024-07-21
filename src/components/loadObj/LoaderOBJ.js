@@ -91,6 +91,8 @@ async function handleZip(path, obj) {
                     loadElevatorRoomManager(result.scene)
                 else if (obj == "loadLaserField")
                     loadLaserFieldManager(result.scene)
+                else if (obj == "loadFizzler")
+                    loadFizzlerManager(result.scene)
             });
         }
     });
@@ -212,12 +214,12 @@ function loadGunManager(scene) {
     GLOBALS.GUN_CLONE2 = GLOBALS.GUN_CLONE.clone();
 
     scene.traverse(child => {
-        child.castShadow=true;
+        child.castShadow = true;
         if (child.material) {
             child.receiveShadow = true;
             child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.5;
-            
+
             /*child.material.stencilWrite= true // stencil optimization, only for culling portal
             child.material.stencilFunc= THREE.EqualStencilFunc
             child.material.stencilRef= 1
@@ -430,6 +432,7 @@ function loadPortalCubeManager(scene) {
     item.userData.wall = false;
     item.userData.ground = true;
     item.userData.ceiling = false;
+    item.scene = scene.children[0];
     item.userData.obj = scene;
     item.userData.obj.children[0].material.envMap = GLOBALS.ENV_MAP;
     item.userData.obj.children[0].material.envMapIntensity = 0.5;
@@ -489,10 +492,11 @@ function loadPortalSphereManager(scene) {
     item.userData.wall = false;
     item.userData.ground = true;
     item.userData.ceiling = false;
-    item.userData.obj = scene;
-    item.userData.obj.children[0].material.envMap = GLOBALS.ENV_MAP;
+    item.scene = scene.children[0];
+    item.userData.obj = scene.children[0];
+    /*item.userData.obj.children[0].material.envMap = GLOBALS.ENV_MAP;
     item.userData.obj.children[0].material.envMapIntensity = 0.5;
-    item.userData.obj.children[0].material.roughness = 0.2;
+    item.userData.obj.children[0].material.roughness = 0.2;*/
     loadHalfWindow()
 }
 
@@ -659,6 +663,7 @@ function loadRadioManager(scene) {
     item.userData.wall = false;
     item.userData.ground = true;
     item.userData.ceiling = false;
+    item.scene = scene.children[0];
     item.userData.obj = scene;
     item.userData.obj.children[0].material.envMap = GLOBALS.ENV_MAP;
     item.userData.obj.children[0].material.envMapIntensity = 0.5;
@@ -969,7 +974,21 @@ function loadLaserField() {
 
 function loadLaserFieldManager(scene) {
 
-    var item = instancedTransform(scene, "laser_field", false, 0.3, 1)
+    var item = instancedTransform(scene, "laser_field", false, 0.1, 1)
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
+
+    loadFizzler()
+}
+
+function loadFizzler() {
+    handleZip('./assets/3ds/fizzler.zip', "loadFizzler");
+}
+
+function loadFizzlerManager(scene) {
+
+    var item = instancedTransform(scene, "fizzler", false, 0.1, 1)
     item.userData.wall = true;
     item.userData.ground = true;
     item.userData.ceiling = true;

@@ -317,6 +317,8 @@ function deletePortal(portalIndex) {
     if (GLOBALS.PORTALS[portalIndex] === null)
         return;
 
+    GLOBALS.PORTALS[portalIndex].light.visible = false;
+
     if (GLOBALS.PORTALS[portalIndex].hostObjects !== null) {
 
         for (var i = 0; i < GLOBALS.CANNON_BODIES.length; i++) {

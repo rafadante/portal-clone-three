@@ -7,6 +7,8 @@ import './LightBridge/LightBridgerShader.js';
 import './TractorBeam/TractorBeamShader.js';
 import './ExitRoom/ExitRoomShader.js';
 import './LightBridge/LaserFieldShader.js';
+import './Fizzler.js';
+import './Dissolve.js'
 import {
     GLOBALS
 } from '../../Globals.js';
@@ -23,6 +25,8 @@ var clock2 = new THREE.Clock();
 var delta = 0;
 const interval = 1 / 30;
 
+var clock3 = new THREE.Clock();
+
 const animateShader = (time) => {
     delta += clock2.getDelta();
 
@@ -33,8 +37,11 @@ const animateShader = (time) => {
     }
 };
 
+const effectOrigin = new THREE.Vector3(1,1,5)
+
 const animateShader2 = (time) => {
     var val = clock.getDelta();
+    const elapsed = clock3.getElapsedTime()
 
     //PORTAL GUN
     GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iTime.value += val;
@@ -59,6 +66,11 @@ const animateShader2 = (time) => {
     //TRACTOR BEAM
     GLOBALS.UNIFORMS_TRACTOR_BEAM.iTime.value += val;
     GLOBALS.UNIFORMS_TRACTOR_BEAM_ORANGE.iTime.value += val;
+    GLOBALS.UNIFORMS_FIZZLER.iTime.value += val;
+
+
+    //GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value = effectOrigin;
+    GLOBALS.UNIFORMS_DISSOLVER.u_Time.value = t;
 };
 
 export {

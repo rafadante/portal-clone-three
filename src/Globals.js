@@ -200,7 +200,8 @@ var GLOBALS = {
         camera: [],
         portal_0: [],
         portal_1: [],
-        laser_field: []
+        laser_field: [],
+        fizzler: []
     },
 
     INTERACTIVE: [],
@@ -251,8 +252,10 @@ var GLOBALS = {
     LIGHT_BRIDGE_COLLIDER_CLONE: [],
     LIGHT_BRIDGE_TRIGGER: "Middle Horizontal",
     LASER_FIELD_TRIGGER: "Middle Vertical",
+    FIZZLER_TRIGGER: "Middle Vertical",
 
     LASER_FIELD_RAYCASTER: [],
+    FIZZLER_RAYCASTER: [],
 
     LIGHT_GROUP: null,
     INTERVAL: 1 / 60,
@@ -283,6 +286,9 @@ var GLOBALS = {
     UNIFORMS_TRACTOR_BEAM: null,
     UNIFORMS_TRACTOR_BEAM_ORANGE: null,
     UNIFORMS_PORTAL_GUN_ENERGY: null,
+    UNIFORMS_FIZZLER: null,
+    UNIFORMS_DISSOLVER: null,
+    MATERIAL_DISSOLVER: null,
 
     LIGHTNIN_STRIKE_1: null,
     LIGHTNIN_STRIKE_2: null,
@@ -316,6 +322,7 @@ var GLOBALS = {
     MATERIAL_TRACTOR_BEAM_REVERSE: null,
     MATERIAL_LIGHT_BRIDGERS: null,
     MATERIAL_LASER_FIELD: null,
+    MATERIAL_FIZZLER: null,
     UNIFORMS_LASER_FIELD: null,
 
     ELEVATOR: null,
@@ -462,6 +469,10 @@ var GLOBALS = {
             max: 10
         },
         laser_field: {
+            count: 0,
+            max: 10
+        },
+        fizzler: {
             count: 0,
             max: 10
         },

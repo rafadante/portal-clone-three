@@ -92,9 +92,7 @@
           <img data-content="Reflects the laser." data-title="LASER CUBE" class="item" data-name="laser_cube"
             src="../assets/ui/items/laser_cube.png" />-->
 
-          <!--<img
-            data-content="Fizzlers destroy any objects which pass through them such as cubes or turrets. If a player walks through a Fizzler any previously placed portals will also be destroyed. You can increase and decrease the size of the Fizzler using the arrows that appear when the object is selected."
-            data-title="FIZZLERS" class="item" data-name="fizzlers" src="../assets/ui/items/fizzlers.png" />
+          <!--
 
           <img
             data-content="Glass panels can be placed in your level which the player cannot break. You can increase and decrease the size of the panel by using the arrows that appear when the object is selected. You can change the barrier type to grating within the properties menu which will allow players to place a portal on the other side."
@@ -148,6 +146,12 @@
             data-title="LASER FIELD" class="item" data-name="laser_field" src="../assets/ui/items/laser_field.png" 
             data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" data-allowconnection="true"
             id="laser_field"/>
+
+            <img
+            data-content="Fizzlers destroy any objects which pass through them such as cubes or turrets. If a player walks through a Fizzler any previously placed portals will also be destroyed. You can increase and decrease the size of the Fizzler using the arrows that appear when the object is selected."
+            data-title="FIZZLER" class="item" data-name="fizzler" src="../assets/ui/items/fizzlers.png" 
+            data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" data-allowconnection="true"
+            id="fizzler"/>
           <!--
           <img
             data-content="If a player walks onto a Faith Plate it will cause them to get bounced into the air. When you place a Faith Plate within the editor it will also create a bullseye and a yellow ball. The Bullseye is where the player will ultimately land, and the yellow ball is the trajectory the player will travel."
@@ -391,11 +395,10 @@
         <span class="menu-text">State</span>
       </a>
     </li>
-
     <li class="menu-item menu-item-submenu hasItem laser-field" id="laser-field-trigger" data-trigger="Middle Horizontal">
       <button type="button" class="menu-btn">
         <i class="fa fa-crosshairs"></i>
-        <span class="menu-text title">Middle Horizontal</span>
+        <span class="menu-text title">Middle Vertical</span>
       </button>
       <ul class="menu">
         <li data-trigger="Middle Horizontal" class="menu-item laser-field-triggers">
@@ -429,6 +432,58 @@
           </button>
         </li>
         <li data-trigger="Right" class="menu-item laser-field-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Right</span>
+          </button>
+        </li>
+      </ul>
+    </li>
+
+    <!---->
+    <li id="fizzler-state" class="menu-item hasItem fizzler">
+      <a href="#" class="menu-btn">
+        <input type="checkbox" checked id="fizzler-state-input"/>
+        <span class="menu-text">State</span>
+      </a>
+    </li>
+    <li class="menu-item menu-item-submenu hasItem fizzler" id="fizzler-trigger" data-trigger="Middle Vertical">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-crosshairs"></i>
+        <span class="menu-text title">Middle Horizontal</span>
+      </button>
+      <ul class="menu">
+        <li data-trigger="Middle Horizontal" class="menu-item fizzler-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Middle Horizontal</span>
+          </button>
+        </li>
+        <li data-trigger="Middle Vertical" class="menu-item fizzler-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Middle Vertical</span>
+          </button>
+        </li>
+        <li data-trigger="Top" class="menu-item fizzler-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Top</span>
+          </button>
+        </li>
+        <li data-trigger="Bottom" class="menu-item fizzler-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Bottom</span>
+          </button>
+        </li>
+        <li data-trigger="Left" class="menu-item fizzler-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Left</span>
+          </button>
+        </li>
+        <li data-trigger="Right" class="menu-item fizzler-triggers">
           <button type="button" class="menu-btn">
             <i class="fa fa-crosshairs"></i>
             <span class="menu-text">Right</span>
