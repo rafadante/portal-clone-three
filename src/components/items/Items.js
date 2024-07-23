@@ -668,6 +668,8 @@ function interactWithItem() {
             itemHolder.sleeping = false;
         }
 
+        GLOBALS.CURRENT_ITEM.body.sideContact = null;
+        GLOBALS.CURRENT_ITEM.body.contactID = null;
         GLOBALS.CURRENT_ITEM.body.holding = false;
         GLOBALS.CURRENT_ITEM.body.angularDamping = 0;
         GLOBALS.CURRENT_ITEM.body.allowSleep = true;
@@ -746,7 +748,7 @@ function interactWithItem() {
             if (intersects[0].distance < 1.5) {
 
                 GLOBALS.HOLDING_ITEM = true;
-                tweenCamera(250, GLOBALS.GUN.children[0].children[0].position, new THREE.Vector3(0.009, -0.013, -0.004))
+                tweenCamera(250, GLOBALS.GUN.children[0].children[0].position, new THREE.Vector3(0.009, -0.013, -0.001))
 
                 if (intersects[0].object.name != "camera") {
                     var instancedId = intersects[0].instanceId;

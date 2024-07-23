@@ -7,41 +7,41 @@ function loadMaterials() {
     //MATERIAL FLOOR NON PORTAL
     GLOBALS.MATERIAL_FLOOR_NON_PORTAL = new THREE.MeshStandardMaterial();
     loadMaterial(GLOBALS.MATERIAL_FLOOR_NON_PORTAL, 'metal/floor.jpg', 'metal/floor_normal.jpg', null, 
-    'floor/nonPortalable/1/roughness.jpg', null, 1);
+    'floor/nonPortalable/1/roughness.jpg', null, 1, 0.15);
     //GLOBALS.MATERIAL_FLOOR_NON_PORTAL.envMapIntensity = 0.3;
 
     //MATERIAL FLOOR PORTAL
     GLOBALS.MATERIAL_FLOOR_PORTAL = GLOBALS.MATERIAL_FLOOR_NON_PORTAL.clone();
-    loadMaterial(GLOBALS.MATERIAL_FLOOR_PORTAL, 'portal/floor.jpg', 'portal/floor_normal.jpg', null, null, null, 1);
+    loadMaterial(GLOBALS.MATERIAL_FLOOR_PORTAL, 'portal/floor.jpg', 'portal/floor_normal.jpg', null, null, null, 1, 0.05);
 
     //MATERIAL WALL PORTAL
     GLOBALS.MATERIAL_WALL_PORTAL = new THREE.MeshStandardMaterial();
     loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL, 'portal/wall1.jpg', 'portal/wall1_normal.jpg',
-        null, null, null, 1);
+        null, null, null, 1, 0.05);
 
     GLOBALS.MATERIAL_WALL_PORTAL2 = new THREE.MeshStandardMaterial();
     loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL2, 'portal/wall2.jpg', 'portal/wall2_normal.jpg',
-        null, null, null, 1);
+        null, null, null, 1, 0.05);
 
     GLOBALS.MATERIAL_WALL_PORTAL3 = new THREE.MeshStandardMaterial();
     loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL3, 'portal/wall3.jpg', 'portal/wall3_normal.jpg',
-        null, null, null, 1);
+        null, null, null, 1, 0.05);
 
     GLOBALS.MATERIAL_WALL_PORTAL4 = new THREE.MeshStandardMaterial();
     loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL4, 'portal/wall4.jpg', 'portal/wall4_normal.jpg',
-        null, null, null, 1);
+        null, null, null, 1, 0.05);
 
     //MATERIAL WALL NON PORTAL
     GLOBALS.MATERIAL_WALL_NON_PORTAL = GLOBALS.MATERIAL_WALL_PORTAL.clone();
     loadMaterial(GLOBALS.MATERIAL_WALL_NON_PORTAL, 'metal/wall1.jpg', 'metal/wall1_normal.jpg',
-        null, null, null, 1);
+        null, null, null, 1, 0.2);
 
     GLOBALS.MATERIAL_WALL_NON_PORTAL2 = GLOBALS.MATERIAL_WALL_PORTAL.clone();
     loadMaterial(GLOBALS.MATERIAL_WALL_NON_PORTAL2, 'metal/wall2.jpg', 'metal/wall2_normal.jpg',
-        null, null, null, 1);
+        null, null, null, 1, 0.2);
 }
 
-function loadMaterial(material, base, normal, ao, rough, metal, roughValue) {
+function loadMaterial(material, base, normal, ao, rough, metal, roughValue, envIntensity) {
 
     var map;
     material.roughness = roughValue;
@@ -74,7 +74,7 @@ function loadMaterial(material, base, normal, ao, rough, metal, roughValue) {
     }
 
     material.envMap = GLOBALS.ENV_MAP;
-    material.envMapIntensity = 0.05;
+    material.envMapIntensity = envIntensity;
 }
 
 const textureLoader = new THREE.TextureLoader();

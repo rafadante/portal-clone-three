@@ -7,6 +7,7 @@ import {
   portalButton
 } from '../portal/CreatePortal.js';
 import { func } from "three/examples/jsm/nodes/Nodes.js";
+import { AUDIO } from "../audio/Audio.js";
 
 function updateEvents() {
   levelEnteredFunction();
@@ -188,10 +189,15 @@ function respawn(d) {
 
   d.repawning = true;
 
-  var time = 2000;
+  var time = 2500;
+  var time2 = 0;
 
-  if (d.name == "player")
-    time = 1500;
+  if (d.name == "player") {
+    AUDIO.DEATH.currentTime = 0;
+    AUDIO.DEATH.play();
+    time = 500;
+    time2 = 500;
+  }
 
   setTimeout(() => {
     d.repawning = false;
@@ -212,7 +218,7 @@ function respawn(d) {
       d.mass = 0;
 
     setTimeout(() => {
-      
+
       if (d.name != "player") {
         if (d.state == "once") {
           d.mass = 0;
@@ -226,7 +232,7 @@ function respawn(d) {
         document.getElementById("death-screen").style.opacity = 0;
       }
     }, time);
-  }, 0);
+  }, time2);
 }
 
 window.CAMERA_ROTATING = false;

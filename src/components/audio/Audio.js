@@ -3,11 +3,14 @@ import {
     GLOBALS
 } from '../../Globals.js';
 
-var sound;
 var listernAdded = false;
 var listener;
 
-function addRadioAudio(path, parent, play) {
+function preLoadAudios() {
+    const audio = new Audio("freejazz.wav");
+}
+
+function addRadioAudio(path, parent, play, loop, staticPosition, maxDis) {
 
     if (!listernAdded) {
         listernAdded = true;
@@ -17,30 +20,55 @@ function addRadioAudio(path, parent, play) {
     }
 
     // create the PositionalAudio object (passing in the listener)
-    sound = new THREE.PositionalAudio(listener);
+    const sound = new THREE.PositionalAudio(listener);
 
-    // load a sound and set it as the PositionalAudio object's buffer
-    const audioLoader = new THREE.AudioLoader();
-    audioLoader.load(path, function (buffer) {
-        sound.setBuffer(buffer);
-        sound.setRefDistance(1);
-        sound.setMaxDistance(8);
-        //sound.setRolloffFactor( 20 );
-        sound.setDistanceModel("linear");
-        sound.play();
-        sound.loop = true;
-        sound.source.loop = true;
+    var audioClone = document.getElementById(path).cloneNode(true);
+    audioClone.id = "";
+    sound.setMediaElementSource(audioClone);
+    sound.setRefDistance(1);
+    sound.setMaxDistance(maxDis);
+    sound.setDistanceModel("linear");
+    sound.audio = audioClone;
+    sound.audio.loop = loop;
 
-
-    });
+    if (play) {
+        sound.audio.play();
+    }
 
     // finally add the sound to the mesh
-    parent.push(sound)
-    GLOBALS.SCENE_FPS.add(sound)
+    parent.sound = sound;
+    GLOBALS.SCENE_FPS.add(sound);
+
+    if (staticPosition) {
+        console.log(parent.position)
+        sound.position.copy(parent.position);
+    }
 }
 
 const ambient = new Audio('audio/ambient.mp3')
+ambient.volume = 0.15;
 ambient.loop = true;
+
+const walk = new Audio('audio/tile1.wav')
+walk.volume = 0.5;
+walk.loop = true;
+walk.pause();
+
+const walkLightBridde = new Audio('audio/fs_fm_lightbridge_01.wav')
+walkLightBridde.volume = 0.5;
+walkLightBridde.loop = true;
+walkLightBridde.playbackRate = 1.5;
+walkLightBridde.pause();
+
+const jump = new Audio('audio/p2_fs_jump_land_tile_01.wav')
+walk.volume = 0.15;
+
+const playerInsideTractorBeam = new Audio('audio/player_enter_tbeam_lp_01.wav')
+playerInsideTractorBeam.volume = 0.5;
+playerInsideTractorBeam.loop = true;
+
+const deathAudio = new Audio('audio/body_medium_impact_hard1.wav')
+deathAudio.volume = 0.5;
 
 const editor = new Audio('audio/editor.mp3')
 editor.loop = true;
@@ -55,15 +83,13 @@ falling.loop = true;
 const hold = new Audio('audio/hold_loop.wav')
 hold.loop = true;
 
-const door_move = new Audio('audio/doormove2.wav');
-
 function volume(val) {
-    ambient.volume = val;
-    editor.volume = val;
-    door_move.volume = val;
+    //ambient.volume = val;
+    //editor.volume = val;
+    //door_move.volume = val;
 
-    if (sound)
-        sound.volume = val;
+    //if (sound)
+    //    sound.volume = val;
 }
 
 var AUDIO = {
@@ -79,7 +105,11 @@ var AUDIO = {
     PICK_FAIL: new Audio('audio/object_use_failure_01.wav'),
     PICK_SUCESS: new Audio('audio/object_use_01.wav'),
     HOLD: hold,
-    DOOR_MOVE: door_move,
+    PLAYER_INSIDE_TRACTOR_BEAM: playerInsideTractorBeam,
+    DEATH: deathAudio,
+    WALK: walk,
+    JUMP: jump,
+    WALK_LIGHT_BRIDGE: walkLightBridde
 }
 
 export {

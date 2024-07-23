@@ -96,12 +96,14 @@ function viewFPS() {
     GLOBALS.FLASH.visible = true;
 
     //ADD PORTAL AMBIENT AUDIO
-    addRadioAudio('audio/portal_ambient_loop1.wav', GLOBALS.PORTAL_AUDIO, false);
-    addRadioAudio('audio/portal_ambient_loop1.wav', GLOBALS.PORTAL_AUDIO, false);
-
-
+    addRadioAudio('audio-portal-ambient', GLOBALS.PORTAL_AUDIO[0], false, true, false, 3);
+    addRadioAudio('audio-portal-ambient', GLOBALS.PORTAL_AUDIO[1], false, true, false, 3);
 
     setTimeout(() => {
+
+        addRadioAudio('audio-door', GLOBALS.EXIT_DOOR, false, false, true, 8);
+        addRadioAudio('audio-door', GLOBALS.ENTER_DOOR, false, false, true, 8);
+
 
         GLOBALS.UNIFORMS_LASER_FIELD.fade = 1;
         GLOBALS.MATERIAL_LIGHT_BRIDGERS.depthWrite = false;
@@ -325,6 +327,11 @@ function viewFPS() {
         addColliderItem(GLOBALS.DYMANIC_ITEMS['laser_cube'], "laser_cube", 5)
         addColliderItem(GLOBALS.DOORS, "door", 0)
         //
+        addAudio(GLOBALS.DYMANIC_ITEMS['fizzler'], 'audio-fizzler')
+        addAudio(GLOBALS.DYMANIC_ITEMS['laser_field'], 'audio-laser-beam')
+        addAudio(GLOBALS.DYMANIC_ITEMS['tractor_beam'], 'audio-tractor-beam')
+        
+        //
 
         for (var s = 0; s < GLOBALS.DYMANIC_ITEMS["tractor_beam"].length; s++) {
             if (GLOBALS.DYMANIC_ITEMS["tractor_beam"][s].length != 0)
@@ -484,6 +491,18 @@ function viewFPS() {
     }, 500);
 };
 
+function addAudio(obj, name) {
+    for (var i = 0; i < obj.length; i++) {
+        if (obj[i].length != 0) {
+            console.log(obj[i])
+            addRadioAudio(name, obj[i], true, true, true,8);
+
+            if (name == 'audio-fizzler' || name == 'audio-laser-beam')
+                addRadioAudio(name, obj[i].cloneLaserField, true, true, true,8);
+        }
+    }
+}
+
 function addColliderItem(items, type, mass, offset) {
 
     let PHYSICS_MATERIAL = new CANNON.Material();
@@ -537,7 +556,6 @@ function addColliderItem(items, type, mass, offset) {
             } else if (type == "radio") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.11, 0.07, 0.049));
                 offset = 0.07;
-                addRadioAudio('audio/radio.mp3', GLOBALS.RADIO_MUSIC, true)
             } else if (type == "button_weight") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.117, 0.5));
                 items[i].position.y += 0.117;
@@ -598,6 +616,13 @@ function addColliderItem(items, type, mass, offset) {
 
             box.updateMassProperties();
 
+            if (type == "radio") {
+                addRadioAudio('audio-radio', box, true, true, false,8)
+            } else if (type == "door") {
+                console.log(items[i])
+                addRadioAudio('audio-door', items[i], false, false, true,8)
+            }
+
             if (mass > 0) {
 
                 if ((type == "cube" || type == "laser_cube" || type == "sphere")) {
@@ -633,6 +658,31 @@ function addColliderItem(items, type, mass, offset) {
                 box.arrayPos = [];
                 box.arrayRot = [];
                 box.name = type;
+
+                box.addEventListener("collide", function (event) {
+                    const body = event.body;
+
+                    if (event.contact.bj.side) {
+                        if (event.contact.bj.side != event.target.sideContact || GLOBALS.HOLDING_ITEM) {
+                            event.target.sideContact = event.contact.bj.side;
+                            addRadioAudio('audio-impact', body, true, false, true,8);
+
+                            setTimeout(() => {
+                                GLOBALS.SCENE_FPS.remove(body.sound);
+                            }, 1000);
+                        }
+                    } else {
+                        if (event.contact.id != event.target.contactID || GLOBALS.HOLDING_ITEM) {
+                            event.target.contactID = event.contact.bj.id;
+                            addRadioAudio('audio-impact', body, true, false, true,8);
+
+                            setTimeout(() => {
+                                GLOBALS.SCENE_FPS.remove(body.sound);
+                            }, 1000);
+                        }
+                    }
+
+                });
 
                 box.addEventListener("sleep", function (event) {
                     box.sleeping = true;

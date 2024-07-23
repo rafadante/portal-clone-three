@@ -14,7 +14,7 @@ import {
 import {
     GLOBALS
 } from '../../Globals.js';
-import { AUDIO, addRadioAudio } from '../audio/Audio.js';
+import { AUDIO } from '../audio/Audio.js';
 
 var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
@@ -314,10 +314,14 @@ function validPortalPoint(point, normal, object) {
 // deletes the portal with index portalIndex from the scene
 function deletePortal(portalIndex) {
 
+    if (GLOBALS.PORTALS[0] === null && GLOBALS.PORTALS[1] === null)
+        AUDIO.PORTAL_GUN_LOOP.pause();
+
     if (GLOBALS.PORTALS[portalIndex] === null)
         return;
 
     GLOBALS.PORTALS[portalIndex].light.visible = false;
+    GLOBALS.PORTAL_AUDIO[portalIndex].sound.audio.pause();
 
     if (GLOBALS.PORTALS[portalIndex].hostObjects !== null) {
 
@@ -327,7 +331,7 @@ function deletePortal(portalIndex) {
             // add back to environment group only if collideable with both portal objects
             if (!(GLOBALS.CANNON_BODIES[i].collisionFilterGroup & GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[0]) &&
                 !(GLOBALS.CANNON_BODIES[i].collisionFilterGroup & GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[1])) {
-                    GLOBALS.CANNON_BODIES[i].collisionFilterGroup |= GLOBALS.CGROUP_ENVIRONMENT
+                GLOBALS.CANNON_BODIES[i].collisionFilterGroup |= GLOBALS.CGROUP_ENVIRONMENT
             }
         }
 
@@ -391,12 +395,14 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
         GLOBALS.PORTALS[1].portalShader.material.uniforms.iOpened.value = 1;
     }
 
+    GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.position.copy(GLOBALS.PORTALS[thisPortalIndex].mesh.position);
+    GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.quaternion.copy(GLOBALS.PORTALS[thisPortalIndex].mesh.quaternion);
+    GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.audio.play();
 
-    GLOBALS.PORTALS[thisPortalIndex].add(GLOBALS.PORTAL_AUDIO[thisPortalIndex])
-
-    //GLOBALS.PORTAL_AUDIO[thisPortalIndex].play();
-
-    console.log("xxxxxxxxxxxxxx")
+    if (AUDIO.PORTAL_GUN_LOOP.paused) {
+        console.log(AUDIO.PORTAL_GUN_LOOP)
+        AUDIO.PORTAL_GUN_LOOP.play();
+    }
 }
 
 export {

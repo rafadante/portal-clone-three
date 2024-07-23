@@ -133,6 +133,14 @@ function updatePhysics() {
 
             if (GLOBALS.DYMANIC_ITEMS[property][i].length != 0) {
 
+                if(GLOBALS.DYMANIC_ITEMS[property][i].body){
+                    if(GLOBALS.DYMANIC_ITEMS[property][i].body.sound){
+                        GLOBALS.DYMANIC_ITEMS[property][i].body.sound.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
+                        GLOBALS.DYMANIC_ITEMS[property][i].body.sound.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
+                    }
+                }
+                
+
                 if (property == "tractor_beam") {
                     if (GLOBALS.DYMANIC_ITEMS[property][i].state) {
                         var dir = new THREE.Vector3(); // create once and reuse it
@@ -159,10 +167,10 @@ function updatePhysics() {
                         instanced.computeBoundingSphere();
                     }
                 } else {
-                    if (property == "radio") {
+                    /*if (property == "radio") {
                         GLOBALS.RADIO_MUSIC[i].position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
                         GLOBALS.RADIO_MUSIC[i].quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
-                    }
+                    }*/
 
                     var item = new THREE.Object3D();
                     item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);

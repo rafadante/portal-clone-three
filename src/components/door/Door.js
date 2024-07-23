@@ -22,10 +22,9 @@ function stateDoor(timeToTrigger, open, enter, door) {
   
     door.timeOutDoor1 = setTimeout(() => {
   
-      if (playing) {
-        AUDIO.DOOR_MOVE.pause();
-        AUDIO.DOOR_MOVE.currentTime = 0;
-        AUDIO.DOOR_MOVE.play();
+      if (playing && door.sound) {
+        door.sound.audio.currentTime = 0;
+        door.sound.audio.play();
       }
   
       playing = false;

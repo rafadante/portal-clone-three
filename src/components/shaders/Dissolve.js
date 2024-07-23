@@ -6,7 +6,7 @@ noise.wrapS = noise.wrapT = RepeatWrapping
 var matcap = new TextureLoader().load('./assets/textures/matcap.png');
 matcap.colorSpace = SRGBColorSpace;
 
-setTimeout(() => {
+//setTimeout(() => {
     GLOBALS.UNIFORMS_DISSOLVER = {
         u_EffectOrigin: { value: new Vector3(3,2,3) },
         u_Time: { value: 0 },
@@ -89,7 +89,8 @@ setTimeout(() => {
         vertexShader: vshader,
         fragmentShader: fshader,
         side: 2,
-        transparent: true
+        transparent: true,
+        depthWrite: false
     });
     
     console.log(GLOBALS.MATERIAL_DISSOLVER)
@@ -99,5 +100,5 @@ setTimeout(() => {
     cube.position.set(3,3,3)
     //
     GLOBALS.SCENE.add( cube );*/
-}, 4000);
+//}, 4000);
 

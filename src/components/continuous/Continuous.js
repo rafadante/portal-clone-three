@@ -13,6 +13,7 @@ import {
 } from '../../Main.js';
 import { interactWithItem } from '../items/Items.js';
 import { deletePortal } from '../portal/CreatePortal.js';
+import { addRadioAudio, AUDIO } from '../audio/Audio.js';
 
 function createLightBridges(item, rayItem, object, instanced) {
 
@@ -70,6 +71,7 @@ function createLightBridges(item, rayItem, object, instanced) {
         instanced.computeBoundingSphere();
 
         object.cloneLaserDistance = intersects[0].distance;
+        object.cloneLaserField = cloneLaserField;
     } else if (item == "tractor_beam") {
         var geometry = new THREE.CylinderGeometry(0.9, 0.9, intersects[0].distance + 0, 32, 1, true);
         raycaster.name = "tractor_beam";
@@ -126,6 +128,8 @@ function createLightBridges(item, rayItem, object, instanced) {
 
     var box = new CANNON.Body({
         shape: result.shape,
+        mass: 0,
+        material: PHYSICS_MATERIAL
     })
 
     box.position.copy(plane.position);
@@ -135,8 +139,10 @@ function createLightBridges(item, rayItem, object, instanced) {
     object.raycaster = raycaster;
 
     if (item == "light_bridge") {
+        console.log(box)
         box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
         box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
+        box.name = "light_bridge";
         /*box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
             box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC*/
         object.bodyBridge = box;
@@ -167,6 +173,8 @@ function createLightBridges(item, rayItem, object, instanced) {
                 }else if (e.body.name == "sphere" || e.body.name == "cube" || e.body.name == "radio") {
                     console.log('FIZZLER!', e.body);
 
+                    //
+
                     //CREATE A CLONE TO APPLY DISSOLVE SHADER
                     const clone = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.name).scene.clone();
                     clone.position.set(e.body.position.x, e.body.position.y, e.body.position.z);
@@ -190,14 +198,17 @@ function createLightBridges(item, rayItem, object, instanced) {
                     var clone2 = clone.clone();
                     clone2.position.y += 1;
 
-                    tweenCamera(2000, GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value, clone.position)
-                    tweenCamera(2000, clone.position, clone2.position)
+                    addRadioAudio('audio-dissolve', clone, true, false, true, 8)
+
+                    tweenCamera(3000, GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value, clone.position)
+                    tweenCamera(3000, clone.position, clone2.position)
 
                     //GLOBALS.MATERIAL_DISSOLVER
 
                     setTimeout(() => {
                         GLOBALS.SCENE.remove(clone);
-                    }, 2000);
+                        GLOBALS.SCENE_FPS.remove(clone.sound);
+                    }, 3000);
 
                     respawn(e.body);
                 }

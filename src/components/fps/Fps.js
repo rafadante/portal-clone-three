@@ -243,13 +243,27 @@ function player() {
     upVector = new CANNON.Vec3(0, 1, 0);
     let contactNormal = new CANNON.Vec3(0, 0, 0);
 
+    GLOBALS.PLAYER.addEventListener("collide", function (event) {
+
+        if (event.contact.bj.name == "light_bridge") {
+            GLOBALS.PLAYER.lightBridge = true;
+        } else {
+            GLOBALS.PLAYER.lightBridge = false;
+        }
+
+        if (GLOBALS.PLAYER.inJump) {
+            AUDIO.JUMP.currentTime = 0;
+            AUDIO.JUMP.play();
+        }
+    })
+
     GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
         GLOBALS.PLAYER.inJump = true;
         if (GLOBALS.CANNON_WORLD.contacts.length > 0) {
 
             for (let contact of GLOBALS.CANNON_WORLD.contacts) {
 
-                if(contact.bi.collisionResponse == 0 || contact.bj.collisionResponse == 0) continue;
+                if (contact.bi.collisionResponse == 0 || contact.bj.collisionResponse == 0) continue;
 
                 if (contact.bi.id == GLOBALS.PLAYER.id || contact.bj.id == GLOBALS.PLAYER.id) {
                     if (contact.bi.id == GLOBALS.PLAYER.id) {
@@ -272,22 +286,6 @@ function player() {
         }
 
         moving = GLOBALS.PLAYER.inJump;
-
-        /*if(GLOBALS.PLAYER.inJump && !audioFallingPlayed){
-
-            timeFalling++;
-
-            if(timeFalling > 70){
-                audioFallingPlayed = true;
-                AUDIO.FALLING.pause();
-                AUDIO.FALLING.currentTime = 0;
-                AUDIO.FALLING.play();
-            }
-        }else if(!GLOBALS.PLAYER.inJump && audioFallingPlayed){
-            audioFallingPlayed = false;
-            timeFalling = 0;
-            AUDIO.FALLING.pause();
-        }*/
     })
 
     GLOBALS.DYNAMIC_OBJECTS.push(GLOBALS.PLAYER);
@@ -370,28 +368,6 @@ $("body").on('click', '#settings-close', function () {
             GLOBALS.DOOR_OPEN_STATE = true;
 
             stateDoor(1000, true, false, GLOBALS.ENTER_DOOR)
-
-            /*setTimeout(() => {
-                AUDIO.DOOR_MOVE.pause();
-                AUDIO.DOOR_MOVE.currentTime = 0;
-                AUDIO.DOOR_MOVE.play();
-                tweenCamera(500, GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_right_05").rotation, new THREE.Vector3(Math.PI,
-                    GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_right_05").rotation.y,
-                    GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_right_05").rotation.z))
-
-                tweenCamera(500, GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_left_07").rotation, new THREE.Vector3(Math.PI,
-                    GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_left_07").rotation.y,
-                    GLOBALS.ENTER_DOOR.getObjectByName("central_spinner_left_07").rotation.z))
-
-                setTimeout(() => {
-                    console.log("yyyyyyyyyyyyyyy")
-                    GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").position.z = -4;
-                    tweenCamera(1000, GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").position, new THREE.Vector3(25, GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").position.y, GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").position.z))
-
-                    GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position.z = -4;
-                    tweenCamera(1000, GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position, new THREE.Vector3(-25, GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position.y, GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").position.z))
-                }, 500);
-            }, 1000);*/
         }
     }
 })
@@ -417,7 +393,6 @@ function controlsLock() {
 
     GLOBALS.POINTER_CONTROLS.addEventListener('lock', function () {
         AUDIO.AMBIENT.play();
-        AUDIO.PORTAL_GUN_LOOP.play();
         document.getElementById('blocker').style.display = 'none';
         GLOBALS.PAUSED = false;
 
@@ -427,7 +402,6 @@ function controlsLock() {
     });
 
     GLOBALS.POINTER_CONTROLS.addEventListener('unlock', function () {
-        AUDIO.PORTAL_GUN_LOOP.pause();
         $("#container").css("filter", "blur(2px)")
         document.getElementById('blocker').style.display = 'block';
         GLOBALS.ALLOW_PLACE_PORTALS = false;
@@ -458,6 +432,9 @@ document.addEventListener('keyup', (event) => {
             Crouch(0.25);
         }
     }
+
+    AUDIO.WALK.pause();
+    AUDIO.WALK_LIGHT_BRIDGE.pause();
 });
 
 $("body").on('pointerdown', '#crouch', function () {
@@ -618,14 +595,29 @@ const updatePlayer = function (deltaTime) {
                 joystickGel(gamepad, 12, gamepadButton12, 1, 0)
                 joystickGel(gamepad, 15, gamepadButton15, 2, 0.08)
 
-                if (gamepad.axes[2] > 0.5)
+                /*if (gamepad.axes[2] > 0.5)
                     GLOBALS.MAIN_CAMERA.rotation.y -= 0.05;
                 if (gamepad.axes[2] < -0.5)
                     GLOBALS.MAIN_CAMERA.rotation.y += 0.05;
                 if (gamepad.axes[3] < -0.5)
                     GLOBALS.MAIN_CAMERA.rotation.x += 0.025;
                 if (gamepad.axes[3] > 0.5)
-                    GLOBALS.MAIN_CAMERA.rotation.x -= 0.025;
+                    GLOBALS.MAIN_CAMERA.rotation.x -= 0.025;*/
+
+                // Ajuste esses valores conforme necessário para controlar a sensibilidade dos movimentos
+                const sensitivity = 0.04;  // Sensibilidade do controle
+
+                // Lê os estados dos controles do gamepad
+                const xAxis = gamepad.axes[2];  // Movimento horizontal
+                const yAxis = gamepad.axes[3];  // Movimento vertical
+
+                // Atualiza a orientação da câmera
+                GLOBALS.MAIN_CAMERA.rotation.y -= xAxis * 0.08;
+                GLOBALS.MAIN_CAMERA.rotation.x -= yAxis * 0.04;
+
+                // Limita o movimento vertical entre -PI/2 e PI/2 para evitar que a câmera dê uma volta completa
+                GLOBALS.MAIN_CAMERA.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, GLOBALS.MAIN_CAMERA.rotation.x));
+
 
                 var gamepadPressed = 0;
 
@@ -638,8 +630,8 @@ const updatePlayer = function (deltaTime) {
                 if (gamepad.axes[0] > 0.5)
                     movePlayerJoystick(right, f, movementMultiplier, gamepadPressed)
                 if (gamepadPressed == 0) {
-                    moving = false;
-                    headBobActive = false;
+                    // moving = false;
+                    //headBobActive = false;
                 }
             }
 
@@ -668,10 +660,17 @@ const updatePlayer = function (deltaTime) {
                 shouldJump = true;
             }
 
-            if (shouldJump && !GLOBALS.PLAYER.inJump && !jumpPressed) {
+            if (shouldJump && !GLOBALS.PLAYER.inJump && !jumpPressed && !blockJump) {
+                AUDIO.WALK.pause();
+                AUDIO.WALK_LIGHT_BRIDGE.pause();
                 jumpPressed = true;
                 GLOBALS.PLAYER.inJump = true
                 GLOBALS.PLAYER.applyImpulse(up.clone().multiplyScalar(230), GLOBALS.PLAYER.position)
+
+                blockJump = true;
+                setTimeout(() => {
+                    blockJump = false;
+                }, 100);
             }
         }
     }
@@ -683,6 +682,7 @@ const updatePlayer = function (deltaTime) {
 }
 
 var jumpPressed = false;
+var blockJump = false;
 
 const updateCamera = function (deltaTime) {
 
@@ -799,6 +799,22 @@ function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
     //if (GLOBALS.PLAYER.launch)
     //    return;
 
+    if (AUDIO.WALK.paused && !GLOBALS.PLAYER.inJump && !GLOBALS.PLAYER.lightBridge) {
+
+        if (!AUDIO.WALK_LIGHT_BRIDGE.paused)
+            AUDIO.WALK_LIGHT_BRIDGE.pause()
+
+        AUDIO.WALK.currentTime = 0;
+        AUDIO.WALK.play();
+    } else if (AUDIO.WALK_LIGHT_BRIDGE.paused && !GLOBALS.PLAYER.inJump && GLOBALS.PLAYER.lightBridge) {
+
+        if (!AUDIO.WALK.paused)
+            AUDIO.WALK.pause()
+
+        AUDIO.WALK_LIGHT_BRIDGE.currentTime = 0;
+        AUDIO.WALK_LIGHT_BRIDGE.play();
+    }
+
     moving = true;
     if (GLOBALS.PLAYER.mass == 0) {
         posPlayer.add(direction.clone().multiplyScalar(0.02));
@@ -864,12 +880,10 @@ const updateHeadBob = function (deltaTime) {
 window.addEventListener("gamepadconnected", (event) => {
     const gamepad = event.gamepad;
     controllerIndex = gamepad.index;
-    console.log("connected");
 });
 
 window.addEventListener("gamepaddisconnected", (event) => {
     controllerIndex = null;
-    console.log("disconnected");
 });
 
 function elevator() {
