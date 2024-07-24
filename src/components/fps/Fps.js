@@ -22,7 +22,7 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
-import { AUDIO } from '../audio/Audio.js';
+import { AUDIO,play } from '../audio/Audio.js';
 import { stateDoor } from '../door/Door.js';
 
 //
@@ -253,7 +253,7 @@ function player() {
 
         if (GLOBALS.PLAYER.inJump) {
             AUDIO.JUMP.currentTime = 0;
-            AUDIO.JUMP.play();
+            play(AUDIO.JUMP)
         }
     })
 
@@ -392,7 +392,7 @@ function controlsLock() {
     GLOBALS.POINTER_CONTROLS.pointerSpeed = 0.5;
 
     GLOBALS.POINTER_CONTROLS.addEventListener('lock', function () {
-        AUDIO.AMBIENT.play();
+        play(AUDIO.AMBIENT)
         document.getElementById('blocker').style.display = 'none';
         GLOBALS.PAUSED = false;
 
@@ -805,14 +805,14 @@ function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
             AUDIO.WALK_LIGHT_BRIDGE.pause()
 
         AUDIO.WALK.currentTime = 0;
-        AUDIO.WALK.play();
+        play(AUDIO.WALK)
     } else if (AUDIO.WALK_LIGHT_BRIDGE.paused && !GLOBALS.PLAYER.inJump && GLOBALS.PLAYER.lightBridge) {
 
         if (!AUDIO.WALK.paused)
             AUDIO.WALK.pause()
 
         AUDIO.WALK_LIGHT_BRIDGE.currentTime = 0;
-        AUDIO.WALK_LIGHT_BRIDGE.play();
+        play(AUDIO.WALK_LIGHT_BRIDGE)
     }
 
     moving = true;

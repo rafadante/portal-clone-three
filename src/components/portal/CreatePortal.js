@@ -14,7 +14,7 @@ import {
 import {
     GLOBALS
 } from '../../Globals.js';
-import { AUDIO } from '../audio/Audio.js';
+import { AUDIO,play } from '../audio/Audio.js';
 
 var coords = new THREE.Vector3();
 var raycaster2 = new THREE.Raycaster();
@@ -99,7 +99,7 @@ function portalButton(button, auto) {
 
                 console.log(userData)
 
-                if (auto || (userData.portal && (!userData.hasItem || userData.itemName.includes("camera")))) {
+                if (auto || (userData.portal)) {//!userData.hasItem || (userData.itemName.includes("camera"))
                     const point = new THREE.Vector3(x, y, z);
                     // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                     // define playerUpDirection
@@ -157,7 +157,7 @@ function portalButton(button, auto) {
                             if (!isInOtherPortalArea(p, normal, intersects[0].object, portalID)) {
                                 AUDIO.PORTAL_INVALID.pause();
                                 AUDIO.PORTAL_INVALID.currentTime = 0;
-                                AUDIO.PORTAL_INVALID.play();
+                                play(AUDIO.PORTAL_INVALID)
                                 return;
                             }
                         }
@@ -220,7 +220,7 @@ function portalButton(button, auto) {
 
                         AUDIO.PORTAL_GUN_ORANGE.pause();
                         AUDIO.PORTAL_GUN_ORANGE.currentTime = 0;
-                        AUDIO.PORTAL_GUN_ORANGE.play();
+                        play(AUDIO.PORTAL_GUN_ORANGE)
                     } else if (button == 2) { // left click
 
                         console.log("777777777777777777777")
@@ -248,7 +248,7 @@ function portalButton(button, auto) {
 
                         AUDIO.PORTAL_GUN_BLUE.pause();
                         AUDIO.PORTAL_GUN_BLUE.currentTime = 0;
-                        AUDIO.PORTAL_GUN_BLUE.play();
+                        play(AUDIO.PORTAL_GUN_BLUE)
                     }
 
                     setTimeout(() => {
@@ -266,7 +266,7 @@ function portalButton(button, auto) {
                     //NONPORTABLE WALL
                     AUDIO.PORTAL_INVALID.pause();
                     AUDIO.PORTAL_INVALID.currentTime = 0;
-                    AUDIO.PORTAL_INVALID.play();
+                    play(AUDIO.PORTAL_INVALID)
                 }
             }
         }
@@ -397,11 +397,11 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
 
     GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.position.copy(GLOBALS.PORTALS[thisPortalIndex].mesh.position);
     GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.quaternion.copy(GLOBALS.PORTALS[thisPortalIndex].mesh.quaternion);
-    GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.audio.play();
+    play(GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.audio)
 
     if (AUDIO.PORTAL_GUN_LOOP.paused) {
         console.log(AUDIO.PORTAL_GUN_LOOP)
-        AUDIO.PORTAL_GUN_LOOP.play();
+        play(AUDIO.PORTAL_GUN_LOOP)
     }
 }
 

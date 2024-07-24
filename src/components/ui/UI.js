@@ -4,7 +4,7 @@ import { GLOBALS } from '../../Globals.js';
 import {
     animate
 } from '../../Main.js';
-import { AUDIO, volume } from '../audio/Audio.js';
+import { AUDIO, volume,play } from '../audio/Audio.js';
 import { stateDoor } from '../door/Door.js';
 
 if (!GLOBALS.MOBILE)
@@ -12,7 +12,7 @@ if (!GLOBALS.MOBILE)
 
 
 $("body").on('click', '#start-place-holder', function () {
-    AUDIO.EDITOR.play();
+    play(AUDIO.EDITOR)
     $("#placeholder").css("display", "none");
 });
 
@@ -245,7 +245,8 @@ $("body").on('click', '#back-editor', function () {
     animate()
     //}, 100);
 
-    AUDIO.EDITOR.play();
+
+    play(AUDIO.EDITOR)
     AUDIO.AMBIENT.pause();
 
     GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").scale.set(0, 0, 0);

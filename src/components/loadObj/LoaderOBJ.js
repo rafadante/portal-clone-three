@@ -93,6 +93,8 @@ async function handleZip(path, obj) {
                     loadLaserFieldManager(result.scene)
                 else if (obj == "loadFizzler")
                     loadFizzlerManager(result.scene)
+                else if (obj == "loadPortalCube2")
+                    loadPortalCubeManager2(result.scene)
             });
         }
     });
@@ -529,23 +531,33 @@ function loadWindowHalfManager(scene) {
         }
 
         if (child.name == "room_light") {
-            const light = new THREE.PointLight(0xffffff, 25, 10);
+            const light = new THREE.PointLight(0xffffff, 5, 25);
             var target = new THREE.Vector3(); // create once an reuse it
             child.getWorldPosition(target);
             light.position.copy(target);
-            light.translateY(-1);
-            //scene.add(light);
+            //light.translateY(-0.2);
+            scene.add(light);
+            light.position.set(0,-1,-0.8)
+            light.shadow.bias = -0.01;
+            light.castShadow = true;
+            light.name = "pointLight";
         }
 
         if (child.name.includes("vidro")) {
             //child.renderOrder = -1;
+            child.visible = false;
             child.material.side = 2;
             child.material.envMap = GLOBALS.ENV_MAP;
+            //child.receiveShadow = false;
+            //hild.castShadow = false;
+            child.material.envMapIntensity = 0.5;
+            child.material.roughness = 0.3;
         }
     })
 
     scene.position.y = -1;
     scene.visible = false;
+    GLOBALS.OBSERVATION_ROOM_HALF = scene;
 }
 
 function loadDispenser() {
@@ -992,6 +1004,25 @@ function loadFizzlerManager(scene) {
     item.userData.wall = true;
     item.userData.ground = true;
     item.userData.ceiling = true;
+
+    loadPortalCube2();
+}
+
+function loadPortalCube2() {
+    handleZip('./assets/3ds/cube_2.zip', "loadPortalCube2");
+}
+
+function loadPortalCubeManager2(scene) {
+
+    var item = instancedTransform(scene, "cube_2", true, 0.2, 0.5)
+    item.userData.wall = false;
+    item.userData.ground = true;
+    item.userData.ceiling = false;
+    item.scene = scene.children[0];
+    item.userData.obj = scene;
+    item.userData.obj.children[0].material.envMap = GLOBALS.ENV_MAP;
+    item.userData.obj.children[0].material.envMapIntensity = 0.5;
+    item.userData.obj.children[0].material.roughness = 0.2;
 
     if (GLOBALS.LOADED_LEVEL) {
         loadLevelJSON()

@@ -7,7 +7,7 @@ import {
   portalButton
 } from '../portal/CreatePortal.js';
 import { func } from "three/examples/jsm/nodes/Nodes.js";
-import { AUDIO } from "../audio/Audio.js";
+import { AUDIO, play, addRadioAudio } from "../audio/Audio.js";
 
 function updateEvents() {
   levelEnteredFunction();
@@ -50,12 +50,18 @@ function updateEvents() {
         //Verify if the button accepts the body
         if (GLOBALS.CONNECTIONS[i]['from'].box3.accept.includes(d.name)) {
 
-          //
           if (!GLOBALS.CONNECTIONS[i]['line'].active) {
             GLOBALS.CONNECTIONS[i]['to'].item.buttons += 1;
             GLOBALS.CONNECTIONS[i]['line'].idConnection = id;
             GLOBALS.CONNECTIONS[i]['line'].active = true;
             GLOBALS.CONNECTIONS[i]['line'].material.color = new THREE.Color(0x0077B6);
+
+            //PLAY AUDIO POSITIVE
+            addRadioAudio('audio-button-positive', GLOBALS.CONNECTIONS[i]['from'], true, false, true, 8);
+            var soundHolder = GLOBALS.CONNECTIONS[i]['from'];
+            setTimeout(() => {
+              GLOBALS.SCENE_FPS.remove(soundHolder.sound);
+            }, 1500);
 
             //Manage Door Trigger
             if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
@@ -194,7 +200,7 @@ function respawn(d) {
 
   if (d.name == "player") {
     AUDIO.DEATH.currentTime = 0;
-    AUDIO.DEATH.play();
+    play(AUDIO.DEATH);
     time = 500;
     time2 = 500;
   }
@@ -278,4 +284,4 @@ function dispenserSpawn(item) {
   item.body.wakeUp();
 }
 
-export { updateEvents, dispenserSpawn, respawn };
+export { updateEvents, dispenserSpawn, respawn, tractorStates, lightBridgeState, laserFieldState };

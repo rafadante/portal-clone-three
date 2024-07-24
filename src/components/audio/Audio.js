@@ -10,6 +10,29 @@ function preLoadAudios() {
     const audio = new Audio("freejazz.wav");
 }
 
+function play(elem) {
+    var isPlaying = elem.currentTime > 0 && !elem.paused && !elem.ended
+        && elem.readyState > elem.HAVE_CURRENT_DATA;
+
+    if (!isPlaying) {
+        //elem.play();
+
+        // Show loading animation.
+        var playPromise = elem.play();
+
+        if (playPromise !== undefined) {
+            playPromise.then(_ => {
+                // Automatic playback started!
+                // Show playing UI.
+            })
+                .catch(error => {
+                    // Auto-play was prevented
+                    // Show paused UI.
+                });
+        }
+    }
+}
+
 function addRadioAudio(path, parent, play, loop, staticPosition, maxDis) {
 
     if (!listernAdded) {
@@ -32,7 +55,14 @@ function addRadioAudio(path, parent, play, loop, staticPosition, maxDis) {
     sound.audio.loop = loop;
 
     if (play) {
-        sound.audio.play();
+        const elem = sound.audio;
+
+        var isPlaying = elem.currentTime > 0 && !elem.paused && !elem.ended
+            && elem.readyState > elem.HAVE_CURRENT_DATA;
+
+        if (!isPlaying) {
+            elem.play();
+        }
     }
 
     // finally add the sound to the mesh
@@ -40,7 +70,6 @@ function addRadioAudio(path, parent, play, loop, staticPosition, maxDis) {
     GLOBALS.SCENE_FPS.add(sound);
 
     if (staticPosition) {
-        console.log(parent.position)
         sound.position.copy(parent.position);
     }
 }
@@ -115,5 +144,6 @@ var AUDIO = {
 export {
     addRadioAudio,
     AUDIO,
-    volume
+    volume,
+    play
 }

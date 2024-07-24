@@ -53,7 +53,8 @@
         <i class="fas fa-chevron-right"></i>
       </button>
       <div class="header">
-        <span>ITEMS</span>
+        <span id="header-items">ITEMS</span>
+        <span id="header-gun">PORTAL GUN</span>
       </div>
       <div class="body">
         <div id="items">
@@ -110,9 +111,15 @@
 
           <img
             data-content="A dropper will come with it. If the player loses the cube the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
-            data-title="CUBE" class="item" data-name="cube" src="../assets/ui/items/cube_blue.png"
+            data-title="CUBE" class="item" data-name="cube" src="../assets/ui/items/cube_pink.png"
             data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
             data-instanced="true" id="cube" />
+
+          <img
+            data-content="A dropper will come with it. If the player loses the cube the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
+            data-title="CUBE 2" class="item" data-name="cube_2" src="../assets/ui/items/cube_blue.png"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
+            data-instanced="true" id="cube_2" />
 
           <img
             data-content="A dropper will come with it. If the player loses the sphere the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
@@ -134,24 +141,23 @@
             data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" data-allowconnection="true"
             id="tractor_beam" src="../assets/ui/items/tractor_beam.png" />
 
-            <img
+          <img
             data-content="Players and objects will not pass through the surface of Light Bridges. Within the properties menu you're given the option to start the bridge enabled or disabled."
-            data-title="LIGHT BRIDGE" class="item" data-name="light_bridge" src="../assets/ui/items/light_bridge.png" 
+            data-title="LIGHT BRIDGE" class="item" data-name="light_bridge" src="../assets/ui/items/light_bridge.png"
             data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" data-allowconnection="true"
-            id="light_bridge"
-            />
+            id="light_bridge" />
 
-            <img
+          <img
             data-content="Any contact with the lasers will result in instant death. However, the Field allows objects to pass through without harm."
-            data-title="LASER FIELD" class="item" data-name="laser_field" src="../assets/ui/items/laser_field.png" 
+            data-title="LASER FIELD" class="item" data-name="laser_field" src="../assets/ui/items/laser_field.png"
             data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" data-allowconnection="true"
-            id="laser_field"/>
+            id="laser_field" />
 
-            <img
+          <img
             data-content="Fizzlers destroy any objects which pass through them such as cubes or turrets. If a player walks through a Fizzler any previously placed portals will also be destroyed. You can increase and decrease the size of the Fizzler using the arrows that appear when the object is selected."
-            data-title="FIZZLER" class="item" data-name="fizzler" src="../assets/ui/items/fizzlers.png" 
+            data-title="FIZZLER" class="item" data-name="fizzler" src="../assets/ui/items/fizzlers.png"
             data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" data-allowconnection="true"
-            id="fizzler"/>
+            id="fizzler" />
           <!--
           <img
             data-content="If a player walks onto a Faith Plate it will cause them to get bounced into the air. When you place a Faith Plate within the editor it will also create a bullseye and a yellow ball. The Bullseye is where the player will ultimately land, and the yellow ball is the trajectory the player will travel."
@@ -192,10 +198,7 @@
             data-title="FLIP PANELS" class="item" data-name="angled_panel3"
             src="../assets/ui/items/angled_panel3.png" />
 
-          <img
-            data-content="Purely cosmetic and provide your map with additional light. Every map will start off with an observation room which cannot be removed."
-            data-title="OBSERVATION ROOM" class="item" data-name="observation_room"
-            src="../assets/ui/items/observation_room.png" />-->
+          -->
 
           <img
             data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
@@ -203,23 +206,29 @@
             data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
             data-instanced="true" id="light" />
 
-          <!--<img
+          <img
             data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
-            data-title="LIGHT STRIPS" class="item" data-name="stripe" src="../assets/ui/items/stripe.png" />-->
+            data-title="LIGHT STRIPS" class="item" data-name="stripe" src="../assets/ui/items/stripe.png" />
+
+          <img
+            data-content="Purely cosmetic and provide your map with additional light. Every map will start off with an observation room which cannot be removed."
+            data-title="OBSERVATION ROOM" class="item" data-name="observation_room" data-allowconnection="false"
+            data-rotate="false" data-floor="false" data-ceiling="false" data-walls="true"
+            src="../assets/ui/items/observation_room.png" id="observation_room" />
 
           <img data-content="You can link a trigger to it to open the door." data-title="DOOR" class="item"
             data-name="door" src="../assets/ui/items/door.png" data-allowconnection="true" data-rotate="true"
             data-floor="true" data-ceiling="false" data-walls="false" data-instanced="false" id="door" />
 
-          <img data-content="You can link a trigger to it to activate this portal without the need of the portal gun." data-title="PORTAL LEFT" class="item"
-            data-name="portal_0" src="../assets/ui/mobile/portalOrange.png" data-allowconnection="true"
-            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="false"
-            id="portal_0" />
+          <img data-content="You can link a trigger to it to activate this portal without the need of the portal gun."
+            data-title="PORTAL LEFT" class="item" data-name="portal_0" src="../assets/ui/mobile/portalOrange.png"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="false" id="portal_0" />
 
-          <img data-content="You can link a trigger to it to activate this portal without the need of the portal gun." data-title="PORTAL RIGHT" class="item"
-            data-name="portal_1" src="../assets/ui/mobile/portalBlue.png" data-allowconnection="true"
-            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="false"
-            id="portal_1" />
+          <img data-content="You can link a trigger to it to activate this portal without the need of the portal gun."
+            data-title="PORTAL RIGHT" class="item" data-name="portal_1" src="../assets/ui/mobile/portalBlue.png"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="false" id="portal_1" />
 
           <!--<img
             data-content="You can place automatic portals on the scene, it can be static or activated by a trigger. You can choose which portal color on the level editor. If the player has a portal gun and shoots a portal with the same color as the automatic portal, the automatic portal will be destroyed and vice versa."
@@ -339,11 +348,12 @@
     <!---->
     <li id="light-bridge-state" class="menu-item hasItem light-bridge">
       <a href="#" class="menu-btn">
-        <input type="checkbox" checked id="light-bridge-state-input"/>
+        <input type="checkbox" checked id="light-bridge-state-input" />
         <span class="menu-text">State</span>
       </a>
     </li>
-    <li class="menu-item menu-item-submenu hasItem light-bridge" id="light-bridge-trigger" data-trigger="Middle Horizontal">
+    <li class="menu-item menu-item-submenu hasItem light-bridge" id="light-bridge-trigger"
+      data-trigger="Middle Horizontal">
       <button type="button" class="menu-btn">
         <i class="fa fa-crosshairs"></i>
         <span class="menu-text title">Middle Horizontal</span>
@@ -389,13 +399,22 @@
     </li>
 
     <!---->
+    <li id="ligh-color" class="menu-item hasItem light-color">
+      <a href="#" class="menu-btn">
+        <input type="color" id="ligh-color-input" />
+        <span class="menu-text">Light Color</span>
+      </a>
+    </li>
+
+    <!---->
     <li id="laser-field-state" class="menu-item hasItem laser-field">
       <a href="#" class="menu-btn">
-        <input type="checkbox" checked id="laser-field-state-input"/>
+        <input type="checkbox" checked id="laser-field-state-input" />
         <span class="menu-text">State</span>
       </a>
     </li>
-    <li class="menu-item menu-item-submenu hasItem laser-field" id="laser-field-trigger" data-trigger="Middle Horizontal">
+    <li class="menu-item menu-item-submenu hasItem laser-field" id="laser-field-trigger"
+      data-trigger="Middle Horizontal">
       <button type="button" class="menu-btn">
         <i class="fa fa-crosshairs"></i>
         <span class="menu-text title">Middle Vertical</span>
@@ -443,7 +462,7 @@
     <!---->
     <li id="fizzler-state" class="menu-item hasItem fizzler">
       <a href="#" class="menu-btn">
-        <input type="checkbox" checked id="fizzler-state-input"/>
+        <input type="checkbox" checked id="fizzler-state-input" />
         <span class="menu-text">State</span>
       </a>
     </li>
@@ -495,13 +514,13 @@
     <!---->
     <li id="tractor-state" class="menu-item hasItem tractor">
       <a href="#" class="menu-btn">
-        <input type="checkbox" checked id="tractor-state-input"/>
+        <input type="checkbox" checked id="tractor-state-input" />
         <span class="menu-text">State</span>
       </a>
     </li>
     <li id="tractor-direction" class="menu-item hasItem tractor">
       <a href="#" class="menu-btn">
-        <input type="checkbox" id="tractor-direction-input"/>
+        <input type="checkbox" id="tractor-direction-input" />
         <span class="menu-text">Revert</span>
       </a>
     </li>
@@ -531,7 +550,7 @@
         </li>
       </ul>
     </li>
-    
+
 
     <li id="dispenser-state" class="menu-item hasItem dispenser">
       <a href="#" class="menu-btn">
@@ -1099,6 +1118,14 @@
 
   <audio id="audio-tractor-beam">
     <source src="./audio/tbeam_pos_lp_01.wav" type="audio/wav">
+  </audio>
+
+  <audio id="audio-button-positive">
+    <source src="./audio/button_synth_positive_01.wav" type="audio/wav">
+  </audio>
+
+  <audio id="audio-button-negative">
+    <source src="./audio/button_synth_negative_01.wav" type="audio/wav">
   </audio>
 
 </body>

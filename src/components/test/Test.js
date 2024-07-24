@@ -180,6 +180,8 @@ function viewFPS() {
         GLOBALS.CONTROLS.enabled = false;
         GLOBALS.ROOM.visible = false;
 
+        console.log(GLOBALS.PLANE_USER_DATA)
+
         //SEPARETE MESHS FOR INSTANCING
         for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
 
@@ -305,6 +307,7 @@ function viewFPS() {
         GLOBALS.ENTER_DOOR.children[1].visible = false;
 
         addColliderItem(GLOBALS.DYMANIC_ITEMS['cube'], "cube", 10)
+        addColliderItem(GLOBALS.DYMANIC_ITEMS['cube_2'], "cube_2", 10)
         addColliderItem(GLOBALS.DYMANIC_ITEMS["sphere"], "sphere", 10)
         addColliderItem(GLOBALS.DYMANIC_ITEMS['gel_gun_blue'], "gel_gun_blue", 0)
         addColliderItem(GLOBALS.DYMANIC_ITEMS['gel_gun_orange'], "gel_gun_orange", 0)
@@ -330,7 +333,7 @@ function viewFPS() {
         addAudio(GLOBALS.DYMANIC_ITEMS['fizzler'], 'audio-fizzler')
         addAudio(GLOBALS.DYMANIC_ITEMS['laser_field'], 'audio-laser-beam')
         addAudio(GLOBALS.DYMANIC_ITEMS['tractor_beam'], 'audio-tractor-beam')
-        
+
         //
 
         for (var s = 0; s < GLOBALS.DYMANIC_ITEMS["tractor_beam"].length; s++) {
@@ -395,7 +398,7 @@ function viewFPS() {
                 instanced.computeBoundingSphere();
 
                 //
-                var spotLight = new THREE.SpotLight(0xffffff, 100);
+                var spotLight = new THREE.SpotLight(GLOBALS.DYMANIC_ITEMS['light'][i].lightColor, 100);
                 spotLight.distance = 0;
                 spotLight.decay = 2;
                 spotLight.penumbra = 1;
@@ -440,6 +443,23 @@ function viewFPS() {
                 //plane.rotation.y *= -1;
                 //plane.rotation.z *= -1;
                 //GLOBALS.SCENE_FPS.add(plane);
+            }
+        }
+
+        for (var i = 0; i < GLOBALS.ITEMS_ADDED.children.length; i++) {
+            console.log(GLOBALS.ITEMS_ADDED.children[i].instancedName)
+            if (GLOBALS.ITEMS_ADDED.children[i].name.includes("observation_room")) {
+                GLOBALS.ITEMS_ADDED.children[i].visible = false;
+
+                const cloneObsRoom = GLOBALS.OBSERVATION_ROOM_HALF.clone();
+                cloneObsRoom.visible = true;
+                GLOBALS.SCENE_FPS.add(cloneObsRoom);
+                cloneObsRoom.position.copy(GLOBALS.ITEMS_ADDED.children[i].position);
+                cloneObsRoom.rotation.copy(GLOBALS.ITEMS_ADDED.children[i].rotation);
+
+                cloneObsRoom.getObjectByName("pointLight").color = new THREE.Color(GLOBALS.ITEMS_ADDED.children[i].lightColor);
+
+                console.log(cloneObsRoom)
             }
         }
 
@@ -495,10 +515,10 @@ function addAudio(obj, name) {
     for (var i = 0; i < obj.length; i++) {
         if (obj[i].length != 0) {
             console.log(obj[i])
-            addRadioAudio(name, obj[i], true, true, true,8);
+            addRadioAudio(name, obj[i], true, true, true, 4);
 
             if (name == 'audio-fizzler' || name == 'audio-laser-beam')
-                addRadioAudio(name, obj[i].cloneLaserField, true, true, true,8);
+                addRadioAudio(name, obj[i].cloneLaserField, true, true, true, 4);
         }
     }
 }
@@ -537,7 +557,7 @@ function addColliderItem(items, type, mass, offset) {
                 var vec = new THREE.Quaternion();
                 items[i].children[1].getWorldQuaternion(vec)
                 var rot = vec;
-            } else if (type == "cube" || type == "laser_cube") {
+            } else if (type == "cube" || type == "cube_2" || type == "laser_cube") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.3, 0.3));
                 shape.height = 0.6;
                 shape.width = 0.6;
@@ -617,15 +637,15 @@ function addColliderItem(items, type, mass, offset) {
             box.updateMassProperties();
 
             if (type == "radio") {
-                addRadioAudio('audio-radio', box, true, true, false,8)
+                addRadioAudio('audio-radio', box, true, true, false, 8)
             } else if (type == "door") {
                 console.log(items[i])
-                addRadioAudio('audio-door', items[i], false, false, true,8)
+                addRadioAudio('audio-door', items[i], false, false, true, 8)
             }
 
             if (mass > 0) {
 
-                if ((type == "cube" || type == "laser_cube" || type == "sphere")) {
+                if ((type == "cube" || type == "cube_2" || type == "laser_cube" || type == "sphere")) {
                     if (items[i].hasDispenser) {
 
                         box.mass = 0;
@@ -662,22 +682,40 @@ function addColliderItem(items, type, mass, offset) {
                 box.addEventListener("collide", function (event) {
                     const body = event.body;
 
+                    if (body.playingAudioContact)
+                        return;
+
                     if (event.contact.bj.side) {
                         if (event.contact.bj.side != event.target.sideContact || GLOBALS.HOLDING_ITEM) {
                             event.target.sideContact = event.contact.bj.side;
-                            addRadioAudio('audio-impact', body, true, false, true,8);
+                            addRadioAudio('audio-impact', body, true, false, true, 8);
+                            body.playingAudioContact = true;
 
                             setTimeout(() => {
                                 GLOBALS.SCENE_FPS.remove(body.sound);
+                                body.playingAudioContact = false;
+                            }, 1000);
+                        }
+                    } else if (event.contact.bi.side) {
+                        if (event.contact.bi.side != event.target.sideContact || GLOBALS.HOLDING_ITEM) {
+                            event.target.sideContact = event.contact.bi.side;
+                            addRadioAudio('audio-impact', body, true, false, true, 8);
+                            body.playingAudioContact = true;
+
+                            setTimeout(() => {
+                                GLOBALS.SCENE_FPS.remove(body.sound);
+                                body.playingAudioContact = false;
                             }, 1000);
                         }
                     } else {
                         if (event.contact.id != event.target.contactID || GLOBALS.HOLDING_ITEM) {
                             event.target.contactID = event.contact.bj.id;
-                            addRadioAudio('audio-impact', body, true, false, true,8);
+                            addRadioAudio('audio-impact', body, true, false, true, 8);
+                            body.playingAudioContact = true;
 
                             setTimeout(() => {
                                 GLOBALS.SCENE_FPS.remove(body.sound);
+                                body.playingAudioContact = false;
                             }, 1000);
                         }
                     }
@@ -825,6 +863,7 @@ function createInstances(meshes, material) {
 
     for (var i = 0; i < meshes.length; i++) {
 
+        
         var dummy = new THREE.Object3D();
 
         if (meshes[i].itemName == "window" || (
@@ -836,6 +875,11 @@ function createInstances(meshes, material) {
             meshes[i].portal = false;
         }
 
+        if (meshes[i].itemName) {
+            if (meshes[i].itemName.includes("observation_room")) {
+                dummy.scale.set(0, 0, 0);
+            }
+        }
 
         dummy.rotation.set(0, 0, 0);
         dummy.position.copy(meshes[i].position);

@@ -1,4 +1,4 @@
-import { AUDIO } from '../audio/Audio.js';
+import { AUDIO, play } from '../audio/Audio.js';
 import * as THREE from "three";
 import { tweenCamera } from "../../Main.js";
 import { GLOBALS } from "../../Globals.js";
@@ -24,7 +24,7 @@ function stateDoor(timeToTrigger, open, enter, door) {
   
       if (playing && door.sound) {
         door.sound.audio.currentTime = 0;
-        door.sound.audio.play();
+        play(door.sound.audio)
       }
   
       playing = false;

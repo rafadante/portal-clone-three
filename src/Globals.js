@@ -172,6 +172,7 @@ var GLOBALS = {
     //ITEMS
     DYMANIC_ITEMS: {
         cube: [],
+        cube_2: [],
         sphere: [],
         gel_gun_blue: [],
         gel_gun_orange: [],
@@ -201,7 +202,7 @@ var GLOBALS = {
         portal_0: [],
         portal_1: [],
         laser_field: [],
-        fizzler: []
+        fizzler: [],
     },
 
     INTERACTIVE: [],
@@ -269,6 +270,8 @@ var GLOBALS = {
 
     OBSERVATION_ROOM: null,
     OBSERVATION_ROOM_IMG: null,
+
+    OBSERVATION_ROOM_HALF: null,
 
     IMG_CHECK: null,
     IMG_CLOSE: null,
@@ -349,6 +352,10 @@ var GLOBALS = {
 
     ITEMS_COUNT: {
         cube: {
+            count: 0,
+            max: 10
+        },
+        cube_2: {
             count: 0,
             max: 10
         },
@@ -473,6 +480,10 @@ var GLOBALS = {
             max: 10
         },
         fizzler: {
+            count: 0,
+            max: 10
+        },
+        observation_room: {
             count: 0,
             max: 10
         },

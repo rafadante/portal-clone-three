@@ -39,8 +39,19 @@ function createLightBridges(item, rayItem, object, instanced) {
 
     var material = GLOBALS.MATERIAL_LIGHT_BRIDGERS;
 
-    GLOBALS.SCENE.remove(obj)
+    GLOBALS.SCENE.remove(obj);
 
+    //CREATE CLONE
+    const cloneLaserField = new THREE.Object3D();
+    cloneLaserField.position.copy(object.position);
+    cloneLaserField.rotation.copy(object.rotation);
+    cloneLaserField.rotateX(Math.PI);
+    cloneLaserField.translateY(-intersects[0].distance);
+
+    cloneLaserField.position.copy(cloneLaserField.position.round());
+
+    console.log(cloneLaserField.position)
+    
     if (item == "light_bridge") {
         var geometry = new THREE.BoxGeometry(0.9, intersects[0].distance, 0.025);
         raycaster.name = "light_bridge";
@@ -58,13 +69,6 @@ function createLightBridges(item, rayItem, object, instanced) {
             object.cloneFizzlerID = object.idInstanced + 10;
         }
 
-        //CREATE CLONE
-        const cloneLaserField = new THREE.Object3D();
-        cloneLaserField.position.copy(object.position);
-        cloneLaserField.rotation.copy(object.rotation);
-        cloneLaserField.rotateX(Math.PI);
-        cloneLaserField.translateY(-intersects[0].distance);
-
         cloneLaserField.updateMatrix();
         instanced.setMatrixAt(object.idInstanced + 10, cloneLaserField.matrix);
         instanced.instanceMatrix.needsUpdate = true;
@@ -72,6 +76,8 @@ function createLightBridges(item, rayItem, object, instanced) {
 
         object.cloneLaserDistance = intersects[0].distance;
         object.cloneLaserField = cloneLaserField;
+
+        console.log(object.position)
     } else if (item == "tractor_beam") {
         var geometry = new THREE.CylinderGeometry(0.9, 0.9, intersects[0].distance + 0, 32, 1, true);
         raycaster.name = "tractor_beam";
@@ -138,6 +144,13 @@ function createLightBridges(item, rayItem, object, instanced) {
     object.continuous = plane;
     object.raycaster = raycaster;
 
+    var otherSide = getPlaneByName(cloneLaserField.position.x + "/" + cloneLaserField.position.y + "/" + cloneLaserField.position.z);
+    
+    if(otherSide.length>0){
+        otherSide[0].hasItem = true;
+        plane.otherSide = otherSide[0];
+    }
+
     if (item == "light_bridge") {
         console.log(box)
         box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
@@ -170,7 +183,7 @@ function createLightBridges(item, rayItem, object, instanced) {
                 if (e.body === GLOBALS.PLAYER) {
                     deletePortal(0)
                     deletePortal(1)
-                }else if (e.body.name == "sphere" || e.body.name == "cube" || e.body.name == "radio") {
+                }else if (e.body.name == "sphere" || e.body.name == "cube" || e.body.name == "radio"|| e.body.name == "cube_2") {
                     console.log('FIZZLER!', e.body);
 
                     //
@@ -497,6 +510,14 @@ function createLightBridgesFromPortal(portal, rayItem) {
             }
         }
     }
+}
+
+function getPlaneByName(name) {
+    return GLOBALS.PLANE_USER_DATA.filter(
+        function (data) {
+            return data.name == name
+        }
+    );
 }
 
 export {

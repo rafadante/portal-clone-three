@@ -11,7 +11,7 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import * as CANNON from "cannon";
-import { AUDIO } from '../audio/Audio.js';
+import { AUDIO,play } from '../audio/Audio.js';
 import { hideMaterial } from "../../Main.js";
 import { removeJointConstraint } from "../../Physics.js";
 
@@ -109,7 +109,7 @@ class Portal extends Group {
             depthTest: true,
             depthWrite: false,
             polygonOffset: true,
-            polygonOffsetFactor: -5,
+            polygonOffsetFactor: -1,
             side: THREE.DoubleSide
         });
 
@@ -407,11 +407,11 @@ function teleportationState() {
 
                         AUDIO.PORTAL_ENTER.pause();
                         AUDIO.PORTAL_ENTER.currentTime = 0;
-                        AUDIO.PORTAL_ENTER.play();
+                        play(AUDIO.PORTAL_ENTER)
 
                         AUDIO.PORTAL_EXIT.pause();
                         AUDIO.PORTAL_EXIT.currentTime = 0;
-                        AUDIO.PORTAL_EXIT.play();
+                        play(AUDIO.PORTAL_EXIT)
 
                         hideMaterial(GLOBALS.PLAYER_MODEL, true, 0)
                         GLOBALS.PLAYER_MODEL_CLONE.visible = false;

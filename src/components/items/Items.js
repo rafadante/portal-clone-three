@@ -15,7 +15,7 @@ import {
     removeJointConstraint
 } from '../../Physics.js';
 import { findPath } from '../findPath/FindPath.js';
-import { AUDIO } from '../audio/Audio.js';
+import { AUDIO, play,addRadioAudio } from '../audio/Audio.js';
 import { floor, func, userData } from 'three/examples/jsm/nodes/Nodes.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { stateDoor } from '../door/Door.js';
@@ -23,6 +23,8 @@ import {
     createLightBridges
 } from '../continuous/Continuous.js';
 import { lightBridgeTrigger } from '../boxSelection/BoxSelection.js';
+import { dispenserSpawn, tractorStates, lightBridgeState, laserFieldState } from '../events/events.js';
+import { portalButton } from '../portal/CreatePortal.js';
 
 var beamType;
 let lineFollow;
@@ -137,6 +139,8 @@ function addItem(found, loaded) {
                 })
             } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
                 var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "observation_room") {
+                var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
             } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
 
                 var item = new THREE.Group();
@@ -222,6 +226,9 @@ function addItem(found, loaded) {
             item.name = GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount;
             item.instancedName = GLOBALS.ITEM_HOLDED_NAME;
             item.planeInstancedId = userData.id_instanced;
+            item.lightColor = "#ffffff";
+
+            console.log(item.rotation)
 
             /*if (loaded) {
                 item.rotation.copy(userData.itemRotation);
@@ -268,7 +275,8 @@ function addItem(found, loaded) {
                 item.translateY(0.5);
             }
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
+                GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
 
                 var idInstanced;
                 userData.dispenser = true;
@@ -407,7 +415,9 @@ function addItem(found, loaded) {
                 GLOBALS.CAMERAS.push(item);
                 GLOBALS.ITEMS_ADDED.add(item);
 
-            } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "observation_room") {
+                GLOBALS.ITEMS_ADDED.add(item);
+            }else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
                 item.translateY(0.025);
 
                 var bb = new THREE.Box3(); // for re-use
@@ -482,7 +492,7 @@ function addItem(found, loaded) {
                     setTimeout(() => {
                         lightBridgeTrigger(userData, GLOBALS.LASER_FIELD_TRIGGER, $("#laser-field-trigger"), "laser_field");
                     }, 100);
-                }else if (GLOBALS.ITEM_HOLDED_NAME == "fizzler") {
+                } else if (GLOBALS.ITEM_HOLDED_NAME == "fizzler") {
                     createLightBridges("fizzler", GLOBALS.FIZZLER_RAYCASTER, item, instanced);
 
                     setTimeout(() => {
@@ -689,7 +699,7 @@ function interactWithItem() {
                 var goal = GLOBALS.PLANE_USER_DATA[item.planeInstancedId];
 
                 //Go through each connection to check for triggers
-                for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+                /*for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
                     if (goal == GLOBALS.CONNECTIONS[i]['from']) {
                         if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
                             GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
@@ -720,29 +730,102 @@ function interactWithItem() {
                             }
                         }
                     }
+                }*/
+
+                //Go through each connection to check for triggers
+                for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+                    if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("pedestal")) {
+                        continue
+                    }
+                    //if item or player touches the trigger
+                    if (goal == GLOBALS.CONNECTIONS[i]['from']) {//TRIGER START
+                        //Verify if the button accepts the body
+                        console.log(GLOBALS.CONNECTIONS[i]['from'])
+
+                        //
+                        if (!GLOBALS.CONNECTIONS[i]['line'].active) {
+                            GLOBALS.CONNECTIONS[i]['to'].item.buttons += 1;
+                            //GLOBALS.CONNECTIONS[i]['line'].idConnection = id;
+                            GLOBALS.CONNECTIONS[i]['line'].active = true;
+                            GLOBALS.CONNECTIONS[i]['line'].material.color = new THREE.Color(0x0077B6);
+
+                            //PLAY AUDIO POSITIVE
+                            addRadioAudio('audio-button-positive', GLOBALS.CONNECTIONS[i]['from'], true, false, true, 8);
+                            var soundHolder = GLOBALS.CONNECTIONS[i]['from'];
+                            setTimeout(() => {
+                                GLOBALS.SCENE_FPS.remove(soundHolder.sound);
+                            }, 1500);
+
+
+                            //Manage Door Trigger
+                            if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
+                                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
+                                    stateDoor(0, true, false, GLOBALS.CONNECTIONS[i]['to'].item);
+                                }
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("cube") ||
+                                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("sphere")) {
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
+                                    dispenserSpawn(GLOBALS.CONNECTIONS[i]['to'].item);
+                                }
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("tractor")) {
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
+                                    tractorStates(GLOBALS.CONNECTIONS[i]['to']);
+                                }
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("light_bridge")) {
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
+                                    lightBridgeState(GLOBALS.CONNECTIONS[i]['to'])
+                                }
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field") ||
+                                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("fizzler")) {
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
+                                    laserFieldState(GLOBALS.CONNECTIONS[i]['to'])
+                                }
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
+                                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
+
+                                GLOBALS.CONNECTIONS[i]['to'].item.active = true;
+
+                                if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0"))
+                                    portalButton(0, GLOBALS.CONNECTIONS[i]['to'].item)
+                                else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1"))
+                                    portalButton(2, GLOBALS.CONNECTIONS[i]['to'].item)
+                            }
+
+                            if (!GLOBALS.CONNECTIONS[i]['from'].item.pedestalInfinity) {
+
+                                var holder = GLOBALS.CONNECTIONS[i];
+
+                                setTimeout(() => {
+                                    holder['line'].active = false;
+                                    holder['to'].item.buttons -= 1;
+                                    holder['line'].material.color = new THREE.Color(0xffa500);
+
+                                    if (holder['to'].itemName.includes("door") || holder['to'].itemName.includes("exitDoor")) {
+                                        if (holder['to'].item.buttons < holder['to'].item.connections) {
+                                            stateDoor(0, false, false, holder['to'].item);
+                                        }
+                                    } else if (holder['to'].itemName.includes("tractor")) {
+                                        if (holder['to'].item.buttons < holder['to'].item.connections) {
+                                            tractorStates(holder['to']);
+                                        }
+                                    } else if (holder['to'].itemName.includes("light_bridge")) {
+                                        if (holder['to'].item.buttons < holder['to'].item.connections) {
+                                            lightBridgeState(holder['to']);
+                                        }
+                                    } else if (holder['to'].itemName.includes("laser_field") || holder['to'].itemName.includes("fizzler")) {
+                                        if (holder['to'].item.buttons < holder['to'].item.connections) {
+                                            laserFieldState(holder['to'])
+                                        }
+                                    } else if (holder['to'].itemName.includes("portal_0") ||
+                                        holder['to'].itemName.includes("portal_1")) {
+                                        holder['to'].item.active = false;
+                                    }
+                                }, GLOBALS.CONNECTIONS[i]['from'].item.pedestalValue * 1000);
+                            }
+                        }
+                    }
                 }
-
-
-                /*var item = GLOBALS.DYMANIC_ITEMS[intersects[0].object.name][intersects[0].instanceId];
-                var goal = GLOBALS.PLANE_USER_DATA[item.planeInstancedId];
-
-                if (goal.trigger.itemName.includes("exitDoor")) {
-
-                } else if (goal.trigger.itemName.includes("dispenser")) {
-                    GLOBALS.BOX_BODY[goal.trigger.item.userData.id].mass = 5;
-                }
-
-                goal.circle.material.color = new THREE.Color(0xfcba03);
-                goal.check.material.color = new THREE.Color(0xfcba03);
-                goal.check.material.map = GLOBALS.IMG_CHECK;
-
-                setTimeout(() => {
-                    goal.circle.material.color = new THREE.Color(0x03e8fc);
-                    goal.check.material.color = new THREE.Color(0x03e8fc);
-                    goal.check.material.map = GLOBALS.CLOSE;
-                }, 2000);*/
-
-
             }
         } else {
             if (intersects[0].distance < 1.5) {
@@ -782,19 +865,18 @@ function interactWithItem() {
 
                 AUDIO.PICK_SUCESS.pause();
                 AUDIO.PICK_SUCESS.currentTime = 0;
-                AUDIO.PICK_SUCESS.play();
-
-                AUDIO.HOLD.play();
+                play(AUDIO.PICK_SUCESS)
+                play(AUDIO.HOLD)
             } else {
                 AUDIO.PICK_FAIL.pause();
                 AUDIO.PICK_FAIL.currentTime = 0;
-                AUDIO.PICK_FAIL.play();
+                play(AUDIO.PICK_FAIL)
             }
         }
     } else {
         AUDIO.PICK_FAIL.pause();
         AUDIO.PICK_FAIL.currentTime = 0;
-        AUDIO.PICK_FAIL.play();
+        play(AUDIO.PICK_FAIL)
     }
 
     GLOBALS.LIGHTNIN_STRIKE_1.visible = GLOBALS.HOLDING_ITEM;

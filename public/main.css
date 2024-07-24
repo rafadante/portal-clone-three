@@ -154,16 +154,30 @@ select {
 	color: black;
 	font-size: 17px;
 	font-weight: bold;
-	padding-left: 10px;
-	padding-right: 10px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	cursor: pointer;
 }
 
+#side-bar-left .header span{
+	padding-left: 10px;
+	padding-right: 10px;
+	height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+	transition: all 0.3s;
+}
+
+#header-items{
+	background-color: black;
+	color: white;
+}
+
 #side-bar-left span:hover {
-	color: grey;
+	color: white;
+	background-color: grey;
 }
 
 #side-bar-left .body {

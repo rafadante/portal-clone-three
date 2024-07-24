@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { tweenCamera } from "../../Main.js";
 import { GLOBALS } from "../../Globals.js";
-import { AUDIO } from "../audio/Audio.js";
+import { AUDIO,play } from "../audio/Audio.js";
 
 function tractorBeam() {
 
@@ -38,7 +38,7 @@ function tractorBeam() {
                         if (d.name == "player") {
 
                             AUDIO.PLAYER_INSIDE_TRACTOR_BEAM.currentTime = 0;
-                            AUDIO.PLAYER_INSIDE_TRACTOR_BEAM.play();
+                            play(AUDIO.PLAYER_INSIDE_TRACTOR_BEAM)
 
                             if (GLOBALS.TRACTOR_BEAM[j].item.reversed)
                                 document.getElementById("panel-top").style.backgroundColor = "#ff80004a";

@@ -8,7 +8,6 @@ import {
 } from '../../Main.js';
 import { planeInstanceReset, deleteItemInstanced } from '../items/Items.js';
 import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline';
-import { func } from 'three/examples/jsm/nodes/Nodes.js';
 
 const orange = new THREE.Color("rgb(255, 165, 0)");
 var initialPosition = null;
@@ -176,6 +175,14 @@ function raycastSelected(found, event, type) {
                     $("#fizzler-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.state);
                     $("#fizzler-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
                 }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("observation_room") ||
+                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light")) {
+                    $(".light-color").css("display", "block");
+
+                    console.log(GLOBALS.PLANE_USER_DATA[instanceId].item.lightColor)
+                    $("#ligh-color-input").val(GLOBALS.PLANE_USER_DATA[instanceId].item.lightColor)
+                }
             }
 
             GLOBALS.SELECTED_ID.push(instanceId);
@@ -255,7 +262,12 @@ function raycastSelected(found, event, type) {
                             planeInstanceOld.item.namePosition = planeInstanceNew.position.x + "/" + planeInstanceNew.position.y + "/" + planeInstanceNew.position.z;
                             planeInstanceOld.item.position.copy(planeInstanceNew.position);
 
-                            if (!planeInstanceOld.item.name.includes("door-"))
+                            console.log(planeInstanceOld.item.name)
+
+                            if (planeInstanceOld.item.name.includes("camera") ||
+                                planeInstanceOld.item.name.includes("observation"))
+                                planeInstanceOld.item.rotation.set(planeInstanceNew.normal.x, planeInstanceNew.normal.y, planeInstanceNew.normal.z)
+                            else if (!planeInstanceOld.item.name.includes("door-"))
                                 planeInstanceOld.item.rotation.copy(planeInstanceNew.rotation);
 
                             //UPDATE PARAMETERS OF THE NEW PLACEMENT
@@ -430,6 +442,46 @@ $("body").on('click', '#rotate-item', function () {
 $("body").on('click', '#delete', function () {
 
     if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].isInstanced) {
+
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous) {
+            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide.hasItem = false;
+            GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous);
+        }
+
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge) {
+            GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge)
+        }
+
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField) {
+            GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField)
+        }
+
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.cloneLaserField) {
+
+            //console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName);
+
+            var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName);
+            var dummy = new THREE.Object3D();
+            dummy.scale.set(0, 0, 0);
+            dummy.updateMatrix();
+
+            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "laser_field")
+                instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.cloneLaserID, dummy.matrix);
+            else if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "fizzler")
+                instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.cloneFizzlerID, dummy.matrix);
+
+
+            instanced.instanceMatrix.needsUpdate = true;
+        }
+
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "tractor_beam") {
+            const index = GLOBALS.TRACTOR_BEAM.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous);
+            if (index > -1) { // only splice array when item is found
+                GLOBALS.TRACTOR_BEAM.splice(index, 1); // 2nd parameter means remove one item only
+                GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.splice(index, 1); // 2nd parameter means remove one item only
+            }
+        }
+
         deleteItemInstanced(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false);
     } else {
         GLOBALS.ITEMS_COUNT[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName]["count"] -= 1;
@@ -578,7 +630,6 @@ $("body").on('input', '#tractor-direction-input', function () {
     animate();
 });
 
-
 $("body").on('click', '.tractor-triggers', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.triggers = $(this).data("trigger");
     $("#tractor-trigger").data("trigger", $(this).data("trigger"))
@@ -664,6 +715,13 @@ function lightBridgeTrigger(obj, trigger, elem, name) {
 
     animate();
 }
+
+$("body").on('input', '#ligh-color-input', function () {
+    /*var color = this.value.replace("#", "0x");
+    console.log(color)
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.lightColor = color;*/
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.lightColor = this.value;
+});
 
 export {
     raycastSelected,
