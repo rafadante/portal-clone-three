@@ -1,8 +1,13 @@
-import * as THREE from 'three';
-import $ from 'jquery';
+import {
+    Object3D,
+    Color,
+    Vector3,
+    PlaneGeometry,
+    InstancedMesh
+} from 'three';
 import { GLOBALS } from '../../Globals.js';
+import { getPlaneByName, warning } from '../../Utils.js';
 
-var limit = false;
 var IndexArray = [];
 
 function cubeState(button) {
@@ -18,15 +23,15 @@ function cubeState(button) {
 
             if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == 6 ||
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == -30) {
-                warning();
+                warning("You can not spawn more cubes on this direction");
                 return;
             } else if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.x == 28 ||
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.x == -12) {
-                warning();
+                warning("You can not spawn more cubes on this direction");
                 return;
             } else if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.z == -14 ||
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.z == 26) {
-                warning();
+                warning("You can not spawn more cubes on this direction");
                 return;
             }
 
@@ -36,7 +41,7 @@ function cubeState(button) {
 
     for (var i = 0; i < IndexArray.length; i++) {
 
-        var erase = new THREE.Object3D();
+        var erase = new Object3D();
         erase.scale.set(0, 0, 0);
 
         erase.updateMatrix();
@@ -48,36 +53,12 @@ function cubeState(button) {
         GLOBALS.BUDGET += 1;
     }
 
-    if (limit) {
-        GLOBALS.SELECTED_SIDE = null;
-        GLOBALS.SELECTING = false;
-        GLOBALS.SELECTED_ID = [];
-        GLOBALS.SELECTED_COLOR = [];
-    }
-
     IndexArray = [];
-    limit = false;
-
-    $("#budget").text("BUDGET: " + GLOBALS.BUDGET);
-
-    if (GLOBALS.BUDGET < 900 && GLOBALS.BUDGET >= 300) {
-        $("#budget").css("background-color", "yellow");
-    } else if (GLOBALS.BUDGET < 300) {
-        $("#budget").css("background-color", "red");
-    }
-}
-
-function getPlaneByName(name) {
-    return GLOBALS.PLANE_USER_DATA.filter(
-        function (data) {
-            return data.name == name
-        }
-    );
 }
 
 function trasnlatePlane(id, val, portal) {
 
-    var dummy = new THREE.Object3D();
+    var dummy = new Object3D();
     dummy.position.copy(GLOBALS.PLANE_USER_DATA[id].position);
     dummy.rotation.copy(GLOBALS.PLANE_USER_DATA[id].rotation);
 
@@ -110,20 +91,20 @@ function trasnlatePlane(id, val, portal) {
 
     if (frontExists.length > 0) {
 
-        GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(id, new THREE.Color(0xffffff));
+        GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(id, new Color(0xffffff));
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
-        var erase = new THREE.Object3D();
+        var erase = new Object3D();
         erase.scale.set(0, 0, 0);
         erase.updateMatrix();
         GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(id, erase.matrix);
         GLOBALS.PLANE_USER_DATA[id] = {};
 
-        GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(frontExists[0].id_instanced, new THREE.Color(0xffffff));
+        GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(frontExists[0].id_instanced, new Color(0xffffff));
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
         //---------------------------------------
-        var erase = new THREE.Object3D();
+        var erase = new Object3D();
         erase.scale.set(0, 0, 0);
         erase.updateMatrix();
         GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(frontExists[0].id_instanced, erase.matrix);
@@ -131,7 +112,6 @@ function trasnlatePlane(id, val, portal) {
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
         //
-        limit = true;
 
         GLOBALS.BUDGET += 2;
     } else {
@@ -147,12 +127,11 @@ function trasnlatePlane(id, val, portal) {
         GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
 
         if (GLOBALS.PLANE_USER_DATA[id].hasItem) {
-            console.log(GLOBALS.PLANE_USER_DATA[id]);
 
             var plane = GLOBALS.PLANE_USER_DATA[id];
 
             if (GLOBALS.PLANE_USER_DATA[id].isInstanced) {
-                var item = new THREE.Object3D();
+                var item = new Object3D();
                 item.position.copy(plane.position);
                 item.rotation.copy(plane.item.rotation);
 
@@ -208,9 +187,9 @@ function checkSides(dummy, val, id, side, portal) {
         GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(idEmptyToFill, dummy.matrix);
 
         if (portal)
-            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(idEmptyToFill, new THREE.Color().setHex(0xffffff));
+            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(idEmptyToFill, new Color().setHex(0xffffff));
         else
-            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(idEmptyToFill, new THREE.Color().setHex(0x808080));
+            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(idEmptyToFill, new Color().setHex(0x808080));
 
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
@@ -218,7 +197,7 @@ function checkSides(dummy, val, id, side, portal) {
 
         dummy.position.copy(dummy.position.round());
 
-        var direction = new THREE.Vector3();
+        var direction = new Vector3();
         dummy.getWorldDirection(direction);
 
         if (direction.round().z == 1)
@@ -237,17 +216,17 @@ function checkSides(dummy, val, id, side, portal) {
         var normal;
 
         if (side == "down")
-            normal = new THREE.Vector3(0, 0, 0);
+            normal = new Vector3(0, 0, 0);
         else if (side == "up")
-            normal = new THREE.Vector3(Math.PI, 0, 0);
+            normal = new Vector3(Math.PI, 0, 0);
         else if (side == "front")
-            normal = new THREE.Vector3(Math.PI / 2, 0, 0);
+            normal = new Vector3(Math.PI / 2, 0, 0);
         else if (side == "back")
-            normal = new THREE.Vector3(-Math.PI / 2, 0, 0);
+            normal = new Vector3(-Math.PI / 2, 0, 0);
         else if (side == "right")
-            normal = new THREE.Vector3(0, 0, Math.PI / 2);
+            normal = new Vector3(0, 0, Math.PI / 2);
         else if (side == "left")
-            normal = new THREE.Vector3(0, 0, -Math.PI / 2);
+            normal = new Vector3(0, 0, -Math.PI / 2);
 
         GLOBALS.PLANE_USER_DATA[idEmptyToFill] = {
             iniPos: dummy.position.clone(),
@@ -271,13 +250,6 @@ function checkSides(dummy, val, id, side, portal) {
     }
 }
 
-function warning() {
-    $("#warning").css("opacity", 1);
-    setTimeout(() => {
-        $("#warning").css("opacity", 0);
-    }, 2000);
-}
-
 var a = 0;
 GLOBALS.PLANE_USER_DATA = [];
 for (var i = 0; i < GLOBALS.BUDGET; i++) {
@@ -288,16 +260,16 @@ function buildIniCubes(obj) {
 
     if (!GLOBALS.LOADED_LEVEL) {
 
-        const geometry = new THREE.PlaneGeometry(2, 2);
+        const geometry = new PlaneGeometry(2, 2);
 
-        GLOBALS.PLANE_LEVEL_INSTANCED = new THREE.InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
+        GLOBALS.PLANE_LEVEL_INSTANCED = new InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
         GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
         GLOBALS.CUBES.add(GLOBALS.PLANE_LEVEL_INSTANCED);
 
-        var clone = new THREE.Object3D();
+        var clone = new Object3D();
 
         for (var i = 0; i < GLOBALS.BUDGET; i++) {
             clone.scale.set(0, 0, 0);
@@ -307,63 +279,25 @@ function buildIniCubes(obj) {
         }
 
         //GROUND
-        buildLayer(-1, -1, 0, 'x', 'z', 'y', 6, 8, "down", new THREE.Vector3(-Math.PI / 2, 0, 0), new THREE.Vector3(0, 0, 0));
+        buildLayer(-1, -1, 0, 'x', 'z', 'y', 6, 8, "down", new Vector3(-Math.PI / 2, 0, 0), new Vector3(0, 0, 0));
         //CEILING
-        buildLayer(-1, -1, 8, 'x', 'z', 'y', 6, 8, "up", new THREE.Vector3(Math.PI / 2, 0, 0), new THREE.Vector3(Math.PI, 0, 0));
+        buildLayer(-1, -1, 8, 'x', 'z', 'y', 6, 8, "up", new Vector3(Math.PI / 2, 0, 0), new Vector3(Math.PI, 0, 0));
         //WALL FRONT
-        buildLayer(-1, -1, 0, 'x', 'y', 'z', 4, 8, "front", new THREE.Vector3(0, 0, 0), new THREE.Vector3(Math.PI / 2, 0, 0));
+        buildLayer(-1, -1, 0, 'x', 'y', 'z', 4, 8, "front", new Vector3(0, 0, 0), new Vector3(Math.PI / 2, 0, 0));
         //WALL BACK
-        buildLayer(-1, -1, 12, 'x', 'y', 'z', 4, 8, "back", new THREE.Vector3(0, Math.PI, 0), new THREE.Vector3(-Math.PI / 2, Math.PI, 0));
+        buildLayer(-1, -1, 12, 'x', 'y', 'z', 4, 8, "back", new Vector3(0, Math.PI, 0), new Vector3(-Math.PI / 2, Math.PI, 0));
         //WALL RIGHT
-        buildLayer(-1, -1, 16, 'z', 'y', 'x', 4, 6, "right", new THREE.Vector3(0, -Math.PI / 2, 0), new THREE.Vector3(Math.PI / 2, 0, Math.PI / 2));
+        buildLayer(-1, -1, 16, 'z', 'y', 'x', 4, 6, "right", new Vector3(0, -Math.PI / 2, 0), new Vector3(Math.PI / 2, 0, Math.PI / 2));
         //WALL LEFT
-        buildLayer(-1, -1, 0, 'z', 'y', 'x', 4, 6, "left", new THREE.Vector3(0, Math.PI / 2, 0), new THREE.Vector3(Math.PI / 2, 0, -Math.PI / 2));
-
-        $("#budget").text("BUDGET: " + GLOBALS.BUDGET);
+        buildLayer(-1, -1, 0, 'z', 'y', 'x', 4, 6, "left", new Vector3(0, Math.PI / 2, 0), new Vector3(Math.PI / 2, 0, -Math.PI / 2));
     }
 }
-
-$("body").on('click', '#save-level', function () {
-
-    var data = [];
-    var clone = [];
-
-    for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
-        if (GLOBALS.PLANE_USER_DATA[i].item) {
-            var obj = new THREE.Object3D();
-            obj.position.copy(GLOBALS.PLANE_USER_DATA[i].item.position);
-            obj.rotation.copy(GLOBALS.PLANE_USER_DATA[i].item.rotation);
-            obj.planeInstancedId = GLOBALS.PLANE_USER_DATA[i].item.planeInstancedId;
-            obj.userData = GLOBALS.PLANE_USER_DATA[i].item.userData;
-            GLOBALS.PLANE_USER_DATA[i].item = obj;
-        }
-
-        if (GLOBALS.PLANE_USER_DATA[i].trigger) {
-            var obj = new THREE.Object3D();
-            obj.position.copy(GLOBALS.PLANE_USER_DATA[i].trigger.position);
-            obj.rotation.copy(GLOBALS.PLANE_USER_DATA[i].trigger.rotation);
-            obj.id_instanced = GLOBALS.PLANE_USER_DATA[i].trigger.id_instanced;
-            // obj.userData = GLOBALS.PLANE_USER_DATA[i].trigger.userData;
-            GLOBALS.PLANE_USER_DATA[i].trigger = GLOBALS.PLANE_USER_DATA[i].trigger.id_instanced;
-        }
-    }
-
-
-    data.push(GLOBALS.PLANE_USER_DATA)
-    data.push(GLOBALS.GOO_PLANES)
-
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-    var dlAnchorElem = document.createElement('a');
-    dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", "scene.json");
-    dlAnchorElem.click();
-})
 
 function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
 
     var yo = y;
 
-    var clone = new THREE.Object3D();
+    var clone = new Object3D();
 
     for (var i = 0; i < width; i++) {
 
@@ -387,16 +321,16 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
 
             if (clone.position.x <= 5 && clone.position.z >= 7 && clone.position.y <= 5) {
                 portal = false;
-                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new THREE.Color().setHex(0x808080));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new Color().setHex(0x808080));
             } else if (clone.position.x >= 10 && clone.position.z <= 1 && clone.position.y <= 3) {
                 portal = false;
-                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new THREE.Color().setHex(0x808080));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new Color().setHex(0x808080));
             } else if (clone.position.y == 8) {
                 portal = false;
-                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new THREE.Color().setHex(0x808080));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new Color().setHex(0x808080));
             } else {
                 portal = true;
-                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new THREE.Color().setHex(0xffffff));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new Color().setHex(0xffffff));
             }
 
             var hasItem = false;
@@ -408,19 +342,19 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
             var item = null;
             var allowconnection = false;
 
-            if (clone.position.equals(new THREE.Vector3(3, 1, 12))) {
+            if (clone.position.equals(new Vector3(3, 1, 12))) {
                 hasItem = true;
                 itemName = "enterDoor";
                 walls = true;
                 item = GLOBALS.ENTER_DOOR;
                 allowconnection = true;
-            } else if (clone.position.equals(new THREE.Vector3(13, 1, 0))) {
+            } else if (clone.position.equals(new Vector3(13, 1, 0))) {
                 hasItem = true;
                 itemName = "exitDoor";
                 walls = true;
                 item = GLOBALS.EXIT_DOOR;
                 allowconnection = true;
-            } else if (clone.position.equals(new THREE.Vector3(16, 7, 7))) {
+            } else if (clone.position.equals(new Vector3(16, 7, 7))) {
                 hasItem = true;
                 itemName = "window";
                 walls = true;
@@ -469,39 +403,6 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
 
     GLOBALS.RENDERER.renderLists.dispose();
 }
-
-//
-$("#main-container").on('click', '#plus-portal', function () {
-    cubeState("plus");
-    document.querySelector('.menu').classList.remove('menu-show')
-})
-
-$("body").on('click', '#minus-portal', function () {
-    cubeState("minus");
-    document.querySelector('.menu').classList.remove('menu-show')
-})
-
-$("body").on('click', '#portalable', function () {
-
-    if (GLOBALS.SELECTED_ID.length > 0) {
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].portal = !GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].portal;
-
-        for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
-            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].portal;
-
-            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal)
-                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new THREE.Color(0xffffff));
-            else
-                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new THREE.Color(0x808080));
-
-            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
-        }
-    }
-
-    document.querySelector('.menu').classList.remove('menu-show');
-})
-
-window.addEventListener("contextmenu", e => e.preventDefault());
 
 export {
     buildIniCubes,

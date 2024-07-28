@@ -1,4 +1,13 @@
-import * as THREE from 'three';
+import {
+    Object3D,
+    Vector3,
+    Raycaster,
+    BoxGeometry,
+    CylinderGeometry,
+    BufferAttribute,
+    Mesh,
+    Box3
+} from 'three';
 import * as CANNON from 'cannon';
 import {
     threeToCannon,
@@ -7,31 +16,32 @@ import {
 import {
     GLOBALS
 } from '../../Globals.js';
-import { respawn } from '../events/events.js';
+import { respawn } from '../events/states.js';
 import {
-    tweenCamera
+    animate
 } from '../../Main.js';
-import { interactWithItem } from '../items/Items.js';
+import {
+    tweenCamera,
+} from '../../Utils.js';
+import { interactWithItem } from '../events/events.js';
 import { deletePortal } from '../portal/CreatePortal.js';
-import { addRadioAudio, AUDIO } from '../audio/Audio.js';
+import { addPositionalAudio } from '../audio/Audio.js';
+import { getPlaneByName } from '../../Utils.js';
 
 function createLightBridges(item, rayItem, object, instanced) {
 
-
-    var obj = new THREE.Object3D();
+    var obj = new Object3D();
     obj.position.copy(object.position);
     obj.rotation.copy(object.rotation);
 
-    var vector = new THREE.Vector3();
-    var raycaster = new THREE.Raycaster();
+    var vector = new Vector3();
+    var raycaster = new Raycaster();
 
     vector.copy(obj.position);
 
-    var dir = new THREE.Vector3(); // create once and reuse it
+    var dir = new Vector3(); // create once and reuse it
 
     dir.copy(obj.up).applyQuaternion(obj.quaternion);
-
-    console.log(dir);
 
     raycaster.set(vector, dir);
     raycaster.item = object;
@@ -42,7 +52,7 @@ function createLightBridges(item, rayItem, object, instanced) {
     GLOBALS.SCENE.remove(obj);
 
     //CREATE CLONE
-    const cloneLaserField = new THREE.Object3D();
+    const cloneLaserField = new Object3D();
     cloneLaserField.position.copy(object.position);
     cloneLaserField.rotation.copy(object.rotation);
     cloneLaserField.rotateX(Math.PI);
@@ -50,14 +60,12 @@ function createLightBridges(item, rayItem, object, instanced) {
 
     cloneLaserField.position.copy(cloneLaserField.position.round());
 
-    console.log(cloneLaserField.position)
-    
     if (item == "light_bridge") {
-        var geometry = new THREE.BoxGeometry(0.9, intersects[0].distance, 0.025);
+        var geometry = new BoxGeometry(0.9, intersects[0].distance, 0.025);
         raycaster.name = "light_bridge";
         rayItem.push(raycaster);
     } else if (item == "laser_field" || item == "fizzler") {
-        var geometry = new THREE.BoxGeometry(2, intersects[0].distance, 0.025);
+        var geometry = new BoxGeometry(2, intersects[0].distance, 0.025);
         raycaster.name = "light_bridge";
         rayItem.push(raycaster);
 
@@ -76,36 +84,32 @@ function createLightBridges(item, rayItem, object, instanced) {
 
         object.cloneLaserDistance = intersects[0].distance;
         object.cloneLaserField = cloneLaserField;
-
-        console.log(object.position)
     } else if (item == "tractor_beam") {
-        var geometry = new THREE.CylinderGeometry(0.9, 0.9, intersects[0].distance + 0, 32, 1, true);
+        var geometry = new CylinderGeometry(0.8, 0.8, intersects[0].distance + 0, 32, 1, true);
         raycaster.name = "tractor_beam";
         rayItem.push(raycaster);
         raycaster.beam = "blue";
 
-        if (object.beam == "orange") {
-            material = null; //materialBridgeOrange
-            raycaster.beam = "orange";
-        } else {
-            material = GLOBALS.MATERIAL_TRACTOR_BEAM;
-        }
-    } else if (item == "laser_emitter") {
-        var geometry = new THREE.CylinderGeometry(0.02, 0.02, intersects[0].distance, 32);
-        raycaster.name = "laser_emitter";
-        rayItem.push(raycaster);
+        // Add custom attributes to geometry (e.g., for height)
+        var vertices = geometry.attributes.position.array;
+        var heights = new Float32Array(vertices.length / 3);  // Assuming height for each vertex
 
-        material = new THREE.MeshBasicMaterial({
-            color: new THREE.Color(1, 0.15, 0)
-        })
+        for (var i = 0; i < heights.length; i++) {
+            heights[i] = intersects[0].distance / 5;
+        }
+
+        geometry.setAttribute('height', new BufferAttribute(heights, 1));
+        material = GLOBALS.MATERIAL_TRACTOR_BEAM;
     }
 
-    console.log(intersects[0].distance)
+    const plane = new Mesh(geometry, material);
 
-    const plane = new THREE.Mesh(geometry, material);
     GLOBALS.SCENE_CHILDREN.add(plane);
+    GLOBALS.SELECTED_FOR_BLOOM.add(plane)
 
-    if (item == "tractor_beam" || item == "laser_emitter") {
+    window.uuuu = plane;
+
+    if (item == "tractor_beam") {
         //plane.rotation.x = Math.PI / 2;
         plane.updateMatrix();
         plane.geometry.applyMatrix4(plane.matrix);
@@ -115,10 +119,6 @@ function createLightBridges(item, rayItem, object, instanced) {
     plane.rotation.copy(obj.rotation);
     plane.translateY(intersects[0].distance / 2);
     plane.distance = intersects[0].distance / 2;
-
-    if (item == "laser_emitter") {
-        plane.translateY(-0.6)
-    }
 
     if (item == "laser_field" || item == "fizzler") {
         plane.rotateX(Math.PI)
@@ -145,19 +145,16 @@ function createLightBridges(item, rayItem, object, instanced) {
     object.raycaster = raycaster;
 
     var otherSide = getPlaneByName(cloneLaserField.position.x + "/" + cloneLaserField.position.y + "/" + cloneLaserField.position.z);
-    
-    if(otherSide.length>0){
+
+    if (otherSide.length > 0) {
         otherSide[0].hasItem = true;
         plane.otherSide = otherSide[0];
     }
 
     if (item == "light_bridge") {
-        console.log(box)
         box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
         box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
         box.name = "light_bridge";
-        /*box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
-            box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC*/
         object.bodyBridge = box;
         GLOBALS.CANNON_WORLD.addBody(box);
     } else if (item == "laser_field" || item == "fizzler") {
@@ -169,9 +166,7 @@ function createLightBridges(item, rayItem, object, instanced) {
 
         if (item == "laser_field") {
             box.addEventListener("collide", function (e) {
-                console.log(e);
                 if (e.body === GLOBALS.PLAYER) {
-                    console.log('The sphere entered the trigger!', e);
                     document.getElementById("death-screen").style.backgroundColor = "rgb(255 0 0)";
                     document.getElementById("death-screen").style.opacity = 1;
                     respawn(e.body);
@@ -179,21 +174,15 @@ function createLightBridges(item, rayItem, object, instanced) {
             });
         } else if (item == "fizzler") {
             box.addEventListener("collide", function (e) {
-                console.log(e);
                 if (e.body === GLOBALS.PLAYER) {
                     deletePortal(0)
                     deletePortal(1)
-                }else if (e.body.name == "sphere" || e.body.name == "cube" || e.body.name == "radio"|| e.body.name == "cube_2") {
-                    console.log('FIZZLER!', e.body);
-
-                    //
-
+                } else if (e.body.name == "sphere" || e.body.name == "cube" || e.body.name == "radio" || e.body.name == "cube_2") {
                     //CREATE A CLONE TO APPLY DISSOLVE SHADER
                     const clone = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.name).scene.clone();
                     clone.position.set(e.body.position.x, e.body.position.y, e.body.position.z);
                     clone.quaternion.copy(e.body.quaternion);
-                    clone.visible=true;
-                    console.log(clone);
+                    clone.visible = true;
 
                     if (GLOBALS.HOLDING_ITEM)
                         interactWithItem()
@@ -211,7 +200,7 @@ function createLightBridges(item, rayItem, object, instanced) {
                     var clone2 = clone.clone();
                     clone2.position.y += 1;
 
-                    addRadioAudio('audio-dissolve', clone, true, false, true, 8)
+                    addPositionalAudio('audio-dissolve', clone, true, false, true, 8)
 
                     tweenCamera(3000, GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value, clone.position)
                     tweenCamera(3000, clone.position, clone2.position)
@@ -228,40 +217,19 @@ function createLightBridges(item, rayItem, object, instanced) {
             });
         }
     } else if (item == "tractor_beam") {
-        var bb = new THREE.Box3(); // for re-use
+        var bb = new Box3(); // for re-use
         bb.setFromObject(plane);
         bb.side = 1;
-
-        if (object.beam == "orange")
-            bb.side = -1;
 
         plane.inTractor = false;
         plane.item = object;
         plane.dir = dir;
         GLOBALS.TRACTOR_BEAM.push(plane);
         GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.push(bb);
-    } else if (item == "laser_emitter") {
-
-        //var clone = plane.clone();
-        //plane.scale.set(10,10,10);
-
-        //var bb = new THREE.Box3(); // for re-use
-        //bb.setFromObject(plane);
-
-        //plane.inTractor = false;
-        GLOBALS.LASER_EMITTER.push(plane);
-        //obj.position.copy(plane.position);
-        //obj.rotation.copy(plane.rotation);
-
-        obj.position.y = plane.position.y;
-        obj.distance = intersects[0].distance;
-        GLOBALS.LASER_EMITTER_OBJ.push(obj);
     }
 }
 
 function createLightBridgesFromPortal(portal, rayItem) {
-
-    console.log(rayItem)
 
     if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null)
         return
@@ -271,8 +239,6 @@ function createLightBridgesFromPortal(portal, rayItem) {
         var intersects = rayItem[g].intersectObjects(GLOBALS.PORTAL_SHADER);
 
         if (intersects.length > 0) {
-
-            console.log("11111111111111111111")
 
             if (intersects[0].object.name == "portal-0")
                 portal = 1;
@@ -290,17 +256,12 @@ function createLightBridgesFromPortal(portal, rayItem) {
                     GLOBALS.SCENE_CHILDREN.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
                     GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
                 }
-            } else if (rayItem[g].name == "laser_emitter") {
-                if (GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]) {
-                    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]);
-                    GLOBALS.LASER_EMITTER_BOUNDING_BOX[GLOBALS.LASER_EMITTER_LENGTH + g] = null;
-                }
             }
 
-            let dir = new THREE.Vector3()
+            let dir = new Vector3()
             GLOBALS.PORTAL_SHADER[portal].getWorldDirection(dir)
 
-            var raycasterBridge = new THREE.Raycaster();
+            var raycasterBridge = new Raycaster();
             raycasterBridge.set(GLOBALS.PORTAL_SHADER[portal].position, dir);
 
             var intersectsInstance = raycasterBridge.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
@@ -312,56 +273,44 @@ function createLightBridgesFromPortal(portal, rayItem) {
                             GLOBALS.SCENE_CHILDREN.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
                             GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
                             GLOBALS.LIGHT_BRIDGE_CLONE[g].item.clone = null;
-
-                            console.log("wwwwwwwwwwwwwwwwwwww")
                         }
                     } else if (rayItem[g].name == "tractor_beam") {
                         if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
                             GLOBALS.SCENE_CHILDREN.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
                             GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
                         }
-                    } else if (rayItem[g].name == "laser_emitter") {
-                        if (GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]) {
-                            GLOBALS.SCENE_CHILDREN.remove(GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]);
-                            GLOBALS.LASER_EMITTER_BOUNDING_BOX[GLOBALS.LASER_EMITTER_LENGTH + g] = null;
-                        }
                     }
                 } else {
-                    console.log("2222222222222222")
                     continue;
-                    
                 }
             }*/
-
-            console.log("333333333333333")
 
             //---------------------------------------------------------------------
 
             var material = GLOBALS.MATERIAL_LIGHT_BRIDGERS;
 
             if (rayItem[g].name == "light_bridge") {
-                var geometry = new THREE.BoxGeometry(0.9, 0.025, intersectsInstance[0].distance);
+                var geometry = new BoxGeometry(0.9, 0.025, intersectsInstance[0].distance);
             } else if (rayItem[g].name == "tractor_beam") {
-                var geometry = new THREE.CylinderGeometry(0.9, 0.9, intersectsInstance[0].distance + 0, 32, 1, true);
+                var geometry = new CylinderGeometry(0.9, 0.9, intersectsInstance[0].distance + 0, 32, 1, true);
 
-                if (rayItem[g].beam == "orange")
-                    material = null; //materialBridgeOrange
-                else {
-                    material = GLOBALS.MATERIAL_TRACTOR_BEAM;
+                // Add custom attributes to geometry (e.g., for height)
+                var vertices = geometry.attributes.position.array;
+                var heights = new Float32Array(vertices.length / 3);  // Assuming height for each vertex
+
+                for (var i = 0; i < heights.length; i++) {
+                    heights[i] = intersectsInstance[0].distance / 5;
                 }
-            } else if (rayItem[g].name == "laser_emitter") {
-                var geometry = new THREE.CylinderGeometry(0.02, 0.02, intersectsInstance[0].distance, 32);
 
-                material = new THREE.MeshBasicMaterial({
-                    color: new THREE.Color(1, 0.15, 0)
-                })
+                geometry.setAttribute('height', new BufferAttribute(heights, 1));
+                material = GLOBALS.MATERIAL_TRACTOR_BEAM;
             }
 
-
-            const plane = new THREE.Mesh(geometry, material);
+            const plane = new Mesh(geometry, material);
             GLOBALS.SCENE_CHILDREN.add(plane);
+            GLOBALS.SELECTED_FOR_BLOOM.add(plane)
 
-            if (rayItem[g].name == "tractor_beam" || rayItem[g].name == "laser_emitter") {
+            if (rayItem[g].name == "tractor_beam") {
                 plane.rotation.x = Math.PI / 2;
                 plane.updateMatrix();
                 plane.geometry.applyMatrix4(plane.matrix);
@@ -374,7 +323,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
             if (rayItem[g].name == "light_bridge") {
 
-                var dummy = new THREE.Object3D();
+                var dummy = new Object3D();
                 dummy.rotation.copy(plane.rotation);
                 dummy.position.copy(plane.position);
 
@@ -402,14 +351,9 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 plane.translateX(-(((intersects[0].uv.x) - 0.5) * 1));
             }
 
-
             const result = threeToCannon(plane, {
                 type: ShapeType.BOX
             });
-
-            if (rayItem[g].name == "laser_emitter") {
-                plane.translateY(0.6)
-            }
 
             let PHYSICS_MATERIAL = new CANNON.Material();
             PHYSICS_MATERIAL.friction = 0.4; //0.01
@@ -430,8 +374,6 @@ function createLightBridgesFromPortal(portal, rayItem) {
             plane.material = rayItem[g].item.continuous.material;
             plane.item = rayItem[g].item;
 
-            console.log(plane.id)
-
             rayItem[g].item.clone = plane;
 
             if (rayItem[g].name == "light_bridge") {
@@ -445,82 +387,104 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 rayItem[g].item.clone.bodyBridge = box;
             } else if (rayItem[g].name == "tractor_beam") {
 
-                var bb = new THREE.Box3(); // for re-use
+                var bb = new Box3(); // for re-use
                 bb.setFromObject(plane);
                 bb.side = 1;
-
-                if (rayItem[g].beam == "orange")
-                    bb.side = -1;
 
                 rayItem[g].opened = true;
                 plane.inTractor = false;
                 plane.dir = dir;
 
-
-
-                //setTimeout(() => {
                 GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g] = plane;
                 GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = bb;
-                console.log(GLOBALS.TRACTOR_BEAM)
-                //}, 300);
-
-
-            } else if (rayItem[g].name == "laser_emitter") {
-
-                var obj = new THREE.Object3D();
-                obj.position.copy(GLOBALS.PORTAL_SHADER[portal].position);
-                obj.rotation.copy(GLOBALS.PORTAL_SHADER[portal].rotation);
-
-                //var clone = plane.clone();
-                //plane.scale.set(10,10,10);
-
-                //var bb = new THREE.Box3(); // for re-use
-                //bb.setFromObject(plane);
-
-                //plane.inTractor = false;
-                GLOBALS.LASER_EMITTER.push(plane);
-                //obj.position.copy(plane.position);
-                //obj.rotation.copy(plane.rotation);
-
-                obj.position.y = plane.position.y;
-                obj.distance = intersects[0].distance;
-                GLOBALS.LASER_EMITTER_OBJ.push(obj);
             }
         } else {
-
             if (rayItem[g].name == "light_bridge") {
                 if (GLOBALS.LIGHT_BRIDGE_CLONE[g]) {
                     GLOBALS.SCENE_CHILDREN.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
                     GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
 
                     GLOBALS.LIGHT_BRIDGE_CLONE[g].item.clone = null;
-
-                    console.log("jjjjjjjjjjjjjjjjjjj")
                 }
             } else if (rayItem[g].name == "tractor_beam") {
                 if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
                     GLOBALS.SCENE_CHILDREN.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
                     GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
                 }
-            } else if (rayItem[g].name == "laser_emitter") {
-                if (GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]) {
-                    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.LASER_EMITTER[GLOBALS.LASER_EMITTER_LENGTH + g]);
-                    GLOBALS.LASER_EMITTER_BOUNDING_BOX[GLOBALS.LASER_EMITTER_LENGTH + g] = null;
-                }
             }
         }
     }
 }
 
-function getPlaneByName(name) {
-    return GLOBALS.PLANE_USER_DATA.filter(
-        function (data) {
-            return data.name == name
-        }
+function ContinuousTrigger(obj, trigger, elem, name) {
+    obj.item.triggers = trigger;
+    elem.data("trigger", trigger)
+    elem.find(".title").text(trigger);
+
+    var dummy = new Object3D();
+    dummy.position.copy(new Vector3(
+        obj.position.x,
+        obj.position.y,
+        obj.position.z
+    ));
+    dummy.rotation.set(
+        obj.normal.x,
+        obj.normal.y,
+        obj.normal.z
     );
+
+    if (trigger == "Middle Vertical") {
+        dummy.rotateY(Math.PI / 2);
+    } else if (trigger == "Top") {
+        dummy.translateZ(-0.8);
+    } else if (trigger == "Bottom") {
+        dummy.translateZ(0.8);
+    } else if (trigger == "Left") {
+        dummy.rotateY(Math.PI / 2);
+        dummy.translateZ(-0.8);
+    } else if (trigger == "Right") {
+        dummy.rotateY(Math.PI / 2);
+        dummy.translateZ(0.8);
+    }
+
+    obj.item.raycaster.ray.origin = dummy.position;
+    obj.item.continuous.position.copy(dummy.position)
+    obj.item.continuous.rotation.copy(dummy.rotation)
+    obj.item.continuous.translateY(obj.item.continuous.distance);
+
+    if (name == "light_bridge") {
+        obj.item.bodyBridge.position.copy(obj.item.continuous.position);
+        obj.item.bodyBridge.quaternion.copy(dummy.quaternion);
+    }
+
+    dummy.updateMatrix();
+    var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(name);
+    instanced.setMatrixAt(obj.item.idInstanced, dummy.matrix);
+
+
+    if (name == "laser_field" || name == "fizzler") {
+        obj.item.bodyLaserField.position.copy(obj.item.continuous.position)
+        obj.item.bodyLaserField.quaternion.copy(dummy.quaternion)
+
+        dummy.rotateX(Math.PI);
+        dummy.translateY(-obj.item.cloneLaserDistance);
+
+        dummy.updateMatrix();
+
+        if (name == "laser_field")
+            instanced.setMatrixAt(obj.item.cloneLaserID, dummy.matrix);
+        else if (name == "fizzler")
+            instanced.setMatrixAt(obj.item.cloneFizzlerID, dummy.matrix);
+    }
+
+    instanced.instanceMatrix.needsUpdate = true;
+    instanced.computeBoundingSphere();
+
+    animate();
 }
 
 export {
     createLightBridges,
-    createLightBridgesFromPortal
+    createLightBridgesFromPortal,
+    ContinuousTrigger
 };

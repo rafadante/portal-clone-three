@@ -1,20 +1,13 @@
 import $ from 'jquery';
-import * as THREE from 'three';
 import { GLOBALS } from '../../Globals.js';
 import {
     animate
 } from '../../Main.js';
-import { AUDIO, volume,play } from '../audio/Audio.js';
+import { AUDIO, volume, play } from '../audio/Audio.js';
 import { stateDoor } from '../door/Door.js';
 
 if (!GLOBALS.MOBILE)
     $(".mobile").css("display", "none");
-
-
-$("body").on('click', '#start-place-holder', function () {
-    play(AUDIO.EDITOR)
-    $("#placeholder").css("display", "none");
-});
 
 $("body").on('click', '#settings-audio', function () {
     $("#options-audio").css("display", "block");
@@ -128,8 +121,8 @@ $('#shadows-resolution-select').on('change', function () {
         GLOBALS.SPOTLIGHT.shadow.mapSize.height = $(this).val();
     }
 
-    GLOBALS.RENDERER.shadowMap.autoUpdate = true;
-    GLOBALS.RENDERER.shadowMap.autoUpdate = false;
+    //GLOBALS.RENDERER.shadowMap.autoUpdate = true;
+    //GLOBALS.RENDERER.shadowMap.autoUpdate = false;
 
     update()
 });
@@ -300,6 +293,8 @@ function update() {
     }
 }
 
+
+//LOAD PLAYER DATA
 //VERIFY IF THE PLAYER HAS SETTINGS SAVED ON THE LOCALSTORAGE
 if (!localStorage.getItem("saved")) {
     $("#recursive-select").val(GLOBALS.PORTAL_RECURSION_LEVELS).change();
@@ -307,9 +302,9 @@ if (!localStorage.getItem("saved")) {
     $("#shadows-resolution-select").val(512).change();
 }
 
-if (localStorage.getItem("vol-val-range")){
+if (localStorage.getItem("vol-val-range")) {
     $("#vol-val-range").val(localStorage.getItem("vol-val-range")).trigger("input");
 }
-    //volume(localStorage.getItem("vol-val-range"));
+//volume(localStorage.getItem("vol-val-range"));
 
 allowUpdate = true;

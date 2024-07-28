@@ -1,23 +1,26 @@
-/* eslint-disable */
-import $ from 'jquery';
-import "./components/materials/Materials.js"
+import "./components/materials/Materials.js";
 import "./components/ui/UI.js";
+import "./components/ui/EditorInteractions.js";
+import "./Utils.js";
 import {
     updatePhysics
 } from './Physics.js';
-import * as THREE from 'three';
+import {
+    BoxGeometry,
+    MeshBasicMaterial,
+    Mesh,
+    PMREMGenerator,
+    Clock,
+    Matrix4,
+    Frustum,
+    Vector3
+} from 'three';
 import {
     TWEEN
 } from './Tween.js';
 import {
     Lights
 } from './components/lights/Lights.js';
-import {
-    cubeState
-} from './components/cubeManager/CubeManager.js';
-import {
-    raycastSelected
-} from './components/boxSelection/BoxSelection.js';
 import {
     animateShader
 } from "./components/shaders/AnimateShaders.js"
@@ -33,12 +36,8 @@ import {
     recreateRay
 } from './components/ray/Ray.js';
 import './components/test/Test.js';
-import {
-    addItem,
-    hoverItem
-} from './components/items/Items.js';
 import Stats from "stats-gl";
-import "./components/menuShader/MenuShader.js";
+import "./components/mainMenu/MainMenu.js";
 import {
     renderGoo
 } from './components/goo/Goo.js';
@@ -57,15 +56,22 @@ import {
 import {
     GLOBALS
 } from './Globals.js';
-import { func } from 'three/examples/jsm/nodes/Nodes.js';
-import { teleportationState } from './components/portal/Portal.js';
+import { teleportationState } from './components/portal/Teleportation.js';
+import { hideMaterial } from "./Utils.js";
 
 //VARIABLES
 var angleHolder = 0;
-var raycaster = new THREE.Raycaster();
 let pmremGenerator, currentRenderTarget;
 let timeTarget = 0;
-var justClicked = false;
+//SCENE FPS
+let clock2 = new Clock();
+let clockPortal = new Clock();
+let deltaPortal = 0;
+let frames = 0, prevTime = performance.now();
+var fps = 0;
+let cloneVisible;
+let frustum = new Frustum();
+
 // create a new Stats object
 let mainContainer = document.createElement('div');
 mainContainer.id = 'main-container';
@@ -84,24 +90,17 @@ mainContainer.appendChild(GLOBALS.STATS.container);
 GLOBALS.STATS.init(GLOBALS.RENDERER.domElement);
 GLOBALS.STATS.container.style.display = "none";
 //
-const geometry = new THREE.BoxGeometry(2, 2, 2);
-const material = new THREE.MeshBasicMaterial({
+const geometry = new BoxGeometry(2, 2, 2);
+const material = new MeshBasicMaterial({
     color: 0x00ff00,
     transparent: true,
     opacity: 0.5
 });
-GLOBALS.ITEM_CUBE = new THREE.Mesh(geometry, material);
+GLOBALS.ITEM_CUBE = new Mesh(geometry, material);
 GLOBALS.ITEM_CUBE.visible = false;
 GLOBALS.ITEM_CUBE.name = "ITEM_CUBE";
 
 document.getElementById("container").appendChild(GLOBALS.RENDERER.domElement);
-
-init();
-$("body").on('click', '#option-community-build, #option-single-load', function () { //
-    setTimeout(() => {
-        init();
-    }, 2000);
-});
 //
 function init() {
     // SCENE
@@ -115,11 +114,11 @@ function init() {
     // CAMERA
     GLOBALS.SCENE.add(GLOBALS.MAIN_CAMERA);
     //LIGHT GROUP
-    GLOBALS.LIGHT_GROUP = new Lights(THREE);
+    GLOBALS.LIGHT_GROUP = new Lights();
     GLOBALS.LIGHT_GROUP.name = "LIGHT_GROUP";
     //GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_GROUP);
     //HDR
-    pmremGenerator = new THREE.PMREMGenerator(GLOBALS.RENDERER);
+    pmremGenerator = new PMREMGenerator(GLOBALS.RENDERER);
     const environment = new RoomEnvironment(GLOBALS.RENDERER);
 
     var envMap = pmremGenerator.fromScene(environment).texture;
@@ -134,132 +133,7 @@ function init() {
     initGels();
     //LISTENER
     window.addEventListener('resize', onWindowResize);
-    document.getElementById("container").addEventListener('pointerdown', onDocumentMouseDown, false);
-    document.getElementById("container").addEventListener('pointermove', onDocumentMouseMove, false);
-    document.getElementById("container").addEventListener('pointerup', onDocumentMouseUp, false);
-    document.getElementById("container").addEventListener('wheel', onDocumentMouseWheel, false);
-
     recreateRay();
-}
-
-$(document).on('keypress', function (event) {
-    if (!GLOBALS.FPS_MODE) {
-        if (event.keyCode === 45 && !justClicked) { // minus
-            cubeState("minus");
-        } else if ((event.keyCode === 43 || event.keyCode === 61) && !justClicked) { // plus
-            cubeState("plus");
-        }
-        if (!justClicked) {
-            justClicked = true;
-            setTimeout(() => {
-                justClicked = false;
-            }, 100);
-        }
-        animate();
-    }
-});
-
-function onDocumentMouseDown(event) {
-    if (!GLOBALS.FPS_MODE) {
-        raycastManager(event, "down");
-        animate();
-    }
-}
-
-function onDocumentMouseWheel() {
-    animate();
-}
-
-function onDocumentMouseMove(event) {
-    if (!GLOBALS.FPS_MODE) {
-        mouse2.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse2.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-        raycastManager(event, "move");
-        animate()
-    }
-}
-
-function onDocumentMouseUp(event) {
-    if (!GLOBALS.FPS_MODE) {
-        GLOBALS.SELECTED_SIDE = null;
-        GLOBALS.SELECTING = false;
-        GLOBALS.CONTROLS.enabled = true;
-        GLOBALS.CONTROLS.update();
-
-        if (GLOBALS.ITEM_HOLDED_NAME || GLOBALS.CONNECTING) {
-            raycastManager(event, "up");
-        }
-
-        GLOBALS.ITEM_HOLDED_NAME = null;
-        GLOBALS.DRAGGED_ITEM_ELEMENT = null;
-        $("#follow").css("display", "none");
-
-        if (GLOBALS.DRAGGING) {
-            GLOBALS.SELECTED_ID = [];
-            GLOBALS.DRAGGING = false;
-        }
-
-        if (GLOBALS.SELECTED) {
-            if (!GLOBALS.SELECTED.userData.hasItem)
-                GLOBALS.ITEM_CUBE.visible = false;
-        } else {
-            GLOBALS.ITEM_CUBE.visible = false;
-        }
-
-        animate();
-    }
-}
-
-const mouse2 = new THREE.Vector2(1, 1);
-
-function raycastManager(event, type) {
-    if (!GLOBALS.FPS_MODE && GLOBALS.PLANE_LEVEL_INSTANCED) {
-
-        raycaster.setFromCamera(mouse2, GLOBALS.MAIN_CAMERA);
-        const intersection = raycaster.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
-
-        if (intersection.length > 0) {
-
-            const color = new THREE.Color();
-
-            const instanceId = intersection[0].instanceId;
-            GLOBALS.PLANE_LEVEL_INSTANCED.getColorAt(instanceId, color);
-
-            if (type == "move" && GLOBALS.SELECTING) {
-
-                raycastSelected(intersection[0], event, type)
-
-            } else if (type == "down") {
-
-                GLOBALS.SELECTING = true;
-                GLOBALS.CONTROLS.enabled = false;
-
-                GLOBALS.PLANE_USER_DATA[instanceId].selected = true;
-                GLOBALS.SELECTED_SIDE = GLOBALS.PLANE_USER_DATA[instanceId].side;
-                raycastSelected(intersection[0], event, type)
-            }
-
-            if (type == "up") {
-                if (intersection.length > 0)
-                    addItem(intersection, false);
-            }
-
-            if (GLOBALS.ITEM_HOLDED_NAME) {
-
-                $("#follow").css("display", "block");
-                $("#follow").css({
-                    left: event.pageX - 25,
-                    top: event.pageY - 25
-                });
-
-                hoverItem(intersection, false);
-            }
-        } else {
-            if (type == "down")
-                document.querySelector('.menu').classList.remove('menu-show');
-        }
-    }
 }
 
 function onWindowResize() {
@@ -267,30 +141,24 @@ function onWindowResize() {
 
     GLOBALS.MAIN_CAMERA.aspect = window.innerWidth / window.innerHeight;
     GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
+
+    if (GLOBALS.COMPOSER)
+        GLOBALS.COMPOSER.setSize(window.innerWidth, window.innerHeight);
 }
 
-//SCENE FPS
-let clock2 = new THREE.Clock();
-let clockPortal = new THREE.Clock();
-let deltaPortal = 0;
-let frames = 0, prevTime = performance.now();
-
 function animate(time) {
-
-    $("#drawcalls").text("DRAWCALLS: " + GLOBALS.RENDERER.info.render.calls);
 
     if (GLOBALS.FPS_MODE) {
         requestAnimationFrame(animate);
     }
 
     if (!GLOBALS.FPS_MODE) {
+        //GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
     } else if (!GLOBALS.PAUSED) {
         render(time);
     }
 }
-
-var fps = 0;
 
 function fixedUpdate() { //60 fps always for physics
 
@@ -349,35 +217,19 @@ function render(time) {
         }
     }
 
+    GLOBALS.PORTAL_GUN_CAMERA.position.copy(GLOBALS.MAIN_CAMERA.position)
+    GLOBALS.PORTAL_GUN_CAMERA.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion)
+
     // finally, render to screen
     GLOBALS.RENDERER.setRenderTarget(currentRenderTarget);
-    GLOBALS.RENDERER.localClippingEnabled = false
-    GLOBALS.RENDERER.clippingPlanes = []
-    GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+    GLOBALS.RENDERER.localClippingEnabled = false;
+    GLOBALS.RENDERER.clippingPlanes = [];
+    //GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+    GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+    GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
+
     GLOBALS.STATS.end();
 }
-
-function tweenCamera(duration, ini, final) {
-    new TWEEN.Tween(ini).to(final, duration)
-        //.easing(TWEEN.Easing.Quadratic.Out)
-        .start();
-}
-
-function hideMaterial(obj, transparent, opacity){
-    //obj.visible=transparent;
-    obj.traverse(c => {
-        if (c.material) {
-            //c.material.visible = transparent
-            c.material.transparent = transparent;
-            c.material.opacity = opacity;
-            //c.material.depthTest = !transparent;
-            c.material.colorWrite = !transparent;
-            c.material.depthWrite = !transparent;
-        }
-    })
-}
-
-let cloneVisible;
 
 function animatePortal() {
 
@@ -389,13 +241,13 @@ function animatePortal() {
         cloneVisible = GLOBALS.PLAYER_MODEL_CLONE.visible;
     }
 
-    //const currentShadowAutoUpdate = GLOBALS.RENDERER.shadowMap.autoUpdate;
-    //GLOBALS.RENDERER.shadowMap.autoUpdate = false;
+    const currentShadowAutoUpdate = GLOBALS.RENDERER.shadowMap.autoUpdate;
+    GLOBALS.RENDERER.shadowMap.autoUpdate = false;
     currentRenderTarget = GLOBALS.RENDERER.getRenderTarget();
     GLOBALS.RENDERER.xr.enabled = false;
 
     GLOBALS.GUN.visible = false;
-    GLOBALS.GUN_CLONE.visible = true;
+    GLOBALS.GUN_CLONE.visible = GLOBALS.PLAYER_MODEL.visible;
 
     let cloneItemHolded = false;
 
@@ -403,9 +255,8 @@ function animatePortal() {
         cloneItemHolded = GLOBALS.OBJ_HOLDED_CLONE.visible;
         GLOBALS.OBJ_HOLDED_CLONE.visible = true;
     }
-    //GLOBALS.GUN_CLONE2.visible = true;
 
-    var positionBoneHand = new THREE.Vector3();
+    var positionBoneHand = new Vector3();
     window.hand.getWorldPosition(positionBoneHand);
 
     GLOBALS.GUN_CLONE.position.copy(positionBoneHand);
@@ -425,6 +276,7 @@ function animatePortal() {
     // stencil optimization - only render parts of scene multiple
     // times when it is going to be viewed by the portal
     GLOBALS.RENDERER.autoClearStencil = false
+    GLOBALS.RENDERER.autoClear = true;
 
     if (GLOBALS.PORTAL_RECURSION_LEVELS > 0) {
         renderPortal2(0, 1)
@@ -442,7 +294,8 @@ function animatePortal() {
 
     GLOBALS.SCENE_CHILDREN.visible = true;
     GLOBALS.RENDERER.autoClear = false;
-    GLOBALS.GUN.visible = true;
+
+    GLOBALS.GUN.visible = GLOBALS.PLAYER_MODEL.visible;
 
     GLOBALS.GUN_CLONE.visible = false;
     GLOBALS.GUN_CLONE2.visible = cloneVisible;
@@ -457,7 +310,6 @@ function animatePortal() {
     }
 
     if (GLOBALS.PLAYER && GLOBALS.PLAYER_MODEL) {
-
         hideMaterial(GLOBALS.PLAYER_MODEL, true, 0);
         GLOBALS.PLAYER_MODEL_CLONE.visible = cloneVisible;
     }
@@ -473,7 +325,7 @@ function animatePortal() {
         GLOBALS.PORTALS[1].mesh.visible = true
     }
 
-    //GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
+    GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
 }
 
 // Render loop
@@ -495,17 +347,14 @@ function renderPortal2(thisIndex, pairIndex) {
     GLOBALS.PORTAL_TARGETS[thisIndex].setSize(width, height)
     GLOBALS.PORTAL_TMP_TARGETS[thisIndex].setSize(width, height)
 
-    GLOBALS.PORTALS[thisIndex].mesh.material.stencilWrite = true
-    //GLOBALS.PORTALS[thisIndex].portalShader.material.stencilWrite = true
-    GLOBALS.RENDERER.clearStencil()
-    GLOBALS.RENDERER.setRenderTarget(null)
-    //GLOBALS.RENDERER.render(GLOBALS.PORTALS[pairIndex].mesh, GLOBALS.MAIN_CAMERA)
+    GLOBALS.PORTALS[thisIndex].mesh.material.stencilWrite = true;
+    GLOBALS.RENDERER.clearStencil();
+    GLOBALS.RENDERER.setRenderTarget(null);
 
     let shouldRender = new Array(GLOBALS.PORTAL_RECURSION_LEVELS + 1)
     shouldRender[0] = portalIsVisibleInCamera(portalCamera, GLOBALS.PORTALS[thisIndex], null)
     for (let i = 0; i < GLOBALS.PORTAL_RECURSION_LEVELS; i++) {
         shouldRender[i + 1] = portalIsVisibleInCamera(portalCamera, GLOBALS.PORTALS[thisIndex], GLOBALS.PORTALS[pairIndex].plane) && shouldRender[i]
-        //shouldRender[i + 1] = shouldRender[i]
         teleportObject3D(GLOBALS.PORTALS[thisIndex], portalCamera)
     }
 
@@ -522,10 +371,10 @@ function renderPortal2(thisIndex, pairIndex) {
 
     for (let level = GLOBALS.PORTAL_RECURSION_LEVELS - 1; level >= 0; level--) {
 
-        if(level == 0){
+        if (level == 0) {
             GLOBALS.PLAYER_MODEL_CLONE.visible = false;
             GLOBALS.GUN_CLONE2.visible = false;
-        }else{
+        } else {
             GLOBALS.PLAYER_MODEL_CLONE.visible = cloneVisible;
             GLOBALS.GUN_CLONE2.visible = cloneVisible;
         }
@@ -547,45 +396,42 @@ function renderPortal2(thisIndex, pairIndex) {
         // need to do the swap operation:
         // https://stackoverflow.com/questions/54048816/how-to-switch-the-texture-of-render-target-in-three-js
         // cannot render to texture while also using texture, so have to create another temp render target
-        let swap = GLOBALS.PORTAL_TARGETS[thisIndex]
-        GLOBALS.PORTAL_TARGETS[thisIndex] = GLOBALS.PORTAL_TMP_TARGETS[thisIndex]
-        GLOBALS.PORTAL_TMP_TARGETS[thisIndex] = swap
-        GLOBALS.PORTALS[thisIndex].mesh.material.uniforms.texture1.value = GLOBALS.PORTAL_TARGETS[thisIndex].texture
+        let swap = GLOBALS.PORTAL_TARGETS[thisIndex];
+        GLOBALS.PORTAL_TARGETS[thisIndex] = GLOBALS.PORTAL_TMP_TARGETS[thisIndex];
+        GLOBALS.PORTAL_TMP_TARGETS[thisIndex] = swap;
+        GLOBALS.PORTALS[thisIndex].mesh.material.uniforms.texture1.value = GLOBALS.PORTAL_TARGETS[thisIndex].texture;
 
-        teleportObject3D(GLOBALS.PORTALS[pairIndex], portalCamera)
+        teleportObject3D(GLOBALS.PORTALS[pairIndex], portalCamera);
 
         // show this portal to itself on subsequent iterations
-        GLOBALS.PORTALS[thisIndex].visible = true
+        GLOBALS.PORTALS[thisIndex].visible = true;
     }
 
     if (GLOBALS.MOBILE) {
-        GLOBALS.PORTALS[thisIndex].mesh.visible = true
-        GLOBALS.PORTALS[pairIndex].mesh.visible = true
+        GLOBALS.PORTALS[thisIndex].mesh.visible = true;
+        GLOBALS.PORTALS[pairIndex].mesh.visible = true;
     } else {
-        GLOBALS.PORTALS[thisIndex].visible = true
-        GLOBALS.PORTALS[pairIndex].visible = true
+        GLOBALS.PORTALS[thisIndex].visible = true;
+        GLOBALS.PORTALS[pairIndex].visible = true;
     }
 
-    GLOBALS.PORTALS[thisIndex].mesh.material.stencilWrite = false
-    //GLOBALS.PORTALS[thisIndex].portalShader.material.stencilWrite = false
+    GLOBALS.PORTALS[thisIndex].mesh.material.stencilWrite = false;
 }
 
 // teleport a 3D object directly, returns nothing
 // Object3D includes camera, meshes
 function teleportObject3D(obj1, obj2) {
-    let f = new THREE.Matrix4().makeScale(-1, -1, 1)
+    let f = new Matrix4().makeScale(-1, -1, 1)
     let m = obj1.CDBB.inverse_t.clone().premultiply(f).premultiply(obj1.output.CDBB.t)
     obj2.applyMatrix4(m)
 }
-
-let frustum = new THREE.Frustum();
 
 function portalIsVisibleInCamera(camera, portal, clippingPlane) {
 
     camera.updateMatrix();
     camera.updateMatrixWorld();
 
-    frustum.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
+    frustum.setFromProjectionMatrix(new Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
 
     // in frustum,
     // in front of clipping plane,
@@ -597,7 +443,6 @@ function portalIsVisibleInCamera(camera, portal, clippingPlane) {
 }
 
 export {
-    tweenCamera,
     animate,
-    hideMaterial
+    init
 };

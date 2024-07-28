@@ -1,7 +1,9 @@
-import * as THREE from 'three';
 import {
-    GLOBALS
-} from '../../../Globals';
+    Color,
+    MeshBasicMaterial,
+    DoubleSide
+} from 'three';
+import { GLOBALS } from '../../Globals';
 
 GLOBALS.UNIFORMS_LASER_FIELD = {
     time: {
@@ -9,9 +11,9 @@ GLOBALS.UNIFORMS_LASER_FIELD = {
     }
 }
 
-GLOBALS.MATERIAL_LASER_FIELD = new THREE.MeshBasicMaterial({
-    color: new THREE.Color(1, 0, 0),
-    side: THREE.DoubleSide,
+GLOBALS.MATERIAL_LASER_FIELD = new MeshBasicMaterial({
+    color: new Color(1, 0, 0),
+    side: DoubleSide,
     transparent: true,
     onBeforeCompile: shader => {
         shader.uniforms.time = GLOBALS.UNIFORMS_LASER_FIELD.time;
@@ -42,8 +44,6 @@ GLOBALS.MATERIAL_LASER_FIELD = new THREE.MeshBasicMaterial({
         );
     }
 });
-
-console.log(GLOBALS.MATERIAL_LASER_FIELD)
 
 GLOBALS.MATERIAL_LASER_FIELD.defines = {
     "USE_UV": ""

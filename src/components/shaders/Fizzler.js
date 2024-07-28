@@ -1,4 +1,7 @@
-import * as THREE from 'three';
+import {
+    ShaderMaterial,
+    Vector2
+} from 'three';
 import { GLOBALS } from '../../Globals';
 
 GLOBALS.UNIFORMS_FIZZLER = {
@@ -7,7 +10,7 @@ GLOBALS.UNIFORMS_FIZZLER = {
     },
     iResolution: {
         type: "v2",
-        value: new THREE.Vector2(1000, 1000)
+        value: new Vector2(1000, 1000)
     },
 };
 
@@ -67,11 +70,11 @@ void main()
 	vec3 colour = vec3(pow(abs(c), 8.0));
     colour = clamp(colour + vec3(0.0, 0.35, 0.5), 0.0, 1.0);
     
-	gl_FragColor = vec4(colour, 0.1);
+	gl_FragColor = vec4(colour, 0.15);
 }
 `;
 
-GLOBALS.MATERIAL_FIZZLER = new THREE.ShaderMaterial({
+GLOBALS.MATERIAL_FIZZLER = new ShaderMaterial({
     uniforms: GLOBALS.UNIFORMS_FIZZLER,
     vertexShader: vshader,
     fragmentShader: fshader,

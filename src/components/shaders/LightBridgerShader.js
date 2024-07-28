@@ -1,7 +1,11 @@
-import * as THREE from 'three';
+import {
+    MeshBasicMaterial,
+    Color,
+    DoubleSide
+} from 'three';
 import {
     GLOBALS
-} from '../../../Globals';
+} from '../../Globals';
 
 GLOBALS.UNIFORMS_LIGHT_BRIDGE = {
     time: {
@@ -9,9 +13,9 @@ GLOBALS.UNIFORMS_LIGHT_BRIDGE = {
     }
 }
 
-GLOBALS.MATERIAL_LIGHT_BRIDGERS = new THREE.MeshBasicMaterial({
-    color: new THREE.Color(0, 0.75, 1),
-    side: THREE.DoubleSide,
+GLOBALS.MATERIAL_LIGHT_BRIDGERS = new MeshBasicMaterial({
+    color: new Color(0, 0.75, 1),
+    side: DoubleSide,
     transparent: true,
     onBeforeCompile: shader => {
         shader.uniforms.time = GLOBALS.UNIFORMS_LIGHT_BRIDGE.time;

@@ -1,4 +1,4 @@
-import { Vector3, ShaderMaterial,TextureLoader,RepeatWrapping, SphereGeometry, Mesh,SRGBColorSpace } from 'three'
+import { Vector3, ShaderMaterial, TextureLoader, RepeatWrapping, SRGBColorSpace } from 'three'
 import { GLOBALS } from '../../Globals';
 
 var noise = new TextureLoader().load('./assets/textures/noise.jpg');
@@ -7,14 +7,14 @@ var matcap = new TextureLoader().load('./assets/textures/matcap.png');
 matcap.colorSpace = SRGBColorSpace;
 
 //setTimeout(() => {
-    GLOBALS.UNIFORMS_DISSOLVER = {
-        u_EffectOrigin: { value: new Vector3(3,2,3) },
-        u_Time: { value: 0 },
-        diffuseMap: { value: matcap },
-        t_Noise: { value: noise }
-    };
-    
-    const vshader = `
+GLOBALS.UNIFORMS_DISSOLVER = {
+  u_EffectOrigin: { value: new Vector3(3, 2, 3) },
+  u_Time: { value: 0 },
+  diffuseMap: { value: matcap },
+  t_Noise: { value: noise }
+};
+
+const vshader = `
     varying vec3 vViewPosition;
     varying vec3 vWorldPosition;
     varying vec2 vUv; // Pass UV coordinates to fragment shader
@@ -39,8 +39,8 @@ matcap.colorSpace = SRGBColorSpace;
       vViewPosition = -mvPosition.xyz;
     }
     `;
-    
-    const fshader = `
+
+const fshader = `
     varying vec3 vViewPosition;
     varying vec3 vWorldPosition;
     varying vec2 vUv; // Receive UV coordinates from vertex shader
@@ -78,27 +78,21 @@ matcap.colorSpace = SRGBColorSpace;
 
         // Set fragment color
         gl_FragColor = finalColor;
-
-        #include <tonemapping_fragment>
-        #include <colorspace_fragment>
     }
     `;
-    
-    GLOBALS.MATERIAL_DISSOLVER = new ShaderMaterial({
-        uniforms: GLOBALS.UNIFORMS_DISSOLVER,
-        vertexShader: vshader,
-        fragmentShader: fshader,
-        side: 2,
-        transparent: true,
-        depthWrite: false
-    });
-    
-    console.log(GLOBALS.MATERIAL_DISSOLVER)
-    
-    /*const geometry = new SphereGeometry(1, 32, 32)
-    const cube = new Mesh( geometry, GLOBALS.MATERIAL_DISSOLVER ); 
-    cube.position.set(3,3,3)
-    //
-    GLOBALS.SCENE.add( cube );*/
-//}, 4000);
 
+GLOBALS.MATERIAL_DISSOLVER = new ShaderMaterial({
+  uniforms: GLOBALS.UNIFORMS_DISSOLVER,
+  vertexShader: vshader,
+  fragmentShader: fshader,
+  side: 2,
+  transparent: true,
+  depthWrite: false
+});
+
+/*const geometry = new SphereGeometry(1, 32, 32)
+const cube = new Mesh( geometry, GLOBALS.MATERIAL_DISSOLVER );
+cube.position.set(3,3,3)
+//
+GLOBALS.SCENE.add( cube );*/
+//}, 4000);

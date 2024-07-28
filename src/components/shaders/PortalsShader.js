@@ -1,5 +1,10 @@
-import * as THREE from 'three';
-import { GLOBALS } from '../../../Globals';
+import {
+    ShaderMaterial,
+    Vector2,
+    Mesh,
+    CircleGeometry
+} from 'three';
+import { GLOBALS } from '../../Globals';
 
 var width = window.innerWidth,
     height = window.innerHeight;
@@ -102,14 +107,14 @@ void main( )
 
 const generateMeshPortalShader = () => {
 
-    var mat = new THREE.ShaderMaterial({
+    var mat = new ShaderMaterial({
         uniforms: {
             iTime: {
                 type: 'f',
                 value: 0.1
             },
             resolution: {
-                value: new THREE.Vector2(width, height)
+                value: new Vector2(width, height)
             },
             iPortal: {
                 value: 0
@@ -124,21 +129,22 @@ const generateMeshPortalShader = () => {
         transparent: true,
         polygonOffset: true,
             polygonOffsetFactor: -10,
+            depthWrite: false
     });
 
-    var planegeometry = new THREE.CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
-    var plane = new THREE.Mesh(planegeometry, mat);
+    var planegeometry = new CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
+    var plane = new Mesh(planegeometry, mat);
     plane.name = "portal-0";
     GLOBALS.PORTAL_SHADER[0] = plane;
 
-    var mat2 = new THREE.ShaderMaterial({
+    var mat2 = new ShaderMaterial({
         uniforms: {
             iTime: {
                 type: 'f',
                 value: 0.1
             },
             resolution: {
-                value: new THREE.Vector2(width, height)
+                value: new Vector2(width, height)
             },
             iPortal: {
                 value: 1
@@ -153,10 +159,11 @@ const generateMeshPortalShader = () => {
         transparent: true,
         polygonOffset: true,
             polygonOffsetFactor: -10,
+            depthWrite: false
     });
 
-    var planegeometry = new THREE.CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
-    var plane = new THREE.Mesh(planegeometry, mat2);
+    var planegeometry = new CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
+    var plane = new Mesh(planegeometry, mat2);
     plane.name = "portal-1";
     GLOBALS.PORTAL_SHADER[1] = plane;
 };

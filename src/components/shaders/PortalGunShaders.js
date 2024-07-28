@@ -1,5 +1,13 @@
-import * as THREE from 'three';
-import { GLOBALS } from '../../../Globals';
+import {
+    Vector2,
+    Vector3,
+    TextureLoader,
+    SphereGeometry,
+    MeshBasicMaterial,
+    ShaderMaterial,
+    Mesh
+} from 'three';
+import { GLOBALS } from '../../Globals';
 
 const vshader = `
 varying vec2 vUv; 
@@ -66,24 +74,24 @@ GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY = {
     },
     iColor: {
         type: 'v3',
-        value: new THREE.Vector3(1.0, 0.25, 0.0)
+        value: new Vector3(1.0, 0.25, 0.0)
     },
     resolution: {
         type: "v2",
-        value: new THREE.Vector2(10, 1)
+        value: new Vector2(10, 1)
     },
     iChannel0: {
         type: "t",
-        value: new THREE.TextureLoader().load('./assets/textures/shaders/energy2.png'),
+        value: new TextureLoader().load('./assets/textures/shaders/energy2.png'),
     },
 };
 
-//const geometry = new THREE.PlaneGeometry( 10, 1);
-//const geometry = new THREE.CylinderGeometry( 5, 5, 20, 32 );  
-const geometry = new THREE.SphereGeometry( 15, 32, 16 ); 
-const material2 = new THREE.MeshBasicMaterial( { color: 0xffff00 } ); 
+//const geometry = new PlaneGeometry( 10, 1);
+//const geometry = new CylinderGeometry( 5, 5, 20, 32 );  
+const geometry = new SphereGeometry( 15, 32, 16 ); 
+const material2 = new MeshBasicMaterial( { color: 0xffff00 } ); 
 
-GLOBALS.MATERIAL_GUN = new THREE.ShaderMaterial({
+GLOBALS.MATERIAL_GUN = new ShaderMaterial({
     uniforms: GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY,
     vertexShader: vshader,
     fragmentShader: fshader,
@@ -92,4 +100,4 @@ GLOBALS.MATERIAL_GUN = new THREE.ShaderMaterial({
     opacity: 0
 });
 
-const sphere = new THREE.Mesh( geometry, GLOBALS.MATERIAL_GUN );
+const sphere = new Mesh( geometry, GLOBALS.MATERIAL_GUN );

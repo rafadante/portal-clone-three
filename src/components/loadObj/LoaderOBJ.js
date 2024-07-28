@@ -1,4 +1,23 @@
-import * as THREE from 'three';
+import {
+    LoadingManager,
+    Box3,
+    MeshBasicMaterial,
+    Color,
+    PointLight,
+    Vector3,
+    Group,
+    MathUtils,
+    Bone,
+    SRGBColorSpace,
+    PlaneGeometry,
+    Mesh,
+    TextureLoader,
+    BoxGeometry,
+    Object3D,
+    AnimationMixer,
+    DynamicDrawUsage,
+    InstancedMesh
+} from 'three';
 import {
     GLTFLoader
 } from 'three/addons/loaders/GLTFLoader.js';
@@ -15,13 +34,10 @@ import {
 } from '../../Main.js';
 import {
     loadLevelJSON
-} from '../menuShader/MenuShader.js';
+} from '../mainMenu/MainMenu.js';
 import {
     GLOBALS
 } from '../../Globals.js';
-import {
-    FBXLoader
-} from 'three/addons/loaders/FBXLoader.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
 async function handleZip(path, obj) {
@@ -87,8 +103,6 @@ async function handleZip(path, obj) {
                     loadLightEmissiveManager(result.scene)
                 else if (obj == "loadLightStripe")
                     loadLightStripeManager(result.scene)
-                else if (obj == "loadElevatorRoom")
-                    loadElevatorRoomManager(result.scene)
                 else if (obj == "loadLaserField")
                     loadLaserFieldManager(result.scene)
                 else if (obj == "loadFizzler")
@@ -100,12 +114,12 @@ async function handleZip(path, obj) {
     });
 }
 
-const manager = new THREE.LoadingManager();
+const manager = new LoadingManager();
 const loader = new GLTFLoader(manager).setPath('./assets');
 
 function loadCube() {
 
-    var bb = new THREE.Box3()
+    var bb = new Box3()
     bb.setFromObject(GLOBALS.CUBES);
     bb.getCenter(GLOBALS.CONTROLS.target);
 
@@ -127,7 +141,7 @@ function loadWindowIMG() {
 
             if (child.material) {
                 var map = child.material.map;
-                child.material = new THREE.MeshBasicMaterial();
+                child.material = new MeshBasicMaterial();
                 child.material.map = map;
                 child.material.polygonOffset = true;
                 child.material.polygonOffsetFactor = -1;
@@ -153,16 +167,15 @@ function loadWindowManager(scene) {
 
     scene.traverse(child => {
         if (child.name.includes("Cube")) {
-            //child.receiveShadow = true;
             child.castShadow = true;
-            child.material = new THREE.MeshBasicMaterial({
-                color: new THREE.Color(0x000000)
+            child.material = new MeshBasicMaterial({
+                color: new Color(0x000000)
             })
         }
 
         if (child.name == "room_light") {
-            const light = new THREE.PointLight(0xffffff, 50, 3);
-            var target = new THREE.Vector3(); // create once an reuse it
+            const light = new PointLight(0xffffff, 50, 3);
+            var target = new Vector3(); // create once an reuse it
             child.getWorldPosition(target);
             light.position.copy(target);
             light.translateY(-0.2);
@@ -182,9 +195,7 @@ function loadWindowManager(scene) {
     scene.visible = false;
     scene.name = "OBSERVATION_ROOM";
     GLOBALS.SCENE_CHILDREN.add(scene);
-
     GLOBALS.SPOTLIGHT.target = scene.getObjectByName("lightTarget");
-
     GLOBALS.OBSERVATION_ROOM = scene;
     GLOBALS.OBSERVATION_ROOM.add(GLOBALS.LIGHT_GROUP);
     loadGun();
@@ -196,20 +207,17 @@ function loadGun() {
 
 function loadGunManager(scene) {
 
-    GLOBALS.GUN = new THREE.Group();
+    GLOBALS.GUN = new Group();
     GLOBALS.GUN.visible = false;
 
-    var newGroup = new THREE.Group();
+    var newGroup = new Group();
 
     GLOBALS.GUN.add(newGroup);
     newGroup.add(scene);
 
-    var cube_1, cube_2, cube_3;
-
-    GLOBALS.GUN_CLONE = new THREE.Group();
+    GLOBALS.GUN_CLONE = new Group();
     var gunClone = scene.clone();
-    //gunClone.rotation.y = THREE.MathUtils.degToRad(38);
-    gunClone.rotation.x = THREE.MathUtils.degToRad(10);
+    gunClone.rotation.x = MathUtils.degToRad(10);
     gunClone.position.set(-0.05, 0.075, -0.1)
     GLOBALS.GUN_CLONE.add(gunClone);
 
@@ -217,86 +225,35 @@ function loadGunManager(scene) {
 
     scene.traverse(child => {
         child.castShadow = true;
+        child.layers.mask = 2;
+        child.renderOrder = 100;
         if (child.material) {
             child.receiveShadow = true;
             child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.5;
-
-            /*child.material.stencilWrite= true // stencil optimization, only for culling portal
-            child.material.stencilFunc= THREE.EqualStencilFunc
-            child.material.stencilRef= 1
-            child.material.stencilFail= THREE.ReplaceStencilOp
-            child.material.depthTest= true
-            child.material.depthWrite= false
-            child.material.polygonOffset= true
-            child.material.polygonOffsetFactor= -1*/
         }
 
-        /*child.onAfterRender = function (renderer) {
-            renderer.clearStencil();
-        };*/
-
-        //child.renderOrder = 999;
-
-        if (child.name == "sphere")
+        if (child.name == "sphere") {
             GLOBALS.GUN_SPHERE = child;
-        else if (child.name == "cylinder")
+            GLOBALS.SELECTED_FOR_BLOOM.add(child)
+        } else if (child.name == "cylinder") {
             GLOBALS.GUN_CYLINDER = child;
-        else if (child.name == "cube_1") {
-            //child.scale.set(0.01,0.01,0.01)
-            //child.material.side = 2;
-            cube_1 = child;
-        } else if (child.name == "cube_2") {
-            //child.scale.set(0.01,0.01,0.01)
-            //child.material.side = 2;
-            cube_2 = child;
-        } else if (child.name == "cube_3") {
-            //child.scale.set(0.01,0.01,0.01)
-            //child.material.side = 2;
-            cube_3 = child;
+            GLOBALS.SELECTED_FOR_BLOOM.add(child)
         } else if (child.name == "cube_4")
             window.gun_holder = child;
         else if (child.name == "cube_5")
             GLOBALS.PORTAL_GUN_FLASH = child;
-
     });
 
     GLOBALS.GUN.name = "GUN";
     GLOBALS.SCENE.add(GLOBALS.GUN);
-
-    //gltf.scene.position.set(0.12, -0.14, -0.13);
-    scene.scale.set(0.1, 0.1, 0.1)
-    scene.position.set(0.009, -0.013, -0.012);
-    //scene.scale.set(1, 1, 1)
-    //scene.position.set(0.1, -0.13, -0.13);//-0.15
+    //scene.scale.set(0.1, 0.1, 0.1)
+    //scene.position.set(0.009, -0.013, -0.012);
+    scene.scale.set(1, 1, 1)
+    scene.position.set(0.12, -0.16, -0.14);
+    scene.visible = false;
+    console.log(scene)
     loadDoor()
-
-    /*const geometry = new THREE.SphereGeometry(0.01, 32, 16);
-    const material = new THREE.MeshBasicMaterial({
-        color: 0xffff00,
-    });
-    const sphere = new THREE.Mesh(geometry, material);
-    const sphere1 = sphere.clone();
-    sphere1.name = "sphere1";
-    const sphere2 = sphere.clone();
-    sphere2.name = "sphere2";
-    const sphere3 = sphere.clone();
-    sphere3.name = "sphere3";
-
-    var target = new THREE.Vector3(); // create once an reuse it
-    cube_1.getWorldPosition(target);
-    sphere1.position.copy(target)
-    GLOBALS.GUN.children[0].children[0].add(sphere1)
-
-    var target = new THREE.Vector3(); // create once an reuse it
-    cube_2.getWorldPosition(target);
-    sphere2.position.copy(target)
-    GLOBALS.GUN.children[0].children[0].add(sphere2)
-
-    var target = new THREE.Vector3(); // create once an reuse it
-    cube_3.getWorldPosition(target);
-    sphere3.position.copy(target)
-    GLOBALS.GUN.children[0].children[0].add(sphere3)*/
 }
 
 function loadDoor() {
@@ -318,26 +275,22 @@ function loadEnterDoor(scene) {
     GLOBALS.SCENE_CHILDREN.add(door);
 
     //
-    const geometry = new THREE.PlaneGeometry(2, 2);
-    const material = new THREE.MeshBasicMaterial({
+    const geometry = new PlaneGeometry(2, 2);
+    const material = new MeshBasicMaterial({
         color: 0xffff00,
         side: 2,
         visible: false
     });
-    const plane = new THREE.Mesh(geometry, material);
+    const plane = new Mesh(geometry, material);
     door.add(plane);
 
-    const geometry3 = new THREE.BoxGeometry(2, 2, 0.1);
-    const material3 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry3, material3);
+    const geometry3 = new BoxGeometry(2, 2, 0.1);
+    const material3 = new MeshBasicMaterial({ color: 0x00ff00 });
+    const cube = new Mesh(geometry3, material3);
     cube.visible = false;
     door.add(cube);
     door.cube = cube;
     cube.translateZ(0.3);
-
-    var map2 = new THREE.TextureLoader().load('./assets/textures/door.jpg');
-    //map.flipY = false;
-    map2.colorSpace = THREE.SRGBColorSpace;
 
     door.traverse(child => {
 
@@ -345,24 +298,16 @@ function loadEnterDoor(scene) {
         child.userData.ground = false;
         child.userData.ceiling = false;
 
-        if (child.isBone) {
-            if (child.name == "portal_door_right_04") {
-                child.scale.set(0, 0, 0);
-            } else if (child.name == "portal_door_left_06") {
-                child.scale.set(0, 0, 0);
-            }
-        }
-
         if (child.material) {
             child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.5;
-            /*child.material.map = map2;
 
-            if(child.material.name == "portal_door_02"){
-                child.material.emissiveMap = null;
-                child.material.emissiveIntensity = 0;
-            }*/
+            if (child.name.includes("dif")) {
+                child.material = new MeshBasicMaterial();
+                child.material.color = new Color(0x000000);
+            }
         }
+
     })
     //
     GLOBALS.EXIT_DOOR = SkeletonUtils.clone(GLOBALS.ENTER_DOOR);
@@ -374,25 +319,16 @@ function loadEnterDoor(scene) {
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.EXIT_DOOR);
     GLOBALS.EXIT_DOOR.namePosition = GLOBALS.EXIT_DOOR.position.x + "/" + GLOBALS.EXIT_DOOR.position.y + "/" + GLOBALS.EXIT_DOOR.position.z;
     //
-    var map = new THREE.TextureLoader().load('./assets/exit.jpg');
-    //map.flipY = false;
-    map.colorSpace = THREE.SRGBColorSpace;
+    var map = new TextureLoader().load('./assets/exit.jpg');
+    map.colorSpace = SRGBColorSpace;
 
-    const geometryExitDoor = new THREE.PlaneGeometry(1, 1);
-    const materialExitDoor = new THREE.MeshBasicMaterial({ map: map });
-    const planeExitDoor = new THREE.Mesh(geometryExitDoor, materialExitDoor);
-    planeExitDoor.position.set(0, 1.5, 0.01)
+    const geometryExitDoor = new PlaneGeometry(1, 1);
+    const materialExitDoor = new MeshBasicMaterial({ map: map });
+    const planeExitDoor = new Mesh(geometryExitDoor, materialExitDoor);
+    planeExitDoor.position.set(0, 1.3, 0.01)
     planeExitDoor.scale.set(1, 0.5, 1)
     GLOBALS.EXIT_DOOR.add(planeExitDoor);
 
-
-    //
-    door.getObjectByName("warning").material = new THREE.MeshStandardMaterial();
-    var map = new THREE.TextureLoader().load('./assets/enter.jpg');
-    map.flipY = false;
-    map.colorSpace = THREE.SRGBColorSpace;
-    door.getObjectByName("warning").material.map = map;
-    //
     loadCorridor()
 }
 
@@ -403,7 +339,6 @@ function loadCorridor() {
 function loadCorridorEnter(scene) {
 
     var corridor = scene.clone();
-    corridor.position.z = -0.99;
     corridor.visible = false;
 
     corridor.traverse(child => {
@@ -411,7 +346,7 @@ function loadCorridorEnter(scene) {
             child.material.envMap = GLOBALS.ENV_MAP;
 
             if (child.material.name == "lambert5")
-                child.material = new THREE.MeshBasicMaterial()
+                child.material = new MeshBasicMaterial()
 
             if (child.name == "back")
                 GLOBALS.WALL_CORRIDOR_BACK = child;
@@ -447,10 +382,10 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity) {
     var geometry = scene.children[0].geometry.clone();
     geometry.computeVertexNormals();
 
-    var item = new THREE.InstancedMesh(geometry, scene.children[0].material.clone(), 20);
-    item.instanceMatrix.setUsage(THREE.DynamicDrawUsage); // will be updated every frame
+    var item = new InstancedMesh(geometry, scene.children[0].material.clone(), 20);
+    item.instanceMatrix.setUsage(DynamicDrawUsage); // will be updated every frame
 
-    var clone = new THREE.Object3D();
+    var clone = new Object3D();
 
     for (var i = 0; i < 20; i++) {
         clone.scale.set(0, 0, 0);
@@ -496,9 +431,10 @@ function loadPortalSphereManager(scene) {
     item.userData.ceiling = false;
     item.scene = scene.children[0];
     item.userData.obj = scene.children[0];
-    /*item.userData.obj.children[0].material.envMap = GLOBALS.ENV_MAP;
-    item.userData.obj.children[0].material.envMapIntensity = 0.5;
-    item.userData.obj.children[0].material.roughness = 0.2;*/
+    item.userData.obj.material.envMap = GLOBALS.ENV_MAP;
+    item.userData.obj.material.envMapIntensity = 0.5;
+    item.userData.obj.material.roughness = 0.2;
+    
     loadHalfWindow()
 }
 
@@ -520,36 +456,27 @@ function loadWindowHalfManager(scene) {
     scene.traverse(child => {
         child.receiveShadow = true;
         child.castShadow = true;
-        if (child.material) {
-            //child.material.envMap = GLOBALS.ENV_MAP;
-            //child.material.envMapIntensity = 1;
-        }
 
         if (child.name.includes("Cube")) {
-            //child.receiveShadow = true;
             child.castShadow = true;
         }
 
         if (child.name == "room_light") {
-            const light = new THREE.PointLight(0xffffff, 5, 25);
-            var target = new THREE.Vector3(); // create once an reuse it
+            const light = new PointLight(0xffffff, 5, 25);
+            var target = new Vector3(); // create once an reuse it
             child.getWorldPosition(target);
             light.position.copy(target);
-            //light.translateY(-0.2);
             scene.add(light);
-            light.position.set(0,-1,-0.8)
+            light.position.set(0, -1, -0.8)
             light.shadow.bias = -0.01;
             light.castShadow = true;
             light.name = "pointLight";
         }
 
         if (child.name.includes("vidro")) {
-            //child.renderOrder = -1;
             child.visible = false;
             child.material.side = 2;
             child.material.envMap = GLOBALS.ENV_MAP;
-            //child.receiveShadow = false;
-            //hild.castShadow = false;
             child.material.envMapIntensity = 0.5;
             child.material.roughness = 0.3;
         }
@@ -655,9 +582,9 @@ function loadCameraManager(scene) {
             child.material.roughness = 0.2;
 
             if (child.name == "Sphere") {
-                child.material = new THREE.MeshBasicMaterial();
+                child.material = new MeshBasicMaterial();
                 child.material.roughness = 0;
-                child.material.color = new THREE.Color(0xf70022);
+                child.material.color = new Color(0xf70022);
             }
         }
     })
@@ -837,64 +764,9 @@ function loadLightStripeManager(scene) {
     item.userData.ground = true;
     item.userData.ceiling = true;
 
-    loadElevatorRoom()
-}
-
-function loadElevatorRoom() {
-    handleZip('./assets/3ds/exit_room.zip', "loadElevatorRoom");
-}
-
-function loadElevatorRoomManager(scene) {
-
-    scene.name = "exit_room";
-    GLOBALS.EXIT_ROOM = scene;
-
-    //GLOBALS.SCENE_CHILDREN.add(scene)
-    GLOBALS.EXIT_ROOM.visible = false;
-
-    scene.traverse(child => {
-        //child.receiveShadow = true;
-        //child.castShadow = true;
-        if (child.material) {
-            child.material.envMap = GLOBALS.ENV_MAP;
-            //child.material.envMapIntensity = 0.5;
-            //child.material.roughness = 0.2;
-        }
-
-        if (child.name == "shader") {
-            child.material = GLOBALS.MATERIAL_EXIT_ROOM;
-            child.material.side = 1;
-        } else if (child.name == "ground") {
-            child.material.roughness = 1;
-        } else if (child.name == "trigger") {
-            child.visible = false;
-            GLOBALS.ELEVATOR_TRIGGER = child;
-        } else if (child.name == "door") {
-            child.visible = false;
-            GLOBALS.ELEVATOR = child;
-        }
-
-        if (child.name.includes("col")) {
-            child.visible = false;
-            GLOBALS.EXIT_ROOM_COLLIDERS.push(child)
-        }
-
-
-        if (child.isBone && child.name == "spinnydoor_left_06") {
-            GLOBALS.ELEVATOR_DOOR_LEFT = child;
-            child.rotation.y = Math.PI / 3;
-        }
-
-        if (child.isBone && child.name == "spinnydoor_right_08") {
-            GLOBALS.ELEVATOR_DOOR_RIGHT = child;
-            child.rotation.y = -Math.PI / 3;
-        }
-    })
-
     loadAvatar();
 }
 
-const fbxLoader = new FBXLoader();
 const gltfLoader = new GLTFLoader();
 
 function loadAvatar() {
@@ -916,8 +788,7 @@ function loadAvatar() {
         const fbx = glb.scene;
 
         fbx.scale.setScalar(0.015);
-        GLOBALS.MIXERS = new THREE.AnimationMixer(fbx)
-        //fbx.visible = false;
+        GLOBALS.MIXERS = new AnimationMixer(fbx)
 
         fbx.traverse(c => {
             c.castShadow = true;
@@ -971,8 +842,8 @@ function loadAvatar() {
 
     // modify bone update function to also update its world matrix
     // possibly do this only to skeletons you need it for, not for all bones
-    var update = THREE.Bone.prototype.update;
-    THREE.Bone.prototype.update = function (parentSkinMatrix, forceUpdate) {
+    var update = Bone.prototype.update;
+    Bone.prototype.update = function (parentSkinMatrix, forceUpdate) {
         update.call(this, parentSkinMatrix, forceUpdate);
         this.updateMatrixWorld(true);
     };
@@ -1033,12 +904,12 @@ function loadPortalCubeManager2(scene) {
     animate();
 }
 
-GLOBALS.LIGHT_PORTAL_0 = new THREE.PointLight(new THREE.Color(1, 0.25, 0), 3, 2);
-GLOBALS.LIGHT_PORTAL_1 = new THREE.PointLight(new THREE.Color(0, 0.3, 1), 3, 2);
+GLOBALS.LIGHT_PORTAL_0 = new PointLight(new Color(1, 0.25, 0), 3, 2);
+GLOBALS.LIGHT_PORTAL_1 = new PointLight(new Color(0, 0.3, 1), 3, 2);
 GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
 GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
 
-GLOBALS.FLASH = new THREE.PointLight(0xff0000, 10);
+GLOBALS.FLASH = new PointLight(0xff0000, 10);
 GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
 
 setTimeout(() => {

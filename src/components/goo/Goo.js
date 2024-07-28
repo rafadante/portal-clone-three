@@ -1,4 +1,20 @@
-import * as THREE from 'three';
+import {
+    Group,
+    PlaneGeometry,
+    Matrix4,
+    Mesh,
+    Object3D,
+    MeshBasicMaterial,
+    Color,
+    TextureLoader,
+    RepeatWrapping,
+    Vector3,
+    Box3,
+    Quaternion,
+    Clock,
+    SRGBColorSpace,
+    ShaderMaterial
+} from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import {
     GLOBALS
@@ -6,7 +22,7 @@ import {
 import {
     Water
 } from '../Water.js';
-import { roughness } from 'three/examples/jsm/nodes/Nodes.js';
+import { getPlaneByName } from '../../Utils.js';
 
 var GOO = null;
 var water, lava;
@@ -15,7 +31,7 @@ var water2 = [];
 const AddGoo = function (found, loading) {
 
     if (GOO == null) {
-        GOO = new THREE.Group();
+        GOO = new Group();
         GLOBALS.SCENE_CHILDREN.add(GOO);
     }
 
@@ -57,8 +73,8 @@ const AddGoo = function (found, loading) {
 
         /*
     
-        const geometry = new THREE.PlaneGeometry(2, 2);
-        const plane = new THREE.Mesh(geometry, material);
+        const geometry = new PlaneGeometry(2, 2);
+        const plane = new Mesh(geometry, material);
         plane.rotation.x = -Math.PI / 2;
     
         for (var i = 0; i < goo.length; i++) {
@@ -70,14 +86,14 @@ const AddGoo = function (found, loading) {
 
         //
 
-        /*var mesh = new THREE.InstancedMesh(geometry.clone(), material, goo.length);
+        /*var mesh = new InstancedMesh(geometry.clone(), material, goo.length);
         mesh.receiveShadow = true;
         mesh.frustumCulled = false;
         GOO.add(mesh);
     
         for (var i = 0; i < goo.length; i++) {
     
-            var dummy = new THREE.Object3D();
+            var dummy = new Object3D();
     
             dummy.rotation.set(0, 0, 0);
             dummy.rotation.x = -Math.PI / 2;
@@ -94,22 +110,22 @@ const AddGoo = function (found, loading) {
         //------------------------
 
         /*goo = [
-            new THREE.Vector3(7,0,5),
-            new THREE.Vector3(7,0,7),
-            new THREE.Vector3(7,0,3)]*/
+            new Vector3(7,0,5),
+            new Vector3(7,0,7),
+            new Vector3(7,0,3)]*/
     } else {
         goo = found;
     }
 
-    const geometry = new THREE.PlaneGeometry(2, 2);
+    const geometry = new PlaneGeometry(2, 2);
     const geometries = [];
-    const matrix = new THREE.Matrix4();
+    const matrix = new Matrix4();
 
     GLOBALS.GOO_PLANES.push(goo)
 
     for (let i = 0; i < goo.length; i++) {
 
-        var dummy = new THREE.Object3D();
+        var dummy = new Object3D();
 
         dummy.rotation.set(0, 0, 0);
         dummy.rotation.x = -Math.PI / 2;
@@ -130,22 +146,22 @@ const AddGoo = function (found, loading) {
 
     const mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries);
 
-    // mergedGeometry.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI))
+    // mergedGeometry.applyMatrix4(new Matrix4().makeRotationX(Math.PI))
 
-    lava = new THREE.Mesh(mergedGeometry, new THREE.MeshBasicMaterial({color: new THREE.Color(0x7c3f00)})); //material
+    lava = new Mesh(mergedGeometry, new MeshBasicMaterial({color: new Color(0x7c3f00)})); //material
 
-    const waterGeometry = new THREE.PlaneGeometry(1000, 1000);
+    const waterGeometry = new PlaneGeometry(1000, 1000);
 
     water = new Water(
         mergedGeometry, {
             textureWidth: 512,
             textureHeight: 512,
-            waterNormals: new THREE.TextureLoader().load('assets/textures/waternormals.jpg', function (texture) {
+            waterNormals: new TextureLoader().load('assets/textures/waternormals.jpg', function (texture) {
 
-                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                texture.wrapS = texture.wrapT = RepeatWrapping;
 
             }),
-            sunDirection: new THREE.Vector3(),
+            sunDirection: new Vector3(),
             sunColor: 0xffffff,
             waterColor: 0x001e0f,
             distortionScale: 0.4,
@@ -165,7 +181,7 @@ const AddGoo = function (found, loading) {
     GOO.add(water);
     GOO.add(lava);
 
-    var bb = new THREE.Box3(); // for re-use
+    var bb = new Box3(); // for re-use
     bb.setFromObject(lava);
     bb.max.y += 0.2;
 
@@ -179,9 +195,9 @@ const AddGoo = function (found, loading) {
 
 const randomizeMatrix = function () {
 
-    const position = new THREE.Vector3();
-    const quaternion = new THREE.Quaternion();
-    const scale = new THREE.Vector3();
+    const position = new Vector3();
+    const quaternion = new Quaternion();
+    const scale = new Vector3();
 
     return function (matrix) {
 
@@ -259,14 +275,6 @@ function checkSides(userData) {
                 checkSides(userData2[0])
         }
     }
-}
-
-function getPlaneByName(name) {
-    return GLOBALS.PLANE_USER_DATA.filter(
-        function (data) {
-            return data.name == name
-        }
-    );
 }
 
 // Vertex Shader
@@ -347,15 +355,15 @@ const fragmentShader = `
             }
 `;
 
-const textureLoader = new THREE.TextureLoader();
+const textureLoader = new TextureLoader();
 
 const cloudTexture = textureLoader.load( 'lava/cloud.png' );
 const lavaTexture = textureLoader.load( 'lava/lavatile.jpg' );
 
-lavaTexture.colorSpace = THREE.SRGBColorSpace;
+lavaTexture.colorSpace = SRGBColorSpace;
 
-cloudTexture.wrapS = cloudTexture.wrapT = THREE.RepeatWrapping;
-lavaTexture.wrapS = lavaTexture.wrapT = THREE.RepeatWrapping;
+cloudTexture.wrapS = cloudTexture.wrapT = RepeatWrapping;
+lavaTexture.wrapS = lavaTexture.wrapT = RepeatWrapping;
 
 var uniforms = {
     iTime: {
@@ -363,7 +371,7 @@ var uniforms = {
     }
 };
 
-const material = new THREE.ShaderMaterial({
+const material = new ShaderMaterial({
 
     uniforms: uniforms,
     vertexShader: vertexShader,
@@ -373,8 +381,8 @@ const material = new THREE.ShaderMaterial({
 });
 
 
-var clock = new THREE.Clock();
-var clock2 = new THREE.Clock();
+var clock = new Clock();
+var clock2 = new Clock();
 var delta = 0;
 const interval = 1 / 20;
 

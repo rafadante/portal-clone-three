@@ -1,12 +1,16 @@
-import * as THREE from 'three';
+import {
+    Vector3,
+    Mesh,
+    MeshBasicMaterial,
+} from 'three';
 import {
     LightningStrike
 } from '../../LightningStrike.js';
 import { GLOBALS } from '../../Globals.js';
 
 const rayParams1 = {
-    sourceOffset: new THREE.Vector3(),
-    destOffset: new THREE.Vector3(),
+    sourceOffset: new Vector3(),
+    destOffset: new Vector3(),
     radius0: 0.00075,
     radius1: 0.00075,
     minRadius: 25,
@@ -28,8 +32,8 @@ const rayParams1 = {
 }
 
 const rayParams2 = {
-    sourceOffset: new THREE.Vector3(),
-    destOffset: new THREE.Vector3(),
+    sourceOffset: new Vector3(),
+    destOffset: new Vector3(),
     radius0: 0.00075,
     radius1: 0.00075,
     minRadius: 25,
@@ -51,8 +55,8 @@ const rayParams2 = {
 }
 
 const rayParams3 = {
-    sourceOffset: new THREE.Vector3(),
-    destOffset: new THREE.Vector3(),
+    sourceOffset: new Vector3(),
+    destOffset: new Vector3(),
     radius0: 0.00075,
     radius1: 0.00075,
     minRadius: 25,
@@ -79,19 +83,23 @@ let lightningStrikeMesh, lightningStrikeMesh2, lightningStrikeMesh3;
 function recreateRay() {
 
     lightningStrike = new LightningStrike(rayParams1);
-    lightningStrikeMesh = new THREE.Mesh(lightningStrike, new THREE.MeshBasicMaterial({
+    lightningStrikeMesh = new Mesh(lightningStrike, new MeshBasicMaterial({
         color: 0xffffff
     }));
 
     lightningStrike2 = new LightningStrike(rayParams2);
-    lightningStrikeMesh2 = new THREE.Mesh(lightningStrike2, new THREE.MeshBasicMaterial({
+    lightningStrikeMesh2 = new Mesh(lightningStrike2, new MeshBasicMaterial({
         color: 0xffffff
     }));
 
     lightningStrike3 = new LightningStrike(rayParams3);
-    lightningStrikeMesh3 = new THREE.Mesh(lightningStrike3, new THREE.MeshBasicMaterial({
+    lightningStrikeMesh3 = new Mesh(lightningStrike3, new MeshBasicMaterial({
         color: 0xffffff
     }));
+
+    GLOBALS.SELECTED_FOR_BLOOM.add(lightningStrikeMesh);
+    GLOBALS.SELECTED_FOR_BLOOM.add(lightningStrikeMesh2);
+    GLOBALS.SELECTED_FOR_BLOOM.add(lightningStrikeMesh3);
 
     GLOBALS.LIGHTNIN_STRIKE_1 = lightningStrikeMesh;
     lightningStrikeMesh.visible = false;
@@ -101,10 +109,6 @@ function recreateRay() {
 
     GLOBALS.LIGHTNIN_STRIKE_3 = lightningStrikeMesh3;
     lightningStrikeMesh3.visible = false;
-
-    console.log(GLOBALS.LIGHTNIN_STRIKE_1)
-    console.log(GLOBALS.LIGHTNIN_STRIKE_2)
-    console.log(GLOBALS.LIGHTNIN_STRIKE_3)
 
     GLOBALS.LIGHTNIN_STRIKE_1.scale.set(1,1,1)
     GLOBALS.LIGHTNIN_STRIKE_2.scale.set(1,1,1)

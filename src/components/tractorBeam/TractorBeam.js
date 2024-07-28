@@ -1,13 +1,13 @@
-import * as THREE from "three";
-import { tweenCamera } from "../../Main.js";
+import { Vector3 } from "three";
+import { tweenCamera } from "../../Utils.js";
 import { GLOBALS } from "../../Globals.js";
-import { AUDIO,play } from "../audio/Audio.js";
+import { AUDIO, play } from "../audio/Audio.js";
 
 function tractorBeam() {
 
     for (let d of GLOBALS.DYNAMIC_OBJECTS) {
 
-        let pos = new THREE.Vector3(d.position.x, d.position.y - 1, d.position.z);
+        let pos = new Vector3(d.position.x, d.position.y - 1, d.position.z);
 
         if (d.holding) continue;
 
@@ -18,7 +18,7 @@ function tractorBeam() {
         for (var j = 0; j < GLOBALS.TRACTOR_BEAM.length; j++) {
             if (GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j]) {
 
-                if (!GLOBALS.TRACTOR_BEAM[j].item.state){
+                if (!GLOBALS.TRACTOR_BEAM[j].item.state) {
                     continue;
                 }
 
@@ -33,8 +33,6 @@ function tractorBeam() {
 
                     if (d.tractorID != GLOBALS.TRACTOR_BEAM[j].id) {//!d.inTractor
 
-                        console.log(vec)
-
                         if (d.name == "player") {
 
                             AUDIO.PLAYER_INSIDE_TRACTOR_BEAM.currentTime = 0;
@@ -45,7 +43,6 @@ function tractorBeam() {
                             else
                                 document.getElementById("panel-top").style.backgroundColor = "#0035ff4a";
 
-                            console.log(GLOBALS.TRACTOR_BEAM[j])
                             //GLOBALS.MATERIAL_TRACTOR_BEAM.side = 1;
                             //document.getElementById("panel-top").style.background = "";
                             document.getElementById("panel-top").style.opacity = 1;
@@ -72,7 +69,7 @@ function tractorBeam() {
                         d.wakeUp();
 
                         if (!d.inArea) {
-                            var center = new THREE.Vector3(
+                            var center = new Vector3(
                                 Math.abs(Math.abs(vec.x) - 1) * GLOBALS.TRACTOR_BEAM[j].position.x +
                                 d.position.x * Math.abs(vec.x),
                                 Math.abs(Math.abs(vec.y) - 1) * GLOBALS.TRACTOR_BEAM[j].position.y +

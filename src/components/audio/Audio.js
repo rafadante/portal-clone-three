@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { PositionalAudio, AudioListener } from 'three';
 import {
     GLOBALS
 } from '../../Globals.js';
@@ -6,17 +6,12 @@ import {
 var listernAdded = false;
 var listener;
 
-function preLoadAudios() {
-    const audio = new Audio("freejazz.wav");
-}
-
 function play(elem) {
+    return
     var isPlaying = elem.currentTime > 0 && !elem.paused && !elem.ended
         && elem.readyState > elem.HAVE_CURRENT_DATA;
 
-    if (!isPlaying) {
-        //elem.play();
-
+    if (!isPlaying) {//
         // Show loading animation.
         var playPromise = elem.play();
 
@@ -33,17 +28,17 @@ function play(elem) {
     }
 }
 
-function addRadioAudio(path, parent, play, loop, staticPosition, maxDis) {
+function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis) {
 
     if (!listernAdded) {
         listernAdded = true;
         // create an AudioListener and add it to the camera
-        listener = new THREE.AudioListener();
+        listener = new AudioListener();
         GLOBALS.GUN.add(listener);
     }
 
     // create the PositionalAudio object (passing in the listener)
-    const sound = new THREE.PositionalAudio(listener);
+    const sound = new PositionalAudio(listener);
 
     var audioClone = document.getElementById(path).cloneNode(true);
     audioClone.id = "";
@@ -69,8 +64,18 @@ function addRadioAudio(path, parent, play, loop, staticPosition, maxDis) {
     parent.sound = sound;
     GLOBALS.SCENE_FPS.add(sound);
 
-    if (staticPosition) {
+    if (staticPosition)
         sound.position.copy(parent.position);
+}
+
+function addAudio(obj, name) {
+    for (var i = 0; i < obj.length; i++) {
+        if (obj[i].length != 0) {
+            addPositionalAudio(name, obj[i], true, true, true, 4);
+
+            if (name == 'audio-fizzler' || name == 'audio-laser-beam')
+                addPositionalAudio(name, obj[i].cloneLaserField, true, true, true, 4);
+        }
     }
 }
 
@@ -90,7 +95,7 @@ walkLightBridde.playbackRate = 1.5;
 walkLightBridde.pause();
 
 const jump = new Audio('audio/p2_fs_jump_land_tile_01.wav')
-walk.volume = 0.15;
+jump.volume = 0.3;
 
 const playerInsideTractorBeam = new Audio('audio/player_enter_tbeam_lp_01.wav')
 playerInsideTractorBeam.volume = 0.5;
@@ -113,12 +118,6 @@ const hold = new Audio('audio/hold_loop.wav')
 hold.loop = true;
 
 function volume(val) {
-    //ambient.volume = val;
-    //editor.volume = val;
-    //door_move.volume = val;
-
-    //if (sound)
-    //    sound.volume = val;
 }
 
 var AUDIO = {
@@ -142,8 +141,9 @@ var AUDIO = {
 }
 
 export {
-    addRadioAudio,
+    addPositionalAudio,
     AUDIO,
     volume,
-    play
+    play,
+    addAudio
 }

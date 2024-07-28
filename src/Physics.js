@@ -3,7 +3,14 @@ import CannonDebugger from 'cannon-es-debugger';
 import {
     GLOBALS
 } from './Globals.js';
-import * as THREE from 'three';
+import {
+    PlaneGeometry,
+    Mesh,
+    MeshBasicMaterial,
+    Vector3,
+    Object3D,
+    Raycaster
+} from 'three';
 import $ from 'jquery';
 
 // return the cannon world
@@ -47,8 +54,8 @@ jointBody.collisionFilterMask = 0
 world.addBody(jointBody)
 
 // Movement plane when dragging
-const planeGeometry = new THREE.PlaneGeometry(100, 100)
-movementPlane = new THREE.Mesh(planeGeometry, new THREE.MeshBasicMaterial())
+const planeGeometry = new PlaneGeometry(100, 100)
+movementPlane = new Mesh(planeGeometry, new MeshBasicMaterial())
 movementPlane.visible = false // Hide it..
 
 const cannonDebugger = new CannonDebugger(GLOBALS.SCENE, world, {
@@ -61,13 +68,13 @@ const cannonDebugger = new CannonDebugger(GLOBALS.SCENE, world, {
     }
 })
 
-var coords = new THREE.Vector3();
-var raycaster = new THREE.Raycaster();
+var coords = new Vector3();
+var raycaster = new Raycaster();
 
 function updatePhysics() {
     if (GLOBALS.HOLDING_ITEM) {
         // Project the mouse onto the movement plane
-        var hitPoint = new THREE.Vector3(); // create once an reuse it
+        var hitPoint = new Vector3(); // create once an reuse it
         GLOBALS.MAIN_CAMERA.getObjectByName("cubeHolder").getWorldPosition(hitPoint);
 
         var portalInFront = false;
@@ -92,7 +99,7 @@ function updatePhysics() {
 
                 var point = intersectWall[0].point;
 
-                var pLocal = new THREE.Vector3(0, 0, -1);
+                var pLocal = new Vector3(0, 0, -1);
                 var pWorld = pLocal.applyMatrix4(GLOBALS.MAIN_CAMERA.matrixWorld);
                 var dir = pWorld.sub(GLOBALS.MAIN_CAMERA.position).normalize();
 
@@ -118,8 +125,6 @@ function updatePhysics() {
 
         var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(property);
 
-
-
         if (property == "gel_gun_blue" || property == "gel_gun_orange" || property == "gel_gun_white" ||
             property == "pedestal_button" || property == "button_weight" || property == "button_box" ||
             property == "button_circle" || property == "dispenser" || property == "ramp" ||
@@ -139,16 +144,15 @@ function updatePhysics() {
                         GLOBALS.DYMANIC_ITEMS[property][i].body.sound.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
                     }
                 }
-                
 
                 if (property == "tractor_beam") {
                     if (GLOBALS.DYMANIC_ITEMS[property][i].state) {
-                        var dir = new THREE.Vector3(); // create once and reuse it
+                        var dir = new Vector3(); // create once and reuse it
                         dir.copy(GLOBALS.DYMANIC_ITEMS[property][i].up).applyQuaternion(GLOBALS.DYMANIC_ITEMS[property][i].quaternion);
 
-                        var val = -0.05;
+                        var val = 0.05;
                         if (GLOBALS.DYMANIC_ITEMS[property][i].reversed)
-                            val = 0.05;
+                            val = -0.05;
 
                         if (Math.round(Math.abs(dir.z)) == 1)
                             GLOBALS.DYMANIC_ITEMS[property][i].rotation.y += val;
@@ -157,7 +161,7 @@ function updatePhysics() {
                         else if (Math.round(Math.abs(dir.y)) == 1)
                             GLOBALS.DYMANIC_ITEMS[property][i].rotation.y += val;
 
-                        var item = new THREE.Object3D();
+                        var item = new Object3D();
                         item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].position);
                         item.rotation.copy(GLOBALS.DYMANIC_ITEMS[property][i].rotation);
 
@@ -167,12 +171,7 @@ function updatePhysics() {
                         instanced.computeBoundingSphere();
                     }
                 } else {
-                    /*if (property == "radio") {
-                        GLOBALS.RADIO_MUSIC[i].position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
-                        GLOBALS.RADIO_MUSIC[i].quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
-                    }*/
-
-                    var item = new THREE.Object3D();
+                    var item = new Object3D();
                     item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
                     item.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
 
@@ -191,8 +190,6 @@ function updatePhysics() {
             GLOBALS.CAMERAS[i].quaternion.copy(GLOBALS.CAMERAS[i].body.quaternion);
             GLOBALS.CAMERAS[i].cube.position.copy(GLOBALS.CAMERAS[i].body.position);
             GLOBALS.CAMERAS[i].cube.quaternion.copy(GLOBALS.CAMERAS[i].body.quaternion);
-            //GLOBALS.CAMERAS[i].translateY(-0.22);
-            //GLOBALS.CAMERAS[i].translateZ(-0.1);
         }
     }
 

@@ -1,29 +1,39 @@
-/* eslint-disable */
-import * as THREE from 'three';
+import {
+    Group,
+    PlaneGeometry,
+    MeshBasicMaterial,
+    DoubleSide,
+    Mesh,
+    Object3D,
+    Vector3,
+    CircleGeometry,
+    Matrix4
+} from 'three';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import {
     GLOBALS
 } from '../../Globals.js';
 
 var visited = {};
 var shapes = [];
-var scene = new THREE.Group();
-var dgraph;
-
+var scene = new Group();
+var dgraph,lineFollow,count;
+var isDrawStart = false;
 
 function findPath(ini, target, found) {
 
     var nodes = [];
 
     //
-    const geometryCheck = new THREE.PlaneGeometry(0.5, 0.5);
-    const materialCheck = new THREE.MeshBasicMaterial({
+    const geometryCheck = new PlaneGeometry(0.5, 0.5);
+    const materialCheck = new MeshBasicMaterial({
         color: 0x03e8fc,
-        side: THREE.DoubleSide,
+        side: DoubleSide,
         polygonOffset: true,
         polygonOffsetFactor: -7,
         map: GLOBALS.IMG_CLOSE,
     });
-    const plane = new THREE.Mesh(geometryCheck, materialCheck);
+    const plane = new Mesh(geometryCheck, materialCheck);
     GLOBALS.SCENE_CHILDREN.add(plane);
 
     var side = true;
@@ -60,7 +70,7 @@ function findPath(ini, target, found) {
     var dmap = {};
 
     for (var j = 0; j < nodes.length; j++) { //making the map for the shapes
-        var obj = new THREE.Object3D;
+        var obj = new Object3D;
         obj.position.copy(nodes[j].position);
         obj.rotation.copy(nodes[j].rotation);
         obj.name = nodes[j].name;
@@ -126,7 +136,7 @@ function path2(dgraph, start, end, side) {
 
         if (points[j - 1].distanceTo(points[j]) != 2) {
 
-            var dir = new THREE.Vector3(); // create once an reuse it
+            var dir = new Vector3(); // create once an reuse it
             dir.subVectors(points[j], points[j - 1]).normalize();
 
             if (direction.z != 0) {
@@ -149,12 +159,12 @@ function path2(dgraph, start, end, side) {
             pathPoints.push(points[j])
         }
 
-        var direction = new THREE.Vector3(); // create once an reuse it
+        var direction = new Vector3(); // create once an reuse it
         direction.subVectors(pathPoints[j - 1], points[j]).normalize();
     }
 
     //
-    var dir = new THREE.Vector3(); // create once an reuse it
+    var dir = new Vector3(); // create once an reuse it
     dir.subVectors(pathPoints[pathPoints.length - 2], pathPoints[pathPoints.length - 1]).normalize();
 
     if (side) {
@@ -173,8 +183,8 @@ function path2(dgraph, start, end, side) {
     const numberOfCircles = totalLength * 4;
 
     // Create circles evenly spaced along the path
-    const circleGeometry = new THREE.CircleGeometry(0.05, 32);
-    const circleMaterial = new THREE.MeshBasicMaterial({
+    const circleGeometry = new CircleGeometry(0.05, 32);
+    const circleMaterial = new MeshBasicMaterial({
         side: 2,
         color: 0x03e8fc,
         emissiveIntensity: 100,
@@ -193,7 +203,7 @@ function path2(dgraph, start, end, side) {
 
             if (currentDistance + segmentLength >= targetDistance) {
                 const t = (targetDistance - currentDistance) / segmentLength;
-                const point = new THREE.Vector3().lerpVectors(pathPoints[j], pathPoints[j + 1], t);
+                const point = new Vector3().lerpVectors(pathPoints[j], pathPoints[j + 1], t);
 
                 nodesPos.push(point);
                 nodesRot.push(rotPoints[j]);
@@ -205,12 +215,12 @@ function path2(dgraph, start, end, side) {
         }
     }
 
-    const matrix = new THREE.Matrix4();
+    const matrix = new Matrix4();
     const geometries = [];
 
     for (let j = 0; j < nodesPos.length; j++) {
 
-        var dummy = new THREE.Object3D();
+        var dummy = new Object3D();
         dummy.position.copy(nodesPos[j]);
         dummy.rotation.copy(nodesRot[j])
         dummy.updateMatrix();
@@ -226,7 +236,7 @@ function path2(dgraph, start, end, side) {
 
     const mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries);
 
-    var circlePAth = new THREE.Mesh(mergedGeometry, circleMaterial);
+    var circlePAth = new Mesh(mergedGeometry, circleMaterial);
 
     GLOBALS.SCENE_CHILDREN.add(circlePAth);
     GLOBALS.SELECTED_FOR_CONNECTION.circle = circlePAth;

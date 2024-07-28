@@ -1,7 +1,9 @@
-import * as THREE from 'three';
 import {
-    GLOBALS
-} from '../../../Globals';
+    TextureLoader,
+    ShaderMaterial,
+    Vector2
+} from 'three';
+import { GLOBALS } from '../../Globals';
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -130,10 +132,10 @@ void main()
 }
 `;
 
-var background = new THREE.TextureLoader().load('./assets/loading/3.jpg');
-GLOBALS.TEXTURE_MENU_GRID = new THREE.TextureLoader().load('./assets/ui/grid.jpg');
+var background = new TextureLoader().load('./assets/loading/3.jpg');
+GLOBALS.TEXTURE_MENU_GRID = new TextureLoader().load('./assets/ui/grid.jpg');
 
-GLOBALS.MATERIAL_MAIN_MENU = new THREE.ShaderMaterial({
+GLOBALS.MATERIAL_MAIN_MENU = new ShaderMaterial({
     uniforms: {
         iTime: {
             type: 'f',
@@ -141,7 +143,7 @@ GLOBALS.MATERIAL_MAIN_MENU = new THREE.ShaderMaterial({
         },
         resolution: {
             type: "v2",
-            value: new THREE.Vector2(width, height)
+            value: new Vector2(width, height)
         },
         iChannel0: {
             type: "t",
@@ -164,7 +166,7 @@ GLOBALS.MATERIAL_MAIN_MENU = new THREE.ShaderMaterial({
     transparent: true,
 });
 
-GLOBALS.MATERIAL_SUB_MENU = new THREE.ShaderMaterial({
+GLOBALS.MATERIAL_SUB_MENU = new ShaderMaterial({
     uniforms: {
         iTime: {
             type: 'f',
@@ -172,7 +174,7 @@ GLOBALS.MATERIAL_SUB_MENU = new THREE.ShaderMaterial({
         },
         resolution: {
             type: "v2",
-            value: new THREE.Vector2(width, height)
+            value: new Vector2(width, height)
         },
         iChannel0: {
             type: "t",

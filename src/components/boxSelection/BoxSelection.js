@@ -1,15 +1,13 @@
-import * as THREE from 'three';
+import { Color, Mesh, Vector3, BoxGeometry, MeshBasicMaterial, Object3D } from 'three';
 import $ from 'jquery';
 import {
     GLOBALS
 } from '../../Globals.js';
-import {
-    animate
-} from '../../Main.js';
 import { planeInstanceReset, deleteItemInstanced } from '../items/Items.js';
 import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline';
+import { getPlaneByName,warning } from '../../Utils.js';
 
-const orange = new THREE.Color("rgb(255, 165, 0)");
+const orange = new Color("rgb(255, 165, 0)");
 var initialPosition = null;
 var currentID = null;
 
@@ -43,8 +41,6 @@ function raycastSelected(found, event, type) {
             points.push(GLOBALS.SELECTED_FOR_CONNECTION.position);
             points.push(endPos);
 
-            console.log(GLOBALS.PLANE_USER_DATA[instanceId])
-
             const geometry = new MeshLineGeometry()
             geometry.setPoints(points)
             const material = new MeshLineMaterial({
@@ -57,7 +53,7 @@ function raycastSelected(found, event, type) {
             material.uniforms.dashArray.value = 0.01;
             material.uniforms.lineWidth.value = 0.1;
             material.uniforms.useDash.value = 1;
-            const line = new THREE.Mesh(geometry, material)
+            const line = new Mesh(geometry, material)
 
             GLOBALS.SCENE_CHILDREN.add(line);
 
@@ -66,8 +62,6 @@ function raycastSelected(found, event, type) {
                 from: GLOBALS.SELECTED_FOR_CONNECTION,
                 to: GLOBALS.PLANE_USER_DATA[instanceId]
             })
-
-            console.log(GLOBALS.CONNECTIONS)
         }
 
         GLOBALS.ITEM_CUBE.visible = false;
@@ -93,6 +87,10 @@ function raycastSelected(found, event, type) {
 
             $(".hasItem").css("display", "none");
 
+            if (GLOBALS.PLANE_USER_DATA[instanceId].wall) {
+
+            }
+
             if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem) {
                 $("#delete").css("display", "block");
 
@@ -101,7 +99,6 @@ function raycastSelected(found, event, type) {
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_cube"))) {
                     $(".dispenser").css("display", "block");
                     $("#state-dispenser").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.hasDispenser);
-                    console.log(GLOBALS.PLANE_USER_DATA[instanceId].item.opened)
                     $("#dispenser-opened").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.opened);
                 } else {
                     $(".dispenser").css("display", "none");
@@ -109,10 +106,8 @@ function raycastSelected(found, event, type) {
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button")) {
                     $(".buttons").css("display", "block");
-
                     $("#connections").empty();
 
-                    console.log(GLOBALS.PLANE_USER_DATA[instanceId])
                     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
 
                         if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[instanceId].itemName) {
@@ -152,7 +147,6 @@ function raycastSelected(found, event, type) {
                     $("#tractor-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.state)
                     $("#tractor-direction-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.reversed)
                     $("#tractor-trigger").find(".title").text("Triggers: " + GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
-                    console.log("bbbbbbbbbbbbbbbbbb")
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light_bridge")) {
@@ -177,10 +171,9 @@ function raycastSelected(found, event, type) {
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("observation_room") ||
-                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light")) {
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light")) {
                     $(".light-color").css("display", "block");
 
-                    console.log(GLOBALS.PLANE_USER_DATA[instanceId].item.lightColor)
                     $("#ligh-color-input").val(GLOBALS.PLANE_USER_DATA[instanceId].item.lightColor)
                 }
             }
@@ -262,8 +255,6 @@ function raycastSelected(found, event, type) {
                             planeInstanceOld.item.namePosition = planeInstanceNew.position.x + "/" + planeInstanceNew.position.y + "/" + planeInstanceNew.position.z;
                             planeInstanceOld.item.position.copy(planeInstanceNew.position);
 
-                            console.log(planeInstanceOld.item.name)
-
                             if (planeInstanceOld.item.name.includes("camera") ||
                                 planeInstanceOld.item.name.includes("observation"))
                                 planeInstanceOld.item.rotation.set(planeInstanceNew.normal.x, planeInstanceNew.normal.y, planeInstanceNew.normal.z)
@@ -302,9 +293,9 @@ function raycastSelected(found, event, type) {
 
             for (var i = 0; i < GLOBALS.SELECTED_ID_ORANGE.length; i++) {
                 if (GLOBALS.SELECTED_ID_ORANGE[i].portal)
-                    GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID_ORANGE[i].id_instanced, new THREE.Color(0xffffff));
+                    GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID_ORANGE[i].id_instanced, new Color(0xffffff));
                 else
-                    GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID_ORANGE[i].id_instanced, new THREE.Color(0x808080));
+                    GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID_ORANGE[i].id_instanced, new Color(0x808080));
             }
 
             GLOBALS.SELECTED_ID_ORANGE = [];
@@ -324,23 +315,23 @@ function raycastSelected(found, event, type) {
                 var yDir = Math.sign(vec1.y - vec2.y) * (-1);
                 var zDir = Math.sign(vec1.z - vec2.z) * (-1);
 
-                let size = new THREE.Vector3().subVectors(vec2, vec1);
-                let center = new THREE.Vector3().addVectors(vec1, vec2).multiplyScalar(0.5);
+                let size = new Vector3().subVectors(vec2, vec1);
+                let center = new Vector3().addVectors(vec1, vec2).multiplyScalar(0.5);
 
                 let planeWidth = Math.abs(size.x);
                 let planeHeight = Math.abs(size.y);
                 let planeDepth = Math.abs(size.z);
 
-                let planeGeom = new THREE.BoxGeometry(planeWidth, planeHeight, planeDepth);
-                let planeMat = new THREE.MeshBasicMaterial({
-                    color: new THREE.Color("rgb(0, 0, 255)")
+                let planeGeom = new BoxGeometry(planeWidth, planeHeight, planeDepth);
+                let planeMat = new MeshBasicMaterial({
+                    color: new Color("rgb(0, 0, 255)")
                 });
-                var planeSelection = new THREE.Mesh(planeGeom, planeMat);
+                var planeSelection = new Mesh(planeGeom, planeMat);
                 planeSelection.position.copy(center);
 
-                var direction = new THREE.Vector3();
+                var direction = new Vector3();
                 planeSelection.getWorldDirection(direction);
-                direction = new THREE.Vector3(Math.abs(direction.x - 1), Math.abs(direction.y - 1), Math.abs(direction.z - 1))
+                direction = new Vector3(Math.abs(direction.x - 1), Math.abs(direction.y - 1), Math.abs(direction.z - 1))
 
                 for (var w = 0, i = 0; w <= planeWidth / 2; w++, i += 2) {
 
@@ -365,21 +356,13 @@ function raycastSelected(found, event, type) {
     }
 }
 
-function warning(text) {
-    $("#warning span").text(text);
-    $("#warning").css("opacity", 1);
-    setTimeout(() => {
-        $("#warning").css("opacity", 0);
-    }, 2000);
-}
-
 function removeSelection() {
     for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
 
         if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal)
-            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new THREE.Color(0xffffff));
+            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(0xffffff));
         else
-            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new THREE.Color(0x808080));
+            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(0x808080));
 
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].selected = false;
@@ -387,14 +370,6 @@ function removeSelection() {
 
     GLOBALS.SELECTED_ID = [];
     GLOBALS.SELECTED_COLOR = [];
-}
-
-function getPlaneByName(name) {
-    return GLOBALS.PLANE_USER_DATA.filter(
-        function (data) {
-            return data.name == name
-        }
-    );
 }
 
 //UI
@@ -405,325 +380,6 @@ function showMenu(x, y) {
     menu.classList.add('menu-show');
 }
 
-$("body").on('click', '#side-bar-left, #ui-top', function () {
-    document.querySelector('.menu').classList.remove('menu-show');
-});
-
-$("body").on('click', '#rotate-item', function () {
-    if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("door") ||
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("faith_plate")) {
-
-        var door = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName);
-        door.rotation.y += Math.PI / 2;
-    } else {
-        for (var i = 0; i < 1; i++) { //GLOBALS.SELECTED_ID.length
-
-            var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].itemName);
-
-            var dummy = new THREE.Object3D();
-            dummy.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.position);
-            dummy.rotation.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation);
-
-            dummy.rotation.y += Math.PI / 2;
-
-            dummy.updateMatrix();
-            instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.userData.id, dummy.matrix)
-
-            instanced.instanceMatrix.needsUpdate = true;
-            instanced.computeBoundingSphere();
-
-            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation.copy(dummy.rotation);
-        }
-    }
-
-    animate();
-});
-
-$("body").on('click', '#delete', function () {
-
-    if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].isInstanced) {
-
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous) {
-            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide.hasItem = false;
-            GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous);
-        }
-
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge) {
-            GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge)
-        }
-
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField) {
-            GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField)
-        }
-
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.cloneLaserField) {
-
-            //console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName);
-
-            var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName);
-            var dummy = new THREE.Object3D();
-            dummy.scale.set(0, 0, 0);
-            dummy.updateMatrix();
-
-            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "laser_field")
-                instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.cloneLaserID, dummy.matrix);
-            else if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "fizzler")
-                instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.cloneFizzlerID, dummy.matrix);
-
-
-            instanced.instanceMatrix.needsUpdate = true;
-        }
-
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "tractor_beam") {
-            const index = GLOBALS.TRACTOR_BEAM.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous);
-            if (index > -1) { // only splice array when item is found
-                GLOBALS.TRACTOR_BEAM.splice(index, 1); // 2nd parameter means remove one item only
-                GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.splice(index, 1); // 2nd parameter means remove one item only
-            }
-        }
-
-        deleteItemInstanced(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false);
-    } else {
-        GLOBALS.ITEMS_COUNT[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName]["count"] -= 1;
-        GLOBALS.ITEMS_ADDED.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item);
-    }
-
-    planeInstanceReset(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false, null, null, null, null, null, null, null, false, null, false);
-    $(".menu").removeClass("menu-show");
-
-    animate()
-});
-
-$("body").on('input', '#state-dispenser', function () {
-
-    var scale;
-
-    if (this.checked)
-        scale = new THREE.Vector3(1, 1, 1);
-    else
-        scale = new THREE.Vector3(0, 0, 0);
-
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.hasDispenser = this.checked;
-
-    var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
-    var dummy = new THREE.Object3D();
-    dummy.scale.copy(scale);
-    dummy.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserPosition);
-    dummy.rotation.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.rotation);
-    dummy.updateMatrix();
-    instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserID, dummy.matrix);
-    instanced.instanceMatrix.needsUpdate = true;
-
-    animate();
-});
-
-$("body").on('input', '#dispenser-opened', function () {
-    console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]])
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.opened = this.checked;
-})
-
-$("body").on('input', '#state-lines', function () {
-    for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-        if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName)
-            GLOBALS.CONNECTIONS[i]["line"].visible = this.checked;
-    }
-
-    animate();
-})
-
-$("body").on('input', '#state-pedetsal-infinity', function () {
-    if (this.checked)
-        $("#pedestal-timer").addClass("disabled");
-    else
-        $("#pedestal-timer").removeClass("disabled");
-
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.pedestalInfinity = this.checked;
-});
-
-$("body").on('input', '#pedestal-timer-value', function () {
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.pedestalValue = parseInt(this.value);
-});
-
-$("body").on('click', '.removeConnection', function () {
-
-    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[$(this).data("id")]["line"]);
-    GLOBALS.CONNECTIONS[$(this).data("id")]["to"].item.connections -= 1;
-
-    //RESET UI
-    GLOBALS.CONNECTIONS.splice($(this).data("id"), 1);
-    $("#connections").empty();
-    for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-
-        if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName) {
-            var elem = '<li data-id="' + i + '" class="menu-item removeConnection">' +
-                '<button type="button" class="menu-btn">' +
-                '<i class="fas fa-times"></i>' +
-                '<span class="menu-text">' + GLOBALS.CONNECTIONS[i]["to"].itemName + '</span>' +
-                '</button>' +
-                '</li>';
-
-            $("#connections").append(elem);
-        }
-    }
-
-    animate();
-});
-
-$("body").on('mouseenter', '.removeConnection', function () {
-    GLOBALS.ITEM_CUBE.position.copy(GLOBALS.CONNECTIONS[$(this).data("id")]["to"].position);
-    GLOBALS.ITEM_CUBE.rotation.copy(GLOBALS.CONNECTIONS[$(this).data("id")]["to"].rotation);
-    GLOBALS.ITEM_CUBE.translateZ(1)
-    GLOBALS.ITEM_CUBE.material.color = new THREE.Color(0xff0000);
-    GLOBALS.ITEM_CUBE.visible = true;
-    animate();
-});
-
-$("body").on('mouseleave', '.removeConnection', function () {
-    GLOBALS.ITEM_CUBE.visible = false;
-});
-
-$("body").on('click', '.tile-nonPortal', function () {
-    for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
-        if (!GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal) {
-            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].tile = $(this).data("id");
-        }
-    }
-
-    $(".menu").removeClass("menu-show");
-});
-
-$("body").on('click', '.tile-portal', function () {
-    for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal) {
-            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].tile = $(this).data("id");
-        }
-    }
-
-    $(".menu").removeClass("menu-show");
-});
-
-
-$("body").on('input', '#tractor-state-input, #light-bridge-state-input, #laser-field-state-input,#fizzler-state-input', function () {
-
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.state = this.checked;
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.visible = this.checked;
-
-    if ($(this).attr("id") == "light-bridge-state-input") {
-        if (this.checked)
-            GLOBALS.CANNON_WORLD.addBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
-        else
-            GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
-    }
-
-    animate();
-});
-
-$("body").on('input', '#tractor-direction-input', function () {
-
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.reversed = this.checked;
-
-    if (this.checked)
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE;
-    else
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_TRACTOR_BEAM;
-
-    animate();
-});
-
-$("body").on('click', '.tractor-triggers', function () {
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.triggers = $(this).data("trigger");
-    $("#tractor-trigger").data("trigger", $(this).data("trigger"))
-    $("#tractor-trigger").find(".title").text("Triggers: " + $(this).data("trigger"));
-});
-
-$("body").on('click', '.light-bridge-triggers', function () {
-    lightBridgeTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], $(this).data("trigger"), $("#light-bridge-trigger"), "light_bridge")
-});
-
-$("body").on('click', '.laser-field-triggers', function () {
-    lightBridgeTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], $(this).data("trigger"), $("#laser-field-trigger"), "laser_field")
-});
-
-$("body").on('click', '.fizzler-triggers', function () {
-    lightBridgeTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], $(this).data("trigger"), $("#fizzler-trigger"), "fizzler")
-});
-
-function lightBridgeTrigger(obj, trigger, elem, name) {
-    obj.item.triggers = trigger;
-    elem.data("trigger", trigger)
-    elem.find(".title").text(trigger);
-
-    var dummy = new THREE.Object3D();
-    dummy.position.copy(new THREE.Vector3(
-        obj.position.x,
-        obj.position.y,
-        obj.position.z
-    ));
-    dummy.rotation.set(
-        obj.normal.x,
-        obj.normal.y,
-        obj.normal.z
-    );
-
-    if (trigger == "Middle Vertical") {
-        dummy.rotateY(Math.PI / 2);
-    } else if (trigger == "Top") {
-        dummy.translateZ(-0.8);
-    } else if (trigger == "Bottom") {
-        dummy.translateZ(0.8);
-    } else if (trigger == "Left") {
-        dummy.rotateY(Math.PI / 2);
-        dummy.translateZ(-0.8);
-    } else if (trigger == "Right") {
-        dummy.rotateY(Math.PI / 2);
-        dummy.translateZ(0.8);
-    }
-
-    obj.item.raycaster.ray.origin = dummy.position;
-    obj.item.continuous.position.copy(dummy.position)
-    obj.item.continuous.rotation.copy(dummy.rotation)
-    obj.item.continuous.translateY(obj.item.continuous.distance);
-
-    if (name == "light_bridge") {
-        obj.item.bodyBridge.position.copy(obj.item.continuous.position)
-        obj.item.bodyBridge.quaternion.copy(dummy.quaternion)
-        //GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge.translateY(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.distance);
-    }
-
-    dummy.updateMatrix();
-    var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(name);
-    instanced.setMatrixAt(obj.item.idInstanced, dummy.matrix);
-
-
-    if (name == "laser_field" || name == "fizzler") {
-        obj.item.bodyLaserField.position.copy(obj.item.continuous.position)
-        obj.item.bodyLaserField.quaternion.copy(dummy.quaternion)
-
-        dummy.rotateX(Math.PI);
-        dummy.translateY(-obj.item.cloneLaserDistance);
-
-        dummy.updateMatrix();
-
-        if (name == "laser_field")
-            instanced.setMatrixAt(obj.item.cloneLaserID, dummy.matrix);
-        else if (name == "fizzler")
-            instanced.setMatrixAt(obj.item.cloneFizzlerID, dummy.matrix);
-    }
-
-    instanced.instanceMatrix.needsUpdate = true;
-    instanced.computeBoundingSphere();
-
-    animate();
-}
-
-$("body").on('input', '#ligh-color-input', function () {
-    /*var color = this.value.replace("#", "0x");
-    console.log(color)
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.lightColor = color;*/
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.lightColor = this.value;
-});
-
 export {
-    raycastSelected,
-    lightBridgeTrigger
+    raycastSelected
 }

@@ -1,55 +1,59 @@
-import * as THREE from 'three';
+import {
+    PlaneGeometry,
+    Mesh,
+    Color,
+    Clock,
+    Object3D,
+    InstancedMesh
+} from 'three';
 import $ from 'jquery';
 import {
     addItem,
-} from '../items/Items';
+} from '../items/AddItem.js';
 import {
     AddGoo
-} from '../goo/Goo';
+} from '../goo/Goo.js';
 import {
     viewFPS
-} from '../test/Test';
+} from '../test/Test.js';
 import {
     GLOBALS
 } from '../../Globals.js';
-import '../shaders/MainMenu/MainMenu.js';
+import '../shaders/MainMenuShader.js';
 import { findPath } from '../findPath/FindPath.js';
+import { init } from '../../Main.js';
+import { AUDIO, play } from '../audio/Audio.js';
 
 var plane1;
 var plane2;
 
 var transition = false;
 var transition2 = false;
-var stopMenuLoop = true;
-
-$("#blocker").css("display", "none");
-$("#ui").css("display", "block");
-$("#container #back-effect").css("display", "none");
-$("#main-container").css("display", "block");
-
-$("#option-main").css("display", "none");
-$("#options-settings").css("display", "block");
-$("#settings-menu-title").text("OPTIONS");
-$("#back-main").css("display", "none");
-$("#settings-close").css("display", "block");
-$("#main-container").css("display", "block");
+var stopMenuLoop = false;
 
 //
-/*$("#blocker").css("display", "flex");
+$("#blocker").css("display", "flex");
 $("#options-main").css("display", "block");
 $("#loading-parent").css("opacity", "0");
-$("#loading-parent").css("pointer-events", "none");*/
+$("#loading-parent").css("pointer-events", "none");
+
+$("body").on('click', '#option-community-build, #option-single-load', function () { //
+    setTimeout(() => {
+        play(AUDIO.EDITOR);
+        init();
+    }, 2000);
+});
 
 if (!stopMenuLoop) {
     setTimeout(() => {
-        var planegeometry = new THREE.PlaneGeometry(1, 1);
-        plane1 = new THREE.Mesh(planegeometry, GLOBALS.MATERIAL_MAIN_MENU);
+        var planegeometry = new PlaneGeometry(1, 1);
+        plane1 = new Mesh(planegeometry, GLOBALS.MATERIAL_MAIN_MENU);
         GLOBALS.SCENE_CHILDREN.add(plane1);
 
-        var planegeometry = new THREE.PlaneGeometry(1, 1);
-        plane2 = new THREE.Mesh(planegeometry, GLOBALS.MATERIAL_SUB_MENU);
+        var planegeometry = new PlaneGeometry(1, 1);
+        plane2 = new Mesh(planegeometry, GLOBALS.MATERIAL_SUB_MENU);
 
-        GLOBALS.SCENE.background = new THREE.Color(0x000000)
+        GLOBALS.SCENE.background = new Color(0x000000)
 
         planeFitPerspectiveCamera(plane1, GLOBALS.MAIN_CAMERA)
 
@@ -90,7 +94,6 @@ $("body").on('click', '#option-single-load', function () {
             GLOBALS.LOADED_LEVEL = true;
 
             startLevel();
-
             /*setTimeout(() => {
                 loadLevel(json[0]);
 
@@ -98,8 +101,6 @@ $("body").on('click', '#option-single-load', function () {
                     AddGoo(json[1][i], true);
                 }
             }, 3000);*/
-
-
             //Do something with json variable
         });
 })
@@ -229,7 +230,7 @@ function pointerState(display1, display2, title, titleDisplay, id) {
     }, 2000);
 }
 
-let clock = new THREE.Clock();
+let clock = new Clock();
 
 var t = [];
 var getMonitorFPS = true;
@@ -297,15 +298,15 @@ function loadLevel(data) {
     GLOBALS.PLANE_USER_DATA = data;
     GLOBALS.CUBES.remove(GLOBALS.PLANE_LEVEL_INSTANCED);
 
-    const geometry = new THREE.PlaneGeometry(2, 2);
+    const geometry = new PlaneGeometry(2, 2);
 
-    GLOBALS.PLANE_LEVEL_INSTANCED = new THREE.InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
+    GLOBALS.PLANE_LEVEL_INSTANCED = new InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
     GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = true;
     GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = true;
     GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
     GLOBALS.CUBES.add(GLOBALS.PLANE_LEVEL_INSTANCED);
 
-    var clone = new THREE.Object3D();
+    var clone = new Object3D();
 
     for (var i = 0; i < GLOBALS.BUDGET; i++) {
         clone.scale.set(0, 0, 0);
@@ -329,9 +330,9 @@ function loadLevel(data) {
             //GLOBALS.PLANE_USER_DATA[i] = data[i];
 
             if (data[i].portal)
-                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(i, new THREE.Color().setHex(0xffffff));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(i, new Color().setHex(0xffffff));
             else
-                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(i, new THREE.Color().setHex(0x808080));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(i, new Color().setHex(0x808080));
 
             GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 

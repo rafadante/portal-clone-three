@@ -1,11 +1,18 @@
-import * as THREE from 'three';
-import * as CANNON from 'cannon';
 import {
-    TWEEN
-} from '../../Tween.js';
+    PlaneGeometry,
+    InstancedMesh,
+    Object3D,
+    IcosahedronGeometry,
+    Mesh,
+    Vector3,
+    Color,
+    ShaderMaterial
+} from 'three';
+import * as CANNON from 'cannon';
 import {
     GLOBALS
 } from '../../Globals.js';
+import { getPlaneByName } from '../../Utils.js';
 
 var vv = false;
 var destroyed = false;
@@ -16,16 +23,16 @@ var instancedMeshGel, gelBallBlue, gelBallOrange, gelBallBodyBlue, gelBallBodyOr
 function initGels() {
 
     GLOBALS.INK_MATERIAL.envMap = GLOBALS.ENV_MAP;
-    const geometryDecal = new THREE.PlaneGeometry(2, 2);
+    const geometryDecal = new PlaneGeometry(2, 2);
 
-    instancedMeshGel = new THREE.InstancedMesh(geometryDecal.clone(), GLOBALS.INK_MATERIAL, 100);
+    instancedMeshGel = new InstancedMesh(geometryDecal.clone(), GLOBALS.INK_MATERIAL, 100);
     instancedMeshGel.castShadow = true;
     instancedMeshGel.receiveShadow = true;
     instancedMeshGel.frustumCulled = true;
     instancedMeshGel.name = "gel-parent";
     GLOBALS.SCENE_CHILDREN.add(instancedMeshGel);
 
-    var clone = new THREE.Object3D();
+    var clone = new Object3D();
 
     for (var i = 0; i < 100; i++) {
         clone.scale.set(0, 0, 0);
@@ -71,8 +78,8 @@ window['createOrangeGel'] = function () {
                     material: PHYSICS_MATERIAL
                 })
 
-                const geometry = new THREE.IcosahedronGeometry(20, 4);
-                gelBallOrange = new THREE.Mesh(geometry, mat2);
+                const geometry = new IcosahedronGeometry(20, 4);
+                gelBallOrange = new Mesh(geometry, mat2);
                 GLOBALS.SCENE_CHILDREN.add(gelBallOrange);
 
                 gelBallOrange.scale.set(0.022, 0.022, 0.022)
@@ -135,7 +142,7 @@ window['createOrangeGel'] = function () {
 
                             console.log("111111111111111")
 
-                            const pos = new THREE.Vector3(event.target.position.x, event.body.position.y, event.target.position.z);
+                            const pos = new Vector3(event.target.position.x, event.body.position.y, event.target.position.z);
                             const pos2 = pos.round();
                             var plane = getPlaneByName((2 * Math.floor(pos2.x / 2) + 1) + "/" +
                                 pos2.y + "/" +
@@ -187,7 +194,7 @@ function createGelOrange(pos, plane) {
     }
 
 
-    var gel = new THREE.Object3D();
+    var gel = new Object3D();
     gel.scale.set(1, 1, 1);
     gel.position.copy(pos);
 
@@ -207,12 +214,12 @@ function createGelOrange(pos, plane) {
 
 
     gel.rotation.copy(plane.rotation)
-    box.up = new THREE.Vector3(0, 1, 0)
-    box.vel = new THREE.Vector3(1, 0, 1)
+    box.up = new Vector3(0, 1, 0)
+    box.vel = new Vector3(1, 0, 1)
 
     gel.updateMatrix();
     instancedMeshGel.setMatrixAt(id, gel.matrix);
-    instancedMeshGel.setColorAt(id, new THREE.Color(0xFF8C00));
+    instancedMeshGel.setColorAt(id, new Color(0xFF8C00));
     instancedMeshGel.instanceColor.needsUpdate = true;
     instancedMeshGel.instanceMatrix.needsUpdate = true;
     instancedMeshGel.computeBoundingSphere();
@@ -257,8 +264,8 @@ window['createBlueGel'] = function () {
                     material: PHYSICS_MATERIAL
                 })
 
-                const geometry = new THREE.IcosahedronGeometry(20, 4);
-                gelBallBlue = new THREE.Mesh(geometry, mat);
+                const geometry = new IcosahedronGeometry(20, 4);
+                gelBallBlue = new Mesh(geometry, mat);
                 GLOBALS.SCENE_CHILDREN.add(gelBallBlue);
 
                 gelBallBlue.scale.set(0.022, 0.022, 0.022)
@@ -308,7 +315,7 @@ window['createBlueGel'] = function () {
                             }, 10);
                         } else {
 
-                            const pos = new THREE.Vector3(event.target.position.x, event.body.position.y, event.target.position.z);
+                            const pos = new Vector3(event.target.position.x, event.body.position.y, event.target.position.z);
                             const pos2 = pos.round();
                             var plane = getPlaneByName((2 * Math.floor(pos2.x / 2) + 1) + "/" +
                                 pos2.y + "/" +
@@ -347,14 +354,6 @@ window['createBlueGel'] = function () {
     vv = true;
 }
 
-function getPlaneByName(name) {
-    return GLOBALS.PLANE_USER_DATA.filter(
-        function (data) {
-            return data.name == name
-        }
-    );
-}
-
 function createGel(pos, plane) {
 
     var id;
@@ -367,11 +366,11 @@ function createGel(pos, plane) {
         }
     }
 
-    //const geometry = new THREE.PlaneGeometry(2, 2);
-    //const material = new THREE.MeshBasicMaterial();
-    //const gel = new THREE.Mesh(geometry, material);
+    //const geometry = new PlaneGeometry(2, 2);
+    //const material = new MeshBasicMaterial();
+    //const gel = new Mesh(geometry, material);
 
-    var gel = new THREE.Object3D();
+    var gel = new Object3D();
     gel.scale.set(1, 1, 1);
     //pos.y -= 0.01;
     gel.position.copy(pos);
@@ -392,15 +391,15 @@ function createGel(pos, plane) {
 
     //gel.rotation.x = -Math.PI / 2;
     gel.rotation.copy(plane.rotation)
-    box.up = new THREE.Vector3(0, 1, 0)
-    box.vel = new THREE.Vector3(1, 0, 1)
+    box.up = new Vector3(0, 1, 0)
+    box.vel = new Vector3(1, 0, 1)
 
 
     gel.updateMatrix();
     instancedMeshGel.setMatrixAt(id, gel.matrix);
 
 
-    instancedMeshGel.setColorAt(id, new THREE.Color(0x108ac8));
+    instancedMeshGel.setColorAt(id, new Color(0x108ac8));
 
     instancedMeshGel.instanceColor.needsUpdate = true;
     instancedMeshGel.instanceMatrix.needsUpdate = true;
@@ -416,23 +415,23 @@ function createGel(pos, plane) {
     //box.posMinus = box.position.y - 100;
 
     if (plane.side == "down") {
-        box.up = new THREE.Vector3(0, 1, 0)
-        box.vel = new THREE.Vector3(1, 0, 1)
+        box.up = new Vector3(0, 1, 0)
+        box.vel = new Vector3(1, 0, 1)
     } else if (plane.side == "up") {
-        box.up = new THREE.Vector3(0, -1, 0)
-        box.vel = new THREE.Vector3(1, 0, 1)
+        box.up = new Vector3(0, -1, 0)
+        box.vel = new Vector3(1, 0, 1)
     } else if (plane.side == "back") {
-        box.up = new THREE.Vector3(0.6, 0.15, -1)
-        box.vel = new THREE.Vector3(1, 1, 0)
+        box.up = new Vector3(0.6, 0.15, -1)
+        box.vel = new Vector3(1, 1, 0)
     } else if (plane.side == "left") {
-        box.up = new THREE.Vector3(1, 0, 0)
-        box.vel = new THREE.Vector3(0, 1, 1)
+        box.up = new Vector3(1, 0, 0)
+        box.vel = new Vector3(0, 1, 1)
     } else if (plane.side == "right") {
-        box.up = new THREE.Vector3(-1, 0, 0)
-        box.vel = new THREE.Vector3(0, 1, 1)
+        box.up = new Vector3(-1, 0, 0)
+        box.vel = new Vector3(0, 1, 1)
     } else if (plane.side == "front") {
-        box.up = new THREE.Vector3(0.6, 0.15, 1)
-        box.vel = new THREE.Vector3(1, 1, 0)
+        box.up = new Vector3(0.6, 0.15, 1)
+        box.vel = new Vector3(1, 1, 0)
     }
 
     box.side = plane.side;
@@ -708,13 +707,13 @@ GLOBALS.UNIFORMS_GEL = {
     }
 }
 
-var mat = new THREE.ShaderMaterial({
+var mat = new ShaderMaterial({
     uniforms: GLOBALS.UNIFORMS_GEL,
     vertexShader: vshader,
     fragmentShader: fshader,
 });
 
-var mat2 = new THREE.ShaderMaterial({
+var mat2 = new ShaderMaterial({
     uniforms: GLOBALS.UNIFORMS_GEL,
     vertexShader: vshader,
     fragmentShader: fshader2,

@@ -1,32 +1,24 @@
-/* eslint-disable */
-import * as THREE from 'three';
 import {
-    PointerLockControls
-} from 'three/addons/controls/PointerLockControls.js';
-import $ from 'jquery';
-import * as CANNON from 'cannon';
-import nipplejs from 'nipplejs';
-import {
-    tweenCamera
-} from '../../Main.js';
+    Vector3,
+    Quaternion,
+    Clock
+} from 'three';
 import {
     portalButton
 } from '../portal/CreatePortal.js'
 import {
     interactWithItem
-} from '../items/Items.js'
-import {
-    elevatorCollider
-} from '../test/Test.js';
+} from '../events/events.js'
 import {
     GLOBALS
 } from '../../Globals.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
-import { AUDIO,play } from '../audio/Audio.js';
-import { stateDoor } from '../door/Door.js';
+import { AUDIO, play } from '../audio/Audio.js';
+import "./Player.js";
+import "./Input.js";
+import { INPUT } from './index.js';
+import { Crouch } from './Input.js';
 
-//
-let shouldJump = false;
 var gamepadButton1 = false;
 var gamepadButton3 = false;
 var gamepadButton5 = false;
@@ -34,449 +26,17 @@ var gamepadButton6 = false;
 var gamepadButton7 = false;
 var gamepadButton12 = false;
 var gamepadButton15 = false;
-var headBobTimer = 0;
 var headBobSpeed = 5;
-var headBobHeight = 0.00005;
-var headBobActive = false;
-var moving = false;
+var headBobHeight = 0;
 let controllerIndex = null;
-var allowEnterFPS = true;
-var openedDoor = false;
-var controller = {
-    "KeyE": {
-        pressed: false
-    },
-    "KeyW": {
-        pressed: false
-    },
-    "KeyS": {
-        pressed: false
-    },
-    "KeyA": {
-        pressed: false
-    },
-    "KeyD": {
-        pressed: false
-    },
-    "Space": {
-        pressed: false
-    },
-}
-
-var crouched = false;
-var moving = false;
-var slipperyMaterial = new CANNON.Material();
-slipperyMaterial.friction = 0.00;
+var finalRotationY;
 window.PLAYER_JUMPING_FROM_BLUE_GEL = false;
-
-//WINDOW VARIABLES
-
 var rotationMobile = 0.1;
-
-// MOBILE VARIABLES
-
-let fwdValue = 0;
-let bkdValue = 0;
-let rgtValue = 0;
-let lftValue = 0;
-
-if (GLOBALS.MOBILE) {
-    //var controlsDevice = new DeviceOrientationControls(GLOBALS.MAIN_CAMERA);
-    var targetRotationOnMouseDownX = 0;
-    var targetRotationOnMouseDownY = 0;
-    var mouseX = 0;
-    var mouseXOnMouseDown = 0;
-    var mouseY = 0;
-    var mouseYOnMouseDown = 0;
-    var windowHalfX = window.innerWidth / 2;
-    var windowHalfY = window.innerHeight / 2;
-    var finalRotationY, outOfAngle = false;
-    var blocked_bottom = false,
-        blocked_top = false;
-    var deltaX2, touchX2;
-    var touches = 0;
-    let joyManager;
-
-    document.getElementById("camera").addEventListener('touchstart', onDocumentTouchStart, false);
-    document.getElementById("camera").addEventListener('touchmove', onDocumentTouchMove, false);
-    document.getElementById("camera").addEventListener('touchup', onDocumentTouchUp, false);
-
-    function onDocumentTouchUp(event) {
-        touches = 0;
-    }
-
-    function onDocumentTouchStart(event) {
-        if (event.touches.length > 0) {
-            touches = event.touches.length - 1;
-
-            if (touches == 0 || touches == 1) {
-                mouseXOnMouseDown = event.touches[touches].pageX - windowHalfX;
-                targetRotationOnMouseDownX = GLOBALS.TARGET_ROTATION_X;
-
-                mouseYOnMouseDown = event.touches[touches].pageY - windowHalfY;
-                targetRotationOnMouseDownY = GLOBALS.TARGET_ROTATION_Y;
-            }
-        }
-    }
-
-    function onDocumentTouchMove(event) {
-        if (event.touches.length > 0 && (touches == 0 || touches == 1)) {
-            mouseX = event.touches[touches].pageX - windowHalfX;
-            GLOBALS.TARGET_ROTATION_X = targetRotationOnMouseDownX + (mouseX - mouseXOnMouseDown) * (-0.01); //camera speed
-
-            mouseY = event.touches[touches].pageY - windowHalfY;
-            deltaX2 = event.touches[touches].pageY - touchX2;
-            touchX2 = event.touches[touches].pageY;
-
-            if (deltaX2 > 0) {
-                if (!blocked_bottom)
-                    GLOBALS.TARGET_ROTATION_Y = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * (-0.01);
-            } else {
-                if (!blocked_top)
-                    GLOBALS.TARGET_ROTATION_Y = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * (-0.01);
-            }
-        }
-    }
-
-    addJoystick();
-
-    function addJoystick() {
-        const options = {
-            zone: document.getElementById('joystickWrapper1'),
-            size: 120,
-            multitouch: true,
-            maxNumberOfNipples: 2,
-            mode: 'static',
-            restJoystick: true,
-            shape: 'circle',
-            // position: { top: 20, left: 20 },
-            position: {
-                top: '60px',
-                left: '60px'
-            },
-            dynamicPage: true,
-        }
-
-        joyManager = nipplejs.create(options);
-
-        joyManager['0'].on('move', function (evt, data) {
-
-            const forward = data.vector.y
-            const turn = data.vector.x
-
-            if (forward > 0) {
-                fwdValue = Math.abs(forward)
-                bkdValue = 0
-            } else if (forward < 0) {
-                fwdValue = 0
-                bkdValue = Math.abs(forward)
-            }
-
-            if (turn > 0) {
-                lftValue = 0
-                rgtValue = Math.abs(turn)
-            } else if (turn < 0) {
-                lftValue = Math.abs(turn)
-                rgtValue = 0
-            }
-
-            headBobActive = true;
-        })
-
-        joyManager['0'].on('end', function (evt) {
-            bkdValue = 0
-            fwdValue = 0
-            lftValue = 0
-            rgtValue = 0
-            // headBobActive = false;
-            moving = false;
-            headBobTimer = 0;
-            //headBobActive = false;
-
-            tweenCamera(500, GLOBALS.GUN.children[0].position, new THREE.Vector3(0, 0, 0))
-            touches = 0;
-        })
-    }
-}
-
-player();
-
-if (!GLOBALS.MOBILE)
-    controlsLock();
-// added joystick + movement
-
-var upVector;
-
-function player() {
-
-    let sphereShape = new CANNON.Sphere(0.3);
-    // define shape
-    let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 2, 2 / 3.2, 0.5 / 2));
-    physicsShape.height = 1.25;
-    physicsShape.width = 0.5;
-
-    // define the physical body attributes
-    GLOBALS.PLAYER = new CANNON.Body({
-        mass: 50,
-        material: slipperyMaterial
-    });
-    GLOBALS.PLAYER.allowSleep = false;
-    GLOBALS.PLAYER.addShape(physicsShape);
-    GLOBALS.PLAYER.position.set(5, 5, 5);
-    GLOBALS.PLAYER.linearDamping = 0.999;
-    GLOBALS.PLAYER.name = "player";
-
-    // keep the player upright
-    GLOBALS.PLAYER.angularDamping = 1
-
-    // set additional properties
-    GLOBALS.PLAYER.inJump = true
-
-    // construct the physical body
-    GLOBALS.PLAYER.updateMassProperties()
-    GLOBALS.CANNON_WORLD.addBody(GLOBALS.PLAYER);
-
-    // normal collision events don't happen consistently - will stop once an object is stable on the ground
-    // so need to check contacts to detect if grounded or not
-    // https://github.com/schteppe/cannon.js/issues/313
-
-    upVector = new CANNON.Vec3(0, 1, 0);
-    let contactNormal = new CANNON.Vec3(0, 0, 0);
-
-    GLOBALS.PLAYER.addEventListener("collide", function (event) {
-
-        if (event.contact.bj.name == "light_bridge") {
-            GLOBALS.PLAYER.lightBridge = true;
-        } else {
-            GLOBALS.PLAYER.lightBridge = false;
-        }
-
-        if (GLOBALS.PLAYER.inJump) {
-            AUDIO.JUMP.currentTime = 0;
-            play(AUDIO.JUMP)
-        }
-    })
-
-    GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
-        GLOBALS.PLAYER.inJump = true;
-        if (GLOBALS.CANNON_WORLD.contacts.length > 0) {
-
-            for (let contact of GLOBALS.CANNON_WORLD.contacts) {
-
-                if (contact.bi.collisionResponse == 0 || contact.bj.collisionResponse == 0) continue;
-
-                if (contact.bi.id == GLOBALS.PLAYER.id || contact.bj.id == GLOBALS.PLAYER.id) {
-                    if (contact.bi.id == GLOBALS.PLAYER.id) {
-                        // contact.ni.negate(contactNormal);
-                        contactNormal = new THREE.Vector3(contact.ni.x * -1, contact.ni.y * -1, contact.ni.z * -1)
-                    } else {
-                        // contact.ni.copy(contactNormal);
-                        contactNormal = contact.ni
-                    }
-
-                    GLOBALS.PLAYER.inJump = (contactNormal.dot(upVector) <= 0.5);
-
-                    if (!GLOBALS.PLAYER.inJump) {
-                        window.PLAYER_JUMPING_FROM_BLUE_GEL = false;
-                    }
-
-                    break;
-                }
-            }
-        }
-
-        moving = GLOBALS.PLAYER.inJump;
-    })
-
-    GLOBALS.DYNAMIC_OBJECTS.push(GLOBALS.PLAYER);
-
-    for (let d of GLOBALS.DYNAMIC_OBJECTS) {
-        d.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC
-        d.collisionFilterMask = GLOBALS.CGROUP_ALL
-    }
-}
-
-var audioFallingPlayed = true;
-var timeFalling = 0;
-
-document.addEventListener('keydown', (event) => {
-
-    //if (event.code == "ControlLeft" && !crouched)
-
-    if (GLOBALS.FPS_MODE && allowEnterFPS) {
-        if (controller[event.code])
-            controller[event.code].pressed = true;
-
-        headBobActive = true;
-
-        if (event.code == "ControlLeft" && !crouched) {
-            crouched = true;
-            Crouch(-0.25);
-        } else if (event.code == "KeyE")
-            interactWithItem();
-    }
-});
-
-$("body").on('click', '#close', function () {
-    $("#blocker").css("display", "block");
-    //$("#mobile-controls").css("display", "none");
-    $("#container").css("filter", "blur(2px)");
-    //openFullscreen();
-})
-
-$("body").on('click', '#item', function () {
-    interactWithItem();
-})
-
-$("body").on('click', '#settings-close', function () {
-    if (GLOBALS.FPS_MODE && allowEnterFPS) {
-
-        controller = {
-            "KeyE": {
-                pressed: false
-            },
-            "KeyW": {
-                pressed: false
-            },
-            "KeyS": {
-                pressed: false
-            },
-            "KeyA": {
-                pressed: false
-            },
-            "KeyD": {
-                pressed: false
-            },
-            "Space": {
-                pressed: false
-            },
-        }
-
-        GLOBALS.PAUSED = false;
-
-        if (!GLOBALS.MOBILE) {
-            document.body.requestPointerLock();
-        } else {
-            $("#blocker").css("display", "none");
-            $("#mobile-controls").css("display", "block");
-            openFullscreen();
-        }
-
-        $("#container").css("filter", "none");
-
-        if (!GLOBALS.DOOR_OPEN_STATE) {
-            GLOBALS.DOOR_OPEN_STATE = true;
-
-            stateDoor(1000, true, false, GLOBALS.ENTER_DOOR)
-        }
-    }
-})
-
-function openFullscreen() {
-    if (document.body.requestFullscreen) {
-        document.body.requestFullscreen();
-    } else if (document.body.mozRequestFullScreen) {
-        /* Firefox */
-        document.body.mozRequestFullScreen();
-    } else if (document.body.webkitRequestFullscreen) {
-        /* Chrome, Safari and Opera */
-        document.body.webkitRequestFullscreen();
-    } else if (document.body.msRequestFullscreen) {
-        /* IE/Edge */
-        document.body.msRequestFullscreen();
-    }
-}
-
-function controlsLock() {
-    GLOBALS.POINTER_CONTROLS = new PointerLockControls(GLOBALS.MAIN_CAMERA, document.body);
-    GLOBALS.POINTER_CONTROLS.pointerSpeed = 0.5;
-
-    GLOBALS.POINTER_CONTROLS.addEventListener('lock', function () {
-        play(AUDIO.AMBIENT)
-        document.getElementById('blocker').style.display = 'none';
-        GLOBALS.PAUSED = false;
-
-        setTimeout(() => {
-            GLOBALS.ALLOW_PLACE_PORTALS = true;
-        }, 1000);
-    });
-
-    GLOBALS.POINTER_CONTROLS.addEventListener('unlock', function () {
-        $("#container").css("filter", "blur(2px)")
-        document.getElementById('blocker').style.display = 'block';
-        GLOBALS.ALLOW_PLACE_PORTALS = false;
-        allowEnterFPS = false;
-        GLOBALS.PAUSED = true;
-
-        setTimeout(() => {
-            allowEnterFPS = true;
-        }, 1500);
-    });
-}
-
-document.addEventListener('keyup', (event) => {
-
-    if (GLOBALS.FPS_MODE && allowEnterFPS) {
-
-        if (controller[event.code])
-            controller[event.code].pressed = false;
-
-        moving = false;
-        headBobTimer = 0;
-        //headBobActive = false;
-
-        tweenCamera(300, GLOBALS.GUN.children[0].position, new THREE.Vector3(0, 0, 0))
-
-        if (crouched) {
-            crouched = false;
-            Crouch(0.25);
-        }
-    }
-
-    AUDIO.WALK.pause();
-    AUDIO.WALK_LIGHT_BRIDGE.pause();
-});
-
-$("body").on('pointerdown', '#crouch', function () {
-    crouched = true;
-    Crouch(-0.25);
-})
-
-$("body").on('pointerup', '#crouch', function () {
-    Crouch(0.25);
-})
-
-document.addEventListener('mousedown', (event) => {
-    if (!GLOBALS.MOBILE && document.pointerLockElement !== null)
-        portalButton(event.button)
-});
-
-//LEFT PORTAL MOBILE
-document.getElementById("portal_l").addEventListener('pointerdown', portal_l_Touch, false);
-
-function portal_l_Touch() {
-    GLOBALS.ALLOW_PLACE_PORTALS = true;
-    portalButton(0);
-}
-//RIGHT PORTAL MOBILE
-document.getElementById("portal_r").addEventListener('pointerdown', portal_r_Touch, false);
-
-function portal_r_Touch() {
-    GLOBALS.ALLOW_PLACE_PORTALS = true;
-    portalButton(2)
-}
-//JUMP MOBILE
-document.getElementById("jump").addEventListener('pointerdown', jumpTouch, false);
-
-function jumpTouch() {
-    // handle jumping when space bar is pressed
-    if (!GLOBALS.PLAYER.inJump)
-        shouldJump = true;
-}
-
 var vv = false;
-var up = new THREE.Vector3(0, 1, 0)
+var up = new Vector3(0, 1, 0)
 var lastTimeStamp = 0;
+var activeAction, lastAction;
+const clock = new Clock();
 
 const updatePlayer = function (deltaTime) {
 
@@ -493,21 +53,21 @@ const updatePlayer = function (deltaTime) {
             GLOBALS.MAIN_CAMERA.rotation.x += finalRotationY * rotationMobile;
 
         if (GLOBALS.MAIN_CAMERA.rotation.x > 1) {
-            blocked_top = true;
+            INPUT.blocked_top = true;
             GLOBALS.MAIN_CAMERA.rotation.x = 1
         } else
-            blocked_top = false;
+            INPUT.blocked_top = false;
 
         if (GLOBALS.MAIN_CAMERA.rotation.x < -1) {
-            blocked_bottom = true;
+            INPUT.blocked_bottom = true;
             GLOBALS.MAIN_CAMERA.rotation.x = -1
         } else
-            blocked_bottom = false;
+            INPUT.blocked_bottom = false;
     }
 
     // gives a bit of air control
     // define directions
-    let cameraDirection = new THREE.Vector3()
+    let cameraDirection = new Vector3()
     GLOBALS.MAIN_CAMERA.getWorldDirection(cameraDirection)
 
     const forward = cameraDirection.projectOnPlane(up).normalize()
@@ -526,16 +86,12 @@ const updatePlayer = function (deltaTime) {
         GLOBALS.PLAYER.linearDamping = 0.01
 
     // regulates speed when multiple directions are pressed 
-    let movementDirections = fwdValue + bkdValue + lftValue + rgtValue;
+    let movementDirections = INPUT.fwdValue + INPUT.bkdValue + INPUT.lftValue + INPUT.rgtValue;
     let movementMultiplier = 1
     if (movementDirections == 2)
         movementMultiplier = (1 / Math.sqrt(movementDirections))
 
     // apply forces in WASD directions when pressed
-
-    var mass = 50;
-    if (GLOBALS.PLAYER.mass == 0)
-        mass = 10;
 
     const f = velocity * GLOBALS.PLAYER.mass * jumpMultiplier * deltaTime;
 
@@ -545,21 +101,21 @@ const updatePlayer = function (deltaTime) {
     if (!GLOBALS.STOP_TIME && !GLOBALS.GEL_ORANGE && !window.PLAYER_JUMPING_FROM_BLUE_GEL) {
         if (GLOBALS.MOBILE) {
 
-            if (fwdValue > 0)
-                movePlayerTouch(forward, f, fwdValue)
-            if (bkdValue > 0)
-                movePlayerTouch(backward, f, bkdValue)
-            if (lftValue > 0)
-                movePlayerTouch(left, f, lftValue)
-            if (rgtValue > 0)
-                movePlayerTouch(right, f, rgtValue)
+            if (INPUT.fwdValue > 0)
+                movePlayerTouch(forward, f, INPUT.fwdValue)
+            if (INPUT.bkdValue > 0)
+                movePlayerTouch(backward, f, INPUT.bkdValue)
+            if (INPUT.lftValue > 0)
+                movePlayerTouch(left, f, INPUT.lftValue)
+            if (INPUT.rgtValue > 0)
+                movePlayerTouch(right, f, INPUT.rgtValue)
 
-            if (shouldJump) {
+            if (INPUT.shouldJump) {
                 GLOBALS.PLAYER.inJump = true
                 GLOBALS.PLAYER.applyImpulse(up.clone().multiplyScalar(f * 0.25), GLOBALS.PLAYER.position)
             }
 
-            shouldJump = false;
+            INPUT.shouldJump = false;
         } else {
             var gamepad;
             if (controllerIndex !== null) {
@@ -571,16 +127,16 @@ const updatePlayer = function (deltaTime) {
                 joystickAction(gamepad, 7, gamepadButton7, 2);
 
                 if (gamepad.buttons[3].value == 1 && !gamepadButton3) {
-                    /*crouched = true;
+                    INPUT.crouched = true;
                     Crouch(-0.25);
-                    gamepadButton3 = true;*/
+                    gamepadButton3 = true;
                     vv = true;
                 } else if (gamepad.buttons[3].value == 0) {
-                    /*if (crouched) {
+                    if (INPUT.crouched) {
                         Crouch(0.25);
                     }
                     gamepadButton3 = false;
-                    crouched = false;*/
+                    INPUT.crouched = false;
                     if (vv) {
                         vv = false;
                     }
@@ -594,15 +150,6 @@ const updatePlayer = function (deltaTime) {
 
                 joystickGel(gamepad, 12, gamepadButton12, 1, 0)
                 joystickGel(gamepad, 15, gamepadButton15, 2, 0.08)
-
-                /*if (gamepad.axes[2] > 0.5)
-                    GLOBALS.MAIN_CAMERA.rotation.y -= 0.05;
-                if (gamepad.axes[2] < -0.5)
-                    GLOBALS.MAIN_CAMERA.rotation.y += 0.05;
-                if (gamepad.axes[3] < -0.5)
-                    GLOBALS.MAIN_CAMERA.rotation.x += 0.025;
-                if (gamepad.axes[3] > 0.5)
-                    GLOBALS.MAIN_CAMERA.rotation.x -= 0.025;*/
 
                 // Ajuste esses valores conforme necessário para controlar a sensibilidade dos movimentos
                 const sensitivity = 0.04;  // Sensibilidade do controle
@@ -629,38 +176,34 @@ const updatePlayer = function (deltaTime) {
                     movePlayerJoystick(left, f, movementMultiplier, gamepadPressed)
                 if (gamepad.axes[0] > 0.5)
                     movePlayerJoystick(right, f, movementMultiplier, gamepadPressed)
-                if (gamepadPressed == 0) {
-                    // moving = false;
-                    //headBobActive = false;
-                }
             }
 
-            var posPlayer = new THREE.Vector3(GLOBALS.PLAYER.position.x, GLOBALS.PLAYER.position.y, GLOBALS.PLAYER.position.z)
+            var posPlayer = new Vector3(GLOBALS.PLAYER.position.x, GLOBALS.PLAYER.position.y, GLOBALS.PLAYER.position.z)
 
-            if (controller["KeyW"].pressed)
+            if (INPUT.controller["KeyW"].pressed)
                 movePlayerKeyboard(forward, posPlayer, f, movementMultiplier)
-            if (controller["KeyS"].pressed)
+            if (INPUT.controller["KeyS"].pressed)
                 movePlayerKeyboard(backward, posPlayer, f, movementMultiplier)
-            if (controller["KeyA"].pressed)
+            if (INPUT.controller["KeyA"].pressed)
                 movePlayerKeyboard(left, posPlayer, f, movementMultiplier)
-            if (controller["KeyD"].pressed)
+            if (INPUT.controller["KeyD"].pressed)
                 movePlayerKeyboard(right, posPlayer, f, movementMultiplier)
 
-            shouldJump = false;
+            INPUT.shouldJump = false;
             // handle jumping when space bar is pressed
 
-            if (!controller["Space"].pressed) {
+            if (!INPUT.controller["Space"].pressed) {
                 jumpPressed = false;
             }
 
             if (controllerIndex !== null) {
                 if (gamepad.buttons[0].value > 0 && !GLOBALS.PLAYER.inJump)
-                    shouldJump = true;
-            } else if (controller["Space"].pressed && !GLOBALS.PLAYER.inJump) {
-                shouldJump = true;
+                    INPUT.shouldJump = true;
+            } else if (INPUT.controller["Space"].pressed && !GLOBALS.PLAYER.inJump) {
+                INPUT.shouldJump = true;
             }
 
-            if (shouldJump && !GLOBALS.PLAYER.inJump && !jumpPressed && !blockJump) {
+            if (INPUT.shouldJump && !GLOBALS.PLAYER.inJump && !jumpPressed && !blockJump) {
                 AUDIO.WALK.pause();
                 AUDIO.WALK_LIGHT_BRIDGE.pause();
                 jumpPressed = true;
@@ -677,8 +220,8 @@ const updatePlayer = function (deltaTime) {
 
     updateHeadBob(deltaTime);
 
-    if (moving)
-        GLOBALS.GUN.children[0].position.x += Math.sin(headBobTimer * headBobSpeed) * headBobHeight;
+    if (GLOBALS.PLAYER_MOVING)
+        GLOBALS.GUN.children[0].position.x += Math.sin(INPUT.headBobTimer * headBobSpeed) * headBobHeight;
 }
 
 var jumpPressed = false;
@@ -702,9 +245,10 @@ const updateCamera = function (deltaTime) {
     //GLOBALS.MAIN_CAMERA.translateZ(0.2)
     GLOBALS.MAIN_CAMERA.translateY(0.3)
     GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
-    GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.SMOOTHNESS);
+    //GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.SMOOTHNESS);
+    GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion)
 
-    if (GLOBALS.MAIN_CAMERA.position.distanceTo(new THREE.Vector3(0, 0, 0)) > 100) {
+    if (GLOBALS.MAIN_CAMERA.position.distanceTo(new Vector3(0, 0, 0)) > 100) {
         var obj = GLOBALS.ENTER_DOOR.clone();
         obj.translateZ(1);
         GLOBALS.PLAYER.position.copy(obj.position);
@@ -712,10 +256,10 @@ const updateCamera = function (deltaTime) {
 
     // copy position and rotation so player model aligns with the physical body
     if (GLOBALS.PLAYER_MODEL) {
-        GLOBALS.PLAYER_MODEL.position.copy(GLOBALS.PLAYER.position).add(new THREE.Vector3(0, -1, 0))
+        GLOBALS.PLAYER_MODEL.position.copy(GLOBALS.PLAYER.position).add(new Vector3(0, -1, 0))
         GLOBALS.PLAYER_MODEL.translateY(0.2)
         GLOBALS.PLAYER_MODEL.quaternion.copy(GLOBALS.PLAYER.quaternion)
-        GLOBALS.PLAYER_MODEL.quaternion.multiply(new THREE.Quaternion(0, 50, 0)).normalize()
+        GLOBALS.PLAYER_MODEL.quaternion.multiply(new Quaternion(0, 50, 0)).normalize()
 
         GLOBALS.PLAYER_MODEL.position.y += 0.2;
 
@@ -730,6 +274,8 @@ const updateCamera = function (deltaTime) {
                 c.material = clone;
                 c.material.transparent = false;
                 c.material.opacity = 1;
+                c.material.colorWrite = true;
+                c.material.depthWrite = true;
             }
         })
     }
@@ -746,28 +292,28 @@ const updateCamera = function (deltaTime) {
     if (GLOBALS.PLAYER_MODEL.modelReady) {
         if (GLOBALS.PLAYER.inJump && !GLOBALS.PLAYER.inTractor) {
             action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_JUMP
-        } else if (controller["KeyW"].pressed && controller["KeyD"].pressed && controller["KeyA"].pressed && controller["KeyS"].pressed) {
+        } else if (INPUT.controller["KeyW"].pressed && INPUT.controller["KeyD"].pressed && INPUT.controller["KeyA"].pressed && INPUT.controller["KeyS"].pressed) {
             action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
-        } else if (controller["KeyW"].pressed && controller["KeyS"].pressed) {
+        } else if (INPUT.controller["KeyW"].pressed && INPUT.controller["KeyS"].pressed) {
             action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
-            if (controller["KeyD"].pressed)
+            if (INPUT.controller["KeyD"].pressed)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_RIGHT_STRAFE
-            else if (controller["KeyA"].pressed)
+            else if (INPUT.controller["KeyA"].pressed)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_LEFT_STRAFE
-        } else if (controller["KeyA"].pressed && controller["KeyD"].pressed) {
+        } else if (INPUT.controller["KeyA"].pressed && INPUT.controller["KeyD"].pressed) {
             action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
-            if (controller["KeyW"].pressed)
+            if (INPUT.controller["KeyW"].pressed)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STATIONARY_RUNNING
-            else if (controller["KeyS"].pressed)
+            else if (INPUT.controller["KeyS"].pressed)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_BACKWARD_RUNNING
         } else {
-            if (controller["KeyW"].pressed)
+            if (INPUT.controller["KeyW"].pressed)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STATIONARY_RUNNING
-            if (controller["KeyS"].pressed)
+            if (INPUT.controller["KeyS"].pressed)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_BACKWARD_RUNNING
-            if (controller["KeyD"].pressed)
+            if (INPUT.controller["KeyD"].pressed)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_RIGHT_STRAFE
-            if (controller["KeyA"].pressed)
+            if (INPUT.controller["KeyA"].pressed)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_LEFT_STRAFE
         }
 
@@ -776,9 +322,6 @@ const updateCamera = function (deltaTime) {
         GLOBALS.MIXERS.update(delta);
     }
 }
-
-var activeAction, lastAction;
-const clock = new THREE.Clock();
 
 function setAction(action) {
     if (action != activeAction) {
@@ -796,9 +339,6 @@ function setAction(action) {
 }
 
 function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
-    //if (GLOBALS.PLAYER.launch)
-    //    return;
-
     if (AUDIO.WALK.paused && !GLOBALS.PLAYER.inJump && !GLOBALS.PLAYER.lightBridge) {
 
         if (!AUDIO.WALK_LIGHT_BRIDGE.paused)
@@ -815,7 +355,7 @@ function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
         play(AUDIO.WALK_LIGHT_BRIDGE)
     }
 
-    moving = true;
+    GLOBALS.PLAYER_MOVING = true;
     if (GLOBALS.PLAYER.mass == 0) {
         posPlayer.add(direction.clone().multiplyScalar(0.02));
         GLOBALS.PLAYER.position.copy(posPlayer);
@@ -825,14 +365,14 @@ function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
 
 function movePlayerJoystick(direction, f, movementMultiplier, gamepadPressed) {
     GLOBALS.PLAYER.applyForce(direction.clone().multiplyScalar(f * movementMultiplier), GLOBALS.PLAYER.position)
-    moving = true;
+    GLOBALS.PLAYER_MOVING = true;
     gamepadPressed++;
-    headBobActive = true;
+    INPUT.headBobActive = true;
 }
 
 function movePlayerTouch(direction, f, value) {
     GLOBALS.PLAYER.applyForce(direction.clone().multiplyScalar(f * value), GLOBALS.PLAYER.position)
-    moving = true;
+    GLOBALS.PLAYER_MOVING = true;
 }
 
 function joystickAction(gamepad, index, gamepadButton, button) {
@@ -852,13 +392,6 @@ function joystickAction(gamepad, index, gamepadButton, button) {
     }
 }
 
-function Crouch(value) {
-    GLOBALS.PLAYER.shapes[0].halfExtents.y += value;
-    GLOBALS.PLAYER.shapes[0].updateConvexPolyhedronRepresentation();
-    GLOBALS.PLAYER.computeAABB();
-    GLOBALS.PLAYER.updateMassProperties();
-}
-
 function joystickGel(gamepad, index, gamepadButton, mode, value) {
     if (gamepad.buttons[index].value == 1 && !gamepadButton) {
         GLOBALS.GUN_MODE = mode;
@@ -869,11 +402,11 @@ function joystickGel(gamepad, index, gamepadButton, mode, value) {
 }
 
 const updateHeadBob = function (deltaTime) {
-    if (headBobActive && moving) {
+    if (INPUT.headBobActive && GLOBALS.PLAYER_MOVING) {
         const wavLength = Math.PI;
-        const nextStep = 1 + Math.floor(((headBobTimer + 0.0000001) * headBobSpeed) / wavLength);
+        const nextStep = 1 + Math.floor(((INPUT.headBobTimer + 0.0000001) * headBobSpeed) / wavLength);
         const nextStepTime = nextStep * wavLength / headBobSpeed;
-        headBobTimer = Math.min(headBobTimer + deltaTime, nextStepTime);
+        INPUT.headBobTimer = Math.min(INPUT.headBobTimer + deltaTime, nextStepTime);
     }
 }
 
@@ -886,22 +419,7 @@ window.addEventListener("gamepaddisconnected", (event) => {
     controllerIndex = null;
 });
 
-function elevator() {
-
-    elevatorCollider();
-
-    setTimeout(() => {
-        tweenCamera(1000, GLOBALS.ELEVATOR_DOOR_LEFT.rotation, new THREE.Vector3(0, 0, 0))
-        tweenCamera(1000, GLOBALS.ELEVATOR_DOOR_RIGHT.rotation, new THREE.Vector3(0, 0, 0))
-
-        setTimeout(() => {
-            $("#loading-parent").css("opacity", 1);
-        }, 3000);
-    }, 1000);
-}
-
 export {
     updatePlayer,
-    elevator,
     updateCamera
 };

@@ -1,12 +1,14 @@
-import * as THREE from 'three';
+import {
+    Clock,
+    Vector3
+} from 'three';
 import {
     generateMeshPortalShader
-} from './Portals/PortalsShader.js';
-import './PortalGun/PortalGunShaders.js';
-import './LightBridge/LightBridgerShader.js';
-import './TractorBeam/TractorBeamShader.js';
-import './ExitRoom/ExitRoomShader.js';
-import './LightBridge/LaserFieldShader.js';
+} from './PortalsShader.js';
+import './PortalGunShaders.js';
+import './LightBridgerShader.js';
+import './TractorBeamShader.js';
+import './LaserFieldShader.js';
 import './Fizzler.js';
 import './Dissolve.js'
 import {
@@ -15,17 +17,17 @@ import {
 
 generateMeshPortalShader();
 
-var clock = new THREE.Clock();
-var clock2 = new THREE.Clock();
+var clock = new Clock();
+var clock2 = new Clock();
 
 var start = Date.now();
 
 //
-var clock2 = new THREE.Clock();
+var clock2 = new Clock();
 var delta = 0;
-const interval = 1 / 30;
+const interval = 1 / 60;
 
-var clock3 = new THREE.Clock();
+var clock3 = new Clock();
 
 const animateShader = (time) => {
     delta += clock2.getDelta();
@@ -37,7 +39,7 @@ const animateShader = (time) => {
     }
 };
 
-const effectOrigin = new THREE.Vector3(1,1,5)
+const effectOrigin = new Vector3(1,1,5)
 
 const animateShader2 = (time) => {
     var val = clock.getDelta();
@@ -54,9 +56,6 @@ const animateShader2 = (time) => {
 
     //GELS
     //GLOBALS.UNIFORMS_GEL.time.value = .00025 * (Date.now() - start)
-
-    //EXIT ROOM WALL
-    //GLOBALS.MATERIAL_EXIT_ROOM.uniforms.iTime.value += val;
 
     //LIGHT BRIDGES
     let t = clock.getElapsedTime();

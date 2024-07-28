@@ -1,0 +1,457 @@
+import {
+    Vector3,
+    Group,
+    PlaneGeometry,
+    MeshBasicMaterial,
+    DoubleSide,
+    CircleGeometry,
+    Mesh,
+    TextureLoader,
+    SRGBColorSpace,
+    BoxGeometry,
+    Color,
+    MeshStandardMaterial,
+    Object3D,
+    Box3,
+} from 'three';
+import {
+    AddGoo
+} from '../goo/Goo.js';
+import {
+    GLOBALS
+} from '../../Globals.js';
+import { findPath } from '../findPath/FindPath.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+import {
+    createLightBridges
+} from '../continuous/Continuous.js';
+import { ContinuousTrigger } from '../continuous/Continuous.js';
+import { getPlaneByName } from '../../Utils.js';
+import $ from 'jquery';
+import { planeInstanceReset } from './Items.js';
+
+var beamType;
+var itemCount = 0;
+
+function addItem(found, loaded) {
+
+    if (!GLOBALS.ITEM_CUBE.place)
+        return
+
+    if (GLOBALS.ITEM_HOLDED_NAME == "goo") {
+        AddGoo(found, false);
+        return;
+    }
+
+    if (loaded)
+        GLOBALS.ITEM_HOLDED_NAME = found.itemName.split('-')[0];
+
+    const i = 0;
+
+    if (GLOBALS.CONNECTING) {
+
+        target = GLOBALS.PLANE_USER_DATA[found[i].instanceId];
+
+        GLOBALS.SELECTED_FOR_CONNECTION.trigger = target;
+        GLOBALS.SELECTED_FOR_CONNECTION.normal = found[i].normal;
+
+        findPath(GLOBALS.SELECTED_FOR_CONNECTION.position, target.position, found[i])
+    } else {
+
+        var userData;
+
+        if (loaded) {
+            userData = found;
+        } else {
+            userData = GLOBALS.PLANE_USER_DATA[found[i].instanceId];
+            userData.hasItem = false; //delete here
+        }
+
+        if (!userData.hasItem || loaded) {
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
+
+                const groupGlass = new Group();
+
+                const geometry = new PlaneGeometry(2, 2);
+                const material = new MeshBasicMaterial({ color: 0xffff00, side: DoubleSide });
+                const glass = new Mesh(geometry, material);
+
+                groupGlass.add(glass);
+                glass.translateZ(-1);
+                glass.translateY(1);
+
+                const geometryC = new CircleGeometry(0.5, 8);
+                const materialC = new MeshBasicMaterial({ color: 0xffff00 });
+                const circle = new Mesh(geometryC, materialC); 
+                circle.rotation.x = -Math.PI/2;
+                groupGlass.add(circle);
+                circle.translateZ(0.01)
+
+                GLOBALS.ITEMS_ADDED.add(groupGlass);
+
+                userData.wall = glass;
+
+                groupGlass.position.copy(userData.position);
+                groupGlass.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
+
+                return;
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
+
+                var map2 = new TextureLoader().load(GLOBALS.DRAGGED_ITEM_ELEMENT.attr("src"));
+                map2.colorSpace = SRGBColorSpace;
+
+                const geometry = new BoxGeometry(2, 0, 2);
+                const material = new MeshBasicMaterial({ map: map2, transparent: true, visible: false });
+                const plane = new Mesh(geometry, material);
+
+                var color;
+
+                if (GLOBALS.ITEM_HOLDED_NAME == "portal_0")
+                    color = new Color(0xff9a00);
+                else if (GLOBALS.ITEM_HOLDED_NAME == "portal_1")
+                    color = new Color(0x27a7d8);
+
+                const geometry2 = new BoxGeometry(0.1, 0.1, 2);
+                const material2 = new MeshStandardMaterial({ color: color, roughness: 0.2, envMap: GLOBALS.ENV_MAP });
+                const box = new Mesh(geometry2, material2);
+                const box2 = box.clone()
+                box.translateX(0.65)
+                box2.translateX(-0.65)
+
+                plane.add(box)
+                plane.add(box2)
+
+                var item = plane;
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
+                var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
+
+                item.traverse(child => {
+                    if (child.name == "horizontal")
+                        GLOBALS.CAMERA_OBJ_HORIZONTAL.push(child)
+                    else if (child.name == "vertical")
+                        GLOBALS.CAMERA_OBJ_VERTICAL.push(child)
+                })
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
+                var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "observation_room") {
+                var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
+
+                var item = new Group();
+
+                const geometry = new CircleGeometry(0.25, 32);
+                const material = new MeshBasicMaterial({ color: 0x000000 });
+                const circle = new Mesh(geometry, material);
+                circle.rotation.x = -Math.PI / 2;
+                circle.name = "circle_rotation";
+                item.add(circle);
+                circle.translateZ(0.01);
+
+                const door = SkeletonUtils.clone(GLOBALS.ENTER_DOOR);
+                door.position.set(0, 0, 0);
+                door.rotation.set(0, 0, 0);
+                item.add(door);
+                door.translateZ(-1);
+                door.translateY(1);
+
+                item.getObjectByName("portal_door_right_04").scale.set(1, 1, 1);
+                item.getObjectByName("portal_door_left_06").scale.set(1, 1, 1);
+                item.getObjectByName("warning").visible = false;
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_blue2") {
+                GLOBALS.ITEM_HOLDED_NAME = "dispenser";
+                var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
+                var item = new Object3D();
+                item.userData = instanced.userData;
+            } else {
+                var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);
+                var item = new Object3D();
+                item.userData = instanced.userData;
+            }
+
+            if (GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["count"] < GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["max"]) {
+                GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["count"] += 1;
+            } else {
+                alert("Max Number of this item on the scene reached!");
+                return;
+            }
+
+            item.buttons = 0;
+            item.connections = 0;
+            item.opened = true;
+
+            //UPDATE INSTANCE DATA
+            planeInstanceReset(
+                userData,
+                true,
+                GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount,
+                item,
+                'open',
+                GLOBALS.DRAGGED_ITEM_ELEMENT.data('rotate'),
+                GLOBALS.DRAGGED_ITEM_ELEMENT.data('floor'),
+                GLOBALS.DRAGGED_ITEM_ELEMENT.data('ceiling'),
+                GLOBALS.DRAGGED_ITEM_ELEMENT.data('walls'),
+                GLOBALS.DRAGGED_ITEM_ELEMENT.data('instanced'),
+                GLOBALS.ITEM_HOLDED_NAME,
+                GLOBALS.DRAGGED_ITEM_ELEMENT.data('allowconnection')
+            );
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
+                var target = new Vector3(); // create once an reuse it
+
+                if (loaded)
+                    target = found.position;
+                else
+                    found[i].object.getWorldPosition(target);
+
+                item.position.copy(target);
+            } else
+                item.position.copy(userData.position);
+
+            item.position.copy(userData.position);
+            item.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
+            item.renderOrder = 2;
+            item.name = GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount;
+            item.instancedName = GLOBALS.ITEM_HOLDED_NAME;
+            item.planeInstancedId = userData.id_instanced;
+            item.lightColor = "#ffffff";
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "radio")
+                item.translateY(0.5);
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
+                GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
+
+                var idInstanced;
+                userData.dispenser = true;
+                item.translateY(1);
+
+                for (var j = 0; j < GLOBALS.DYMANIC_ITEMS["dispenser"].length; j++) {
+                    if (GLOBALS.DYMANIC_ITEMS["dispenser"][j].length == 0) {
+                        GLOBALS.DYMANIC_ITEMS["dispenser"][j] = item;
+                        idInstanced = j;
+                        break;
+                    }
+                }
+
+                var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
+                var item2 = new Object3D();
+                item2.position.copy(userData.position);
+
+                //GET CEILING SURFACE
+                for (var x = 0, j = 2; x < 100; x++, j += 2) {
+
+                    var boxTop = getPlaneByName(userData.position.x + "/" + (userData.position.y + j) + "/" + userData.position.z);
+
+                    if (boxTop.length > 0) {
+                        boxTop[0].hasItem = true;
+                        boxTop[0].itemName = "dispenser";
+                        boxTop[0].item = item2;
+                        item2.translateY(j);
+                        break;
+                    }
+                }
+
+                item.dispenserPosition = item2.position.clone();
+                item.hasDispenser = true;
+                item.dispenserID = idInstanced;
+                item.state = "open";
+
+                item2.item = item;
+                item2.userData.id = idInstanced;
+                item2.scale.set(1, 1, 1);
+                item2.updateMatrix();
+                instanced2.setMatrixAt(idInstanced, item2.matrix);
+                instanced2.instanceMatrix.needsUpdate = true;
+                instanced2.computeBoundingSphere();
+            }
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "laser_field") {
+                item.state = true;
+                item.triggers = GLOBALS.LASER_FIELD_TRIGGER;
+            }
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "fizzler") {
+                item.state = true;
+                item.triggers = GLOBALS.FIZZLER_TRIGGER;
+            }
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "light_bridge") {
+                item.state = true;
+                item.triggers = GLOBALS.LIGHT_BRIDGE_TRIGGER;
+                createLightBridges("light_bridge", GLOBALS.LIGHT_BRIDGE_RAYCASTER, item);
+
+                setTimeout(() => {
+                    ContinuousTrigger(userData, GLOBALS.LIGHT_BRIDGE_TRIGGER, $("#light-bridge-trigger"), "light_bridge");
+                }, 100);
+            }
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "tractor_beam") {
+                item.beam = beamType;
+                item.state = true;
+                item.reversed = false;
+                item.triggers = "State";
+                createLightBridges("tractor_beam", GLOBALS.TRACTOR_BEAM_RAYCASTER, item);
+            }
+
+            if (GLOBALS.ITEM_HOLDED_NAME.includes("button")) {
+                const geometryBox3 = new BoxGeometry(1, 0.5, 1);
+                const materialBox3 = new MeshBasicMaterial({
+                    color: 0x00ff00
+                });
+                const cube = new Mesh(geometryBox3, materialBox3);
+                cube.position.copy(item.position);
+                cube.rotation.copy(item.rotation);
+
+                var bb = new Box3(); // for re-use
+                bb.setFromObject(cube);
+
+                if (userData.instancedName == "button_box") {
+                    bb.accept = "cube";
+                } else if (userData.instancedName == "button_circle") {
+                    bb.accept = "sphere";
+                } else if (userData.instancedName == "button_weight") {
+                    bb.accept = "sphere-cube-player";
+                }
+
+                userData.box3 = bb;
+            }
+
+            item.pedestalInfinity = true;
+            item.pedestalValue = 3;
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
+                GLOBALS.ITEMS_ADDED.add(item);
+                item.translateY(0.01);
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
+
+                item.translateY(0.3)
+
+                const geometry = new BoxGeometry(0.6, 0.6, 0.6);
+                const material = new MeshBasicMaterial({ color: 0x00ff00 });
+                const cube = new Mesh(geometry, material);
+                cube.name = "camera";
+                cube.visible = false;
+
+                var holder = new Vector3();
+                item.children[1].getWorldPosition(holder)
+                holder.y -= 0.25;
+
+                cube.position.copy(holder)
+                GLOBALS.SCENE.add(cube);
+
+                var bb = new Box3(); // for re-use
+                bb.setFromObject(cube);
+                item.box3 = bb;
+                item.fixed = true;
+                item.cube = cube;
+                cube.item = item;
+
+
+                GLOBALS.CAMERAS.push(item);
+                GLOBALS.ITEMS_ADDED.add(item);
+
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "observation_room") {
+                GLOBALS.ITEMS_ADDED.add(item);
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
+                item.translateY(0.025);
+
+                var bb = new Box3(); // for re-use
+                bb.setFromObject(item);
+                bb.side = 1;
+                bb.position = item.position;
+                bb.item = item;
+
+                GLOBALS.FAITH_PLATE_CONTACT_BOX.push(bb);
+
+                item.traverse(child => {
+                    if (child.name == "launch") {
+                        GLOBALS.FAITH_PLATE_TO_ROTATE.push(child)
+                    }
+                })
+
+                GLOBALS.ITEMS_ADDED.add(item);
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
+                GLOBALS.ITEMS_ADDED.add(item);
+                GLOBALS.DOORS.push(item)
+            } else {
+                var idInstanced;
+
+                for (var j = 0; j < GLOBALS.DYMANIC_ITEMS[GLOBALS.ITEM_HOLDED_NAME].length; j++) {
+                    if (GLOBALS.DYMANIC_ITEMS[GLOBALS.ITEM_HOLDED_NAME][j].length == 0) {
+                        item.laser = false;
+                        GLOBALS.DYMANIC_ITEMS[GLOBALS.ITEM_HOLDED_NAME][j] = item;
+                        idInstanced = j;
+                        break;
+                    }
+                }
+
+                if (GLOBALS.ITEM_HOLDED_NAME == "dispenser") {
+                    //GET CEILING SURFACE
+                    for (var x = 0, j = 2; x < 100; x++, j += 2) {
+
+                        var boxTop = getPlaneByName(userData.position.x + "/" + (userData.position.y + j) + "/" + userData.position.z);
+
+                        if (boxTop.length > 0) {
+                            item.translateY(j);
+                            break;
+                        }
+                    }
+                }
+
+                item.userData.id = idInstanced;
+                item.idInstanced = idInstanced;
+                item.scale.set(1, 1, 1);
+                item.updateMatrix();
+                instanced.setMatrixAt(idInstanced, item.matrix);
+
+                if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_blue") {
+                    instanced.setColorAt(idInstanced, new Color(0x0000ff));
+                    instanced.instanceColor.needsUpdate = true;
+                } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_orange") {
+                    instanced.setColorAt(idInstanced, new Color(0xffa500));
+                    instanced.instanceColor.needsUpdate = true;
+                } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_white") {
+                    instanced.setColorAt(idInstanced, new Color(0xffffff));
+                    instanced.instanceColor.needsUpdate = true;
+                }
+
+                instanced.instanceMatrix.needsUpdate = true;
+                instanced.computeBoundingSphere();
+
+                if (GLOBALS.ITEM_HOLDED_NAME == "laser_field") {
+                    createLightBridges("laser_field", GLOBALS.LASER_FIELD_RAYCASTER, item, instanced);
+
+                    setTimeout(() => {
+                        ContinuousTrigger(userData, GLOBALS.LASER_FIELD_TRIGGER, $("#laser-field-trigger"), "laser_field");
+                    }, 100);
+                } else if (GLOBALS.ITEM_HOLDED_NAME == "fizzler") {
+                    createLightBridges("fizzler", GLOBALS.FIZZLER_RAYCASTER, item, instanced);
+
+                    setTimeout(() => {
+                        ContinuousTrigger(userData, GLOBALS.FIZZLER_TRIGGER, $("#laser-field-trigger"), "fizzler");
+                    }, 100);
+                }
+            }
+
+            itemCount++;
+        }
+    }
+
+    if (loaded) {
+        GLOBALS.ITEM_HOLDED_NAME = null;
+        $("#follow").css("display", "none");
+    }
+}
+
+function clickItem(elem) {
+    GLOBALS.ITEM_HOLDED_NAME = elem.data("name");
+    beamType = elem.data("beam");
+    $("#follow").attr("src", elem.attr("src"));
+    GLOBALS.DRAGGED_ITEM_ELEMENT = elem;
+}
+
+export {
+    addItem,
+    clickItem
+}

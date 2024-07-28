@@ -1,19 +1,26 @@
-/* eslint-disable */
-import * as THREE from 'three';
 import {
-    GeneralBB
-} from '../generalBB/GeneralBB.js'
-import {
+    Plane,
+    CylinderGeometry,
+    Matrix4,
+    BoxGeometry,
+    ShaderMaterial,
+    Texture,
+    Mesh,
+    DoubleSide,
+    MeshBasicMaterial,
+    ArrowHelper,
+    EqualStencilFunc,
+    ReplaceStencilOp,
     Group,
     Vector3
 } from 'three';
 import {
+    GeneralBB
+} from '../generalBB/GeneralBB.js'
+import {
     GLOBALS
 } from '../../Globals.js';
-import * as CANNON from "cannon";
-import { AUDIO,play } from '../audio/Audio.js';
-import { hideMaterial } from "../../Main.js";
-import { removeJointConstraint } from "../../Physics.js";
+import './Teleportation.js';
 
 class Portal extends Group {
     // position - the center position (vector3)
@@ -28,7 +35,7 @@ class Portal extends Group {
         this.pos = position.clone()
         this.output = output
         this.hostObjects = hostObjects
-        this.plane = new THREE.Plane(new Vector3(0, 1, 0), 0)
+        this.plane = new Plane(new Vector3(0, 1, 0), 0)
         this.debugMeshes = new Group()
 
         // create onb for bb transformations
@@ -43,19 +50,19 @@ class Portal extends Group {
         // set portal corner points
         this.portalPoints = portalPoints;
         if (portalPoints === undefined || portalPoints.length == 0) {
-            this.portalPoints = [this.pos.clone().add(this.tz.clone().multiplyScalar(portal_depth / 2 + 2 * portal_eps).add(this.tx.clone().multiplyScalar(portal_width / 2 + 2 * portal_eps))),
-            this.pos.clone().add(this.tz.clone().multiplyScalar(-portal_depth / 2 - 2 * portal_eps).add(this.tx.clone().multiplyScalar(portal_width / 2 + 2 * portal_eps))),
-            this.pos.clone().add(this.tz.clone().multiplyScalar(-portal_depth / 2 - 2 * portal_eps).add(this.tx.clone().multiplyScalar(-portal_width / 2 - 2 * portal_eps))),
-            this.pos.clone().add(this.tz.clone().multiplyScalar(portal_depth / 2 + 2 * portal_eps).add(this.tx.clone().multiplyScalar(-portal_width / 2 - 2 * portal_eps)))
+            this.portalPoints = [this.pos.clone().add(this.tz.clone().multiplyScalar(GLOBALS.PORTAL_DEPTH / 2 + 2 * GLOBALS.PORTAL_EPS).add(this.tx.clone().multiplyScalar(GLOBALS.PORTAL_WIDTH / 2 + 2 * GLOBALS.PORTAL_EPS))),
+            this.pos.clone().add(this.tz.clone().multiplyScalar(-GLOBALS.PORTAL_DEPTH / 2 - 2 * GLOBALS.PORTAL_EPS).add(this.tx.clone().multiplyScalar(GLOBALS.PORTAL_WIDTH / 2 + 2 * GLOBALS.PORTAL_EPS))),
+            this.pos.clone().add(this.tz.clone().multiplyScalar(-GLOBALS.PORTAL_DEPTH / 2 - 2 * GLOBALS.PORTAL_EPS).add(this.tx.clone().multiplyScalar(-GLOBALS.PORTAL_WIDTH / 2 - 2 * GLOBALS.PORTAL_EPS))),
+            this.pos.clone().add(this.tz.clone().multiplyScalar(GLOBALS.PORTAL_DEPTH / 2 + 2 * GLOBALS.PORTAL_EPS).add(this.tx.clone().multiplyScalar(-GLOBALS.PORTAL_WIDTH / 2 - 2 * GLOBALS.PORTAL_EPS)))
             ]
         }
 
-        let tRot = new THREE.Matrix4().makeBasis(this.tx, this.ty, this.tz)
+        let tRot = new Matrix4().makeBasis(this.tx, this.ty, this.tz)
 
         // for visualization purposes
-        let xHelper = new THREE.ArrowHelper(this.tx, position, 1, 0xff0000)
-        let yHelper = new THREE.ArrowHelper(this.ty, position, 1, 0x00ff00)
-        let zHelper = new THREE.ArrowHelper(this.tz, position, 1, 0x0000ff)
+        let xHelper = new ArrowHelper(this.tx, position, 1, 0xff0000)
+        let yHelper = new ArrowHelper(this.ty, position, 1, 0x00ff00)
+        let zHelper = new ArrowHelper(this.tz, position, 1, 0x0000ff)
         this.debugMeshes.add(xHelper, yHelper, zHelper)
 
         this.transform = tRot.clone().setPosition(position)
@@ -78,15 +85,16 @@ class Portal extends Group {
         void main() {
             gl_FragColor = texture2D(texture1, gl_FragCoord.xy / vec2(ww, wh));
 
-            #include <tonemapping_fragment>
-            #include <colorspace_fragment>
         }
         `
-        const geometry = new THREE.CylinderGeometry(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_HEIGHT);
+
+        /*#include <tonemapping_fragment>
+            #include <colorspace_fragment>*/
+        const geometry = new CylinderGeometry(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_HEIGHT);
         const uniforms = {
             texture1: {
                 type: 't',
-                value: new THREE.Texture()
+                value: new Texture()
             },
             ww: {
                 type: 'f',
@@ -98,34 +106,35 @@ class Portal extends Group {
             }
         }
 
-        const material = new THREE.ShaderMaterial({
+        const material = new ShaderMaterial({
             vertexShader: VERT_SHADER,
             fragmentShader: FRAG_SHADER,
             uniforms: uniforms,
             stencilWrite: true, // stencil optimization, only for culling portal
-            stencilFunc: THREE.EqualStencilFunc,
+            stencilFunc: EqualStencilFunc,
             stencilRef: 1,
-            stencilFail: THREE.ReplaceStencilOp,
+            stencilFail: ReplaceStencilOp,
             depthTest: true,
             depthWrite: false,
-            polygonOffset: true,
-            polygonOffsetFactor: -1,
-            side: THREE.DoubleSide
+            polygonOffset: false,
+            polygonOffsetFactor: -2,
+            side: DoubleSide
         });
 
-        this.mesh = new THREE.Mesh(geometry, material);
+        this.mesh = new Mesh(geometry, material);
         this.mesh.applyMatrix4(this.transform)
         this.mesh.updateMatrix()
         this.mesh.matrixAutoUpdate = true;
         this.matrixAutoUpdate = true;
         this.mesh.frustumCulled = true;
         this.add(this.mesh)
+        this.mesh.renderOrder = 100;
 
-        this.mesh.translateY(-0.25);
+        this.mesh.translateY(-0.5);
 
-        this.mesh.onAfterRender = function (renderer) {
+        /*this.mesh.onAfterRender = function (renderer) {
             renderer.clearStencil();
-        };
+        };*/
 
         var light;
 
@@ -152,19 +161,20 @@ class Portal extends Group {
         }
 
         //
-        GLOBALS.PORTAL_SHADER[index].applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
+        GLOBALS.PORTAL_SHADER[index].applyMatrix4(new Matrix4().makeRotationX(-Math.PI / 2))
         GLOBALS.PORTAL_SHADER[index].applyMatrix4(this.transform)
         GLOBALS.PORTAL_SHADER[index].updateMatrix()
         GLOBALS.PORTAL_SHADER[index].matrixAutoUpdate = true;
         this.portalShader = GLOBALS.PORTAL_SHADER[index];
+        this.portalShader.renderOrder = 100;
         this.portalShader.frustumCulled = true;
         this.add(GLOBALS.PORTAL_SHADER[index])
 
         //
-        const geometry3 = new THREE.BoxGeometry(1.4, 2, 0.1);
-        const material3 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        GLOBALS.PORTAL_BOX[index] = new THREE.Mesh(geometry3, material3);
-        GLOBALS.PORTAL_BOX[index].applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
+        const geometry3 = new BoxGeometry(1.4, 2, 0.1);
+        const material3 = new MeshBasicMaterial({ color: 0x00ff00 });
+        GLOBALS.PORTAL_BOX[index] = new Mesh(geometry3, material3);
+        GLOBALS.PORTAL_BOX[index].applyMatrix4(new Matrix4().makeRotationX(-Math.PI / 2))
         GLOBALS.PORTAL_BOX[index].applyMatrix4(this.transform)
         GLOBALS.PORTAL_BOX[index].updateMatrix()
         GLOBALS.PORTAL_BOX[index].matrixAutoUpdate = true;
@@ -172,9 +182,9 @@ class Portal extends Group {
         this.add(GLOBALS.PORTAL_BOX[index]);
 
         //
-        const geometry4 = new THREE.BoxGeometry(0.75, 1.2, 0.1);
-        GLOBALS.PORTAL_INNER_BOX[index] = new THREE.Mesh(geometry4, material3);
-        GLOBALS.PORTAL_INNER_BOX[index].applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2))
+        const geometry4 = new BoxGeometry(0.75, 1.2, 0.1);
+        GLOBALS.PORTAL_INNER_BOX[index] = new Mesh(geometry4, material3);
+        GLOBALS.PORTAL_INNER_BOX[index].applyMatrix4(new Matrix4().makeRotationX(-Math.PI / 2))
         GLOBALS.PORTAL_INNER_BOX[index].applyMatrix4(this.transform)
         GLOBALS.PORTAL_INNER_BOX[index].updateMatrix()
         GLOBALS.PORTAL_INNER_BOX[index].matrixAutoUpdate = true;
@@ -201,299 +211,6 @@ class Portal extends Group {
     }
 }
 
-// teleport a 3D object directly, returns nothing
-// Object3D includes camera, meshes
-function teleportObject3D(object, portal) {
-    let f = new THREE.Matrix4().makeScale(-1, -1, 1)
-    let m = portal.CDBB.inverse_t.clone().premultiply(f).premultiply(portal.output.CDBB.t)
-    object.applyMatrix4(m)
-}
-
-function teleportPhysicalObject(object, portal) {
-
-    let f = new THREE.Matrix4().makeScale(-1, -1, 1)
-    let m = portal.CDBB.inverse_t.clone().premultiply(f).premultiply(portal.output.CDBB.t)
-    //object.mesh.applyMatrix4(m)
-    let position = cannonToThreeVector3(object.position)
-    let previousPosition = cannonToThreeVector3(object.position)
-    let velocity = cannonToThreeVector3(object.velocity)
-    let force = cannonToThreeVector3(object.force)
-
-    let orientation = new THREE.Quaternion().copy(object.quaternion)
-    let mquat = new THREE.Quaternion().setFromRotationMatrix(m)
-    orientation.premultiply(mquat)
-
-    position = getTeleportedPositionalVector(position, portal)
-    previousPosition = getTeleportedPositionalVector(previousPosition, portal)
-    velocity = getTeleportedDirectionalVector(velocity, portal)
-    force = getTeleportedDirectionalVector(force, portal)
-
-    if (velocity.x > 10) {
-        velocity.x = 10;
-    } else if (velocity.x < -10)
-        velocity.x = -10;
-
-    if (velocity.y > 10) {
-        velocity.y = 10;
-    } else if (velocity.y < -10)
-        velocity.y = -10;
-
-    if (velocity.z > 10) {
-        velocity.z = 10;
-    } else if (velocity.z < -10)
-        velocity.z = -10;
-
-    if (Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) {
-        velocity.x *= 0.5;
-        velocity.z *= 0.5;
-    }
-
-    object.position.copy(position)
-    object.previousPosition.copy(previousPosition)
-    object.velocity.copy(velocity)
-    object.force.copy(force)
-    object.quaternion.copy(orientation)
-}
-
-function threeToCannonVector3(v3) {
-    return new CANNON.Vec3().copy(v3)
-}
-
-function cannonToThreeVector3(v3) {
-    return new THREE.Vector3().copy(v3)
-}
-
-// apply teleportation to the output portal to the vector
-// no side effects
-function getTeleportedPositionalVector(v, portal) {
-    let f = new THREE.Matrix4().makeScale(-1, -1, 1)
-    let m = portal.CDBB.inverse_t.clone().premultiply(f).premultiply(portal.output.CDBB.t)
-    let v4 = threeToFour(v).applyMatrix4(m)
-    return fourToThree(v4)
-}
-
-// for directional vectors, it doesn't make sense to translate them
-// we only apply the rotational component of the matrix
-function getTeleportedDirectionalVector(v, portal) {
-    let f = new THREE.Matrix4().makeScale(-1, -1, 1)
-    let it = new THREE.Matrix4()
-    it.extractRotation(portal.CDBB.inverse_t)
-    let to = new THREE.Matrix4()
-    to.extractRotation(portal.output.CDBB.t)
-
-    let m = it.clone().premultiply(f).premultiply(to)
-    let v4 = threeToFour(v).applyMatrix4(m)
-    return fourToThree(v4)
-}
-
-// convert vector3 to vector4
-function threeToFour(v) {
-    return new THREE.Vector4(v.x, v.y, v.z, 1)
-}
-
-function fourToThree(v) {
-    return new THREE.Vector3(v.x, v.y, v.z).multiplyScalar(1 / v.w)
-}
-
-function teleportationState() {
-
-    GLOBALS.MAIN_CAMERA.position.copy(GLOBALS.PLAYER.position)
-    GLOBALS.MAIN_CAMERA.translateY(0.3)
-    GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
-
-    if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null) return;
-
-    var dd = 0;
-
-    for (var i = 0; i < GLOBALS.CAMERAS.length; i++) {
-        if (
-            (GLOBALS.CAMERAS[i].box3.containsPoint(GLOBALS.PORTAL_BOX[0].position) ||
-                GLOBALS.CAMERAS[i].box3.containsPoint(
-                    GLOBALS.PORTAL_BOX[1].position
-                )) &&
-            GLOBALS.CAMERAS[i].fixed
-        ) {
-            GLOBALS.CAMERAS[i].fixed = false;
-            addCameraBody(GLOBALS.CAMERAS[i]);
-        }
-    }
-
-    if (GLOBALS.OBJ_HOLDED_CLONE && GLOBALS.HOLDING_ITEM) {
-
-        let pos = GLOBALS.CURRENT_ITEM.body.position;
-        let CDBB_isOverlap = false;
-        GLOBALS.OBJ_HOLDED_CLONE.visible = false;
-
-        for (let p = 0; p < GLOBALS.PORTALS.length; p++) {
-            // collision disable, might be partially intersecting with portal
-            if (GLOBALS.PORTALS[p].CDBB.containsPoint(pos)) {
-                // show the clone
-                if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
-                    CDBB_isOverlap = true;
-                    teleportObject3D(GLOBALS.OBJ_HOLDED_CLONE, GLOBALS.PORTALS[p]);
-                    GLOBALS.OBJ_HOLDED_CLONE.visible = true;
-                }
-            }
-        }
-    }
-
-    for (let d of GLOBALS.DYNAMIC_OBJECTS) {
-
-        let pos = new THREE.Vector3(d.position.x, d.position.y, d.position.z);
-
-        if (dd == 0) {
-            //pos = new THREE.Vector3(GLOBALS.MAIN_CAMERA.position.x, d.position.y, GLOBALS.MAIN_CAMERA.position.z);
-        }
-
-        d.collisionFilterMask = GLOBALS.CGROUP_ALL;
-
-        if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null) continue;
-
-        var inArea = 0;
-
-        if (dd == 0) {
-            GLOBALS.PLAYER_MODEL_CLONE.visible = false;
-            GLOBALS.GUN_CLONE.visible = false;
-            GLOBALS.GUN_CLONE2.visible = false;
-        }
-
-        let CDBB_isOverlap = false;
-
-        for (let p = 0; p < GLOBALS.PORTALS.length; p++) {
-            // collision disable, might be partially intersecting with portal
-            if (GLOBALS.PORTALS[p].CDBB.containsPoint(pos)) {
-                if (d.name != "player") {
-                    d.wakeUp();
-                }
-
-                d.collisionFilterMask &=
-                    ~GLOBALS.PORTALS[p].hostObjects.collisionFilterGroup;
-                d.inArea = true;
-
-                if (dd == 0) {
-                    inArea++;
-
-                    // show the clone
-                    if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
-
-                        CDBB_isOverlap = true;
-                        teleportObject3D(GLOBALS.PLAYER_MODEL_CLONE, GLOBALS.PORTALS[p]);
-                        GLOBALS.PLAYER_MODEL_CLONE.visible = true;
-
-                        GLOBALS.PLAYER_MODEL_CLONE.traverse((c) => {
-                            if (c.isBone) {
-                                if (c.name == "wrist_R") {
-                                    var positionBoneHand = new THREE.Vector3();
-                                    c.getWorldPosition(positionBoneHand);
-                                    window.posW = positionBoneHand;
-                                }
-                            }
-                        });
-                    }
-                }
-            }else{
-                d.inArea = false;
-            }
-
-            // should teleport
-            if (GLOBALS.PORTALS[p].STBB.containsPoint(pos)) {
-
-                if (d.holding) {
-                    d.teleportingHolding = true;
-                } else {
-                    teleportPhysicalObject(d, GLOBALS.PORTALS[p]);
-
-                    if (dd == 0) {
-
-                        AUDIO.PORTAL_ENTER.pause();
-                        AUDIO.PORTAL_ENTER.currentTime = 0;
-                        play(AUDIO.PORTAL_ENTER)
-
-                        AUDIO.PORTAL_EXIT.pause();
-                        AUDIO.PORTAL_EXIT.currentTime = 0;
-                        play(AUDIO.PORTAL_EXIT)
-
-                        hideMaterial(GLOBALS.PLAYER_MODEL, true, 0)
-                        GLOBALS.PLAYER_MODEL_CLONE.visible = false;
-
-                        removeJointConstraint();
-                        teleportObject3D(GLOBALS.MAIN_CAMERA, GLOBALS.PORTALS[p]);
-
-                        // fix camera rotation
-                        // create a new basis with up as the up
-                        // https://danielilett.com/2020-01-03-tut4-4-portal-momentum/
-                        let up = new THREE.Vector3(0, 1, 0);
-                        let cameraForward = new THREE.Vector3();
-                        GLOBALS.MAIN_CAMERA.getWorldDirection(cameraForward);
-                        cameraForward.normalize();
-                        let cameraRight = cameraForward.clone().cross(up).normalize();
-                        let cameraUp = cameraRight.clone().cross(cameraForward).normalize();
-                        let cameraMat = new THREE.Matrix4().makeBasis(
-                            cameraRight,
-                            cameraUp,
-                            cameraForward.negate()
-                        );
-                        GLOBALS.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat);
-
-                        var q = new THREE.Quaternion()
-                        q.setFromRotationMatrix(cameraMat);
-                        window.q = q;
-
-                        GLOBALS.TARGET_ROTATION_X = GLOBALS.MAIN_CAMERA.rotation.y;
-                        GLOBALS.TARGET_ROTATION_Y = GLOBALS.MAIN_CAMERA.rotation.x;
-
-                        GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
-
-                        window.CAMERA_ROTATING = true;
-                        setTimeout(() => {
-                            window.CAMERA_ROTATING = false;
-                        }, 1000);
-                    }
-
-                    d.collisionFilterMask |=
-                        GLOBALS.PORTALS[p].hostObjects.collisionFilterGroup;
-                    d.collisionFilterMask &=
-                        ~GLOBALS.PORTALS[1 - p].hostObjects.collisionFilterGroup;
-
-                    break;
-                }
-            } else {
-                if (d.portal == p && d.teleportingHolding) d.teleportingHolding = false;
-            }
-        }
-        dd++;
-    }
-}
-
-function addCameraBody(obj) {
-    let PHYSICS_MATERIAL = new CANNON.Material();
-    PHYSICS_MATERIAL.friction = 0.4; //0.01
-    PHYSICS_MATERIAL.restitution = 0; //0.1
-  
-    var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.2, 0.2));
-  
-    var box = new CANNON.Body({
-      shape: shape,
-      mass: 10,
-      material: PHYSICS_MATERIAL,
-    });
-  
-    box.position.copy(obj.cube.position);
-    box.quaternion.copy(obj.quaternion);
-    box.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
-    box.collisionFilterMask = GLOBALS.CGROUP_ALL;
-    box.offset = 0.2;
-    obj.body = box;
-    obj.cube.body = box;
-    obj.name == "camera";
-    GLOBALS.DYNAMIC_OBJECTS.push(box);
-    GLOBALS.CANNON_WORLD.addBody(box);
-    GLOBALS.INTERACTIVE.push(obj.cube);
-  }
-
 export {
-    Portal,
-    teleportPhysicalObject,
-    teleportObject3D,
-    teleportationState
+    Portal
 }

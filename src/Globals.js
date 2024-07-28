@@ -1,58 +1,71 @@
-/* eslint-disable */
-import * as THREE from 'three';
+import {
+    PerspectiveCamera,
+    Object3D,
+    WebGLRenderer,
+    SRGBColorSpace,
+    ACESFilmicToneMapping,
+    PCFSoftShadowMap,
+    Group,
+    Scene,
+    WebGLRenderTarget,
+    AudioListener
+} from 'three';
 import * as CANNON from 'cannon';
 import "./components/materials/Materials.js"
 import {
     OrbitControls
 } from 'three/addons/controls/OrbitControls.js';
 
-var pixelRatio, shadowMap, portalsRecursive, fov, mobile,antialias;
+var pixelRatio, shadowMap, portalsRecursive, fov, mobile, antialias;
 
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     mobile = true;
     pixelRatio = 0.5;
     shadowMap = true;
     portalsRecursive = 1;
-    fov = 60;
+    fov = 70;
     antialias = false;
 } else {
     mobile = false;
     pixelRatio = 0.5;
     shadowMap = true;
     portalsRecursive = 2;
-    fov = 60;
+    fov = 70;
 
-    if(localStorage.getItem("antialising") == "true")
+    if (localStorage.getItem("antialising") == "true")
         antialias = true;
     else
         antialias = false;
 }
 
 //MAIN CAMERA
-const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 
+const portalGunCamera = camera.clone();
+portalGunCamera.layers.mask = 2;
+
 //POINT OF OBJECTS WHILE HOLDING WITH THE GUN
-const cubeHolder = new THREE.Object3D()
+const cubeHolder = new Object3D()
 cubeHolder.position.z = -1.25;
 cubeHolder.name = "cubeHolder";
 window.cubeHolder = cubeHolder;
 camera.add(cubeHolder);
 
 //RENDERER
-const renderer = new THREE.WebGLRenderer({
+const renderer = new WebGLRenderer({
     alpha: true,
     powerPreference: "high-performance",
     antialias: antialias,
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;;
+renderer.outputColorSpace = SRGBColorSpace;
+renderer.toneMapping = ACESFilmicToneMapping;;
 renderer.toneMappingExposure = 1;
 renderer.shadowMap.enabled = shadowMap;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = PCFSoftShadowMap;
 renderer.shadowMap.needsUpdate = true;
 renderer.localClippingEnabled = true;
 //renderer.physicallyCorrectLights = true;
@@ -67,12 +80,14 @@ var GLOBALS = {
 
     PIXEL_RATIO: pixelRatio,
 
-    SCENE: new THREE.Scene(),
-    SCENE_CHILDREN: new THREE.Group(),
+    SCENE: new Scene(),
+    SCENE_CHILDREN: new Group(),
     MAIN_CAMERA: camera,
+    PORTAL_GUN_CAMERA: portalGunCamera,
     CONTROLS: controls,
     POINTER_CONTROLS: null,
     RENDERER: renderer,
+    COMPOSER: null,
     ITEM_HOLDED_NAME: null,
 
     //BOOLEAN
@@ -88,10 +103,10 @@ var GLOBALS = {
     LOADED_LEVEL: false,
 
     //GROUPS
-    ITEMS_ADDED: new THREE.Group(),
-    ROOM: new THREE.Group(),
-    ITEMS: new THREE.Group(),
-    CUBES: new THREE.Group(),
+    ITEMS_ADDED: new Group(),
+    ROOM: new Group(),
+    ITEMS: new Group(),
+    CUBES: new Group(),
 
     //LEVEL EDITOR
     PLANE_USER_DATA: [],
@@ -101,14 +116,14 @@ var GLOBALS = {
     //PORTALS
     PORTALS: [null, null],
     PORTAL_RECURSION_LEVELS: portalsRecursive,
-    PORTAL_TARGETS: [new THREE.WebGLRenderTarget(1, 1), new THREE.WebGLRenderTarget(1, 1)],
-    PORTAL_TMP_TARGETS: [new THREE.WebGLRenderTarget(1, 1), new THREE.WebGLRenderTarget(1, 1)],
-    PORTAL_WIDTH: 1,
-    PORTAL_DEPTH: 2,
+    PORTAL_TARGETS: [new WebGLRenderTarget(1, 1), new WebGLRenderTarget(1, 1)],
+    PORTAL_TMP_TARGETS: [new WebGLRenderTarget(1, 1), new WebGLRenderTarget(1, 1)],
+    PORTAL_WIDTH: 0.9,
+    PORTAL_DEPTH: 1.8,
     PORTAL_EPS: 0.01,
     PORTAL_COLORS: [0x00e1ff, 0xffc600],
     PORTAL_CDBB_HEIGHT: 3,
-    PORTAL_HEIGHT: 0.5,
+    PORTAL_HEIGHT: 1.0,
     PORTAL_RING_THICKNESS: 0.3,
     PORTAL_SHADER: [],
     PORTAL_BOX: [],
@@ -232,7 +247,6 @@ var GLOBALS = {
     INK_MATERIAL: null,
 
     CORRIDOR_ENTER: null,
-    CORRIDOR_EXIT: null,
     ENTER_DOOR: null,
     EXIT_DOOR: null,
 
@@ -276,7 +290,7 @@ var GLOBALS = {
     IMG_CHECK: null,
     IMG_CLOSE: null,
 
-    SMOOTHNESS: 0.1,
+    SMOOTHNESS: 0.2,
 
     GOO_PLANES: [],
     GOO_BOXES: [],
@@ -300,9 +314,6 @@ var GLOBALS = {
     TARGET_ROTATION_X: 0,
     TARGET_ROTATION_Y: 0,
 
-    EXIT_ROOM: null,
-    EXIT_ROOM_COLLIDERS: [],
-
     SPOTLIGHT: null,
 
     DOORS: [],
@@ -316,7 +327,6 @@ var GLOBALS = {
     MATERIAL_WALL_NON_PORTAL: null,
     MATERIAL_WALL_NON_PORTAL2: null,
     MATERIAL_GUN: null,
-    MATERIAL_EXIT_ROOM: null,
     MATERIAL_MAIN_MENU: null,
     MATERIAL_SUB_MENU: null,
     TEXTURE_MENU_GRID: null,
@@ -489,7 +499,7 @@ var GLOBALS = {
         },
     },
     SCENE_FPS: null,
-    LISTENER: new THREE.AudioListener(),
+    LISTENER: new AudioListener(),
     CANNON_BODIES: [],
     LEVEL_ENTERED: false,
     DOOR_OPEN_STATE: false,
@@ -502,7 +512,10 @@ var GLOBALS = {
     CONNECTIONS: [],
 
     POSITIONAL_AUDIO_GROUP: null,
-    PORTAL_AUDIO: [new THREE.Object3D, new THREE.Object3D]
+    PORTAL_AUDIO: [new Object3D, new Object3D],
+
+    SELECTED_FOR_BLOOM: null,
+    PLAYER_MOVING: false
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
