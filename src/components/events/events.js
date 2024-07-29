@@ -185,10 +185,8 @@ function interactWithItem() {
   if (GLOBALS.HOLDING_ITEM) {
 
     AUDIO.HOLD.pause();
-    tweenCamera(250, GLOBALS.GUN.children[0].children[0].position, new Vector3(0.009, -0.013, -0.012))
+    tweenCamera(250, GLOBALS.GUN.children[0].children[0].position, new Vector3(0.00009, -0.00013, -0.00012))
     GLOBALS.HOLDING_ITEM = false;
-    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.OBJ_HOLDED_CLONE);
-    GLOBALS.OBJ_HOLDED_CLONE = null;
 
     if (itemHolder) {
       itemHolder.gelJumping = false;
@@ -301,7 +299,7 @@ function interactWithItem() {
       if (intersects[0].distance < 1.5) {
 
         GLOBALS.HOLDING_ITEM = true;
-        tweenCamera(250, GLOBALS.GUN.children[0].children[0].position, new Vector3(0.009, -0.013, -0.001))
+        tweenCamera(250, GLOBALS.GUN.children[0].children[0].position, new Vector3(0.00009, -0.00013, -0.00001))
 
         if (intersects[0].object.name != "camera") {
           var instancedId = intersects[0].instanceId;
@@ -315,20 +313,12 @@ function interactWithItem() {
           GLOBALS.CURRENT_ITEM.body.angularDamping = 1;
           GLOBALS.CURRENT_ITEM.body.allowSleep = false;
           GLOBALS.CURRENT_ITEM.body.holding = true;
-
-          GLOBALS.OBJ_HOLDED_CLONE = GLOBALS.CURRENT_ITEM.userData.obj;
-          GLOBALS.OBJ_HOLDED_CLONE.userData.instanced = true;
         } else {
           GLOBALS.CURRENT_ITEM = intersects[0].object;
           GLOBALS.CURRENT_ITEM.body.angularDamping = 1;
           GLOBALS.CURRENT_ITEM.body.allowSleep = false;
           GLOBALS.CURRENT_ITEM.body.holding = true;
-          GLOBALS.OBJ_HOLDED_CLONE = GLOBALS.CURRENT_ITEM.item.clone();
-          GLOBALS.OBJ_HOLDED_CLONE.userData.instanced = false;
         }
-
-        GLOBALS.SCENE_CHILDREN.add(GLOBALS.OBJ_HOLDED_CLONE);
-        GLOBALS.OBJ_HOLDED_CLONE.visible = false;
 
         AUDIO.PICK_SUCESS.pause();
         AUDIO.PICK_SUCESS.currentTime = 0;

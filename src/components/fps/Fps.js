@@ -28,7 +28,7 @@ var gamepadButton7 = false;
 var gamepadButton12 = false;
 var gamepadButton15 = false;
 var headBobSpeed = 5;
-var headBobHeight = 0.00075;
+var headBobHeight = 0.00000075;//
 let controllerIndex = null;
 var finalRotationY;
 window.PLAYER_JUMPING_FROM_BLUE_GEL = false;
@@ -236,18 +236,6 @@ const updateCamera = function (deltaTime) {
 
     // always look where the camera points
     GLOBALS.PLAYER.quaternion.setFromAxisAngle(new CANNON.Vec3(0,1,0), GLOBALS.MAIN_CAMERA.rotation.y);
-    //GLOBALS.PLAYER.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion)
-    //GLOBALS.PLAYER.quaternion.x = 0
-    //GLOBALS.PLAYER.quaternion.z = 0
-    //GLOBALS.PLAYER.quaternion.normalize()
-
-    // set camera position to be at player
-    //GLOBALS.MAIN_CAMERA.position.copy(GLOBALS.PLAYER.position);
-
-    //GLOBALS.MAIN_CAMERA.translateZ(0.2)
-    //GLOBALS.MAIN_CAMERA.translateY(0.3)
-    //GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
-    //GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.SMOOTHNESS);
     GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion)
 
     if (GLOBALS.MAIN_CAMERA.position.distanceTo(new Vector3(0, 0, 0)) > 100) {
@@ -280,11 +268,6 @@ const updateCamera = function (deltaTime) {
                 c.material.depthWrite = true;
             }
         })
-    }
-
-    if (GLOBALS.OBJ_HOLDED_CLONE) {
-        GLOBALS.OBJ_HOLDED_CLONE.position.copy(GLOBALS.CURRENT_ITEM.body.position)
-        GLOBALS.OBJ_HOLDED_CLONE.quaternion.copy(GLOBALS.CURRENT_ITEM.body.quaternion)
     }
 
     // handle model movements

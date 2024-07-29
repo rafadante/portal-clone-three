@@ -217,14 +217,10 @@ function render(time) {
         }
     }
 
-    GLOBALS.PORTAL_GUN_CAMERA.position.copy(GLOBALS.MAIN_CAMERA.position)
-    GLOBALS.PORTAL_GUN_CAMERA.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion)
-
     // finally, render to screen
     GLOBALS.RENDERER.setRenderTarget(currentRenderTarget);
     GLOBALS.RENDERER.localClippingEnabled = false;
     GLOBALS.RENDERER.clippingPlanes = [];
-    //GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
     GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
     GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
 
@@ -246,15 +242,7 @@ function animatePortal() {
     currentRenderTarget = GLOBALS.RENDERER.getRenderTarget();
     GLOBALS.RENDERER.xr.enabled = false;
 
-    GLOBALS.GUN.visible = false;
     GLOBALS.GUN_CLONE.visible = GLOBALS.PLAYER_MODEL.visible;
-
-    let cloneItemHolded = false;
-
-    if (GLOBALS.OBJ_HOLDED_CLONE) {
-        cloneItemHolded = GLOBALS.OBJ_HOLDED_CLONE.visible;
-        GLOBALS.OBJ_HOLDED_CLONE.visible = true;
-    }
 
     var positionBoneHand = new Vector3();
     window.hand.getWorldPosition(positionBoneHand);
@@ -295,13 +283,8 @@ function animatePortal() {
     GLOBALS.SCENE_CHILDREN.visible = true;
     GLOBALS.RENDERER.autoClear = false;
 
-    GLOBALS.GUN.visible = GLOBALS.PLAYER_MODEL.visible;
-
     GLOBALS.GUN_CLONE.visible = false;
     GLOBALS.GUN_CLONE2.visible = cloneVisible;
-
-    if (GLOBALS.OBJ_HOLDED_CLONE)
-        GLOBALS.OBJ_HOLDED_CLONE.visible = cloneItemHolded;
 
     if (cloneVisible && GLOBALS.GUN_CLONE2 && window.posW) {
         GLOBALS.GUN_CLONE2.position.copy(window.posW);

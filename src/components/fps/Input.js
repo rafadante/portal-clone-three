@@ -210,16 +210,17 @@ $("body").on('click', '#settings-close', function () {
         if (!GLOBALS.DOOR_OPEN_STATE) {
             GLOBALS.DOOR_OPEN_STATE = true;
 
-            stateDoor(1000, true, false, GLOBALS.ENTER_DOOR)
-
-
             setTimeout(() => {
-                tweenCamera(2000, GLOBALS.CORRIDOR_ENTER.getObjectByName("spawn").rotation,
+                tweenCamera(1500, GLOBALS.CORRIDOR_ENTER.getObjectByName("spawn").rotation,
                     new Vector3(
                         GLOBALS.CORRIDOR_ENTER.getObjectByName("spawn").rotation.x,
                         Math.PI,
                         GLOBALS.CORRIDOR_ENTER.getObjectByName("spawn").rotation.z))
-            }, 2000);
+
+                setTimeout(() => {
+                    stateDoor(1000, true, false, GLOBALS.ENTER_DOOR)
+                }, 800);
+            }, 800);
         }
     }
 })
@@ -333,4 +334,4 @@ function Crouch(value) {
     GLOBALS.PLAYER.updateMassProperties();
 }
 
-export {Crouch}
+export { Crouch }

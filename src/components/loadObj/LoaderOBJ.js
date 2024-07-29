@@ -247,10 +247,10 @@ function loadGunManager(scene) {
 
     GLOBALS.GUN.name = "GUN";
     GLOBALS.SCENE.add(GLOBALS.GUN);
-    //scene.scale.set(0.1, 0.1, 0.1)
-    //scene.position.set(0.009, -0.013, -0.012);
-    scene.scale.set(1, 1, 1)
-    scene.position.set(0.12, -0.16, -0.14);
+    scene.scale.set(0.001, 0.001, 0.001)
+    scene.position.set(0.00009, -0.00013, -0.00012);
+    //cene.scale.set(1, 1, 1)
+    //scene.position.set(0.12, -0.16, -0.14);
     //scene.visible = false;
     console.log(scene)
     loadDoor()

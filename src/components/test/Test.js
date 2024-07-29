@@ -32,9 +32,6 @@ $("body").on('click', '#view-fps', function () {
 
 function viewFPS() {
 
-    //GLOBALS.MAIN_CAMERA.near = 0.0095;
-    //GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
-
     AUDIO.EDITOR.pause();
 
     GLOBALS.SCENE_FPS = new Group();

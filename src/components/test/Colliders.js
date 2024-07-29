@@ -51,6 +51,8 @@ function addColliderItem(items, type, mass, offset) {
     for (var i = 0; i < items.length; i++) {
         if (items[i].length != 0) {
 
+            console.log(items[i])
+
             let PHYSICS_MATERIAL = new CANNON.Material();
             PHYSICS_MATERIAL.friction = items[i].friction; //0.01
             //PHYSICS_MATERIAL.restitution = 0; //0.1
@@ -186,6 +188,11 @@ function addColliderItem(items, type, mass, offset) {
                 box.arrayPos = [];
                 box.arrayRot = [];
                 box.name = type;
+
+                const clone = items[i].userData.obj.clone();
+                clone.visible=false;
+                GLOBALS.SCENE_FPS.add(clone);
+                box.clone = clone;
 
                 console.log(box)
 

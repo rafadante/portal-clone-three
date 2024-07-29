@@ -43,8 +43,11 @@ const camera = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 
+//CAMERA THAT ONLY RENDERS THE MAIN PORTAL GUN ON TOP OF THE SCENE
 const portalGunCamera = camera.clone();
 portalGunCamera.layers.mask = 2;
+portalGunCamera.near = 0.0001;
+portalGunCamera.updateProjectionMatrix();
 
 //POINT OF OBJECTS WHILE HOLDING WITH THE GUN
 const cubeHolder = new Object3D()
@@ -240,7 +243,6 @@ var GLOBALS = {
     GUN_CLONE: null,
     GUN_CLONE2: null,
     GUN_MODE: 1,
-    OBJ_HOLDED_CLONE: null,
 
     ENV_MAP: null,
     STATS: null,

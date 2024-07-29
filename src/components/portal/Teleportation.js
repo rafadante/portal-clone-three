@@ -122,6 +122,9 @@ function teleportationState() {
     GLOBALS.MAIN_CAMERA.position.y += 0.3;
     GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
 
+    GLOBALS.PORTAL_GUN_CAMERA.position.copy(GLOBALS.MAIN_CAMERA.position)
+    GLOBALS.PORTAL_GUN_CAMERA.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion)
+
     if (teleported) {
         teleported = false;
         GLOBALS.PLAYER_MODEL.visible = true;
@@ -144,25 +147,6 @@ function teleportationState() {
         }
     }
 
-    if (GLOBALS.OBJ_HOLDED_CLONE && GLOBALS.HOLDING_ITEM) {
-
-        let pos = GLOBALS.CURRENT_ITEM.body.position;
-        let CDBB_isOverlap = false;
-        GLOBALS.OBJ_HOLDED_CLONE.visible = false;
-
-        for (let p = 0; p < GLOBALS.PORTALS.length; p++) {
-            // collision disable, might be partially intersecting with portal
-            if (GLOBALS.PORTALS[p].CDBB.containsPoint(pos)) {
-                // show the clone
-                if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
-                    CDBB_isOverlap = true;
-                    teleportObject3D(GLOBALS.OBJ_HOLDED_CLONE, GLOBALS.PORTALS[p]);
-                    GLOBALS.OBJ_HOLDED_CLONE.visible = true;
-                }
-            }
-        }
-    }
-
     for (let d of GLOBALS.DYNAMIC_OBJECTS) {
 
         let pos = new Vector3(d.position.x, d.position.y, d.position.z);
@@ -181,6 +165,10 @@ function teleportationState() {
             GLOBALS.PLAYER_MODEL_CLONE.visible = false;
             GLOBALS.GUN_CLONE.visible = false;
             GLOBALS.GUN_CLONE2.visible = false;
+        } else {
+            d.clone.visible = false;
+            d.clone.position.copy(d.position)
+            d.clone.quaternion.copy(d.quaternion)
         }
 
         let CDBB_isOverlap = false;
@@ -200,7 +188,7 @@ function teleportationState() {
                 if (dd == 0) {
                     inArea++;
 
-                    // show the clone
+                    // show the clone of player
                     if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
 
                         CDBB_isOverlap = true;
@@ -216,6 +204,14 @@ function teleportationState() {
                                 }
                             }
                         });
+                    }
+                } else {
+                    // show the clone of items
+                    if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
+                        CDBB_isOverlap = true;
+                        teleportObject3D(d.clone, GLOBALS.PORTALS[p]);
+                        d.clone.visible = true;
+                        console.log("1111111111")
                     }
                 }
             } else {
@@ -244,7 +240,6 @@ function teleportationState() {
                         teleportObject3D(GLOBALS.MAIN_CAMERA, GLOBALS.PORTALS[p]);
                         GLOBALS.PLAYER_MODEL_CLONE.visible = false;
                         GLOBALS.PLAYER_MODEL.visible = false;
-                        GLOBALS.GUN.visible = false;
                         teleported = true;
 
                         // fix camera rotation
