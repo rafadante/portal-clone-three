@@ -12,6 +12,9 @@ import {
     GLOBALS
 } from '../../Globals.js';
 
+var teleported = false;
+var cameraRotatingTimeout;
+
 // teleport a 3D object directly, returns nothing
 // Object3D includes camera, meshes
 function teleportObject3D(object, portal) {
@@ -20,15 +23,36 @@ function teleportObject3D(object, portal) {
     object.applyMatrix4(m)
 }
 
+function getHeightDifference(currentPosition, destinationPosition) {
+    return currentPosition.y - destinationPosition.y;
+}
+
+function calculateVelocity(heightDifference, gravity) {
+    return Math.sqrt(2 * gravity * heightDifference);
+}
+
 function teleportPhysicalObject(object, portal) {
 
     let f = new Matrix4().makeScale(-1, -1, 1)
     let m = portal.CDBB.inverse_t.clone().premultiply(f).premultiply(portal.output.CDBB.t)
     //object.mesh.applyMatrix4(m)
     let position = cannonToThreeVector3(object.position)
-    let previousPosition = cannonToThreeVector3(object.position)
-    let velocity = cannonToThreeVector3(object.velocity)
-    let force = cannonToThreeVector3(object.force)
+    let previousPosition = cannonToThreeVector3(object.position);
+
+    let velocity = cannonToThreeVector3(object.velocity);
+
+    if (GLOBALS.PORTALS[0].normal.y != GLOBALS.PORTALS[1].normal.y) {
+        if (object.looping == true) {
+            const heightDifference = getHeightDifference(portal.portalShader.position, portal.output.portalShader.position);
+            velocity.y = -calculateVelocity(Math.abs(heightDifference), 9.8);
+            velocity.x *= 0.2;
+            velocity.z *= 0.2;
+        } else {
+            object.looping = true;
+        }
+    }
+
+    let force = cannonToThreeVector3(object.force);
 
     let orientation = new Quaternion().copy(object.quaternion)
     let mquat = new Quaternion().setFromRotationMatrix(m)
@@ -39,28 +63,30 @@ function teleportPhysicalObject(object, portal) {
     velocity = getTeleportedDirectionalVector(velocity, portal)
     force = getTeleportedDirectionalVector(force, portal)
 
-    if (velocity.x > 10) {
-        velocity.x = 10;
-    } else if (velocity.x < -10)
-        velocity.x = -10;
+    /*if (teleportLooping) {
+        if (velocity.x > 10) {
+            velocity.x = 10;
+        } else if (velocity.x < -10)
+            velocity.x = -10;
 
-    if (velocity.y > 10) {
-        velocity.y = 10;
-    } else if (velocity.y < -10)
-        velocity.y = -10;
+        if (velocity.y > 10) {
+            velocity.y = 10;
+        } else if (velocity.y < -10)
+            velocity.y = -10;
 
-    if (velocity.z > 10) {
-        velocity.z = 10;
-    } else if (velocity.z < -10)
-        velocity.z = -10;
+        if (velocity.z > 10) {
+            velocity.z = 10;
+        } else if (velocity.z < -10)
+            velocity.z = -10;
 
-    if (Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) {
-        velocity.x *= 0.5;
-        velocity.z *= 0.5;
-    }
+        if (Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) {
+            velocity.x *= 0.5;
+            velocity.z *= 0.5;
+        }
+    }*/
 
-    object.position.copy(position)
     object.previousPosition.copy(previousPosition)
+    object.position.copy(position)
     object.velocity.copy(velocity)
     object.force.copy(force)
     object.quaternion.copy(orientation)
@@ -89,18 +115,17 @@ function getTeleportedDirectionalVector(v, portal) {
     return fourToThree(v4)
 }
 
-var teleported = false;
-
 function teleportationState() {
 
-    if(teleported){
-        teleported = false;
-        GLOBALS.PLAYER_MODEL.visible = true; 
-    }
-
-    GLOBALS.MAIN_CAMERA.position.copy(GLOBALS.PLAYER.position)
-    GLOBALS.MAIN_CAMERA.translateY(0.3)
+    const playerPos = cannonToThreeVector3(GLOBALS.PLAYER.position)
+    GLOBALS.MAIN_CAMERA.position.copy(playerPos)
+    GLOBALS.MAIN_CAMERA.position.y += 0.3;
     GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
+
+    if (teleported) {
+        teleported = false;
+        GLOBALS.PLAYER_MODEL.visible = true;
+    }
 
     if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null) return;
 
@@ -143,7 +168,7 @@ function teleportationState() {
         let pos = new Vector3(d.position.x, d.position.y, d.position.z);
 
         if (dd == 0) {
-            pos = new Vector3(GLOBALS.MAIN_CAMERA.position.x, d.position.y, GLOBALS.MAIN_CAMERA.position.z);
+            //pos = new Vector3(GLOBALS.MAIN_CAMERA.position.x, d.position.y, GLOBALS.MAIN_CAMERA.position.z);
         }
 
         d.collisionFilterMask = GLOBALS.CGROUP_ALL;
@@ -163,6 +188,7 @@ function teleportationState() {
         for (let p = 0; p < GLOBALS.PORTALS.length; p++) {
             // collision disable, might be partially intersecting with portal
             if (GLOBALS.PORTALS[p].CDBB.containsPoint(pos)) {
+
                 if (d.name != "player") {
                     d.wakeUp();
                 }
@@ -206,13 +232,13 @@ function teleportationState() {
 
                     if (dd == 0) {
 
-                        AUDIO.PORTAL_ENTER.pause();
+                        //AUDIO.PORTAL_ENTER.pause();
                         AUDIO.PORTAL_ENTER.currentTime = 0;
                         play(AUDIO.PORTAL_ENTER)
 
-                        AUDIO.PORTAL_EXIT.pause();
+                        /*AUDIO.PORTAL_EXIT.pause();
                         AUDIO.PORTAL_EXIT.currentTime = 0;
-                        play(AUDIO.PORTAL_EXIT);
+                        play(AUDIO.PORTAL_EXIT);*/
 
                         removeJointConstraint();
                         teleportObject3D(GLOBALS.MAIN_CAMERA, GLOBALS.PORTALS[p]);
@@ -235,7 +261,11 @@ function teleportationState() {
                             cameraUp,
                             cameraForward.negate()
                         );
-                        GLOBALS.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat);
+                        //GLOBALS.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat);
+                        //GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
+
+                        if (cameraRotatingTimeout)
+                            clearTimeout(cameraRotatingTimeout);
 
                         var q = new Quaternion()
                         q.setFromRotationMatrix(cameraMat);
@@ -244,12 +274,11 @@ function teleportationState() {
                         GLOBALS.TARGET_ROTATION_X = GLOBALS.MAIN_CAMERA.rotation.y;
                         GLOBALS.TARGET_ROTATION_Y = GLOBALS.MAIN_CAMERA.rotation.x;
 
-                        GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
-
                         window.CAMERA_ROTATING = true;
-                        setTimeout(() => {
+                        cameraRotatingTimeout = setTimeout(() => {
                             window.CAMERA_ROTATING = false;
-                        }, 1000);
+                            GLOBALS.MAIN_CAMERA.rotation.z = 0;
+                        }, 500);
                     }
 
                     d.collisionFilterMask |=
@@ -294,7 +323,6 @@ function addCameraBody(obj) {
 }
 
 export {
-    teleportPhysicalObject,
     teleportObject3D,
     teleportationState
 }

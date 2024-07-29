@@ -33,7 +33,6 @@ import {
 var itemHolder = null;
 var coords = new Vector3();
 var raycaster2 = new Raycaster();
-window.CAMERA_ROTATING = false;
 
 function updateEvents() {
   levelEnteredFunction();

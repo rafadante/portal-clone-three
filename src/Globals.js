@@ -23,14 +23,14 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
     pixelRatio = 0.5;
     shadowMap = true;
     portalsRecursive = 1;
-    fov = 70;
+    fov = 60;
     antialias = false;
 } else {
     mobile = false;
     pixelRatio = 0.5;
     shadowMap = true;
     portalsRecursive = 2;
-    fov = 70;
+    fov = 60;
 
     if (localStorage.getItem("antialising") == "true")
         antialias = true;
@@ -375,7 +375,7 @@ var GLOBALS = {
         },
         sphere: {
             count: 0,
-            max: 10
+            max: 15
         },
         gel_gun_blue: {
             count: 0,

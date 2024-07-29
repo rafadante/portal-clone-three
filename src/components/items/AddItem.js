@@ -320,6 +320,9 @@ function addItem(found, loaded) {
             item.pedestalInfinity = true;
             item.pedestalValue = 3;
 
+            item.friction = 0.4;
+            item.restitution = 0;
+
             if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
                 GLOBALS.ITEMS_ADDED.add(item);
                 item.translateY(0.01);

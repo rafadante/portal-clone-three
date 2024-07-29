@@ -176,6 +176,14 @@ function raycastSelected(found, event, type) {
 
                     $("#ligh-color-input").val(GLOBALS.PLANE_USER_DATA[instanceId].item.lightColor)
                 }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere")) {
+                    $(".physics").css("display", "block");
+
+                    $("#restitution").val(GLOBALS.PLANE_USER_DATA[instanceId].item.restitution)
+                    $("#friction").val(GLOBALS.PLANE_USER_DATA[instanceId].item.friction)
+                }
             }
 
             GLOBALS.SELECTED_ID.push(instanceId);

@@ -251,7 +251,7 @@ function loadGunManager(scene) {
     //scene.position.set(0.009, -0.013, -0.012);
     scene.scale.set(1, 1, 1)
     scene.position.set(0.12, -0.16, -0.14);
-    scene.visible = false;
+    //scene.visible = false;
     console.log(scene)
     loadDoor()
 }

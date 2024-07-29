@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import * as CANNON from 'cannon'
-import { GLOBALS } from './Globals'
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -20,7 +19,6 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
 
     this.pitchObject = new THREE.Object3D()
     this.pitchObject.add(camera)
-    this.camera = camera;
 
     this.yawObject = new THREE.Object3D()
     this.yawObject.position.y = 2
@@ -227,12 +225,6 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
     this.velocity.z += this.inputVelocity.z
 
     this.yawObject.position.copy(this.cannonBody.position)
-
-    var tt = new THREE.Quaternion();
-    this.camera.getWorldQuaternion(tt)
-
-    GLOBALS.MAIN_CAMERA.position.copy(this.cannonBody.position);
-    GLOBALS.MAIN_CAMERA.quaternion.copy(tt);
   }
 }
 

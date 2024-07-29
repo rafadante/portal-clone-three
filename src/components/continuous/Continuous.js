@@ -266,24 +266,30 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
             var intersectsInstance = raycasterBridge.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
 
-            /*if (intersects.length > 0) {
-                if (intersects[0].uv.x > 0.3 && intersects[0].uv.x < 0.7) {
-                    if (rayItem[g].name == "light_bridge") {
+            if (intersects.length > 0) {
+                if (rayItem[g].name == "light_bridge") {
+                    if (intersects[0].uv.x > 0.3 && intersects[0].uv.x < 0.7) {
                         if (GLOBALS.LIGHT_BRIDGE_CLONE[g]) {
                             GLOBALS.SCENE_CHILDREN.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
                             GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
                             GLOBALS.LIGHT_BRIDGE_CLONE[g].item.clone = null;
                         }
-                    } else if (rayItem[g].name == "tractor_beam") {
+                    } else {
+                        return;
+                    }
+                } else if (rayItem[g].name == "tractor_beam") {
+                    if (intersects[0].uv.x > 0.3 && intersects[0].uv.x < 0.7 &&
+                        intersects[0].uv.y > 0.3 && intersects[0].uv.y < 0.7
+                    ) {
                         if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
                             GLOBALS.SCENE_CHILDREN.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
                             GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
                         }
+                    } else {
+                        return;
                     }
-                } else {
-                    continue;
                 }
-            }*/
+            }
 
             //---------------------------------------------------------------------
 

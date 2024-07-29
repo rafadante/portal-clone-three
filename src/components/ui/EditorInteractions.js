@@ -462,4 +462,12 @@ $("body").on('click', '#save-level', function () {
     dlAnchorElem.setAttribute("href", dataStr);
     dlAnchorElem.setAttribute("download", "scene.json");
     dlAnchorElem.click();
-})
+});
+
+$("body").on('input', '#friction', function () {
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.friction = this.value;
+});
+
+$("body").on('input', '#restitution', function () {
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.restitution = parseFloat(this.value);
+});

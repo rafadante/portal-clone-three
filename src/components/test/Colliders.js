@@ -46,14 +46,14 @@ function colliderItemManager() {
 
 function addColliderItem(items, type, mass, offset) {
 
-    let PHYSICS_MATERIAL = new CANNON.Material();
-    PHYSICS_MATERIAL.friction = 0.4; //0.01
-    PHYSICS_MATERIAL.restitution = 0; //0.1
-
     var offset;
 
     for (var i = 0; i < items.length; i++) {
         if (items[i].length != 0) {
+
+            let PHYSICS_MATERIAL = new CANNON.Material();
+            PHYSICS_MATERIAL.friction = items[i].friction; //0.01
+            //PHYSICS_MATERIAL.restitution = 0; //0.1
 
             var pos = items[i].position;
             var rot = items[i].quaternion;
@@ -74,11 +74,21 @@ function addColliderItem(items, type, mass, offset) {
                 shape.height = 0.6;
                 shape.width = 0.6;
                 offset = 0.5;
+
+                // Create contact material behaviour
+                const mat3_ground = new CANNON.ContactMaterial(GLOBALS.PHYSICS_MATERIAL, PHYSICS_MATERIAL, { friction: 0.0, restitution: items[i].restitution })
+                GLOBALS.CANNON_WORLD.addContactMaterial(mat3_ground);
             } else if (type == "sphere") {
                 var shape = new CANNON.Sphere(0.3);
                 shape.height = 0.6;
                 shape.width = 0.6;
                 offset = 0.5;
+
+                console.log(items[i].restitution)
+
+                // Create contact material behaviour
+                const mat3_ground = new CANNON.ContactMaterial(GLOBALS.PHYSICS_MATERIAL, PHYSICS_MATERIAL, { friction: 0.0, restitution: items[i].restitution })
+                GLOBALS.CANNON_WORLD.addContactMaterial(mat3_ground);
             } else if (type == "gel_gun_blue" || type == "gel_gun_orange" || type == "gel_gun_white") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.5, 0.1));
             } else if (type == "pedestal_button") {
@@ -177,8 +187,12 @@ function addColliderItem(items, type, mass, offset) {
                 box.arrayRot = [];
                 box.name = type;
 
+                console.log(box)
+
                 box.addEventListener("collide", function (event) {
-                    const body = event.body;
+                    const body = event.target;
+
+                    body.looping = false;
 
                     if (body.playingAudioContact)
                         return;

@@ -46,6 +46,8 @@ let contactNormal = new CANNON.Vec3(0, 0, 0);
 
 GLOBALS.PLAYER.addEventListener("collide", function (event) {
 
+    GLOBALS.PLAYER.looping = false;
+
     if (event.contact.bj.name == "light_bridge") {
         GLOBALS.PLAYER.lightBridge = true;
     } else {

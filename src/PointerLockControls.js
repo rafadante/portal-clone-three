@@ -4,6 +4,7 @@ import {
 	Vector3,
 	Quaternion
 } from 'three';
+import { GLOBALS } from './Globals';
 
 //const _euler = new Euler(0, 0, 0, 'YXZ');
 const _vector = new Vector3();
@@ -92,7 +93,7 @@ class PointerLockControls extends EventDispatcher {
 
 		_vector.crossVectors(camera.up, _vector);
 
-		camera.position.addScaledVector(_vector, distance);
+		//camera.position.addScaledVector(_vector, distance);
 
 	}
 
@@ -102,7 +103,7 @@ class PointerLockControls extends EventDispatcher {
 
 		_vector.setFromMatrixColumn(camera.matrix, 0);
 
-		camera.position.addScaledVector(_vector, distance);
+		//camera.position.addScaledVector(_vector, distance);
 
 	}
 
@@ -146,6 +147,8 @@ function onMouseMove(event) {
 	const smoothness = 0.1; // 0 to 1 only
 	const targetPosition = quaternion;
 	camera.quaternion.slerp(targetPosition, smoothness);*/
+	camera.position.copy(GLOBALS.PLAYER.position);
+	camera.translateY(0.3)
 
 	this.dispatchEvent(_changeEvent);
 
