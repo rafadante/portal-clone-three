@@ -11,8 +11,8 @@ import { GLOBALS } from '../../Globals.js';
 const rayParams1 = {
     sourceOffset: new Vector3(),
     destOffset: new Vector3(),
-    radius0: 0.00075,
-    radius1: 0.00075,
+    radius0: 0.001,
+    radius1: 0.001,
     minRadius: 25,
     maxIterations: 7,
     isEternal: true,
@@ -34,8 +34,8 @@ const rayParams1 = {
 const rayParams2 = {
     sourceOffset: new Vector3(),
     destOffset: new Vector3(),
-    radius0: 0.00075,
-    radius1: 0.00075,
+    radius0: 0.001,
+    radius1: 0.001,
     minRadius: 25,
     maxIterations: 7,
     isEternal: true,
@@ -57,8 +57,8 @@ const rayParams2 = {
 const rayParams3 = {
     sourceOffset: new Vector3(),
     destOffset: new Vector3(),
-    radius0: 0.00075,
-    radius1: 0.00075,
+    radius0: 0.001,
+    radius1: 0.001,
     minRadius: 25,
     maxIterations: 7,
     isEternal: true,
@@ -97,9 +97,9 @@ function recreateRay() {
         color: 0xffffff
     }));
 
-    GLOBALS.SELECTED_FOR_BLOOM.add(lightningStrikeMesh);
-    GLOBALS.SELECTED_FOR_BLOOM.add(lightningStrikeMesh2);
-    GLOBALS.SELECTED_FOR_BLOOM.add(lightningStrikeMesh3);
+    //GLOBALS.SELECTED_FOR_BLOOM.add(lightningStrikeMesh);
+    //GLOBALS.SELECTED_FOR_BLOOM.add(lightningStrikeMesh2);
+    //GLOBALS.SELECTED_FOR_BLOOM.add(lightningStrikeMesh3);
 
     GLOBALS.LIGHTNIN_STRIKE_1 = lightningStrikeMesh;
     lightningStrikeMesh.visible = false;
@@ -113,6 +113,10 @@ function recreateRay() {
     GLOBALS.LIGHTNIN_STRIKE_1.scale.set(1,1,1)
     GLOBALS.LIGHTNIN_STRIKE_2.scale.set(1,1,1)
     GLOBALS.LIGHTNIN_STRIKE_3.scale.set(1,1,1)
+
+    lightningStrikeMesh.layers.mask = 2;
+    lightningStrikeMesh2.layers.mask = 2;
+    lightningStrikeMesh3.layers.mask = 2;
 }
 
 //
@@ -128,13 +132,13 @@ function updateRay() {
         var t3 = GLOBALS.GUN.getObjectByName("cube_3").position;
 
         lightningStrike.rayParameters.sourceOffset.copy(t1);
-        lightningStrike.rayParameters.destOffset.copy(t2);
+        lightningStrike.rayParameters.destOffset.copy(GLOBALS.PORTAL_GUN_FLASH.position);
 
         lightningStrike2.rayParameters.sourceOffset.copy(t2);
-        lightningStrike2.rayParameters.destOffset.copy(t3);
+        lightningStrike2.rayParameters.destOffset.copy(GLOBALS.PORTAL_GUN_FLASH.position);
 
         lightningStrike3.rayParameters.sourceOffset.copy(t3);
-        lightningStrike3.rayParameters.destOffset.copy(t1);
+        lightningStrike3.rayParameters.destOffset.copy(GLOBALS.PORTAL_GUN_FLASH.position);
 
         lightningStrike.update(t);
         lightningStrike2.update(t);

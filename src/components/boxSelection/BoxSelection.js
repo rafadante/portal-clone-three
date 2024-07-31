@@ -5,7 +5,8 @@ import {
 } from '../../Globals.js';
 import { planeInstanceReset, deleteItemInstanced } from '../items/Items.js';
 import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline';
-import { getPlaneByName,warning } from '../../Utils.js';
+import { getPlaneByName, warning } from '../../Utils.js';
+import { clickItem } from '../items/AddItem.js';
 
 const orange = new Color("rgb(255, 165, 0)");
 var initialPosition = null;
@@ -76,6 +77,10 @@ function raycastSelected(found, event, type) {
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "enterDoor" &&
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "window") {
 
+            if (GLOBALS.PLANE_USER_DATA[instanceId].continuousEnding) {
+
+            }
+
             if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem &&
                 (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("door") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("ramp") ||
@@ -86,10 +91,6 @@ function raycastSelected(found, event, type) {
             }
 
             $(".hasItem").css("display", "none");
-
-            if (GLOBALS.PLANE_USER_DATA[instanceId].wall) {
-
-            }
 
             if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem) {
                 $("#delete").css("display", "block");
@@ -184,6 +185,13 @@ function raycastSelected(found, event, type) {
                     $("#restitution").val(GLOBALS.PLANE_USER_DATA[instanceId].item.restitution)
                     $("#friction").val(GLOBALS.PLANE_USER_DATA[instanceId].item.friction)
                 }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("glass")) {
+                    $(".glass").css("display", "block");
+
+                    $("#glass-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
+                    $("#grid-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.grid);
+                }
             }
 
             GLOBALS.SELECTED_ID.push(instanceId);
@@ -225,7 +233,7 @@ function raycastSelected(found, event, type) {
                             if (planeInstanceOld.item.bodyBridge) {
                                 GLOBALS.LIGHT_BRIDGE_TRIGGER = planeInstanceOld.item.triggers;
                                 GLOBALS.CANNON_WORLD.removeBody(planeInstanceOld.item.bodyBridge);
-                                planeInstanceOld.item.bodyBridge = null;
+                                //planeInstanceOld.item.bodyBridge = null;
                             }
 
                             if (planeInstanceOld.item.cloneLaserID) {
@@ -233,12 +241,15 @@ function raycastSelected(found, event, type) {
                             }
 
                             if (planeInstanceOld.item.cloneFizzlerID) {
-                                GLOBALS.FIZZLER_RAYCASTER = planeInstanceOld.item.triggers;
+                                GLOBALS.FIZZLER_TRIGGER = planeInstanceOld.item.triggers;
                             }
 
+                            if (planeInstanceOld.item.bodyLaserField) {
+                                GLOBALS.CANNON_WORLD.removeBody(planeInstanceOld.item.bodyLaserField);
+                            }
 
                             deleteItemInstanced(planeInstanceOld, true);
-                            planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false);
+                            planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false, false);
                         } else {
                             //CHECK IF THE ITEM CAN BE MOVED ALONG DIRECTIONS
                             if (planeInstanceNew.side == "down") {
@@ -258,6 +269,22 @@ function raycastSelected(found, event, type) {
                                 }
                             }
 
+                            if (planeInstanceOld.item.continuous) {
+
+                                GLOBALS.GRID_STATE = planeInstanceOld.item.userData.grid;
+                                GLOBALS.SCENE_CHILDREN.remove(planeInstanceOld.item.continuous);
+                                GLOBALS.ITEMS_ADDED.remove(planeInstanceOld.item);
+
+                                if (planeInstanceOld.item.bodyBridge) {
+                                    GLOBALS.CANNON_WORLD.removeBody(planeInstanceOld.item.bodyBridge);
+                                    //planeInstanceOld.item.bodyBridge = null;
+                                }
+
+                                clickItem($("#" + planeInstanceOld.item.instancedName));
+                                planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false, false);
+                                return;
+                            }
+
                             //IF EVERYTHING IS OK, MOVE THE ITEM TO THE NEXT POSITION
                             GLOBALS.DRAGGING = true;
                             planeInstanceOld.item.namePosition = planeInstanceNew.position.x + "/" + planeInstanceNew.position.y + "/" + planeInstanceNew.position.z;
@@ -272,9 +299,11 @@ function raycastSelected(found, event, type) {
                             //UPDATE PARAMETERS OF THE NEW PLACEMENT
                             planeInstanceReset(planeInstanceNew, true, planeInstanceOld.item.name, planeInstanceOld.item,
                                 planeInstanceOld.state, planeInstanceOld.canRotate, planeInstanceOld.floor,
-                                planeInstanceOld.ceiling, planeInstanceOld.walls, false, null, planeInstanceOld.allowconnection);
+                                planeInstanceOld.ceiling, planeInstanceOld.walls, false, null, planeInstanceOld.allowconnection,
+                                planeInstanceOld.continuousEnding
+                            );
                             //UPDATE PARAMETERS OF THE OLD PLACEMENT
-                            planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false)
+                            planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false, false)
 
                             /*if (planeInstanceNew.itemName.includes("door_enter") || planeInstanceNew.itemName.includes("door_exit")) {
                                 checkItemBoundingBox(planeInstanceNew.item, planeInstanceNew.item.cube)

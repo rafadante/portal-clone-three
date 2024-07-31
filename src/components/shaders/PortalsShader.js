@@ -135,6 +135,7 @@ const generateMeshPortalShader = () => {
     var planegeometry = new CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
     var plane = new Mesh(planegeometry, mat);
     plane.name = "portal-0";
+    plane.renderOrder = -1;
     GLOBALS.PORTAL_SHADER[0] = plane;
 
     var mat2 = new ShaderMaterial({
@@ -164,6 +165,7 @@ const generateMeshPortalShader = () => {
 
     var planegeometry = new CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
     var plane = new Mesh(planegeometry, mat2);
+    plane.renderOrder = -1;
     plane.name = "portal-1";
     GLOBALS.PORTAL_SHADER[1] = plane;
 };

@@ -2,7 +2,9 @@ import {
     MeshStandardMaterial,
     TextureLoader,
     SRGBColorSpace,
-    Vector2
+    Vector2,
+    Color,
+    MeshBasicMaterial
 } from 'three';
 import {
     GLOBALS
@@ -118,6 +120,10 @@ GLOBALS.MATERIAL_NON_PORTAL_EDITOR = new MeshStandardMaterial({
 //
 GLOBALS.IMG_CHECK = new TextureLoader().load('./assets/check.png');
 GLOBALS.IMG_CLOSE = new TextureLoader().load('./assets/close.png');
+
+//
+GLOBALS.MATERIAL_GRID = new MeshBasicMaterial({color: new Color(0x00ff00)})
+GLOBALS.MATERIAL_GLASS = new MeshBasicMaterial({color: new Color(0xff0000)})
 
 export {
     loadMaterials

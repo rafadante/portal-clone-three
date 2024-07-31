@@ -23,14 +23,14 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
     pixelRatio = 0.5;
     shadowMap = true;
     portalsRecursive = 1;
-    fov = 60;
+    fov = 63;
     antialias = false;
 } else {
     mobile = false;
     pixelRatio = 0.5;
     shadowMap = true;
     portalsRecursive = 2;
-    fov = 60;
+    fov = 63;
 
     if (localStorage.getItem("antialising") == "true")
         antialias = true;
@@ -42,6 +42,9 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
 const camera = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
+
+var hFOV = 2 * Math.atan( Math.tan( camera.fov * Math.PI / 180 / 2 ) * camera.aspect ) * 180 / Math.PI; // degrees
+console.log(hFOV)
 
 //CAMERA THAT ONLY RENDERS THE MAIN PORTAL GUN ON TOP OF THE SCENE
 const portalGunCamera = camera.clone();
@@ -91,6 +94,7 @@ var GLOBALS = {
     POINTER_CONTROLS: null,
     RENDERER: renderer,
     COMPOSER: null,
+    COMPOSER2: null,
     ITEM_HOLDED_NAME: null,
 
     //BOOLEAN
@@ -221,6 +225,7 @@ var GLOBALS = {
         portal_1: [],
         laser_field: [],
         fizzler: [],
+        glass: []
     },
 
     INTERACTIVE: [],
@@ -268,11 +273,13 @@ var GLOBALS = {
     LIGHT_BRIDGE_CLONE: [],
     LIGHT_BRIDGE_COLLIDER_CLONE: [],
     LIGHT_BRIDGE_TRIGGER: "Middle Horizontal",
+    GLASS_TRIGGER: "Left",
     LASER_FIELD_TRIGGER: "Middle Vertical",
     FIZZLER_TRIGGER: "Middle Vertical",
 
     LASER_FIELD_RAYCASTER: [],
     FIZZLER_RAYCASTER: [],
+    GLASS_RAYCASTER: [],
 
     LIGHT_GROUP: null,
     INTERVAL: 1 / 60,
@@ -499,6 +506,10 @@ var GLOBALS = {
             count: 0,
             max: 10
         },
+        glass: {
+            count: 0,
+            max: 100
+        },
     },
     SCENE_FPS: null,
     LISTENER: new AudioListener(),
@@ -517,7 +528,14 @@ var GLOBALS = {
     PORTAL_AUDIO: [new Object3D, new Object3D],
 
     SELECTED_FOR_BLOOM: null,
-    PLAYER_MOVING: false
+    PLAYER_MOVING: false,
+    GLASS_PANELS: [],
+    RESIZING_GLASS_PANEL: false,
+    BLOCK_PORTAL: [],
+
+    MATERIAL_GLASS: null,
+    MATERIAL_GRID: null,
+    GRID_STATE: false
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)

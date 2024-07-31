@@ -211,7 +211,6 @@ function teleportationState() {
                         CDBB_isOverlap = true;
                         teleportObject3D(d.clone, GLOBALS.PORTALS[p]);
                         d.clone.visible = true;
-                        console.log("1111111111")
                     }
                 }
             } else {
@@ -256,24 +255,15 @@ function teleportationState() {
                             cameraUp,
                             cameraForward.negate()
                         );
-                        //GLOBALS.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat);
-                        //GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
+                        GLOBALS.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat);
+                        GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
+                        GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
+                        GLOBALS.PORTAL_GUN_CAMERA.position.copy(GLOBALS.MAIN_CAMERA.position);
+                        GLOBALS.PORTAL_GUN_CAMERA.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
 
-                        if (cameraRotatingTimeout)
-                            clearTimeout(cameraRotatingTimeout);
-
-                        var q = new Quaternion()
-                        q.setFromRotationMatrix(cameraMat);
-                        window.q = q;
 
                         GLOBALS.TARGET_ROTATION_X = GLOBALS.MAIN_CAMERA.rotation.y;
                         GLOBALS.TARGET_ROTATION_Y = GLOBALS.MAIN_CAMERA.rotation.x;
-
-                        window.CAMERA_ROTATING = true;
-                        cameraRotatingTimeout = setTimeout(() => {
-                            window.CAMERA_ROTATING = false;
-                            GLOBALS.MAIN_CAMERA.rotation.z = 0;
-                        }, 500);
                     }
 
                     d.collisionFilterMask |=

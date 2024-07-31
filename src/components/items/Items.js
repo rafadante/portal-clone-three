@@ -156,7 +156,7 @@ function hoverItem(found, connecting) {
             GLOBALS.ITEM_CUBE.place = false;
         }
     } else {
-        if (userData.hasItem ||
+        if ((userData.hasItem || userData.continuousEnding) ||
             (userData.side == "down" && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("floor")) ||
             (userData.side == "up" && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("ceiling")) ||
             ((userData.side == "front" || userData.side == "back" || userData.side == "left" || userData.side == "right")
@@ -177,7 +177,15 @@ function hoverItem(found, connecting) {
         animate();
 }
 
-function planeInstanceReset(planeInstance, hasItem, itemName, item, state, canRotate, floor, ceiling, walls, isInstanced, instancedName, allowconnection) {
+function planeInstanceReset(planeInstance, hasItem, itemName, item, state, canRotate, floor, ceiling, walls, isInstanced, instancedName, allowconnection, continuousEnding) {
+
+    if (planeInstance.item) {
+        if (planeInstance.item.continuous) {
+            if (planeInstance.item.continuous.otherSide)
+                planeInstance.item.continuous.otherSide.continuousEnding = continuousEnding;
+        }
+    }
+
     planeInstance.hasItem = hasItem;
     planeInstance.itemName = itemName;
     planeInstance.item = item;

@@ -28,7 +28,7 @@ var gamepadButton7 = false;
 var gamepadButton12 = false;
 var gamepadButton15 = false;
 var headBobSpeed = 5;
-var headBobHeight = 0.00000075;//
+var headBobHeight = 0.0000006;//
 let controllerIndex = null;
 var finalRotationY;
 window.PLAYER_JUMPING_FROM_BLUE_GEL = false;
@@ -230,12 +230,9 @@ var blockJump = false;
 
 const updateCamera = function (deltaTime) {
 
-    if (window.CAMERA_ROTATING) {
-        GLOBALS.MAIN_CAMERA.quaternion.slerp(window.q, 0.2);
-    }
-
     // always look where the camera points
     GLOBALS.PLAYER.quaternion.setFromAxisAngle(new CANNON.Vec3(0,1,0), GLOBALS.MAIN_CAMERA.rotation.y);
+    //GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.SMOOTHNESS);
     GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion)
 
     if (GLOBALS.MAIN_CAMERA.position.distanceTo(new Vector3(0, 0, 0)) > 100) {

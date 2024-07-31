@@ -169,10 +169,6 @@
             data-instanced="true" id="light" />
 
           <img
-            data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
-            data-title="LIGHT STRIPS" class="item" data-name="stripe" src="../assets/ui/items/stripe.png" />
-
-          <img
             data-content="Purely cosmetic and provide your map with additional light. Every map will start off with an observation room which cannot be removed."
             data-title="OBSERVATION ROOM" class="item" data-name="observation_room" data-allowconnection="false"
             data-rotate="false" data-floor="false" data-ceiling="false" data-walls="true"
@@ -195,9 +191,15 @@
             <img
             data-content="Glass panels can be placed in your level which the player cannot break. You can increase and decrease the size of the panel by using the arrows that appear when the object is selected. You can change the barrier type to grating within the properties menu which will allow players to place a portal on the other side."
             data-title="GLASS PANELS" class="item" data-name="glass" src="../assets/ui/items/glass.png" 
-            data-allowconnection="false" data-rotate="true" data-floor="true" data-ceiling="true" data-walls="true"
+            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
             id="glass"/>
 
+            <!--
+            
+            <img
+            data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
+            data-title="LIGHT STRIPS" class="item" data-name="stripe" src="../assets/ui/items/stripe.png" />
+            
             <img data-content="If the player steps in Deadly Goo they will be instantly killed." data-title="DEADLY GOO"
             class="item" data-name="goo" src="../assets/ui/items/goo.png" />
 
@@ -227,7 +229,7 @@
             src="../assets/ui/items/laser_relays.png" />
 
           <img data-content="Reflects the laser." data-title="LASER CUBE" class="item" data-name="laser_cube"
-            src="../assets/ui/items/laser_cube.png" />
+            src="../assets/ui/items/laser_cube.png" />-->
 
           <!--<img
             data-content="You can place automatic portals on the scene, it can be static or activated by a trigger. You can choose which portal color on the level editor. If the player has a portal gun and shoots a portal with the same color as the automatic portal, the automatic portal will be destroyed and vice versa."
@@ -389,6 +391,47 @@
           </button>
         </li>
         <li data-trigger="Right" class="menu-item light-bridge-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Right</span>
+          </button>
+        </li>
+      </ul>
+    </li>
+
+    <!---->
+    <li id="grid-state" class="menu-item hasItem glass">
+      <a href="#" class="menu-btn">
+        <input type="checkbox" id="grid-state-input" />
+        <span class="menu-text">Grid</span>
+      </a>
+    </li>
+    <li class="menu-item menu-item-submenu hasItem glass" id="glass-trigger"
+      data-trigger="Left">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-crosshairs"></i>
+        <span class="menu-text title">Left</span>
+      </button>
+      <ul class="menu">
+        <li data-trigger="Top" class="menu-item glass-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Top</span>
+          </button>
+        </li>
+        <li data-trigger="Bottom" class="menu-item glass-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Bottom</span>
+          </button>
+        </li>
+        <li data-trigger="Left" class="menu-item glass-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Left</span>
+          </button>
+        </li>
+        <li data-trigger="Right" class="menu-item glass-triggers">
           <button type="button" class="menu-btn">
             <i class="fa fa-crosshairs"></i>
             <span class="menu-text">Right</span>

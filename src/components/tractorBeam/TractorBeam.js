@@ -45,7 +45,7 @@ function tractorBeam() {
 
                             //GLOBALS.MATERIAL_TRACTOR_BEAM.side = 1;
                             //document.getElementById("panel-top").style.background = "";
-                            document.getElementById("panel-top").style.opacity = 1;
+                            //document.getElementById("panel-top").style.opacity = 1;
                         }
 
                         d.inTractorPositionY = d.position.clone().y;

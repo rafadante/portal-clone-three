@@ -33,6 +33,9 @@ function portalButton(button, auto) {
     if (GLOBALS.FPS_MODE && (button == 2 || button == 0 || button == 1) && GLOBALS.ALLOW_PLACE_PORTALS) {
 
         raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
+
+        var intersectBlockPortal = raycaster2.intersectObjects(GLOBALS.BLOCK_PORTAL);
+
         var intersects = raycaster2.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
 
         if (auto) {
@@ -92,6 +95,13 @@ function portalButton(button, auto) {
                     GLOBALS.FLASH.visible = false;
                     allowPortal = true;
                 }, 300);
+            }
+
+            if(intersectBlockPortal.length > 0){
+                //NONPORTABLE WALL
+                AUDIO.PORTAL_INVALID.currentTime = 0;
+                play(AUDIO.PORTAL_INVALID)
+                return;
             }
 
             if (GLOBALS.GUN_MODE == 1) {

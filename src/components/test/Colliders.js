@@ -51,8 +51,6 @@ function addColliderItem(items, type, mass, offset) {
     for (var i = 0; i < items.length; i++) {
         if (items[i].length != 0) {
 
-            console.log(items[i])
-
             let PHYSICS_MATERIAL = new CANNON.Material();
             PHYSICS_MATERIAL.friction = items[i].friction; //0.01
             //PHYSICS_MATERIAL.restitution = 0; //0.1
@@ -85,8 +83,6 @@ function addColliderItem(items, type, mass, offset) {
                 shape.height = 0.6;
                 shape.width = 0.6;
                 offset = 0.5;
-
-                console.log(items[i].restitution)
 
                 // Create contact material behaviour
                 const mat3_ground = new CANNON.ContactMaterial(GLOBALS.PHYSICS_MATERIAL, PHYSICS_MATERIAL, { friction: 0.0, restitution: items[i].restitution })
@@ -193,8 +189,6 @@ function addColliderItem(items, type, mass, offset) {
                 clone.visible=false;
                 GLOBALS.SCENE_FPS.add(clone);
                 box.clone = clone;
-
-                console.log(box)
 
                 box.addEventListener("collide", function (event) {
                     const body = event.target;
@@ -343,8 +337,8 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
 
             box.position.copy(obj.position);
             box.position[a4] += columsNew[i][j].length - 1;
-            box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
-            box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC
+            box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT;
+            box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
             box.room = true;
             box.side = side;
 

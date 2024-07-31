@@ -47,10 +47,13 @@ function manageInstances() {
                     sideRight.push(GLOBALS.PLANE_USER_DATA[i])
                 else if (GLOBALS.PLANE_USER_DATA[i].side == "left")
                     sideLeft.push(GLOBALS.PLANE_USER_DATA[i])
+                else if (GLOBALS.PLANE_USER_DATA[i].side == "down")
+                    sideDown.push(GLOBALS.PLANE_USER_DATA[i])
+                else if (GLOBALS.PLANE_USER_DATA[i].side == "up")
+                    sideUp.push(GLOBALS.PLANE_USER_DATA[i])
 
                 if (GLOBALS.PLANE_USER_DATA[i].portal) {
                     if (GLOBALS.PLANE_USER_DATA[i].side == "up" || GLOBALS.PLANE_USER_DATA[i].side == "down") {
-                        sideUp.push(GLOBALS.PLANE_USER_DATA[i])
                         meshesFloorPortal.push(GLOBALS.PLANE_USER_DATA[i]);
                     } else {
                         meshesWallPortal.push(GLOBALS.PLANE_USER_DATA[i]);
@@ -58,7 +61,6 @@ function manageInstances() {
                 } else {
                     if (GLOBALS.PLANE_USER_DATA[i].side == "up" || GLOBALS.PLANE_USER_DATA[i].side == "down") {
                         meshesFloorNonPortal.push(GLOBALS.PLANE_USER_DATA[i])
-                        sideUp.push(GLOBALS.PLANE_USER_DATA[i])
                     } else {
                         meshesWallNonPortal.push(GLOBALS.PLANE_USER_DATA[i]);
                     }

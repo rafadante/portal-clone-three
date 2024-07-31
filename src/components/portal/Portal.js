@@ -38,6 +38,8 @@ class Portal extends Group {
         this.plane = new Plane(new Vector3(0, 1, 0), 0)
         this.debugMeshes = new Group()
 
+        console.log(hostObjects)
+
         // create onb for bb transformations
         this.ty = normal.clone().normalize()
         this.tz = playerUpDirection.clone().projectOnPlane(this.ty).normalize()
@@ -106,6 +108,8 @@ class Portal extends Group {
             }
         }
 
+        console.log(this)
+
         const material = new ShaderMaterial({
             vertexShader: VERT_SHADER,
             fragmentShader: FRAG_SHADER,
@@ -166,7 +170,6 @@ class Portal extends Group {
         GLOBALS.PORTAL_SHADER[index].updateMatrix()
         GLOBALS.PORTAL_SHADER[index].matrixAutoUpdate = true;
         this.portalShader = GLOBALS.PORTAL_SHADER[index];
-        this.portalShader.renderOrder = 100;
         this.portalShader.frustumCulled = true;
         this.add(GLOBALS.PORTAL_SHADER[index])
 

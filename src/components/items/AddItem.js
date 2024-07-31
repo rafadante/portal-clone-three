@@ -13,6 +13,7 @@ import {
     MeshStandardMaterial,
     Object3D,
     Box3,
+    ConeGeometry
 } from 'three';
 import {
     AddGoo
@@ -67,35 +68,13 @@ function addItem(found, loaded) {
             userData.hasItem = false; //delete here
         }
 
-        if (!userData.hasItem || loaded) {
+        if ((!userData.hasItem && !userData.continuousEnding) || loaded) {
 
             if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
-
-                const groupGlass = new Group();
-
-                const geometry = new PlaneGeometry(2, 2);
-                const material = new MeshBasicMaterial({ color: 0xffff00, side: DoubleSide });
-                const glass = new Mesh(geometry, material);
-
-                groupGlass.add(glass);
-                glass.translateZ(-1);
-                glass.translateY(1);
-
-                const geometryC = new CircleGeometry(0.5, 8);
-                const materialC = new MeshBasicMaterial({ color: 0xffff00 });
-                const circle = new Mesh(geometryC, materialC); 
-                circle.rotation.x = -Math.PI/2;
-                groupGlass.add(circle);
-                circle.translateZ(0.01)
-
-                GLOBALS.ITEMS_ADDED.add(groupGlass);
-
-                userData.wall = glass;
-
-                groupGlass.position.copy(userData.position);
-                groupGlass.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
-
-                return;
+                const geometry = new BoxGeometry(1, 1, 1);
+                const material = new MeshBasicMaterial({color: new Color(0x000000)});
+                const box = new Mesh(geometry, material);
+                var item = box;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
 
                 var map2 = new TextureLoader().load(GLOBALS.DRAGGED_ITEM_ELEMENT.attr("src"));
@@ -193,7 +172,8 @@ function addItem(found, loaded) {
                 GLOBALS.DRAGGED_ITEM_ELEMENT.data('walls'),
                 GLOBALS.DRAGGED_ITEM_ELEMENT.data('instanced'),
                 GLOBALS.ITEM_HOLDED_NAME,
-                GLOBALS.DRAGGED_ITEM_ELEMENT.data('allowconnection')
+                GLOBALS.DRAGGED_ITEM_ELEMENT.data('allowconnection'),
+                false
             );
 
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
@@ -279,19 +259,27 @@ function addItem(found, loaded) {
             if (GLOBALS.ITEM_HOLDED_NAME == "light_bridge") {
                 item.state = true;
                 item.triggers = GLOBALS.LIGHT_BRIDGE_TRIGGER;
-                createLightBridges("light_bridge", GLOBALS.LIGHT_BRIDGE_RAYCASTER, item);
+                createLightBridges("light_bridge", GLOBALS.LIGHT_BRIDGE_RAYCASTER, item, null, false);
 
                 setTimeout(() => {
-                    ContinuousTrigger(userData, GLOBALS.LIGHT_BRIDGE_TRIGGER, $("#light-bridge-trigger"), "light_bridge");
+                    ContinuousTrigger(userData.item, GLOBALS.LIGHT_BRIDGE_TRIGGER, $("#light-bridge-trigger"), "light_bridge");
                 }, 100);
             }
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
+                item.triggers = GLOBALS.GLASS_TRIGGER;
+                item.userData.grid = GLOBALS.GRID_STATE;
+                createLightBridges("glass", GLOBALS.GLASS_RAYCASTER, item, null, false);
+                ContinuousTrigger(userData.item, GLOBALS.GLASS_TRIGGER, $("#glass-trigger"), "glass");
+            }
+
 
             if (GLOBALS.ITEM_HOLDED_NAME == "tractor_beam") {
                 item.beam = beamType;
                 item.state = true;
                 item.reversed = false;
                 item.triggers = "State";
-                createLightBridges("tractor_beam", GLOBALS.TRACTOR_BEAM_RAYCASTER, item);
+                createLightBridges("tractor_beam", GLOBALS.TRACTOR_BEAM_RAYCASTER, item, null, false);
             }
 
             if (GLOBALS.ITEM_HOLDED_NAME.includes("button")) {
@@ -323,7 +311,9 @@ function addItem(found, loaded) {
             item.friction = 0.4;
             item.restitution = 0;
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
+                GLOBALS.ITEMS_ADDED.add(item);
+            }else if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
                 GLOBALS.ITEMS_ADDED.add(item);
                 item.translateY(0.01);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
@@ -423,16 +413,16 @@ function addItem(found, loaded) {
                 instanced.computeBoundingSphere();
 
                 if (GLOBALS.ITEM_HOLDED_NAME == "laser_field") {
-                    createLightBridges("laser_field", GLOBALS.LASER_FIELD_RAYCASTER, item, instanced);
+                    createLightBridges("laser_field", GLOBALS.LASER_FIELD_RAYCASTER, item, instanced,false);
 
                     setTimeout(() => {
-                        ContinuousTrigger(userData, GLOBALS.LASER_FIELD_TRIGGER, $("#laser-field-trigger"), "laser_field");
+                        ContinuousTrigger(userData.item, GLOBALS.LASER_FIELD_TRIGGER, $("#laser-field-trigger"), "laser_field");
                     }, 100);
                 } else if (GLOBALS.ITEM_HOLDED_NAME == "fizzler") {
-                    createLightBridges("fizzler", GLOBALS.FIZZLER_RAYCASTER, item, instanced);
+                    createLightBridges("fizzler", GLOBALS.FIZZLER_RAYCASTER, item, instanced, false);
 
                     setTimeout(() => {
-                        ContinuousTrigger(userData, GLOBALS.FIZZLER_TRIGGER, $("#laser-field-trigger"), "fizzler");
+                        ContinuousTrigger(userData.item, GLOBALS.FIZZLER_TRIGGER, $("#laser-field-trigger"), "fizzler");
                     }, 100);
                 }
             }

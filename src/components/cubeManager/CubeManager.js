@@ -7,6 +7,7 @@ import {
 } from 'three';
 import { GLOBALS } from '../../Globals.js';
 import { getPlaneByName, warning } from '../../Utils.js';
+import { checkToUpdateContinuous } from './UpdateRaycast.js';
 
 var IndexArray = [];
 
@@ -54,6 +55,8 @@ function cubeState(button) {
     }
 
     IndexArray = [];
+
+    checkToUpdateContinuous();
 }
 
 function trasnlatePlane(id, val, portal) {
@@ -131,6 +134,7 @@ function trasnlatePlane(id, val, portal) {
             var plane = GLOBALS.PLANE_USER_DATA[id];
 
             if (GLOBALS.PLANE_USER_DATA[id].isInstanced) {
+                plane.item.position.copy(plane.position);
                 var item = new Object3D();
                 item.position.copy(plane.position);
                 item.rotation.copy(plane.item.rotation);

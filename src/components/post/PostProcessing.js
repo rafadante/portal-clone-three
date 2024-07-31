@@ -6,12 +6,12 @@ import {
     ToneMappingMode,
     Selection,
     SelectiveBloomEffect,
-    SSAOEffect,
-    BlendFunction,
-    NormalPass,
-    DepthDownsamplingPass
+    BlendFunction
 } from "postprocessing";
-import { HalfFloatType } from 'three';
+import {
+    HalfFloatType,
+    Color
+} from 'three';
 import { GLOBALS } from "../../Globals";
 
 //POST
@@ -24,6 +24,14 @@ function initPost() {
         frameBufferType: HalfFloatType
     });
     GLOBALS.COMPOSER.addPass(new RenderPass(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA));
+
+    const renderPass = new RenderPass(GLOBALS.GUN, GLOBALS.PORTAL_GUN_CAMERA);
+    renderPass.clearColor = new Color(1, 1, 1);
+    renderPass.clearAlpha = 0;
+    renderPass.clearPass.enabled = true;
+    renderPass.clearPass.color = false;
+    renderPass.clearPass.camera = GLOBALS.PORTAL_GUN_CAMERA;
+    GLOBALS.COMPOSER.addPass(renderPass);
 
     //
     const toneMappingEffect = new ToneMappingEffect({
@@ -38,45 +46,21 @@ function initPost() {
     });
 
     //
-    const selectiveBloom = new SelectiveBloomEffect(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA, {
+    const selectiveBloom = new SelectiveBloomEffect(GLOBALS.GUN, GLOBALS.PORTAL_GUN_CAMERA, {
         intensity: 20.0,
         mipmapBlur: true,
         luminanceThreshold: 0.3,
         luminanceSmoothing: 0.2,
         radius: 0.618,
         resolutionScale: 4,
+        //blendFunction: BlendFunction.SCREEN
     });
     selectiveBloom.selection = GLOBALS.SELECTED_FOR_BLOOM;
-
-    //
-    // Note: Thresholds and falloff correspond to camera near/far.
-    // Example: worldDistance = distanceThreshold * (camera.far - camera.near)
-
-    const capabilities = GLOBALS.COMPOSER.getRenderer().capabilities;
-
-    const normalPass = new NormalPass(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
-    const depthDownsamplingPass = new DepthDownsamplingPass({
-        normalBuffer: normalPass.texture,
-        resolutionScale: 0.5
-    });
-
-    const normalDepthBuffer = capabilities.isWebGL2 ?
-        depthDownsamplingPass.texture : null;
-
-    const ssaoEffect = new SSAOEffect(GLOBALS.MAIN_CAMERA, normalPass.texture, {
-        samples: 31,
-        radius: 10,
-        intensity: 30,
-        luminanceInfluence: 0.1
-    });
 
     //
     GLOBALS.COMPOSER.addPass(new EffectPass(GLOBALS.MAIN_CAMERA,
         toneMappingEffect
     ));
-
-    console.log(ssaoEffect)
-    console.log(GLOBALS.COMPOSER)
 }
 
 export { initPost }

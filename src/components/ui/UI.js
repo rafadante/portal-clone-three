@@ -147,12 +147,12 @@ $('#vol-val-range').on('input', function () {
 
 //FOV
 $('#fov-val-range').on('input', function () {
-    localStorage.setItem("fov-val-range", $(this).val());
+    /*localStorage.setItem("fov-val-range", $(this).val());
     $("#fov-val-number").val($(this).val());
     GLOBALS.MAIN_CAMERA.fov = $(this).val();
     GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
 
-    update();
+    update();*/
 });
 
 //MOUSE

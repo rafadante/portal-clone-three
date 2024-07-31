@@ -1,16 +1,18 @@
 import $ from 'jquery';
 import { ContinuousTrigger } from '../continuous/Continuous';
 import { GLOBALS } from '../../Globals';
-import { 
-    Object3D, 
-    Vector3, 
-    Color, 
-    Vector2, 
-    Raycaster } from 'three';
+import {
+    Object3D,
+    Vector3,
+    Color,
+    Vector2,
+    Raycaster
+} from 'three';
 import { animate } from '../../Main';
-import { 
-    planeInstanceReset, 
-    deleteItemInstanced } from '../items/Items.js';
+import {
+    planeInstanceReset,
+    deleteItemInstanced
+} from '../items/Items.js';
 import {
     cubeState
 } from '../cubeManager/CubeManager.js';
@@ -21,6 +23,7 @@ import {
     hoverItem
 } from '../items/Items.js';
 import { addItem } from '../items/AddItem.js';
+import { manageRaycasterGlassPanel } from '../glassPanel/GlassPanel.js';
 
 window.addEventListener("contextmenu", e => e.preventDefault());
 
@@ -105,11 +108,21 @@ $("body").on('click', '#delete', function () {
 
         deleteItemInstanced(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false);
     } else {
+
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous) {
+            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide.hasItem = false;
+            GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous);
+        }
+
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge) {
+            GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge)
+        }
+
         GLOBALS.ITEMS_COUNT[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName]["count"] -= 1;
         GLOBALS.ITEMS_ADDED.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item);
     }
 
-    planeInstanceReset(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false, null, null, null, null, null, null, null, false, null, false);
+    planeInstanceReset(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false, null, null, null, null, null, null, null, false, null, false, false);
     $(".menu").removeClass("menu-show");
 
     animate()
@@ -260,15 +273,39 @@ $("body").on('input', '#ligh-color-input', function () {
 });
 
 $("body").on('click', '.light-bridge-triggers', function () {
-    ContinuousTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], $(this).data("trigger"), $("#light-bridge-trigger"), "light_bridge")
+    GLOBALS.LIGHT_BRIDGE_TRIGGER = $(this).data("trigger");
+    ContinuousTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item,
+        $(this).data("trigger"), $("#light-bridge-trigger"), "light_bridge")
 });
 
 $("body").on('click', '.laser-field-triggers', function () {
-    ContinuousTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], $(this).data("trigger"), $("#laser-field-trigger"), "laser_field")
+    GLOBALS.LASER_FIELD_TRIGGER = $(this).data("trigger");
+    ContinuousTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item,
+        $(this).data("trigger"), $("#laser-field-trigger"), "laser_field")
 });
 
 $("body").on('click', '.fizzler-triggers', function () {
-    ContinuousTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], $(this).data("trigger"), $("#fizzler-trigger"), "fizzler")
+    GLOBALS.FIZZLER_TRIGGER = $(this).data("trigger");
+    ContinuousTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item,
+        $(this).data("trigger"), $("#fizzler-trigger"), "fizzler")
+});
+
+$("body").on('click', '.glass-triggers', function () {
+    GLOBALS.GLASS_TRIGGER = $(this).data("trigger");
+    ContinuousTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item,
+        $(this).data("trigger"), $("#glass-trigger"), "glass")
+});
+
+//
+$("body").on('input', '#grid-state-input', function () {
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.grid = this.checked;
+
+    if (this.checked)
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_GRID;
+    else
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_GLASS;
+
+    animate()
 });
 
 //
@@ -317,6 +354,7 @@ function onDocumentMouseMove(event) {
 
 function onDocumentMouseUp(event) {
     if (!GLOBALS.FPS_MODE) {
+        GLOBALS.RESIZING_GLASS_PANEL = false;
         GLOBALS.SELECTED_SIDE = null;
         GLOBALS.SELECTING = false;
         GLOBALS.CONTROLS.enabled = true;
@@ -351,7 +389,23 @@ const mouse2 = new Vector2(1, 1);
 function raycastManager(event, type) {
     if (!GLOBALS.FPS_MODE && GLOBALS.PLANE_LEVEL_INSTANCED) {
 
+        if (GLOBALS.RESIZING_GLASS_PANEL) {
+            manageRaycasterGlassPanel(mouse2, type);
+            return;
+        }
+
         raycaster.setFromCamera(mouse2, GLOBALS.MAIN_CAMERA);
+        const intersectGlassPanels = raycaster.intersectObjects(GLOBALS.GLASS_PANELS);
+
+        if (intersectGlassPanels.length > 0) {
+            if (type == "down") {
+                GLOBALS.CONTROLS.enabled = false;
+                GLOBALS.RESIZING_GLASS_PANEL = true;
+                manageRaycasterGlassPanel(mouse2, type, intersectGlassPanels[0].object);
+                return;
+            }
+        }
+
         const intersection = raycaster.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
 
         if (intersection.length > 0) {

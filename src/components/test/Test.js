@@ -179,9 +179,32 @@ function viewFPS() {
         else
             stateDoor(0, true, false, GLOBALS.EXIT_DOOR);
 
+        blockPortal();
         GLOBALS.RENDERER.renderLists.dispose();
     }, 500);
 };
+
+function blockPortal() {
+    for (var i = 0; i < GLOBALS.LIGHT_BRIDGE_RAYCASTER.length; i++) {
+        GLOBALS.BLOCK_PORTAL.push(GLOBALS.LIGHT_BRIDGE_RAYCASTER[i].item.continuous)
+    }
+
+    for (var i = 0; i < GLOBALS.LASER_FIELD_RAYCASTER.length; i++) {
+        GLOBALS.BLOCK_PORTAL.push(GLOBALS.LASER_FIELD_RAYCASTER[i].item.continuous)
+    }
+
+    for (var i = 0; i < GLOBALS.FIZZLER_RAYCASTER.length; i++) {
+        GLOBALS.BLOCK_PORTAL.push(GLOBALS.FIZZLER_RAYCASTER[i].item.continuous)
+    }
+
+    for (var i = 0; i < GLOBALS.GLASS_RAYCASTER.length; i++) {
+        if (!GLOBALS.GLASS_RAYCASTER[i].item.userData.grid){
+            console.log("1111111111")
+            GLOBALS.BLOCK_PORTAL.push(GLOBALS.GLASS_RAYCASTER[i].item.continuous)
+        }
+            
+    }
+}
 
 export {
     viewFPS
