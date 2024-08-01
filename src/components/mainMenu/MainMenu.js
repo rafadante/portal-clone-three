@@ -301,6 +301,7 @@ function loadLevel(data) {
     const geometry = new PlaneGeometry(2, 2);
 
     GLOBALS.PLANE_LEVEL_INSTANCED = new InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
+    GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = true;
     GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = true;
     GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = true;
     GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
@@ -310,6 +311,7 @@ function loadLevel(data) {
 
     for (var i = 0; i < GLOBALS.BUDGET; i++) {
         clone.scale.set(0, 0, 0);
+        clone.position.set(100000, 100000, 100000);
         clone.updateMatrix();
         GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(i, clone.matrix);
     }
@@ -335,6 +337,12 @@ function loadLevel(data) {
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(i, new Color().setHex(0x808080));
 
             GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+        }
+    }
+
+    for (var i = 0; i < data.length; i++) {
+
+        if (data[i].exists) {
 
             if (data[i].hasItem) {
 
@@ -357,14 +365,14 @@ function loadLevel(data) {
         }
     }
 
-    for (var i = 0; i < triggers.length; i++) {
+    /*for (var i = 0; i < triggers.length; i++) {
 
         const id = triggers[i].id_instanced;
 
         GLOBALS.SELECTED_FOR_CONNECTION = GLOBALS.PLANE_USER_DATA[id];
         GLOBALS.SELECTED_FOR_CONNECTION.instanceId = id;
         GLOBALS.SELECTED_FOR_CONNECTION.trigger = GLOBALS.PLANE_USER_DATA[triggers[i].trigger];
-        
+
         if (GLOBALS.SELECTED_FOR_CONNECTION.itemName.includes("pedestal_button"))
             GLOBALS.SELECTED_FOR_CONNECTION.trigger.item.item.state = GLOBALS.SELECTED_FOR_CONNECTION.state;
         GLOBALS.SELECTED_FOR_CONNECTION.trigger.instanceId = GLOBALS.SELECTED_FOR_CONNECTION.trigger.id_instanced;
@@ -372,7 +380,7 @@ function loadLevel(data) {
         GLOBALS.SELECTED_FOR_CONNECTION.trigger.normal = GLOBALS.SELECTED_FOR_CONNECTION.normal;
 
         findPath(GLOBALS.PLANE_USER_DATA[id].position, GLOBALS.PLANE_USER_DATA[id].trigger.position, GLOBALS.PLANE_USER_DATA[id].trigger)
-    }
+    }*/
 }
 
 export {

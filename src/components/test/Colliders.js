@@ -185,54 +185,21 @@ function addColliderItem(items, type, mass, offset) {
                 box.arrayRot = [];
                 box.name = type;
 
-                const clone = items[i].userData.obj.clone();
-                clone.visible=false;
+                const clone = GLOBALS.ITEMS_ADDED.getObjectByName(type).clone.clone();
+                clone.visible = false;
                 GLOBALS.SCENE_FPS.add(clone);
                 box.clone = clone;
 
+                addPositionalAudio('audio-impact', box, false, false, true, 8);
+
                 box.addEventListener("collide", function (event) {
-                    const body = event.target;
-
-                    body.looping = false;
-
-                    if (body.playingAudioContact)
-                        return;
-
-                    if (event.contact.bj.side) {
-                        if (event.contact.bj.side != event.target.sideContact || GLOBALS.HOLDING_ITEM) {
-                            event.target.sideContact = event.contact.bj.side;
-                            addPositionalAudio('audio-impact', body, true, false, true, 8);
-                            body.playingAudioContact = true;
-
-                            setTimeout(() => {
-                                GLOBALS.SCENE_FPS.remove(body.sound);
-                                body.playingAudioContact = false;
-                            }, 1000);
-                        }
-                    } else if (event.contact.bi.side) {
-                        if (event.contact.bi.side != event.target.sideContact || GLOBALS.HOLDING_ITEM) {
-                            event.target.sideContact = event.contact.bi.side;
-                            addPositionalAudio('audio-impact', body, true, false, true, 8);
-                            body.playingAudioContact = true;
-
-                            setTimeout(() => {
-                                GLOBALS.SCENE_FPS.remove(body.sound);
-                                body.playingAudioContact = false;
-                            }, 1000);
-                        }
-                    } else {
-                        if (event.contact.id != event.target.contactID || GLOBALS.HOLDING_ITEM) {
-                            event.target.contactID = event.contact.bj.id;
-                            addPositionalAudio('audio-impact', body, true, false, true, 8);
-                            body.playingAudioContact = true;
-
-                            setTimeout(() => {
-                                GLOBALS.SCENE_FPS.remove(body.sound);
-                                body.playingAudioContact = false;
-                            }, 1000);
-                        }
+                    if (Math.abs(event.target.velocity.x) > 1.5 ||
+                        Math.abs(event.target.velocity.y) > 1.5 ||
+                        Math.abs(event.target.velocity.z) > 1.5) {
+                        event.target.sound.position.copy(event.target.position)
+                        //event.target.sound.audio.currentTime = 0;
+                        event.target.sound.audio.play();
                     }
-
                 });
 
                 box.addEventListener("sleep", function (event) {

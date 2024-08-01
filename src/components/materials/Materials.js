@@ -4,7 +4,8 @@ import {
     SRGBColorSpace,
     Vector2,
     Color,
-    MeshBasicMaterial
+    MeshBasicMaterial,
+    RepeatWrapping
 } from 'three';
 import {
     GLOBALS
@@ -13,82 +14,256 @@ import {
 function loadMaterials() {
     //MATERIAL FLOOR NON PORTAL
     GLOBALS.MATERIAL_FLOOR_NON_PORTAL = new MeshStandardMaterial();
-    loadMaterial(GLOBALS.MATERIAL_FLOOR_NON_PORTAL, 'metal/floor.jpg', 'metal/floor_normal.jpg', null, 
-    'floor/nonPortalable/1/roughness.jpg', null, 1, 0.2);
-    //GLOBALS.MATERIAL_FLOOR_NON_PORTAL.envMapIntensity = 0.3;
+    loadMaterial(
+        GLOBALS.MATERIAL_FLOOR_NON_PORTAL,
+        'metal/floor.jpg',
+        'metal/floor_normal.jpg',
+        null,
+        'floor/nonPortalable/1/roughness.jpg',
+        null,
+        null,
+        1,
+        0,
+        0.2,
+        0,
+        null,
+        null
+    );
 
     //MATERIAL FLOOR PORTAL
     GLOBALS.MATERIAL_FLOOR_PORTAL = GLOBALS.MATERIAL_FLOOR_NON_PORTAL.clone();
-    loadMaterial(GLOBALS.MATERIAL_FLOOR_PORTAL, 'portal/floor.jpg', 'portal/floor_normal.jpg', null, null, null, 1, 0.1);
+    loadMaterial(
+        GLOBALS.MATERIAL_FLOOR_PORTAL,
+        'portal/floor.jpg',
+        'portal/floor_normal.jpg',
+        null,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0.1,
+        0,
+        null,
+        null
+    );
 
     //MATERIAL WALL PORTAL
     GLOBALS.MATERIAL_WALL_PORTAL = new MeshStandardMaterial();
-    loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL, 'portal/wall1.jpg', 'portal/wall1_normal.jpg',
-        null, null, null, 1, 0.1);
+    loadMaterial(
+        GLOBALS.MATERIAL_WALL_PORTAL,
+        'portal/wall1.jpg',
+        'portal/wall1_normal.jpg',
+        null,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0.1,
+        0,
+        null,
+        null
+    );
 
     GLOBALS.MATERIAL_WALL_PORTAL2 = new MeshStandardMaterial();
-    loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL2, 'portal/wall2.jpg', 'portal/wall2_normal.jpg',
-        null, null, null, 1, 0.1);
+    loadMaterial(
+        GLOBALS.MATERIAL_WALL_PORTAL2,
+        'portal/wall2.jpg',
+        'portal/wall2_normal.jpg',
+        null,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0.1,
+        0,
+        null,
+        null
+    );
 
     GLOBALS.MATERIAL_WALL_PORTAL3 = new MeshStandardMaterial();
-    loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL3, 'portal/wall3.jpg', 'portal/wall3_normal.jpg',
-        null, null, null, 1, 0.1);
+    loadMaterial(
+        GLOBALS.MATERIAL_WALL_PORTAL3,
+        'portal/wall3.jpg',
+        'portal/wall3_normal.jpg',
+        null,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0.1,
+        0,
+        null,
+        null
+    );
 
     GLOBALS.MATERIAL_WALL_PORTAL4 = new MeshStandardMaterial();
-    loadMaterial(GLOBALS.MATERIAL_WALL_PORTAL4, 'portal/wall4.jpg', 'portal/wall4_normal.jpg',
-        null, null, null, 1, 0.1);
+    loadMaterial(
+        GLOBALS.MATERIAL_WALL_PORTAL4,
+        'portal/wall4.jpg',
+        'portal/wall4_normal.jpg',
+        null,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0.1,
+        0,
+        null,
+        null
+    );
 
     //MATERIAL WALL NON PORTAL
     GLOBALS.MATERIAL_WALL_NON_PORTAL = GLOBALS.MATERIAL_WALL_PORTAL.clone();
-    loadMaterial(GLOBALS.MATERIAL_WALL_NON_PORTAL, 'metal/wall1.jpg', 'metal/wall1_normal.jpg',
-        null, null, null, 1, 0.2);
+    loadMaterial(
+        GLOBALS.MATERIAL_WALL_NON_PORTAL,
+        'metal/wall1.jpg',
+        'metal/wall1_normal.jpg',
+        null,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0.2,
+        0,
+        null,
+        null
+    );
 
     GLOBALS.MATERIAL_WALL_NON_PORTAL2 = GLOBALS.MATERIAL_WALL_PORTAL.clone();
-    loadMaterial(GLOBALS.MATERIAL_WALL_NON_PORTAL2, 'metal/wall2.jpg', 'metal/wall2_normal.jpg',
-        null, null, null, 1, 0.2);
+    loadMaterial(
+        GLOBALS.MATERIAL_WALL_NON_PORTAL2,
+        'metal/wall2.jpg',
+        'metal/wall2_normal.jpg',
+        null,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0.2,
+        0,
+        null,
+        null
+    );
+
+    //GRID
+    GLOBALS.MATERIAL_GRID = new MeshStandardMaterial();
+    loadMaterial(
+        GLOBALS.MATERIAL_GRID,
+        "wall/grid/Metal_Grill_024_basecolor.jpg",
+        "wall/grid/Metal_Grill_024_normal.jpg",
+        null,
+        null,
+        "wall/grid/Metal_Grill_024_metallic.jpg",
+        "wall/grid/Metal_Grill_024_opacity.jpg",
+        0.5,
+        1,
+        0.5,
+        0.5,
+        0.5,
+        3
+    );
+
+    //GLASS
+    GLOBALS.MATERIAL_GLASS = new MeshStandardMaterial({
+        transparent: true,
+        opacity: 0.3
+    });
+    loadMaterial(
+        GLOBALS.MATERIAL_GLASS,
+        "wall/glass/Glass_Frosted_001_basecolor.jpg",
+        "wall/glass/Glass_Frosted_001_normal.jpg",
+        null,
+        "wall/glass/Glass_Frosted_001_roughness.jpg",
+        null,
+        null,
+        0.5,
+        0,
+        0.5,
+        0,
+        0.5,
+        3
+    );
+
+    console.log(GLOBALS.MATERIAL_GLASS)
 }
 
-function loadMaterial(material, base, normal, ao, rough, metal, roughValue, envIntensity) {
+function loadMaterial(material, base, normal, ao, rough, metal, alpha, roughValue, metalValue, envIntensity, alphaTest, repeatX, repeatY) {
 
     var map;
     material.roughness = roughValue;
+    material.metalness = metalValue;
 
     if (base) {
         map = new TextureLoader().load('./assets/textures/' + base);
         map.colorSpace = SRGBColorSpace;
         material.map = map;
+
+        if (repeatX)
+            applyRepeat(map, repeatX, repeatY);
     }
 
     if (normal) {
         map = new TextureLoader().load('./assets/textures/' + normal);
         material.normalMap = map;
+
+        if (repeatX)
+            applyRepeat(map, repeatX, repeatY);
     }
 
     if (ao) {
         map = new TextureLoader().load('./assets/textures/' + ao);
         material.aoMap = map;
+
+        if (repeatX)
+            applyRepeat(map, repeatX, repeatY);
     }
 
     if (rough) {
         map = new TextureLoader().load('./assets/textures/' + rough);
         material.roughnessMap = map;
+
+        if (repeatX)
+            applyRepeat(map, repeatX, repeatY);
     }
 
     if (metal) {
         map = new TextureLoader().load('./assets/textures/' + metal);
         material.metalnessMap = map;
-        material.metalness = 1;
+
+        if (repeatX)
+            applyRepeat(map, repeatX, repeatY);
+    }
+
+    if (alpha) {
+        map = new TextureLoader().load('./assets/textures/' + alpha);
+        material.alphaMap = map;
+
+        if (repeatX)
+            applyRepeat(map, repeatX, repeatY);
     }
 
     material.envMap = GLOBALS.ENV_MAP;
     material.envMapIntensity = envIntensity;
+    material.alphaTest = alphaTest;
+}
+
+function applyRepeat(map, repeatX, repeatY) {
+    map.wrapS = map.wrapT = RepeatWrapping;
+    map.repeat.set(repeatX, repeatY);
 }
 
 const textureLoader = new TextureLoader();
 const map = textureLoader.load('./assets/textures/decal/base2.png');
 //decalDiffuse.colorSpace = SRGBColorSpace;
 map.colorSpace = SRGBColorSpace;
-const normal = textureLoader.load('./assets/textures/decal/normal.jpg');
+var normal = textureLoader.load('./assets/textures/decal/normal.jpg');
 
 GLOBALS.INK_MATERIAL = new MeshStandardMaterial({
     //map: map,
@@ -121,10 +296,42 @@ GLOBALS.MATERIAL_NON_PORTAL_EDITOR = new MeshStandardMaterial({
 GLOBALS.IMG_CHECK = new TextureLoader().load('./assets/check.png');
 GLOBALS.IMG_CLOSE = new TextureLoader().load('./assets/close.png');
 
-//
-GLOBALS.MATERIAL_GRID = new MeshBasicMaterial({color: new Color(0x00ff00)})
-GLOBALS.MATERIAL_GLASS = new MeshBasicMaterial({color: new Color(0xff0000)})
+function updateMaterialRepeat(mesh, newMaterial, distance) {
+    mesh.material = newMaterial.clone();
+
+    var cloneTexture = mesh.material.map.clone();
+    mesh.material.map = cloneTexture;
+    cloneTexture.repeat.set(0.5, distance);
+    cloneTexture.needsUpdate = true;
+
+    var cloneTexture = mesh.material.normalMap.clone();
+    mesh.material.normalMap = cloneTexture;
+    cloneTexture.repeat.set(0.5, distance);
+    cloneTexture.needsUpdate = true;
+
+    if (mesh.material.metalnessMap) {
+        var cloneTexture = mesh.material.metalnessMap.clone();
+        mesh.material.metalnessMap = cloneTexture;
+        cloneTexture.repeat.set(0.5, distance);
+        cloneTexture.needsUpdate = true;
+    }
+
+    if (mesh.material.alphaMap) {
+        var cloneTexture = mesh.material.alphaMap.clone();
+        mesh.material.alphaMap = cloneTexture;
+        cloneTexture.repeat.set(0.5, distance);
+        cloneTexture.needsUpdate = true;
+    }
+
+    if (mesh.material.roughnessMap) {
+        var cloneTexture = mesh.material.roughnessMap.clone();
+        mesh.material.roughnessMap = cloneTexture;
+        cloneTexture.repeat.set(0.5, distance);
+        cloneTexture.needsUpdate = true;
+    }
+}
 
 export {
-    loadMaterials
+    loadMaterials,
+    updateMaterialRepeat
 }

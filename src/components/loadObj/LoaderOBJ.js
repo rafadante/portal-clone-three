@@ -312,7 +312,7 @@ function loadEnterDoor(scene) {
     //
     GLOBALS.EXIT_DOOR = SkeletonUtils.clone(GLOBALS.ENTER_DOOR);
     GLOBALS.EXIT_DOOR.position.set(13, 1, 0);
-    GLOBALS.EXIT_DOOR.buttons = 0;
+    GLOBALS.EXIT_DOOR.userData.buttons = 0;
     GLOBALS.EXIT_DOOR.connections = 0;
     GLOBALS.EXIT_DOOR.name = "exitDoor";
     GLOBALS.EXIT_DOOR.rotation.y += Math.PI;
@@ -370,10 +370,10 @@ function loadPortalCubeManager(scene) {
     item.userData.ground = true;
     item.userData.ceiling = false;
     item.scene = scene.children[0];
-    item.userData.obj = scene;
-    item.userData.obj.children[0].material.envMap = GLOBALS.ENV_MAP;
-    item.userData.obj.children[0].material.envMapIntensity = 0.5;
-    item.userData.obj.children[0].material.roughness = 0.2;
+    item.clone = scene;
+    item.clone.children[0].material.envMap = GLOBALS.ENV_MAP;
+    item.clone.children[0].material.envMapIntensity = 0.5;
+    item.clone.children[0].material.roughness = 0.2;
     loadPortalSphere();
     buildIniCubes();
 }
@@ -430,10 +430,10 @@ function loadPortalSphereManager(scene) {
     item.userData.ground = true;
     item.userData.ceiling = false;
     item.scene = scene.children[0];
-    item.userData.obj = scene.children[0];
-    item.userData.obj.material.envMap = GLOBALS.ENV_MAP;
-    item.userData.obj.material.envMapIntensity = 0.5;
-    item.userData.obj.material.roughness = 0.2;
+    item.clone = scene.children[0];
+    item.clone.material.envMap = GLOBALS.ENV_MAP;
+    item.clone.material.envMapIntensity = 0.5;
+    item.clone.material.roughness = 0.2;
     
     loadHalfWindow()
 }
@@ -603,10 +603,10 @@ function loadRadioManager(scene) {
     item.userData.ground = true;
     item.userData.ceiling = false;
     item.scene = scene.children[0];
-    item.userData.obj = scene;
-    item.userData.obj.children[0].material.envMap = GLOBALS.ENV_MAP;
-    item.userData.obj.children[0].material.envMapIntensity = 0.5;
-    item.userData.obj.children[0].material.roughness = 0.2;
+    item.clone = scene;
+    item.clone.children[0].material.envMap = GLOBALS.ENV_MAP;
+    item.clone.children[0].material.envMapIntensity = 0.5;
+    item.clone.children[0].material.roughness = 0.2;
 
     loadGelRecharger();
 }
@@ -890,10 +890,10 @@ function loadPortalCubeManager2(scene) {
     item.userData.ground = true;
     item.userData.ceiling = false;
     item.scene = scene.children[0];
-    item.userData.obj = scene;
-    item.userData.obj.children[0].material.envMap = GLOBALS.ENV_MAP;
-    item.userData.obj.children[0].material.envMapIntensity = 0.5;
-    item.userData.obj.children[0].material.roughness = 0.2;
+    item.clone = scene;
+    item.clone.children[0].material.envMap = GLOBALS.ENV_MAP;
+    item.clone.children[0].material.envMapIntensity = 0.5;
+    item.clone.children[0].material.roughness = 0.2;
 
     if (GLOBALS.LOADED_LEVEL) {
         loadLevelJSON()

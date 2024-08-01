@@ -85,7 +85,7 @@ function updateEvents() {
           if (GLOBALS.CONNECTIONS[i]['from'].box3.accept.includes(d.name)) {
 
             if (!GLOBALS.CONNECTIONS[i]['line'].active) {
-              GLOBALS.CONNECTIONS[i]['to'].item.buttons += 1;
+              GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
               GLOBALS.CONNECTIONS[i]['line'].idConnection = id;
               GLOBALS.CONNECTIONS[i]['line'].active = true;
               GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0x0077B6);
@@ -100,26 +100,26 @@ function updateEvents() {
               //Manage Door Trigger
               if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
+                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
                   stateDoor(0, true, false, GLOBALS.CONNECTIONS[i]['to'].item);
                 }
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("cube") ||
                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("sphere")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
+                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
                   dispenserSpawn(GLOBALS.CONNECTIONS[i]['to'].item);
                 }
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("tractor")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
+                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
                   tractorStates(GLOBALS.CONNECTIONS[i]['to']);
                 }
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("light_bridge")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
+                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
                   lightBridgeState(GLOBALS.CONNECTIONS[i]['to']);
                   wakeUpAll()
                 }
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field") ||
                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("fizzler")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons) {
+                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
                   laserFieldState(GLOBALS.CONNECTIONS[i]['to'])
                 }
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
@@ -141,27 +141,27 @@ function updateEvents() {
 
           if (notInPos >= 6) {
             if (GLOBALS.CONNECTIONS[i]['line'].active && GLOBALS.CONNECTIONS[i]['line'].idConnection == id) {
-              GLOBALS.CONNECTIONS[i]['to'].item.buttons -= 1;
+              GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons -= 1;
               GLOBALS.CONNECTIONS[i]['line'].idConnection = null;
               GLOBALS.CONNECTIONS[i]['line'].active = false;
               GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0xffa500);
 
               if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.buttons < GLOBALS.CONNECTIONS[i]['to'].item.connections) {
+                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons < GLOBALS.CONNECTIONS[i]['to'].item.connections) {
                   stateDoor(0, false, false, GLOBALS.CONNECTIONS[i]['to'].item);
                 }
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("tractor")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.buttons < GLOBALS.CONNECTIONS[i]['to'].item.connections) {
+                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons < GLOBALS.CONNECTIONS[i]['to'].item.connections) {
                   tractorStates(GLOBALS.CONNECTIONS[i]['to']);
                 }
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("light_bridge")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.buttons < GLOBALS.CONNECTIONS[i]['to'].item.connections) {
+                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons < GLOBALS.CONNECTIONS[i]['to'].item.connections) {
                   lightBridgeState(GLOBALS.CONNECTIONS[i]['to']);
                 }
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field") ||
                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("fizzler")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.buttons < GLOBALS.CONNECTIONS[i]['to'].item.connections) {
+                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons < GLOBALS.CONNECTIONS[i]['to'].item.connections) {
                   laserFieldState(GLOBALS.CONNECTIONS[i]['to'])
                 }
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
@@ -222,7 +222,7 @@ function interactWithItem() {
           if (goal == GLOBALS.CONNECTIONS[i]['from']) {//TRIGER START
             //Verify if the button accepts the body
             if (!GLOBALS.CONNECTIONS[i]['line'].active) {
-              GLOBALS.CONNECTIONS[i]['to'].item.buttons += 1;
+              GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
               //GLOBALS.CONNECTIONS[i]['line'].idConnection = id;
               GLOBALS.CONNECTIONS[i]['line'].active = true;
               GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0x0077B6);
@@ -237,21 +237,21 @@ function interactWithItem() {
               //Manage Door Trigger
               if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons)
+                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
                   stateDoor(0, true, false, GLOBALS.CONNECTIONS[i]['to'].item);
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("cube") ||
                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("sphere")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons)
+                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
                   dispenserSpawn(GLOBALS.CONNECTIONS[i]['to'].item);
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("tractor")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons)
+                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
                   tractorStates(GLOBALS.CONNECTIONS[i]['to']);
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("light_bridge")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons)
+                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
                   lightBridgeState(GLOBALS.CONNECTIONS[i]['to'])
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field") ||
                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("fizzler")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.buttons)
+                if (GLOBALS.CONNECTIONS[i]['to'].item.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
                   laserFieldState(GLOBALS.CONNECTIONS[i]['to'])
               } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
@@ -270,20 +270,20 @@ function interactWithItem() {
 
                 setTimeout(() => {
                   holder['line'].active = false;
-                  holder['to'].item.buttons -= 1;
+                  holder['to'].item.userData.buttons -= 1;
                   holder['line'].material.color = new Color(0xffa500);
 
                   if (holder['to'].itemName.includes("door") || holder['to'].itemName.includes("exitDoor")) {
-                    if (holder['to'].item.buttons < holder['to'].item.connections)
+                    if (holder['to'].item.userData.buttons < holder['to'].item.connections)
                       stateDoor(0, false, false, holder['to'].item);
                   } else if (holder['to'].itemName.includes("tractor")) {
-                    if (holder['to'].item.buttons < holder['to'].item.connections)
+                    if (holder['to'].item.userData.buttons < holder['to'].item.connections)
                       tractorStates(holder['to']);
                   } else if (holder['to'].itemName.includes("light_bridge")) {
-                    if (holder['to'].item.buttons < holder['to'].item.connections)
+                    if (holder['to'].item.userData.buttons < holder['to'].item.connections)
                       lightBridgeState(holder['to']);
                   } else if (holder['to'].itemName.includes("laser_field") || holder['to'].itemName.includes("fizzler")) {
-                    if (holder['to'].item.buttons < holder['to'].item.connections)
+                    if (holder['to'].item.userData.buttons < holder['to'].item.connections)
                       laserFieldState(holder['to'])
                   } else if (holder['to'].itemName.includes("portal_0") ||
                     holder['to'].itemName.includes("portal_1")) {

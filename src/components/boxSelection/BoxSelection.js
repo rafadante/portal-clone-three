@@ -269,6 +269,9 @@ function raycastSelected(found, event, type) {
                                 }
                             }
 
+                            //IF EVERYTHING IS OK, MOVE THE ITEM TO THE NEXT POSITION
+                            GLOBALS.DRAGGING = true;
+
                             if (planeInstanceOld.item.continuous) {
 
                                 GLOBALS.GRID_STATE = planeInstanceOld.item.userData.grid;
@@ -285,8 +288,6 @@ function raycastSelected(found, event, type) {
                                 return;
                             }
 
-                            //IF EVERYTHING IS OK, MOVE THE ITEM TO THE NEXT POSITION
-                            GLOBALS.DRAGGING = true;
                             planeInstanceOld.item.namePosition = planeInstanceNew.position.x + "/" + planeInstanceNew.position.y + "/" + planeInstanceNew.position.z;
                             planeInstanceOld.item.position.copy(planeInstanceNew.position);
 

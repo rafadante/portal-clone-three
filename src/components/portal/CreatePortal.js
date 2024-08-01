@@ -77,7 +77,10 @@ function portalButton(button, auto) {
                     if (GLOBALS.PLAYER.position.distanceTo(intersects[0].point) > 2)
                         GLOBALS.FLASH.visible = true;
 
-                    tweenCamera(300, GLOBALS.FLASH.position, new Vector3(x, y, z));
+                    if (intersectBlockPortal.length > 0)
+                        tweenCamera(300, GLOBALS.FLASH.position, intersectBlockPortal[0].point);
+                    else
+                        tweenCamera(300, GLOBALS.FLASH.position, new Vector3(x, y, z));
 
                     allowPortal = false;
                     tweenCamera(150, GLOBALS.GUN.children[0].position, new Vector3(GLOBALS.GUN.children[0].position.x,
@@ -97,7 +100,7 @@ function portalButton(button, auto) {
                 }, 300);
             }
 
-            if(intersectBlockPortal.length > 0){
+            if (intersectBlockPortal.length > 0) {
                 //NONPORTABLE WALL
                 AUDIO.PORTAL_INVALID.currentTime = 0;
                 play(AUDIO.PORTAL_INVALID)

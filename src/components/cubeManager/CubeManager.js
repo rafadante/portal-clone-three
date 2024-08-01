@@ -228,9 +228,9 @@ function checkSides(dummy, val, id, side, portal) {
         else if (side == "back")
             normal = new Vector3(-Math.PI / 2, 0, 0);
         else if (side == "right")
-            normal = new Vector3(0, 0, Math.PI / 2);
+            normal = new Vector3(Math.PI / 2, 0, Math.PI / 2);
         else if (side == "left")
-            normal = new Vector3(0, 0, -Math.PI / 2);
+            normal = new Vector3(Math.PI / 2, 0, -Math.PI / 2);
 
         GLOBALS.PLANE_USER_DATA[idEmptyToFill] = {
             iniPos: dummy.position.clone(),

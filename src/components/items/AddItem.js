@@ -36,7 +36,7 @@ var itemCount = 0;
 
 function addItem(found, loaded) {
 
-    if (!GLOBALS.ITEM_CUBE.place)
+    if (!GLOBALS.ITEM_CUBE.place && !loaded)
         return
 
     if (GLOBALS.ITEM_HOLDED_NAME == "goo") {
@@ -44,8 +44,12 @@ function addItem(found, loaded) {
         return;
     }
 
-    if (loaded)
+    if (loaded) {
         GLOBALS.ITEM_HOLDED_NAME = found.itemName.split('-')[0];
+        GLOBALS.DRAGGED_ITEM_ELEMENT = $("#" + GLOBALS.ITEM_HOLDED_NAME)
+    }
+
+    console.log(GLOBALS.ITEM_HOLDED_NAME)
 
     const i = 0;
 
@@ -68,12 +72,12 @@ function addItem(found, loaded) {
             userData.hasItem = false; //delete here
         }
 
+        console.log(userData)
+
         if ((!userData.hasItem && !userData.continuousEnding) || loaded) {
 
             if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
-                const geometry = new BoxGeometry(1, 1, 1);
-                const material = new MeshBasicMaterial({color: new Color(0x000000)});
-                const box = new Mesh(geometry, material);
+                const box = new Object3D()
                 var item = box;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
 
@@ -155,7 +159,7 @@ function addItem(found, loaded) {
                 return;
             }
 
-            item.buttons = 0;
+            item.userData.buttons = 0;
             item.connections = 0;
             item.opened = true;
 
@@ -175,6 +179,7 @@ function addItem(found, loaded) {
                 GLOBALS.DRAGGED_ITEM_ELEMENT.data('allowconnection'),
                 false
             );
+
 
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
                 var target = new Vector3(); // create once an reuse it
@@ -201,6 +206,8 @@ function addItem(found, loaded) {
 
             if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
                 GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
+
+
 
                 var idInstanced;
                 userData.dispenser = true;
@@ -244,6 +251,8 @@ function addItem(found, loaded) {
                 instanced2.setMatrixAt(idInstanced, item2.matrix);
                 instanced2.instanceMatrix.needsUpdate = true;
                 instanced2.computeBoundingSphere();
+            } else {
+                userData.portal = false;
             }
 
             if (GLOBALS.ITEM_HOLDED_NAME == "laser_field") {
@@ -260,10 +269,7 @@ function addItem(found, loaded) {
                 item.state = true;
                 item.triggers = GLOBALS.LIGHT_BRIDGE_TRIGGER;
                 createLightBridges("light_bridge", GLOBALS.LIGHT_BRIDGE_RAYCASTER, item, null, false);
-
-                setTimeout(() => {
-                    ContinuousTrigger(userData.item, GLOBALS.LIGHT_BRIDGE_TRIGGER, $("#light-bridge-trigger"), "light_bridge");
-                }, 100);
+                ContinuousTrigger(userData.item, GLOBALS.LIGHT_BRIDGE_TRIGGER, $("#light-bridge-trigger"), "light_bridge");
             }
 
             if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
@@ -279,6 +285,9 @@ function addItem(found, loaded) {
                 item.state = true;
                 item.reversed = false;
                 item.triggers = "State";
+
+                console.log(GLOBALS.TRACTOR_BEAM_RAYCASTER);
+                console.log(item)
                 createLightBridges("tractor_beam", GLOBALS.TRACTOR_BEAM_RAYCASTER, item, null, false);
             }
 
@@ -313,7 +322,7 @@ function addItem(found, loaded) {
 
             if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
                 GLOBALS.ITEMS_ADDED.add(item);
-            }else if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
                 GLOBALS.ITEMS_ADDED.add(item);
                 item.translateY(0.01);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
@@ -413,17 +422,11 @@ function addItem(found, loaded) {
                 instanced.computeBoundingSphere();
 
                 if (GLOBALS.ITEM_HOLDED_NAME == "laser_field") {
-                    createLightBridges("laser_field", GLOBALS.LASER_FIELD_RAYCASTER, item, instanced,false);
-
-                    setTimeout(() => {
-                        ContinuousTrigger(userData.item, GLOBALS.LASER_FIELD_TRIGGER, $("#laser-field-trigger"), "laser_field");
-                    }, 100);
+                    createLightBridges("laser_field", GLOBALS.LASER_FIELD_RAYCASTER, item, instanced, false);
+                    ContinuousTrigger(userData.item, GLOBALS.LASER_FIELD_TRIGGER, $("#laser-field-trigger"), "laser_field");
                 } else if (GLOBALS.ITEM_HOLDED_NAME == "fizzler") {
                     createLightBridges("fizzler", GLOBALS.FIZZLER_RAYCASTER, item, instanced, false);
-
-                    setTimeout(() => {
-                        ContinuousTrigger(userData.item, GLOBALS.FIZZLER_TRIGGER, $("#laser-field-trigger"), "fizzler");
-                    }, 100);
+                    ContinuousTrigger(userData.item, GLOBALS.FIZZLER_TRIGGER, $("#laser-field-trigger"), "fizzler");
                 }
             }
 

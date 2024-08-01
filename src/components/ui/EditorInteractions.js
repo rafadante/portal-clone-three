@@ -24,6 +24,7 @@ import {
 } from '../items/Items.js';
 import { addItem } from '../items/AddItem.js';
 import { manageRaycasterGlassPanel } from '../glassPanel/GlassPanel.js';
+import { updateMaterialRepeat } from '../materials/Materials.js';
 
 window.addEventListener("contextmenu", e => e.preventDefault());
 
@@ -300,10 +301,20 @@ $("body").on('click', '.glass-triggers', function () {
 $("body").on('input', '#grid-state-input', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.grid = this.checked;
 
-    if (this.checked)
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_GRID;
-    else
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_GLASS;
+    if (this.checked) {
+        updateMaterialRepeat(
+            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous,
+            GLOBALS.MATERIAL_GRID,
+            (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.distance * 2) / 3
+        )
+    } else {
+        updateMaterialRepeat(
+            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous,
+            GLOBALS.MATERIAL_GLASS,
+            (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.distance * 2) / 3
+        )
+    }
+    //GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_GLASS;
 
     animate()
 });

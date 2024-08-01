@@ -27,8 +27,11 @@ import { interactWithItem } from '../events/events.js';
 import { deletePortal } from '../portal/CreatePortal.js';
 import { addPositionalAudio } from '../audio/Audio.js';
 import { getPlaneByName } from '../../Utils.js';
+import { updateMaterialRepeat } from '../materials/Materials.js';
 
 function createLightBridges(item, rayItem, object, instanced, update, index) {
+
+    console.log(GLOBALS.PLANE_LEVEL_INSTANCED)
 
 
     var obj = new Object3D();
@@ -66,6 +69,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     GLOBALS.SCENE.remove(obj);
 
     //CREATE CLONE
+    console.log(intersects)
     const cloneLaserField = new Object3D();
     cloneLaserField.position.copy(object.position);
     cloneLaserField.rotation.copy(object.rotation);
@@ -78,13 +82,6 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
         var geometry = new BoxGeometry(0.9, intersects[0].distance, 0.025);
     } else if (item == "glass") {
         var geometry = new BoxGeometry(2, intersects[0].distance, 0.01);
-
-        if (object.userData.grid)
-            material = GLOBALS.MATERIAL_GRID;
-        else
-            material = GLOBALS.MATERIAL_GLASS;
-
-        console.log(material)
     } else if (item == "laser_field" || item == "fizzler") {
         var geometry = new BoxGeometry(2, intersects[0].distance, 0.025);
 
@@ -175,6 +172,22 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     if (otherSide.length > 0 && item != "tractor_beam") {
         otherSide[0].continuousEnding = true;
         plane.otherSide = otherSide[0];
+    }
+
+    if (item == "glass") {
+        if (object.userData.grid) {
+            updateMaterialRepeat(
+                plane,
+                GLOBALS.MATERIAL_GRID,
+                intersects[0].distance / 3
+            )
+        } else {
+            updateMaterialRepeat(
+                plane,
+                GLOBALS.MATERIAL_GLASS,
+                intersects[0].distance / 3
+            )
+        }
     }
 
     if (item == "light_bridge" || item == "glass") {
