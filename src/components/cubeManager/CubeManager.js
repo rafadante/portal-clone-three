@@ -139,13 +139,13 @@ function trasnlatePlane(id, val, portal) {
                 item.position.copy(plane.position);
                 item.rotation.copy(plane.item.rotation);
 
-                if (plane.instancedName == "cube" || plane.instancedName == "sphere") {
+                if (plane.userData.instancedName == "cube" || plane.userData.instancedName == "sphere") {
                     item.translateY(1);
                 }
 
                 item.updateMatrix();
-                GLOBALS.ITEMS_ADDED.getObjectByName(plane.instancedName).setMatrixAt(plane.item.userData.id, item.matrix);
-                GLOBALS.ITEMS_ADDED.getObjectByName(plane.instancedName).instanceMatrix.needsUpdate = true;
+                GLOBALS.ITEMS_ADDED.getObjectByName(plane.userData.instancedName).setMatrixAt(plane.item.userData.id, item.matrix);
+                GLOBALS.ITEMS_ADDED.getObjectByName(plane.userData.instancedName).instanceMatrix.needsUpdate = true;
             } else {
                 plane.item.position.copy(plane.position);
             }

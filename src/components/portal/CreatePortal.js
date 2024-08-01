@@ -27,7 +27,7 @@ var allowPortal = true;
 
 function portalButton(button, auto) {
 
-    if (!allowPortal)//|| GLOBALS.HOLDING_ITEM
+    if (!allowPortal || GLOBALS.HOLDING_ITEM)//|| 
         return;
 
     if (GLOBALS.FPS_MODE && (button == 2 || button == 0 || button == 1) && GLOBALS.ALLOW_PLACE_PORTALS) {
@@ -40,7 +40,7 @@ function portalButton(button, auto) {
 
         if (auto) {
             auto.point = auto.position;
-            auto.instanceId = auto.planeInstancedId;
+            auto.instanceId = auto.userData.planeInstancedId;
             auto.object = auto;
             intersects = [auto];
         }

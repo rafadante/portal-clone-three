@@ -87,14 +87,14 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
 
         if (item == "laser_field") {
             material = GLOBALS.MATERIAL_LASER_FIELD;
-            object.cloneLaserID = object.idInstanced + 10;
+            object.cloneLaserID = object.userData.idInstanced + 10;
         } else if (item == "fizzler") {
             material = GLOBALS.MATERIAL_FIZZLER;
-            object.cloneFizzlerID = object.idInstanced + 10;
+            object.cloneFizzlerID = object.userData.idInstanced + 10;
         }
 
         cloneLaserField.updateMatrix();
-        instanced.setMatrixAt(object.idInstanced + 10, cloneLaserField.matrix);
+        instanced.setMatrixAt(object.userData.idInstanced + 10, cloneLaserField.matrix);
         instanced.instanceMatrix.needsUpdate = true;
         instanced.computeBoundingSphere();
 
@@ -102,7 +102,6 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
         object.cloneLaserField = cloneLaserField;
     } else if (item == "tractor_beam") {
         var geometry = new CylinderGeometry(0.8, 0.8, intersects[0].distance + 0, 32, 1, true);
-        raycaster.beam = "blue";
 
         // Add custom attributes to geometry (e.g., for height)
         var vertices = geometry.attributes.position.array;
@@ -113,7 +112,11 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
         }
 
         geometry.setAttribute('height', new BufferAttribute(heights, 1));
-        material = GLOBALS.MATERIAL_TRACTOR_BEAM;
+
+        if (object.userData.reversed)
+            material = GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE;
+        else
+            material = GLOBALS.MATERIAL_TRACTOR_BEAM;
     }
 
     raycaster.name = item;
@@ -189,6 +192,9 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
             )
         }
     }
+
+    if (!object.userData.state)
+       plane.visible = false;
 
     if (item == "light_bridge" || item == "glass") {
         box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
@@ -378,13 +384,13 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 dummy.rotation.copy(plane.rotation);
                 dummy.position.copy(plane.position);
 
-                if (rayItem[g].item.triggers == "Middle Vertical") {
+                if (rayItem[g].item.userData.triggers == "Middle Vertical") {
                     dummy.rotateZ(Math.PI / 2);
                     vertical = true;
-                } else if (rayItem[g].item.triggers == "Left") {
+                } else if (rayItem[g].item.userData.triggers == "Left") {
                     dummy.rotateZ(Math.PI / 2);
                     vertical = true;
-                } else if (rayItem[g].item.triggers == "Right") {
+                } else if (rayItem[g].item.userData.triggers == "Right") {
                     dummy.rotateZ(Math.PI / 2);
                     vertical = true;
                 }
@@ -442,7 +448,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 bb.setFromObject(plane);
                 bb.side = 1;
 
-                rayItem[g].opened = true;
+                //rayItem[g].userData.opened = true;
                 plane.inTractor = false;
                 plane.dir = dir;
 
@@ -469,7 +475,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
 function ContinuousTrigger(item, trigger, elem, name) {
 
-    item.triggers = trigger;
+    item.userData.triggers = trigger;
     elem.data("trigger", trigger)
     elem.find(".title").text(trigger);
 
@@ -522,7 +528,7 @@ function ContinuousTrigger(item, trigger, elem, name) {
 
     dummy.updateMatrix();
     var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(name);
-    instanced.setMatrixAt(item.idInstanced, dummy.matrix);
+    instanced.setMatrixAt(item.userData.idInstanced, dummy.matrix);
 
 
     if (name == "laser_field" || name == "fizzler") {

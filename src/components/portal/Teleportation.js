@@ -305,6 +305,11 @@ function addCameraBody(obj) {
     GLOBALS.DYNAMIC_OBJECTS.push(box);
     GLOBALS.CANNON_WORLD.addBody(box);
     GLOBALS.INTERACTIVE.push(obj.cube);
+
+    const clone = obj.clone();
+    clone.visible = false;
+    GLOBALS.SCENE_FPS.add(clone);
+    box.clone = clone;
 }
 
 export {

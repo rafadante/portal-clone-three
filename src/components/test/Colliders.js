@@ -12,6 +12,7 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import { addPositionalAudio } from '../audio/Audio.js';
+import { func } from 'three/examples/jsm/nodes/Nodes.js';
 
 function colliderItemManager() {
 
@@ -52,7 +53,7 @@ function addColliderItem(items, type, mass, offset) {
         if (items[i].length != 0) {
 
             let PHYSICS_MATERIAL = new CANNON.Material();
-            PHYSICS_MATERIAL.friction = items[i].friction; //0.01
+            PHYSICS_MATERIAL.friction = items[i].userData.friction; //0.01
             //PHYSICS_MATERIAL.restitution = 0; //0.1
 
             var pos = items[i].position;
@@ -76,7 +77,7 @@ function addColliderItem(items, type, mass, offset) {
                 offset = 0.5;
 
                 // Create contact material behaviour
-                const mat3_ground = new CANNON.ContactMaterial(GLOBALS.PHYSICS_MATERIAL, PHYSICS_MATERIAL, { friction: 0.0, restitution: items[i].restitution })
+                const mat3_ground = new CANNON.ContactMaterial(GLOBALS.PHYSICS_MATERIAL, PHYSICS_MATERIAL, { friction: 0.0, restitution: items[i].userData.restitution })
                 GLOBALS.CANNON_WORLD.addContactMaterial(mat3_ground);
             } else if (type == "sphere") {
                 var shape = new CANNON.Sphere(0.3);
@@ -85,7 +86,7 @@ function addColliderItem(items, type, mass, offset) {
                 offset = 0.5;
 
                 // Create contact material behaviour
-                const mat3_ground = new CANNON.ContactMaterial(GLOBALS.PHYSICS_MATERIAL, PHYSICS_MATERIAL, { friction: 0.0, restitution: items[i].restitution })
+                const mat3_ground = new CANNON.ContactMaterial(GLOBALS.PHYSICS_MATERIAL, PHYSICS_MATERIAL, { friction: 0.0, restitution: items[i].userData.restitution })
                 GLOBALS.CANNON_WORLD.addContactMaterial(mat3_ground);
             } else if (type == "gel_gun_blue" || type == "gel_gun_orange" || type == "gel_gun_white") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.5, 0.1));
@@ -158,7 +159,10 @@ function addColliderItem(items, type, mass, offset) {
             if (mass > 0) {
 
                 if ((type == "cube" || type == "cube_2" || type == "laser_cube" || type == "sphere")) {
-                    if (items[i].hasDispenser) {
+                    console.log(items[i])
+                    if (items[i].userData.hasDispenser) {
+
+                        console.log("222222222")
 
                         box.mass = 0;
                         box.allowSleep = false;
@@ -190,17 +194,20 @@ function addColliderItem(items, type, mass, offset) {
                 GLOBALS.SCENE_FPS.add(clone);
                 box.clone = clone;
 
-                addPositionalAudio('audio-impact', box, false, false, true, 8);
+                if (type != "radio") {
+                    addPositionalAudio('audio-impact', box, false, false, true, 8);
 
-                box.addEventListener("collide", function (event) {
-                    if (Math.abs(event.target.velocity.x) > 1.5 ||
-                        Math.abs(event.target.velocity.y) > 1.5 ||
-                        Math.abs(event.target.velocity.z) > 1.5) {
-                        event.target.sound.position.copy(event.target.position)
-                        //event.target.sound.audio.currentTime = 0;
-                        event.target.sound.audio.play();
-                    }
-                });
+                    box.addEventListener("collide", function (event) {
+                        if (Math.abs(event.target.velocity.x) > 1.5 ||
+                            Math.abs(event.target.velocity.y) > 1.5 ||
+                            Math.abs(event.target.velocity.z) > 1.5) {
+                            event.target.sound.position.copy(event.target.position)
+                            //event.target.sound.audio.currentTime = 0;
+                            event.target.sound.audio.play();
+                        }
+                    });
+                }
+
 
                 box.addEventListener("sleep", function (event) {
                     box.sleeping = true;
@@ -318,65 +325,37 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
     }
 }
 
-var corridor_colliders = [];
-
 function corridorColliderNames(first, corridor) {
-
-    //corridorCollider(corridor, "back", 1.5, 1.5, 0.001, true, first);
-    corridorCollider(corridor, "down", 1, 0.001, 3.5, false, first);
-    //corridorCollider(corridor, "up", 1, 0.001, 3.5, false, first);
-    //corridorCollider(corridor, "left", 0.001, 1, 3.5, false, first);
-    //corridorCollider(corridor, "right", 0.001, 1, 3.5, false, first);
-    //corridorCollider(corridor, "front", 1, 1, 0.001, false, first);
-
-    //if (!first)
-    //    GLOBALS.WALL_CORRIDOR_ENTER.position.copy(GLOBALS.ENTER_DOOR.position);
+    corridor.traverse(child => {
+        if (child.name.includes("Plane")) {
+            child.material = GLOBALS.MATERIAL_FLOOR_NON_PORTAL;
+            addCollidersToCorridor(child)
+        }
+    });
 }
 
-function corridorCollider(parent, name, x, y, z, state, first) {
-    var target = new Vector3(); // create once an reuse it
-    parent.getObjectByName(name).material.visible = state;
-    parent.getObjectByName(name).getWorldPosition(target);
-
-    var shape;
-
-    const result = threeToCannon(parent.getObjectByName(name), {
+function addCollidersToCorridor(mesh){
+    const result = threeToCannon(mesh, {
         type: ShapeType.BOX
     });
 
-    shape = result.shape;
-
-    if (name == "front") {
-        shape = new CANNON.Box(new CANNON.Vec3(1, 0.01, 1));
-    }
-
     var wall = new CANNON.Body({
-        shape: shape,
+        shape: result.shape,
         mass: 0,
         material: GLOBALS.PHYSICS_MATERIAL
-    })
+    });
 
-    wall.position.copy(target);
+    const worldPos = new Vector3();
+    mesh.getWorldPosition(worldPos);
 
-    var quat = new Quaternion();
-    parent.getObjectByName(name).getWorldQuaternion(quat)
+    const worldQuat = new Quaternion();
+    mesh.getWorldQuaternion(worldQuat);
 
-    wall.quaternion.copy(quat);
+    wall.position.copy(worldPos);
+    wall.quaternion.copy(worldQuat);
     wall.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
     wall.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC
     GLOBALS.CANNON_WORLD.addBody(wall);
-    GLOBALS.CANNON_BODIES.push(wall)
-
-    if (name == "front") {
-        if (first) {
-            GLOBALS.WALL_CORRIDOR_ENTER = wall;
-        } else {
-            GLOBALS.WALL_CORRIDOR_BACK = wall;
-            GLOBALS.EXIT_DOOR.body = wall;
-        }
-    }
-
-    corridor_colliders.push(wall)
 }
 
 export {

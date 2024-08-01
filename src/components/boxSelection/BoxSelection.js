@@ -31,7 +31,7 @@ function raycastSelected(found, event, type) {
 
         if (GLOBALS.PLANE_USER_DATA[instanceId].allowconnection) {
 
-            GLOBALS.PLANE_USER_DATA[instanceId].item.connections += 1;
+            GLOBALS.PLANE_USER_DATA[instanceId].item.userData.connections += 1;
 
             var endPos = GLOBALS.PLANE_USER_DATA[instanceId].position;
 
@@ -99,8 +99,8 @@ function raycastSelected(found, event, type) {
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_cube"))) {
                     $(".dispenser").css("display", "block");
-                    $("#state-dispenser").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.hasDispenser);
-                    $("#dispenser-opened").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.opened);
+                    $("#state-dispenser").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.hasDispenser);
+                    $("#dispenser-opened").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.opened);
                 } else {
                     $(".dispenser").css("display", "none");
                 }
@@ -132,10 +132,10 @@ function raycastSelected(found, event, type) {
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal")) {
 
                     $(".pedestal").css("display", "block");
-                    $("#state-pedetsal-infinity").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.pedestalInfinity);
-                    $("#pedestal-timer-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.pedestalValue);
+                    $("#state-pedetsal-infinity").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalInfinity);
+                    $("#pedestal-timer-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalValue);
 
-                    if (GLOBALS.PLANE_USER_DATA[instanceId].item.pedestalInfinity) {
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalInfinity) {
                         $("#pedestal-timer").addClass("disabled");
                     } else {
                         $("#pedestal-timer").removeClass("disabled");
@@ -145,51 +145,51 @@ function raycastSelected(found, event, type) {
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("tractor")) {
                     $(".tractor").css("display", "block");
 
-                    $("#tractor-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.state)
-                    $("#tractor-direction-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.reversed)
-                    $("#tractor-trigger").find(".title").text("Triggers: " + GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
+                    $("#tractor-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state)
+                    $("#tractor-direction-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.reversed)
+                    $("#tractor-trigger").find(".title").text("Triggers: " + GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light_bridge")) {
                     $(".light-bridge").css("display", "block");
 
-                    $("#light-bridge-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.state);
-                    $("#light-bridge-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
+                    $("#light-bridge-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state);
+                    $("#light-bridge-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_field")) {
                     $(".laser-field").css("display", "block");
 
-                    $("#laser-field-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.state);
-                    $("#laser-field-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
+                    $("#laser-field-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state);
+                    $("#laser-field-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("fizzler")) {
                     $(".fizzler").css("display", "block");
 
-                    $("#fizzler-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.state);
-                    $("#fizzler-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
+                    $("#fizzler-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state);
+                    $("#fizzler-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("observation_room") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light")) {
                     $(".light-color").css("display", "block");
 
-                    $("#ligh-color-input").val(GLOBALS.PLANE_USER_DATA[instanceId].item.lightColor)
+                    $("#ligh-color-input").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.lightColor)
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere")) {
                     $(".physics").css("display", "block");
 
-                    $("#restitution").val(GLOBALS.PLANE_USER_DATA[instanceId].item.restitution)
-                    $("#friction").val(GLOBALS.PLANE_USER_DATA[instanceId].item.friction)
+                    $("#restitution").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.restitution)
+                    $("#friction").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.friction)
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("glass")) {
                     $(".glass").css("display", "block");
 
-                    $("#glass-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.triggers);
+                    $("#glass-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
                     $("#grid-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.grid);
                 }
             }
@@ -231,17 +231,17 @@ function raycastSelected(found, event, type) {
                             }
 
                             if (planeInstanceOld.item.bodyBridge) {
-                                GLOBALS.LIGHT_BRIDGE_TRIGGER = planeInstanceOld.item.triggers;
+                                GLOBALS.LIGHT_BRIDGE_TRIGGER = planeInstanceOld.item.userData.triggers;
                                 GLOBALS.CANNON_WORLD.removeBody(planeInstanceOld.item.bodyBridge);
                                 //planeInstanceOld.item.bodyBridge = null;
                             }
 
                             if (planeInstanceOld.item.cloneLaserID) {
-                                GLOBALS.LASER_FIELD_TRIGGER = planeInstanceOld.item.triggers;
+                                GLOBALS.LASER_FIELD_TRIGGER = planeInstanceOld.item.userData.triggers;
                             }
 
                             if (planeInstanceOld.item.cloneFizzlerID) {
-                                GLOBALS.FIZZLER_TRIGGER = planeInstanceOld.item.triggers;
+                                GLOBALS.FIZZLER_TRIGGER = planeInstanceOld.item.userData.triggers;
                             }
 
                             if (planeInstanceOld.item.bodyLaserField) {
@@ -283,13 +283,16 @@ function raycastSelected(found, event, type) {
                                     //planeInstanceOld.item.bodyBridge = null;
                                 }
 
-                                clickItem($("#" + planeInstanceOld.item.instancedName));
+                                clickItem($("#" + planeInstanceOld.item.userData.instancedName));
                                 planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false, false);
                                 return;
                             }
 
                             planeInstanceOld.item.namePosition = planeInstanceNew.position.x + "/" + planeInstanceNew.position.y + "/" + planeInstanceNew.position.z;
                             planeInstanceOld.item.position.copy(planeInstanceNew.position);
+
+                            if (planeInstanceOld.item.name.includes("camera"))
+                                planeInstanceOld.item.translateY(0.3)
 
                             if (planeInstanceOld.item.name.includes("camera") ||
                                 planeInstanceOld.item.name.includes("observation"))

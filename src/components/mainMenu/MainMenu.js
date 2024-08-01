@@ -275,9 +275,9 @@ $("#input-level").on('change', function (e) {
 
         loadLevel(data[0])
 
-        for (var i = 0; i < data[1].length; i++) {
+        /*for (var i = 0; i < data[1].length; i++) {
             AddGoo(data[1][i], true);
-        }
+        }*/
     });
 })
 

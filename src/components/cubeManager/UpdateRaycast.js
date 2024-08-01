@@ -24,7 +24,7 @@ function checkToUpdateContinuous() {
 
         ContinuousTrigger(
             GLOBALS.LIGHT_BRIDGE_RAYCASTER[i].item,
-            GLOBALS.LIGHT_BRIDGE_RAYCASTER[i].item.triggers,
+            GLOBALS.LIGHT_BRIDGE_RAYCASTER[i].item.userData.triggers,
             $("#light-bridge-trigger"),
             "light_bridge");
     }
@@ -41,7 +41,7 @@ function checkToUpdateContinuous() {
 
         ContinuousTrigger(
             GLOBALS.LASER_FIELD_RAYCASTER[i].item,
-            GLOBALS.LASER_FIELD_RAYCASTER[i].item.triggers,
+            GLOBALS.LASER_FIELD_RAYCASTER[i].item.userData.triggers,
             $("#laser-field-trigger"),
             "laser_field");
     }
@@ -58,7 +58,7 @@ function checkToUpdateContinuous() {
 
         ContinuousTrigger(
             GLOBALS.FIZZLER_RAYCASTER[i].item,
-            GLOBALS.FIZZLER_RAYCASTER[i].item.triggers,
+            GLOBALS.FIZZLER_RAYCASTER[i].item.userData.triggers,
             $("#fizzler-trigger"),
             "fizzler");
     }
@@ -75,7 +75,7 @@ function checkToUpdateContinuous() {
 
         ContinuousTrigger(
             GLOBALS.GLASS_RAYCASTER[i].item,
-            GLOBALS.GLASS_RAYCASTER[i].item.triggers,
+            GLOBALS.GLASS_RAYCASTER[i].item.userData.triggers,
             $("#glass-trigger"),
             "glass");
     }

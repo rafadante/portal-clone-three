@@ -33,19 +33,6 @@ $("body").on('pointerdown', '.item', function (event) {
     clickItem($(this))
 });
 
-$("body").on('pointerdown', '.dispenser-once', function (event) {
-    var i = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]];
-    i.trigger.item.item.state = "once";
-    i.state = "once";
-
-});
-
-$("body").on('pointerdown', '.dispenser-always', function (event) {
-    var i = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]];
-    i.trigger.item.item.state = "always";
-    i.state = "always";
-});
-
 document.addEventListener('keydown', (event) => {
 
     if (event.code == "Escape" && isDrawStart) {
@@ -206,7 +193,7 @@ function deleteItemInstanced(item, moving) {
     var dummy = new Object3D();
     dummy.scale.set(0, 0, 0);
     dummy.updateMatrix();
-    instanced.setMatrixAt(item.item.idInstanced, dummy.matrix);
+    instanced.setMatrixAt(item.item.userData.idInstanced, dummy.matrix);
     instanced.instanceMatrix.needsUpdate = true;
 
     if (item.instancedName == "cube" || item.instancedName == "sphere") {
@@ -219,7 +206,7 @@ function deleteItemInstanced(item, moving) {
         GLOBALS.DYMANIC_ITEMS["dispenser"][item.item.dispenserID] = [];
     }
 
-    GLOBALS.DYMANIC_ITEMS[item.instancedName][item.item.idInstanced] = [];
+    GLOBALS.DYMANIC_ITEMS[item.instancedName][item.item.userData.idInstanced] = [];
 
     if (moving)
         clickItem($("#" + item.instancedName));

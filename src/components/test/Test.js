@@ -174,7 +174,7 @@ function viewFPS() {
         //GLOBALS.SCENE.background = new Color(0x000000);//0xff0000
         GLOBALS.FLASH.visible = false;
 
-        if (GLOBALS.EXIT_DOOR.connections > 0)
+        if (GLOBALS.EXIT_DOOR.userData.connections > 0)
             stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
         else
             stateDoor(0, true, false, GLOBALS.EXIT_DOOR);

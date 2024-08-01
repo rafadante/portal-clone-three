@@ -42,6 +42,7 @@ $("body").on('click', '#rotate-item', function () {
 
         var door = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName);
         door.rotation.y += Math.PI / 2;
+        door.userData.rotationY = door.rotation.y;
     } else {
         for (var i = 0; i < 1; i++) { //GLOBALS.SELECTED_ID.length
 
@@ -138,7 +139,7 @@ $("body").on('input', '#state-dispenser', function () {
     else
         scale = new Vector3(0, 0, 0);
 
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.hasDispenser = this.checked;
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.hasDispenser = this.checked;
 
     var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
     var dummy = new Object3D();
@@ -153,7 +154,7 @@ $("body").on('input', '#state-dispenser', function () {
 });
 
 $("body").on('input', '#dispenser-opened', function () {
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.opened = this.checked;
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.opened = this.checked;
 })
 
 $("body").on('input', '#state-lines', function () {
@@ -171,17 +172,17 @@ $("body").on('input', '#state-pedetsal-infinity', function () {
     else
         $("#pedestal-timer").removeClass("disabled");
 
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.pedestalInfinity = this.checked;
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.pedestalInfinity = this.checked;
 });
 
 $("body").on('input', '#pedestal-timer-value', function () {
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.pedestalValue = parseInt(this.value);
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.pedestalValue = parseInt(this.value);
 });
 
 $("body").on('click', '.removeConnection', function () {
 
     GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[$(this).data("id")]["line"]);
-    GLOBALS.CONNECTIONS[$(this).data("id")]["to"].item.connections -= 1;
+    GLOBALS.CONNECTIONS[$(this).data("id")]["to"].item.userData.connections -= 1;
 
     //RESET UI
     GLOBALS.CONNECTIONS.splice($(this).data("id"), 1);
@@ -238,7 +239,7 @@ $("body").on('click', '.tile-portal', function () {
 
 $("body").on('input', '#tractor-state-input, #light-bridge-state-input, #laser-field-state-input,#fizzler-state-input', function () {
 
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.state = this.checked;
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.state = this.checked;
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.visible = this.checked;
 
     if ($(this).attr("id") == "light-bridge-state-input") {
@@ -253,7 +254,7 @@ $("body").on('input', '#tractor-state-input, #light-bridge-state-input, #laser-f
 
 $("body").on('input', '#tractor-direction-input', function () {
 
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.reversed = this.checked;
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.reversed = this.checked;
 
     if (this.checked)
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE;
@@ -264,13 +265,13 @@ $("body").on('input', '#tractor-direction-input', function () {
 });
 
 $("body").on('click', '.tractor-triggers', function () {
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.triggers = $(this).data("trigger");
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.triggers = $(this).data("trigger");
     $("#tractor-trigger").data("trigger", $(this).data("trigger"))
     $("#tractor-trigger").find(".title").text("Triggers: " + $(this).data("trigger"));
 });
 
 $("body").on('input', '#ligh-color-input', function () {
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.lightColor = this.value;
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.lightColor = this.value;
 });
 
 $("body").on('click', '.light-bridge-triggers', function () {
@@ -496,14 +497,22 @@ $("body").on('click', '#portalable', function () {
 $("body").on('click', '#save-level', function () {
 
     var data = [];
-    var clone = [];
+    var userDataHolder = [];
+    var itemHolder = [];
 
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
+
         if (GLOBALS.PLANE_USER_DATA[i].item) {
+            userDataHolder.push(GLOBALS.PLANE_USER_DATA[i])
+            itemHolder.push(GLOBALS.PLANE_USER_DATA[i].item)
+            GLOBALS.PLANE_USER_DATA[i].item = GLOBALS.PLANE_USER_DATA[i].item.userData;
+        }
+
+        /*if (GLOBALS.PLANE_USER_DATA[i].item) {
             var obj = new Object3D();
             obj.position.copy(GLOBALS.PLANE_USER_DATA[i].item.position);
             obj.rotation.copy(GLOBALS.PLANE_USER_DATA[i].item.rotation);
-            obj.planeInstancedId = GLOBALS.PLANE_USER_DATA[i].item.planeInstancedId;
+            obj.userData.planeInstancedId = GLOBALS.PLANE_USER_DATA[i].item.userData.planeInstancedId;
             obj.userData = GLOBALS.PLANE_USER_DATA[i].item.userData;
             GLOBALS.PLANE_USER_DATA[i].item = obj;
         }
@@ -515,24 +524,28 @@ $("body").on('click', '#save-level', function () {
             obj.id_instanced = GLOBALS.PLANE_USER_DATA[i].trigger.id_instanced;
             // obj.userData = GLOBALS.PLANE_USER_DATA[i].trigger.userData;
             GLOBALS.PLANE_USER_DATA[i].trigger = GLOBALS.PLANE_USER_DATA[i].trigger.id_instanced;
-        }
+        }*/
     }
 
 
     data.push(GLOBALS.PLANE_USER_DATA)
-    data.push(GLOBALS.GOO_PLANES)
+    //data.push(GLOBALS.GOO_PLANES)
 
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
     var dlAnchorElem = document.createElement('a');
     dlAnchorElem.setAttribute("href", dataStr);
     dlAnchorElem.setAttribute("download", "scene.json");
     dlAnchorElem.click();
+
+    for (var i = 0; i < userDataHolder.length; i++) {
+        userDataHolder[i].item = itemHolder[i];
+    }
 });
 
 $("body").on('input', '#friction', function () {
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.friction = this.value;
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.friction = this.value;
 });
 
 $("body").on('input', '#restitution', function () {
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.restitution = parseFloat(this.value);
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.restitution = parseFloat(this.value);
 });

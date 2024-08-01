@@ -18,13 +18,13 @@ function tractorBeam() {
         for (var j = 0; j < GLOBALS.TRACTOR_BEAM.length; j++) {
             if (GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j]) {
 
-                if (!GLOBALS.TRACTOR_BEAM[j].item.state) {
+                if (!GLOBALS.TRACTOR_BEAM[j].item.userData.state) {
                     continue;
                 }
 
                 if (d.inTractor && d.tractor != j) continue;
 
-                if (!GLOBALS.TRACTOR_BEAM[j].item.opened) {
+                if (!GLOBALS.TRACTOR_BEAM[j].item.userData.opened) {
                     if (d.inTractor) {
                         outOfTheTractor(d, j);
                     }
@@ -38,7 +38,7 @@ function tractorBeam() {
                             AUDIO.PLAYER_INSIDE_TRACTOR_BEAM.currentTime = 0;
                             play(AUDIO.PLAYER_INSIDE_TRACTOR_BEAM)
 
-                            if (GLOBALS.TRACTOR_BEAM[j].item.reversed)
+                            if (GLOBALS.TRACTOR_BEAM[j].item.userData.reversed)
                                 document.getElementById("panel-top").style.backgroundColor = "#ff80004a";
                             else
                                 document.getElementById("panel-top").style.backgroundColor = "#0035ff4a";
@@ -83,7 +83,7 @@ function tractorBeam() {
                     } else {
 
                         var val = 0.025;
-                        if (GLOBALS.TRACTOR_BEAM[j].item.reversed)
+                        if (GLOBALS.TRACTOR_BEAM[j].item.userData.reversed)
                             val = -0.025;
 
                         pos.add(vec.clone().multiplyScalar(val)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side

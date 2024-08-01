@@ -151,7 +151,7 @@ function updatePhysics() {
                         dir.copy(GLOBALS.DYMANIC_ITEMS[property][i].up).applyQuaternion(GLOBALS.DYMANIC_ITEMS[property][i].quaternion);
 
                         var val = 0.05;
-                        if (GLOBALS.DYMANIC_ITEMS[property][i].reversed)
+                        if (GLOBALS.DYMANIC_ITEMS[property][i].userData.reversed)
                             val = -0.05;
 
                         if (Math.round(Math.abs(dir.z)) == 1)

@@ -86,7 +86,7 @@ function testLightsManager() {
             instanced.computeBoundingSphere();
 
             //
-            var spotLight = new SpotLight(GLOBALS.DYMANIC_ITEMS['light'][i].lightColor, 100);
+            var spotLight = new SpotLight(GLOBALS.DYMANIC_ITEMS['light'][i].userData.lightColor, 100);
             spotLight.distance = 0;
             spotLight.decay = 2;
             spotLight.penumbra = 1;
@@ -121,7 +121,7 @@ function testLightsManager() {
             cloneObsRoom.position.copy(GLOBALS.ITEMS_ADDED.children[i].position);
             cloneObsRoom.rotation.copy(GLOBALS.ITEMS_ADDED.children[i].rotation);
 
-            cloneObsRoom.getObjectByName("pointLight").color = new Color(GLOBALS.ITEMS_ADDED.children[i].lightColor);
+            cloneObsRoom.getObjectByName("pointLight").color = new Color(GLOBALS.ITEMS_ADDED.children[i].userData.lightColor);
         }
     }
 }

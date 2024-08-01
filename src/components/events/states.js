@@ -6,20 +6,20 @@ import {
 import { stateDoor } from "../door/Door.js";
 
 function laserFieldState(obj) {
-    obj.item.state = !obj.item.state;
+    obj.item.userData.state = !obj.item.userData.state;
     obj.item.continuous.visible = !obj.item.continuous.visible;
 
-    if (obj.item.state)
+    if (obj.item.userData.state)
         GLOBALS.CANNON_WORLD.addBody(obj.item.bodyLaserField);
     else
         GLOBALS.CANNON_WORLD.removeBody(obj.item.bodyLaserField);
 }
 
 function lightBridgeState(obj) {
-    obj.item.state = !obj.item.state;
+    obj.item.userData.state = !obj.item.userData.state;
     obj.item.continuous.visible = !obj.item.continuous.visible;
 
-    if (obj.item.state)
+    if (obj.item.userData.state)
         GLOBALS.CANNON_WORLD.addBody(obj.item.bodyBridge);
     else
         GLOBALS.CANNON_WORLD.removeBody(obj.item.bodyBridge);
@@ -28,7 +28,7 @@ function lightBridgeState(obj) {
         if (obj.item.clone.bodyBridge) {
             obj.item.clone.visible = obj.item.continuous.visible;
 
-            if (obj.item.state)
+            if (obj.item.userData.state)
                 GLOBALS.CANNON_WORLD.addBody(obj.item.clone.bodyBridge);
             else
                 GLOBALS.CANNON_WORLD.removeBody(obj.item.clone.bodyBridge);
@@ -37,18 +37,18 @@ function lightBridgeState(obj) {
 }
 
 function tractorStates(obj) {
-    if (obj.item.triggers == "State" || obj.item.triggers == "Both") {
-        obj.item.state = !obj.item.state;
+    if (obj.item.userData.triggers == "State" || obj.item.userData.triggers == "Both") {
+        obj.item.userData.state = !obj.item.userData.state;
         obj.item.continuous.visible = !obj.item.continuous.visible;
 
         if (obj.item.clone)
             obj.item.clone.visible = obj.item.continuous.visible;
     }
 
-    if (obj.item.triggers == "Direction" || obj.item.triggers == "Both") {
-        obj.item.reversed = !obj.item.reversed;
+    if (obj.item.userData.triggers == "Direction" || obj.item.userData.triggers == "Both") {
+        obj.item.userData.reversed = !obj.item.userData.reversed;
 
-        if (obj.item.reversed)
+        if (obj.item.userData.reversed)
             obj.item.continuous.material = GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE;
         else
             obj.item.continuous.material = GLOBALS.MATERIAL_TRACTOR_BEAM;
@@ -145,7 +145,7 @@ function levelEnteredFunction() {
                 setTimeout(() => {
                     //GLOBALS.RENDERER.shadowMap.autoUpdate = false;
                     for (var i = 0; i < GLOBALS.BOX_BODY.length; i++) {
-                        if (GLOBALS.BOX_BODY[i].item.opened)
+                        if (GLOBALS.BOX_BODY[i].item.userData.opened)
                             dispenserSpawn(GLOBALS.BOX_BODY[i].item);
                     }
                 }, 1000);

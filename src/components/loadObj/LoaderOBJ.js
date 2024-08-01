@@ -263,7 +263,7 @@ function loadDoor() {
 function loadEnterDoor(scene) {
 
     var door = scene;
-    door.connections = 0;
+    door.userData.connections = 0;
 
     //ENTER DOOR
     door.name = "enterDoor";
@@ -313,7 +313,7 @@ function loadEnterDoor(scene) {
     GLOBALS.EXIT_DOOR = SkeletonUtils.clone(GLOBALS.ENTER_DOOR);
     GLOBALS.EXIT_DOOR.position.set(13, 1, 0);
     GLOBALS.EXIT_DOOR.userData.buttons = 0;
-    GLOBALS.EXIT_DOOR.connections = 0;
+    GLOBALS.EXIT_DOOR.userData.connections = 0;
     GLOBALS.EXIT_DOOR.name = "exitDoor";
     GLOBALS.EXIT_DOOR.rotation.y += Math.PI;
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.EXIT_DOOR);
@@ -587,7 +587,7 @@ function loadCameraManager(scene) {
                 child.material.color = new Color(0xf70022);
             }
         }
-    })
+    });
 
     loadRadio();
 }

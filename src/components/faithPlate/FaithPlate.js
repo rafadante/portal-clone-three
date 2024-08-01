@@ -110,7 +110,7 @@ function tractorBeam() {
         if (d.inTractor && d.tractor != j) continue;
 
 
-        if (!GLOBALS.TRACTOR_BEAM[j].item.opened) {
+        if (!GLOBALS.TRACTOR_BEAM[j].item.userData.opened) {
 
           if (d.inTractor) {
             if (d.name == "player") d.mass = 50;
