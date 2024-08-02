@@ -176,6 +176,18 @@ function viewFPS() {
 
         blockPortal();
         GLOBALS.RENDERER.renderLists.dispose();
+
+        //GUN STATE
+        if(GLOBALS.PORTAL_GUN_INITIATE == "none"){
+            GLOBALS.GUN.children[0].visible = false;
+            GLOBALS.GUN_CLONE.children[0].visible = false;
+            GLOBALS.GUN_CLONE2.children[0].visible = false;
+        }else{
+            GLOBALS.GUN.children[0].visible = true;
+            GLOBALS.GUN_CLONE.children[0].visible = true;
+            GLOBALS.GUN_CLONE2.children[0].visible = true;
+        }
+        
     }, 500);
 };
 
@@ -194,7 +206,6 @@ function blockPortal() {
 
     for (var i = 0; i < GLOBALS.GLASS_RAYCASTER.length; i++) {
         if (!GLOBALS.GLASS_RAYCASTER[i].item.userData.grid){
-            console.log("1111111111")
             GLOBALS.BLOCK_PORTAL.push(GLOBALS.GLASS_RAYCASTER[i].item.continuous)
         }
             

@@ -190,8 +190,6 @@ function loadMaterials() {
         0.5,
         3
     );
-
-    console.log(GLOBALS.MATERIAL_GLASS)
 }
 
 function loadMaterial(material, base, normal, ao, rough, metal, alpha, roughValue, metalValue, envIntensity, alphaTest, repeatX, repeatY) {

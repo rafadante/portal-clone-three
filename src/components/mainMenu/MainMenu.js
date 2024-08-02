@@ -275,7 +275,8 @@ $("#input-level").on('change', function (e) {
     readTextFile(path, function (text) {
         var data = JSON.parse(text);
 
-        loadLevel(data[0])
+        $("#portal-gun-select").val(data[0]).change();
+        loadLevel(data[1])
 
         /*for (var i = 0; i < data[1].length; i++) {
             AddGoo(data[1][i], true);
@@ -414,8 +415,6 @@ function loadLevel(data) {
     //CONNECTIONS
     for (var g = 0; g < GLOBALS.LOADED_CONNECTIONS.length; g++) {
         for (var h = 0; h < GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo.length; h++) {
-            console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo[h]])
-            console.log(GLOBALS.EXIT_DOOR)
             manageConnection(
                 GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo[h],
                 GLOBALS.LOADED_CONNECTIONS[g]["item"]

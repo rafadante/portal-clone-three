@@ -44,7 +44,6 @@ camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 
 var hFOV = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180 / 2) * camera.aspect) * 180 / Math.PI; // degrees
-console.log(hFOV)
 
 //CAMERA THAT ONLY RENDERS THE MAIN PORTAL GUN ON TOP OF THE SCENE
 const portalGunCamera = camera.clone();
@@ -538,7 +537,9 @@ var GLOBALS = {
     MATERIAL_GLASS: null,
     MATERIAL_GRID: null,
     GRID_STATE: false,
-    LOADED_CONNECTIONS: []
+    LOADED_CONNECTIONS: [],
+
+    PORTAL_GUN_INITIATE: "all"
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)

@@ -252,7 +252,6 @@ function loadGunManager(scene) {
     //cene.scale.set(1, 1, 1)
     //scene.position.set(0.12, -0.16, -0.14);
     //scene.visible = false;
-    console.log(scene)
     loadDoor()
 }
 
@@ -774,6 +773,7 @@ function loadAvatar() {
     const playerModel = gltfLoader.loadAsync('./assets/avatar/chell.glb');
 
     GLOBALS.PLAYER_ANIMATIONS = {
+        //WITH PORTAL GUN
         ANIM_STANDING_IDLE: gltfLoader.loadAsync('./assets/avatar/StandingIdle.glb'),
         ANIM_JUMP: gltfLoader.loadAsync('./assets/avatar/Jump.glb'),
         ANIM_STATIONARY_RUNNING: gltfLoader.loadAsync('./assets/avatar/StationaryRunning.glb'),
@@ -781,6 +781,13 @@ function loadAvatar() {
         ANIM_RIGHT_STRAFE: gltfLoader.loadAsync('./assets/avatar/RightStrafe.glb'),
         ANIM_LEFT_STRAFE: gltfLoader.loadAsync('./assets/avatar/LeftStrafe.glb'),
         ANIM_FALLING_IDLE: gltfLoader.loadAsync('./assets/avatar/FallingIdle.glb'),
+        //NO PORTAL GUN
+        /*ANIM_STANDING_IDLE_NO_GUN: gltfLoader.loadAsync('./assets/avatar/noGun/StandingIdle.glb'),
+        ANIM_JUMP_NO_GUN: gltfLoader.loadAsync('./assets/avatar/noGun/Jump.glb'),
+        ANIM_STATIONARY_RUNNING_NO_GUN: gltfLoader.loadAsync('./assets/avatar/noGun/StationaryRunning.glb'),
+        ANIM_BACKWARD_RUNNING_NO_GUN: gltfLoader.loadAsync('./assets/avatar/noGun/RunningBackward.glb'),
+        ANIM_RIGHT_STRAFE_NO_GUN: gltfLoader.loadAsync('./assets/avatar/noGun/RightStrafe.glb'),
+        ANIM_LEFT_STRAFE_NO_GUN: gltfLoader.loadAsync('./assets/avatar/noGun/LeftStrafe.glb'),*/
     }
 
     playerModel.then((glb) => {

@@ -453,8 +453,6 @@ function corridorColliderNames(corridor, update) {
                 /*const light = new PointLight(0xffffff, 5, 10);
                 light.translateZ(0.2)
                 child.add(light);*/
-
-                console.log(rectLight);
             }
         } else if (child.name.includes("light")) {
             if (!update)

@@ -27,6 +27,15 @@ var allowPortal = true;
 
 function portalButton(button, auto) {
 
+    if (!auto) {
+        if (GLOBALS.PORTAL_GUN_INITIATE == "none" ||
+            (GLOBALS.PORTAL_GUN_INITIATE == "left" && button == 2) ||
+            (GLOBALS.PORTAL_GUN_INITIATE == "right" && button == 0)
+        ) {
+            return;
+        }
+    }
+
     if (!allowPortal || GLOBALS.HOLDING_ITEM)//|| 
         return;
 

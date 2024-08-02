@@ -38,8 +38,6 @@ class Portal extends Group {
         this.plane = new Plane(new Vector3(0, 1, 0), 0)
         this.debugMeshes = new Group()
 
-        console.log(hostObjects)
-
         // create onb for bb transformations
         this.ty = normal.clone().normalize()
         this.tz = playerUpDirection.clone().projectOnPlane(this.ty).normalize()
@@ -107,8 +105,6 @@ class Portal extends Group {
                 value: 1
             }
         }
-
-        console.log(this)
 
         const material = new ShaderMaterial({
             vertexShader: VERT_SHADER,

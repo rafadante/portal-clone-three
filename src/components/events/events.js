@@ -265,35 +265,7 @@ function interactWithItem() {
               }
 
               if (!GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalInfinity) {
-
-                //var holder = GLOBALS.CONNECTIONS[i];
-
                 setTimeout(pedestalTimer, GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalValue * 1000, GLOBALS.CONNECTIONS[i]);
-
-
-                /*setTimeout(() => {
-                  console.log(holder)
-                  holder['line'].active = false;
-                  holder['to'].item.userData.buttons -= 1;
-                  holder['line'].material.color = new Color(0xffa500);
-
-                  if (holder['to'].itemName.includes("door") || holder['to'].itemName.includes("exitDoor")) {
-                    if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections)
-                      stateDoor(0, false, false, holder['to'].item);
-                  } else if (holder['to'].itemName.includes("tractor")) {
-                    if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections)
-                      tractorStates(holder['to']);
-                  } else if (holder['to'].itemName.includes("light_bridge")) {
-                    if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections)
-                      lightBridgeState(holder['to']);
-                  } else if (holder['to'].itemName.includes("laser_field") || holder['to'].itemName.includes("fizzler")) {
-                    if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections)
-                      laserFieldState(holder['to'])
-                  } else if (holder['to'].itemName.includes("portal_0") ||
-                    holder['to'].itemName.includes("portal_1")) {
-                    holder['to'].item.active = false;
-                  }
-                }, GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalValue * 1000);*/
               }
             }
           }
@@ -346,7 +318,7 @@ function interactWithItem() {
 }
 
 function pedestalTimer(holder) {
-  console.log(holder)
+  
   holder['line'].active = false;
   holder['to'].item.userData.buttons -= 1;
   holder['line'].material.color = new Color(0xffa500);

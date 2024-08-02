@@ -32,9 +32,6 @@ import { fizzlerTrigger } from '../test/Colliders.js';
 
 function createLightBridges(item, rayItem, object, instanced, update, index) {
 
-    console.log(GLOBALS.PLANE_LEVEL_INSTANCED)
-
-
     var obj = new Object3D();
     obj.position.copy(object.position);
     obj.rotation.copy(object.rotation);
@@ -70,7 +67,6 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     GLOBALS.SCENE.remove(obj);
 
     //CREATE CLONE
-    console.log(intersects)
     const cloneLaserField = new Object3D();
     cloneLaserField.position.copy(object.position);
     cloneLaserField.rotation.copy(object.rotation);

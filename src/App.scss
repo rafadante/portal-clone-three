@@ -287,3 +287,39 @@ select {
 #rotate-item{
   display: none;
 }
+
+#settings{
+	display: none;
+  flex-direction: column;
+  padding: 20px;
+
+  .options-row{
+    color: black;
+    display: flex;
+
+    span{
+      width: 50%;
+      display: flex;
+      align-items: center;
+      font-weight: bolder;
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .option-value{
+      width: 50%;
+    }
+
+    select{
+      color: black;
+      width: 100%;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    option{
+      font-size: 16px;
+    }
+  }
+
+}

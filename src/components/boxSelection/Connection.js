@@ -24,8 +24,6 @@ function manageConnection(instanceId, from) {
 
     if (GLOBALS.PLANE_USER_DATA[instanceId].allowconnection) {
 
-        console.log(GLOBALS.PLANE_USER_DATA[instanceId])
-
         GLOBALS.PLANE_USER_DATA[instanceId].item.userData.connections += 1;
 
         var endPos = new Vector3(
@@ -68,7 +66,6 @@ function manageConnection(instanceId, from) {
         });
 
         from.item.userData.connectedTo.push(instanceId);
-        console.log(GLOBALS.CONNECTIONS)
     }
 
     GLOBALS.ITEM_CUBE.visible = false;

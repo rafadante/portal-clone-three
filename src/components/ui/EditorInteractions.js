@@ -465,13 +465,13 @@ $("body").on('click', '#save-level', function () {
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
 
         if (GLOBALS.PLANE_USER_DATA[i].item) {
-            console.log(GLOBALS.PLANE_USER_DATA[i].item.userData)
             userDataHolder.push(GLOBALS.PLANE_USER_DATA[i])
             itemHolder.push(GLOBALS.PLANE_USER_DATA[i].item)
             GLOBALS.PLANE_USER_DATA[i].item = GLOBALS.PLANE_USER_DATA[i].item.userData;
         }
     }
 
+    data.push(GLOBALS.PORTAL_GUN_INITIATE);
     data.push(GLOBALS.PLANE_USER_DATA);
 
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
@@ -492,3 +492,26 @@ $("body").on('input', '#friction', function () {
 $("body").on('input', '#restitution', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.restitution = parseFloat(this.value);
 });
+
+//PORTAL_GUN_INITIATE
+$("body").on('click', '#header-items', function () {
+    $(this).css("background-color", "black");
+    $(this).css("color", "white");
+    $("#header-settings").css("background-color", "white");
+    $("#header-settings").css("color", "black");
+    $("#items").css("display", "grid");
+    $("#settings").css("display", "none");
+});
+
+$("body").on('click', '#header-settings', function () {
+    $(this).css("background-color", "black");
+    $(this).css("color", "white");
+    $("#header-items").css("background-color", "white");
+    $("#header-items").css("color", "black");
+    $("#items").css("display", "none");
+    $("#settings").css("display", "flex");
+});
+
+$('#portal-gun-select').on('change', function () {
+    GLOBALS.PORTAL_GUN_INITIATE = $(this).val();
+})

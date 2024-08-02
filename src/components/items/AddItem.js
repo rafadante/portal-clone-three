@@ -152,8 +152,6 @@ function addItem(found, loaded) {
                 return;
             }
 
-            console.log(userData.item)
-
             //UPDATE INSTANCE DATA
             planeInstanceReset(
                 userData,

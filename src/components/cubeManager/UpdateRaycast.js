@@ -12,8 +12,6 @@ function checkToUpdateContinuous() {
 
     for (var i = 0; i < GLOBALS.LIGHT_BRIDGE_RAYCASTER.length; i++) {
 
-        console.log(GLOBALS.LIGHT_BRIDGE_RAYCASTER)
-
         createLightBridges(
             "light_bridge",
             GLOBALS.LIGHT_BRIDGE_RAYCASTER[i],

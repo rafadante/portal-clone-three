@@ -54,9 +54,22 @@
       </button>
       <div class="header">
         <span id="header-items">ITEMS</span>
-        <span id="header-gun">PORTAL GUN</span>
+        <span id="header-settings">SETTINGS</span>
       </div>
       <div class="body">
+        <div id="settings">
+          <div class="options-row">
+            <span class="option-name" id="">Portal Gun Initiate:</span>
+            <div class="option-value">
+              <select name="portal_gun" id="portal-gun-select">
+                <option value="all" id="all-gun">All Portals</option>
+                <option value="left" id="left-gun">Left Portal</option>
+                <option value="right" id="right-gun">Right Portal</option>
+                <option value="none" id="none-gun">No Portals</option>
+              </select>
+            </div>
+          </div>
+        </div>
         <div id="items">
           <img data-content="Can be linked to an object to form a trigger. This button only accepts spheres."
             data-title="BUTTON SPHERE" class="item" data-name="button_circle" id="button_circle"
@@ -188,13 +201,16 @@
             data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
             data-instanced="false" id="portal_1" />
 
-            <img
+          <img
             data-content="Glass panels can be placed in your level which the player cannot break. You can increase and decrease the size of the panel by using the arrows that appear when the object is selected. You can change the barrier type to grating within the properties menu which will allow players to place a portal on the other side."
-            data-title="GLASS PANELS" class="item" data-name="glass" src="../assets/ui/items/glass.png" 
+            data-title="GLASS PANELS" class="item" data-name="glass" src="../assets/ui/items/glass.png"
             data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-            id="glass"/>
+            id="glass" />
 
-            <!--
+          <img data-content="Obtainable item: you can define how many portals it will have." data-title="PORTAL GUN"
+            class="item" data-name="gun2" src="../assets/ui/items/gun2.png" />
+
+          <!--
             
             <img
             data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
@@ -239,8 +255,7 @@
             data-content="You can place the recall gun on the level editor, when the player touches, it will equipe. With the recall gun players can make objects go back in time."
             data-title="RECALL GUN" class="item" data-name="recall2" src="../assets/ui/items/recall2.png" />
 
-          <img data-content="" data-title="PORTAL GUN" class="item" data-name="gun2"
-            src="../assets/ui/items/gun2.png" />-->
+          -->
 
           <!--<img
             data-content="Blue will cause the player to bounce. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
@@ -406,8 +421,7 @@
         <span class="menu-text">Grid</span>
       </a>
     </li>
-    <li class="menu-item menu-item-submenu hasItem glass" id="glass-trigger"
-      data-trigger="Left">
+    <li class="menu-item menu-item-submenu hasItem glass" id="glass-trigger" data-trigger="Left">
       <button type="button" class="menu-btn">
         <i class="fa fa-crosshairs"></i>
         <span class="menu-text title">Left</span>
