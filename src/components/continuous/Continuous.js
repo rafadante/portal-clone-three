@@ -28,6 +28,7 @@ import { deletePortal } from '../portal/CreatePortal.js';
 import { addPositionalAudio } from '../audio/Audio.js';
 import { getPlaneByName } from '../../Utils.js';
 import { updateMaterialRepeat } from '../materials/Materials.js';
+import { fizzlerTrigger } from '../test/Colliders.js';
 
 function createLightBridges(item, rayItem, object, instanced, update, index) {
 
@@ -218,48 +219,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
                 }
             });
         } else if (item == "fizzler") {
-            box.addEventListener("collide", function (e) {
-                if (e.body === GLOBALS.PLAYER) {
-                    deletePortal(0)
-                    deletePortal(1)
-                } else if (e.body.name == "sphere" || e.body.name == "cube" || e.body.name == "radio" || e.body.name == "cube_2") {
-                    //CREATE A CLONE TO APPLY DISSOLVE SHADER
-                    const clone = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.name).scene.clone();
-                    clone.position.set(e.body.position.x, e.body.position.y, e.body.position.z);
-                    clone.quaternion.copy(e.body.quaternion);
-                    clone.visible = true;
-
-                    if (GLOBALS.HOLDING_ITEM)
-                        interactWithItem()
-
-                    GLOBALS.UNIFORMS_DISSOLVER.diffuseMap.value = clone.material.map;
-                    clone.material = GLOBALS.MATERIAL_DISSOLVER;
-
-                    GLOBALS.SCENE.add(clone);
-
-                    var posClone = clone.position.clone();
-                    posClone.y += 2;
-
-                    GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value = posClone;
-
-                    var clone2 = clone.clone();
-                    clone2.position.y += 1;
-
-                    addPositionalAudio('audio-dissolve', clone, true, false, true, 8)
-
-                    tweenCamera(3000, GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value, clone.position)
-                    tweenCamera(3000, clone.position, clone2.position)
-
-                    //GLOBALS.MATERIAL_DISSOLVER
-
-                    setTimeout(() => {
-                        GLOBALS.SCENE.remove(clone);
-                        GLOBALS.SCENE_FPS.remove(clone.sound);
-                    }, 3000);
-
-                    respawn(e.body);
-                }
-            });
+            fizzlerTrigger(box);
         }
     } else if (item == "tractor_beam") {
         var bb = new Box3(); // for re-use

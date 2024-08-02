@@ -179,44 +179,6 @@ $("body").on('input', '#pedestal-timer-value', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.pedestalValue = parseInt(this.value);
 });
 
-$("body").on('click', '.removeConnection', function () {
-
-    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[$(this).data("id")]["line"]);
-    GLOBALS.CONNECTIONS[$(this).data("id")]["to"].item.userData.connections -= 1;
-
-    //RESET UI
-    GLOBALS.CONNECTIONS.splice($(this).data("id"), 1);
-    $("#connections").empty();
-    for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-
-        if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName) {
-            var elem = '<li data-id="' + i + '" class="menu-item removeConnection">' +
-                '<button type="button" class="menu-btn">' +
-                '<i class="fas fa-times"></i>' +
-                '<span class="menu-text">' + GLOBALS.CONNECTIONS[i]["to"].itemName + '</span>' +
-                '</button>' +
-                '</li>';
-
-            $("#connections").append(elem);
-        }
-    }
-
-    animate();
-});
-
-$("body").on('mouseenter', '.removeConnection', function () {
-    GLOBALS.ITEM_CUBE.position.copy(GLOBALS.CONNECTIONS[$(this).data("id")]["to"].position);
-    GLOBALS.ITEM_CUBE.rotation.copy(GLOBALS.CONNECTIONS[$(this).data("id")]["to"].rotation);
-    GLOBALS.ITEM_CUBE.translateZ(1)
-    GLOBALS.ITEM_CUBE.material.color = new Color(0xff0000);
-    GLOBALS.ITEM_CUBE.visible = true;
-    animate();
-});
-
-$("body").on('mouseleave', '.removeConnection', function () {
-    GLOBALS.ITEM_CUBE.visible = false;
-});
-
 $("body").on('click', '.tile-nonPortal', function () {
     for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
         if (!GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal) {
@@ -503,33 +465,14 @@ $("body").on('click', '#save-level', function () {
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
 
         if (GLOBALS.PLANE_USER_DATA[i].item) {
+            console.log(GLOBALS.PLANE_USER_DATA[i].item.userData)
             userDataHolder.push(GLOBALS.PLANE_USER_DATA[i])
             itemHolder.push(GLOBALS.PLANE_USER_DATA[i].item)
             GLOBALS.PLANE_USER_DATA[i].item = GLOBALS.PLANE_USER_DATA[i].item.userData;
         }
-
-        /*if (GLOBALS.PLANE_USER_DATA[i].item) {
-            var obj = new Object3D();
-            obj.position.copy(GLOBALS.PLANE_USER_DATA[i].item.position);
-            obj.rotation.copy(GLOBALS.PLANE_USER_DATA[i].item.rotation);
-            obj.userData.planeInstancedId = GLOBALS.PLANE_USER_DATA[i].item.userData.planeInstancedId;
-            obj.userData = GLOBALS.PLANE_USER_DATA[i].item.userData;
-            GLOBALS.PLANE_USER_DATA[i].item = obj;
-        }
-
-        if (GLOBALS.PLANE_USER_DATA[i].trigger) {
-            var obj = new Object3D();
-            obj.position.copy(GLOBALS.PLANE_USER_DATA[i].trigger.position);
-            obj.rotation.copy(GLOBALS.PLANE_USER_DATA[i].trigger.rotation);
-            obj.id_instanced = GLOBALS.PLANE_USER_DATA[i].trigger.id_instanced;
-            // obj.userData = GLOBALS.PLANE_USER_DATA[i].trigger.userData;
-            GLOBALS.PLANE_USER_DATA[i].trigger = GLOBALS.PLANE_USER_DATA[i].trigger.id_instanced;
-        }*/
     }
 
-
-    data.push(GLOBALS.PLANE_USER_DATA)
-    //data.push(GLOBALS.GOO_PLANES)
+    data.push(GLOBALS.PLANE_USER_DATA);
 
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
     var dlAnchorElem = document.createElement('a');

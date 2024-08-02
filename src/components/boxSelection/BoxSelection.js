@@ -1,12 +1,24 @@
-import { Color, Mesh, Vector3, BoxGeometry, MeshBasicMaterial, Object3D } from 'three';
+import {
+    Color,
+    Mesh,
+    Vector3,
+    BoxGeometry,
+    MeshBasicMaterial
+} from 'three';
 import $ from 'jquery';
 import {
     GLOBALS
 } from '../../Globals.js';
-import { planeInstanceReset, deleteItemInstanced } from '../items/Items.js';
-import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline';
-import { getPlaneByName, warning } from '../../Utils.js';
+import {
+    planeInstanceReset,
+    deleteItemInstanced
+} from '../items/Items.js';
+import {
+    getPlaneByName,
+    warning
+} from '../../Utils.js';
 import { clickItem } from '../items/AddItem.js';
+import { manageConnection } from './Connection.js';
 
 const orange = new Color("rgb(255, 165, 0)");
 var initialPosition = null;
@@ -20,59 +32,11 @@ function raycastSelected(found, event, type) {
     const instanceId = found.instanceId;
 
     if (GLOBALS.CONNECTING) {
-
-        GLOBALS.CONNECTING = false;
-
-        GLOBALS.MATERIAL_PORTAL_EDITOR.opacity = 1;
-        GLOBALS.MATERIAL_NON_PORTAL_EDITOR.opacity = 1;
-        GLOBALS.MATERIAL_PORTAL_EDITOR.transparent = false;
-        GLOBALS.MATERIAL_NON_PORTAL_EDITOR.transparent = false;
-        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CURRENT_LINE);
-
-        if (GLOBALS.PLANE_USER_DATA[instanceId].allowconnection) {
-
-            GLOBALS.PLANE_USER_DATA[instanceId].item.userData.connections += 1;
-
-            var endPos = GLOBALS.PLANE_USER_DATA[instanceId].position;
-
-            if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere"))
-                endPos = GLOBALS.PLANE_USER_DATA[instanceId].item.dispenserPosition
-
-            const points = [];
-            points.push(GLOBALS.SELECTED_FOR_CONNECTION.position);
-            points.push(endPos);
-
-            const geometry = new MeshLineGeometry()
-            geometry.setPoints(points)
-            const material = new MeshLineMaterial({
-                color: 0xffa500,
-                side: 2,
-                depthTest: true,
-                transparent: true
-            })
-            material.uniforms.alphaTest.value = 0;
-            material.uniforms.dashArray.value = 0.01;
-            material.uniforms.lineWidth.value = 0.1;
-            material.uniforms.useDash.value = 1;
-            const line = new Mesh(geometry, material)
-
-            GLOBALS.SCENE_CHILDREN.add(line);
-
-            GLOBALS.CONNECTIONS.push({
-                line: line,
-                from: GLOBALS.SELECTED_FOR_CONNECTION,
-                to: GLOBALS.PLANE_USER_DATA[instanceId]
-            })
-        }
-
-        GLOBALS.ITEM_CUBE.visible = false;
-        GLOBALS.CURRENT_LINE = null;
-
+        manageConnection(instanceId, GLOBALS.SELECTED_FOR_CONNECTION)
         return;
     }
 
     if (event.button == 2) {
-        //removeSelection();
         if (GLOBALS.PLANE_USER_DATA[instanceId].itemName != "exitDoor" &&
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "enterDoor" &&
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "window") {
@@ -195,12 +159,8 @@ function raycastSelected(found, event, type) {
             }
 
             GLOBALS.SELECTED_ID.push(instanceId);
-
             showMenu(event.pageX, event.pageY);
-
             GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(instanceId, orange);
-            //GLOBALS.SELECTED_ID_ORANGE.push(plane[0]);
-            //GLOBALS.SELECTED_ID.push(plane[0].id_instanced);
         }
     } else {
         //MOVE ITEMS ON THE LEVEL EDITOR
@@ -307,11 +267,7 @@ function raycastSelected(found, event, type) {
                                 planeInstanceOld.continuousEnding
                             );
                             //UPDATE PARAMETERS OF THE OLD PLACEMENT
-                            planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false, false)
-
-                            /*if (planeInstanceNew.itemName.includes("door_enter") || planeInstanceNew.itemName.includes("door_exit")) {
-                                checkItemBoundingBox(planeInstanceNew.item, planeInstanceNew.item.cube)
-                            }*/
+                            planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false, false);
                         }
 
                         removeSelection();
@@ -413,7 +369,6 @@ function removeSelection() {
     GLOBALS.SELECTED_COLOR = [];
 }
 
-//UI
 function showMenu(x, y) {
     var menu = document.querySelector('.menu');
     menu.style.left = x + 'px';

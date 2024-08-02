@@ -43,7 +43,7 @@ const camera = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 
-var hFOV = 2 * Math.atan( Math.tan( camera.fov * Math.PI / 180 / 2 ) * camera.aspect ) * 180 / Math.PI; // degrees
+var hFOV = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180 / 2) * camera.aspect) * 180 / Math.PI; // degrees
 console.log(hFOV)
 
 //CAMERA THAT ONLY RENDERS THE MAIN PORTAL GUN ON TOP OF THE SCENE
@@ -353,7 +353,9 @@ var GLOBALS = {
     ELEVATOR_TRIGGER: null,
 
     WALL_CORRIDOR_ENTER: null,
+    BODY_ELEVATOR: null,
     WALL_CORRIDOR_BACK: null,
+    CORRIDOR_COLLIDERS: [],
 
     PLANE_EXIT_DOOR: null,
 
@@ -535,11 +537,172 @@ var GLOBALS = {
 
     MATERIAL_GLASS: null,
     MATERIAL_GRID: null,
-    GRID_STATE: false
+    GRID_STATE: false,
+    LOADED_CONNECTIONS: []
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
 
+function reset() {
+    GLOBALS.TRACTOR_BEAM = [];
+    GLOBALS.TRACTOR_BEAM_BOUNDING_BOX = [];
+    GLOBALS.TRACTOR_BEAM_RAYCASTER = [];
+    GLOBALS.LIGHT_BRIDGE_RAYCASTER = [];
+    GLOBALS.LIGHT_BRIDGE_CLONE = [];
+    GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE = [];
+    GLOBALS.LASER_FIELD_RAYCASTER = [];
+    GLOBALS.FIZZLER_RAYCASTER = [];
+    GLOBALS.GLASS_RAYCASTER = [];
+    GLOBALS.DOORS = [];
+    GLOBALS.CAMERAS = [];
+    GLOBALS.ITEMS_COUNT = {
+        cube: {
+            count: 0,
+            max: 10
+        },
+        cube_2: {
+            count: 0,
+            max: 10
+        },
+        door: {
+            count: 0,
+            max: 10
+        },
+        sphere: {
+            count: 0,
+            max: 15
+        },
+        gel_gun_blue: {
+            count: 0,
+            max: 10
+        },
+        gel_gun_orange: {
+            count: 0,
+            max: 10
+        },
+        gel_gun_white: {
+            count: 0,
+            max: 10
+        },
+        pedestal_button: {
+            count: 0,
+            max: 10
+        },
+        radio: {
+            count: 0,
+            max: 10
+        },
+        button_weight: {
+            count: 0,
+            max: 10
+        },
+        button_box: {
+            count: 0,
+            max: 10
+        },
+        button_circle: {
+            count: 0,
+            max: 10
+        },
+        dispenser: {
+            count: 0,
+            max: 10
+        },
+        ramp: {
+            count: 0,
+            max: 10
+        },
+        ramp_half: {
+            count: 0,
+            max: 10
+        },
+        ramp_half2: {
+            count: 0,
+            max: 10
+        },
+        stairs: {
+            count: 0,
+            max: 10
+        },
+        light_bridge: {
+            count: 0,
+            max: 10
+        },
+        tractor_beam: {
+            count: 0,
+            max: 10
+        },
+        laser_emitter: {
+            count: 0,
+            max: 10
+        },
+        laser_cube: {
+            count: 0,
+            max: 10
+        },
+        faith_plate: {
+            count: 0,
+            max: 10
+        },
+        door: {
+            count: 0,
+            max: 10
+        },
+        light: {
+            count: 0,
+            max: 10
+        },
+        lightEmissive: {
+            count: 0,
+            max: 10
+        },
+        stripe: {
+            count: 0,
+            max: 10
+        },
+        gel_blue: {
+            count: 0,
+            max: 10
+        },
+        gel_orange: {
+            count: 0,
+            max: 10
+        },
+        camera: {
+            count: 0,
+            max: 10
+        },
+        portal_0: {
+            count: 0,
+            max: 10
+        },
+        portal_1: {
+            count: 0,
+            max: 10
+        },
+        laser_field: {
+            count: 0,
+            max: 10
+        },
+        fizzler: {
+            count: 0,
+            max: 10
+        },
+        observation_room: {
+            count: 0,
+            max: 10
+        },
+        glass: {
+            count: 0,
+            max: 100
+        },
+    }
+    GLOBALS.CONNECTIONS = [];
+    GLOBALS.GLASS_PANELS = [];
+    GLOBALS.LOADED_CONNECTIONS = [];
+}
+
 export {
-    GLOBALS
+    GLOBALS,
+    reset
 }

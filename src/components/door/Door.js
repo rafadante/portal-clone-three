@@ -2,6 +2,7 @@ import { play } from '../audio/Audio.js';
 import { Vector3 } from "three";
 import { tweenCamera } from "../../Utils.js";
 import { GLOBALS } from "../../Globals.js";
+import { corridorColliderNames } from '../test/Colliders.js';
 
 var playing = true;
 
@@ -42,11 +43,11 @@ function stateDoor(timeToTrigger, open, enter, door) {
       vel = 800;
     }
 
-    if (!enter && door.body) {
+    if (door.body) {
       if (open)
-        door.body.position.y = 1000;
+        door.body.collisionResponse = 0;
       else
-        door.body.position.y = door.position.y;
+        door.body.collisionResponse = 1;
     }
 
     door.timeOutDoor2 = setTimeout(() => {
@@ -59,8 +60,14 @@ function stateDoor(timeToTrigger, open, enter, door) {
       if (GLOBALS.FPS_MODE) {
         if (enter) {
           setTimeout(() => {
-            GLOBALS.CORRIDOR_ENTER.visible = false;
-          }, 100);
+            GLOBALS.EXIT_DOOR.add(GLOBALS.CORRIDOR_ENTER);
+            corridorColliderNames(GLOBALS.CORRIDOR_ENTER, true)
+
+            if (GLOBALS.EXIT_DOOR.userData.connections > 0)
+              stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
+            else
+              stateDoor(0, true, false, GLOBALS.EXIT_DOOR);
+          }, 300);
         }
 
         if (door == GLOBALS.EXIT_DOOR) {

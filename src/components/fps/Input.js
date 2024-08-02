@@ -211,16 +211,26 @@ $("body").on('click', '#settings-close', function () {
             GLOBALS.DOOR_OPEN_STATE = true;
 
             setTimeout(() => {
-                tweenCamera(1500, GLOBALS.CORRIDOR_ENTER.getObjectByName("spawn").rotation,
+                tweenCamera(1000, GLOBALS.CORRIDOR_ENTER.getObjectByName("rightDoor").rotation,
                     new Vector3(
-                        GLOBALS.CORRIDOR_ENTER.getObjectByName("spawn").rotation.x,
-                        Math.PI,
-                        GLOBALS.CORRIDOR_ENTER.getObjectByName("spawn").rotation.z))
+                        GLOBALS.CORRIDOR_ENTER.getObjectByName("rightDoor").rotation.x,
+                        Math.PI / 8,
+                        GLOBALS.CORRIDOR_ENTER.getObjectByName("rightDoor").rotation.z))
+
+                tweenCamera(1000, GLOBALS.CORRIDOR_ENTER.getObjectByName("leftDoor").rotation,
+                    new Vector3(
+                        GLOBALS.CORRIDOR_ENTER.getObjectByName("leftDoor").rotation.x,
+                        Math.PI * 0.9,
+                        GLOBALS.CORRIDOR_ENTER.getObjectByName("leftDoor").rotation.z))
+
+                setTimeout(() => {
+                    GLOBALS.BODY_ELEVATOR.position.y = 10000;
+                }, 500);
 
                 setTimeout(() => {
                     stateDoor(1000, true, false, GLOBALS.ENTER_DOOR)
-                }, 800);
-            }, 800);
+                }, 1000);
+            }, 500);
         }
     }
 })

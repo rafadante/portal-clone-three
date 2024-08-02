@@ -17,12 +17,14 @@ import {
     viewFPS
 } from '../test/Test.js';
 import {
-    GLOBALS
+    GLOBALS,
+    reset
 } from '../../Globals.js';
 import '../shaders/MainMenuShader.js';
 import { findPath } from '../findPath/FindPath.js';
 import { init } from '../../Main.js';
 import { AUDIO, play } from '../audio/Audio.js';
+import { manageConnection } from '../boxSelection/Connection.js';
 
 var plane1;
 var plane2;
@@ -295,6 +297,28 @@ function readTextFile(file, callback) {
 
 function loadLevel(data) {
 
+    var toRemove = [];
+    for (var i = 0; i < GLOBALS.ITEMS_ADDED.children.length; i++) {
+        if (GLOBALS.ITEMS_ADDED.children[i].instanceMatrix) {
+            for (var j = 0; j < GLOBALS.ITEMS_ADDED.children[i].count; j++) {
+                var instanced = GLOBALS.ITEMS_ADDED.children[i];
+                var dummy = new Object3D();
+                dummy.scale.set(0, 0, 0);
+                dummy.updateMatrix();
+                instanced.setMatrixAt(j, dummy.matrix);
+                instanced.instanceMatrix.needsUpdate = true;
+            }
+        } else {
+            toRemove.push(GLOBALS.ITEMS_ADDED.children[i])
+        }
+    }
+
+    for (var i = 0; i < toRemove.length; i++) {
+        GLOBALS.ITEMS_ADDED.remove(toRemove[i]);
+    }
+
+    reset();
+
     GLOBALS.PLANE_USER_DATA = data;
     GLOBALS.CUBES.remove(GLOBALS.PLANE_LEVEL_INSTANCED);
 
@@ -338,6 +362,28 @@ function loadLevel(data) {
 
             GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
         }
+
+        if (data[i].itemName == "exitDoor") {
+            GLOBALS.EXIT_DOOR.position.set(data[i].position.x, data[i].position.y, data[i].position.z);
+            GLOBALS.EXIT_DOOR.rotation.copy(data[i].rotation);
+
+            GLOBALS.EXIT_DOOR.userData = data[i].item;
+            GLOBALS.EXIT_DOOR.userData.connections = 0;
+            data[i].item = GLOBALS.EXIT_DOOR;
+
+        } else if (data[i].itemName == "enterDoor") {
+            GLOBALS.ENTER_DOOR.position.set(data[i].position.x, data[i].position.y, data[i].position.z)
+            GLOBALS.ENTER_DOOR.rotation.copy(data[i].rotation)
+
+            GLOBALS.ENTER_DOOR.userData = data[i].item;
+            data[i].item = GLOBALS.ENTER_DOOR;
+        } else if (data[i].itemName == "window") {
+            GLOBALS.OBSERVATION_ROOM_IMG.position.set(data[i].position.x, data[i].position.y, data[i].position.z)
+            GLOBALS.OBSERVATION_ROOM_IMG.rotation.copy(data[i].rotation)
+
+            GLOBALS.OBSERVATION_ROOM_IMG.userData = data[i].item;
+            data[i].item = GLOBALS.OBSERVATION_ROOM_IMG;
+        }
     }
 
     for (var i = 0; i < data.length; i++) {
@@ -365,22 +411,17 @@ function loadLevel(data) {
         }
     }
 
-    /*for (var i = 0; i < triggers.length; i++) {
-
-        const id = triggers[i].id_instanced;
-
-        GLOBALS.SELECTED_FOR_CONNECTION = GLOBALS.PLANE_USER_DATA[id];
-        GLOBALS.SELECTED_FOR_CONNECTION.instanceId = id;
-        GLOBALS.SELECTED_FOR_CONNECTION.trigger = GLOBALS.PLANE_USER_DATA[triggers[i].trigger];
-
-        if (GLOBALS.SELECTED_FOR_CONNECTION.itemName.includes("pedestal_button"))
-            GLOBALS.SELECTED_FOR_CONNECTION.trigger.item.item.state = GLOBALS.SELECTED_FOR_CONNECTION.state;
-        GLOBALS.SELECTED_FOR_CONNECTION.trigger.instanceId = GLOBALS.SELECTED_FOR_CONNECTION.trigger.id_instanced;
-        GLOBALS.SELECTED_FOR_CONNECTION.normal = GLOBALS.SELECTED_FOR_CONNECTION.normal;
-        GLOBALS.SELECTED_FOR_CONNECTION.trigger.normal = GLOBALS.SELECTED_FOR_CONNECTION.normal;
-
-        findPath(GLOBALS.PLANE_USER_DATA[id].position, GLOBALS.PLANE_USER_DATA[id].trigger.position, GLOBALS.PLANE_USER_DATA[id].trigger)
-    }*/
+    //CONNECTIONS
+    for (var g = 0; g < GLOBALS.LOADED_CONNECTIONS.length; g++) {
+        for (var h = 0; h < GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo.length; h++) {
+            console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo[h]])
+            console.log(GLOBALS.EXIT_DOOR)
+            manageConnection(
+                GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo[h],
+                GLOBALS.LOADED_CONNECTIONS[g]["item"]
+            );
+        }
+    }
 }
 
 export {

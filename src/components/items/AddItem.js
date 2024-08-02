@@ -243,9 +243,6 @@ function addItem(found, loaded) {
                 instanced2.setMatrixAt(idInstanced, item2.matrix);
                 instanced2.instanceMatrix.needsUpdate = true;
                 instanced2.computeBoundingSphere();
-            } else {
-                if (GLOBALS.ITEM_HOLDED_NAME != "camera")
-                    userData.portal = false;
             }
 
             if (GLOBALS.ITEM_HOLDED_NAME.includes("button")) {
@@ -269,6 +266,12 @@ function addItem(found, loaded) {
                 }
 
                 userData.box3 = bb;
+                item.userData.connectedTo = [];
+
+                GLOBALS.LOADED_CONNECTIONS.push({
+                    data: userDataLoadedItem,
+                    item: userData
+                });
             }
 
             if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
@@ -376,7 +379,7 @@ function addItem(found, loaded) {
             itemCount++;
 
             if (loaded)
-                manageItemVariablesLoaded(item, userDataLoadedItem, instanced);
+                manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData);
             else
                 manageItemVariables(item, userData, instanced);
         }
@@ -435,9 +438,9 @@ function manageItemVariables(item, userData, instanced) {
     }
 }
 
-function manageItemVariablesLoaded(item, userDataLoadedItem, instanced) {
+function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData) {
     item.userData.buttons = userDataLoadedItem.buttons;
-    item.userData.connections = userDataLoadedItem.connections;
+    item.userData.connections = 0;//userDataLoadedItem.connections
     item.userData.opened = userDataLoadedItem.opened;
     item.userData.instancedName = userDataLoadedItem.instancedName;
     item.userData.planeInstancedId = userDataLoadedItem.planeInstancedId;

@@ -33,8 +33,8 @@ function manageInstances() {
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
 
         if (GLOBALS.PLANE_USER_DATA[i].exists) {
-            if (GLOBALS.PLANE_USER_DATA[i].name != GLOBALS.ENTER_DOOR.namePosition &&
-                GLOBALS.PLANE_USER_DATA[i].name != GLOBALS.EXIT_DOOR.namePosition) {
+            if (GLOBALS.PLANE_USER_DATA[i].itemName != "enterDoor" &&
+                GLOBALS.PLANE_USER_DATA[i].itemName != "exitDoor") {
 
                 GLOBALS.PLANE_USER_DATA[i].checked = false;
                 GLOBALS.PLANE_USER_DATA[i].position.checked = false;

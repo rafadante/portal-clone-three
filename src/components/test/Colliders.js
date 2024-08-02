@@ -2,6 +2,12 @@ import {
     Vector3,
     Quaternion,
     Object3D,
+    MeshBasicMaterial,
+    RectAreaLight,
+    MeshStandardMaterial,
+    PlaneGeometry,
+    Mesh,
+    PointLight
 } from 'three';
 import * as CANNON from 'cannon';
 import {
@@ -12,12 +18,17 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import { addPositionalAudio } from '../audio/Audio.js';
-import { func } from 'three/examples/jsm/nodes/Nodes.js';
+import { deletePortal } from '../portal/CreatePortal.js';
+import {
+    tweenCamera,
+} from '../../Utils.js';
+import { interactWithItem } from '../events/events.js';
+import { respawn } from '../events/states.js';
 
 function colliderItemManager() {
 
     //CORRIDOR ENTER COLLIDERS
-    corridorColliderNames(true, GLOBALS.CORRIDOR_ENTER);
+    corridorColliderNames(GLOBALS.CORRIDOR_ENTER, false);
 
     //
     addColliderItem(GLOBALS.DYMANIC_ITEMS['cube'], "cube", 10)
@@ -43,6 +54,81 @@ function colliderItemManager() {
     addColliderItem(GLOBALS.DYMANIC_ITEMS['stairs'], "stairs", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['laser_cube'], "laser_cube", 5)
     addColliderItem(GLOBALS.DOORS, "door", 0)
+
+    addColliderDoorsDefault(GLOBALS.ENTER_DOOR);
+    addColliderDoorsDefault(GLOBALS.EXIT_DOOR);
+}
+
+function addColliderDoorsDefault(obj) {
+    var shape = new CANNON.Box(new CANNON.Vec3(2, 2, 0.01));
+    var door = new CANNON.Body({
+        shape: shape,
+        mass: 0,
+        material: new CANNON.Material()
+    });
+    door.position.copy(obj.position);
+    door.quaternion.copy(obj.quaternion);
+    door.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
+    door.collisionFilterMask = GLOBALS.CGROUP_ALL;
+    obj.body = door;
+    GLOBALS.CANNON_WORLD.addBody(door);
+
+    //ADD FIZZLER
+    const geometry = new PlaneGeometry(2, 2);
+    const plane = new Mesh(geometry, GLOBALS.MATERIAL_FIZZLER);
+    plane.translateZ(-0.1)
+    obj.add(plane);
+
+    fizzlerTrigger(door)
+}
+
+function fizzlerTrigger(body) {
+    body.addEventListener("collide", function (e) {
+
+        if (e.target.collisionResponse == 1)
+            return;
+
+        if (e.body === GLOBALS.PLAYER) {
+            deletePortal(0)
+            deletePortal(1)
+        } else if (e.body.name == "sphere" || e.body.name == "cube" || e.body.name == "radio" || e.body.name == "cube_2") {
+            //CREATE A CLONE TO APPLY DISSOLVE SHADER
+            const clone = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.name).scene.clone();
+            clone.position.set(e.body.position.x, e.body.position.y, e.body.position.z);
+            clone.quaternion.copy(e.body.quaternion);
+            clone.visible = true;
+
+            if (GLOBALS.HOLDING_ITEM)
+                interactWithItem()
+
+            GLOBALS.UNIFORMS_DISSOLVER.diffuseMap.value = clone.material.map;
+            clone.material = GLOBALS.MATERIAL_DISSOLVER;
+
+            GLOBALS.SCENE.add(clone);
+
+            var posClone = clone.position.clone();
+            posClone.y += 2;
+
+            GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value = posClone;
+
+            var clone2 = clone.clone();
+            clone2.position.y += 1;
+
+            addPositionalAudio('audio-dissolve', clone, true, false, true, 8)
+
+            tweenCamera(3000, GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value, clone.position)
+            tweenCamera(3000, clone.position, clone2.position)
+
+            //GLOBALS.MATERIAL_DISSOLVER
+
+            setTimeout(() => {
+                GLOBALS.SCENE.remove(clone);
+                GLOBALS.SCENE_FPS.remove(clone.sound);
+            }, 3000);
+
+            respawn(e.body);
+        }
+    });
 }
 
 function addColliderItem(items, type, mass, offset) {
@@ -159,10 +245,7 @@ function addColliderItem(items, type, mass, offset) {
             if (mass > 0) {
 
                 if ((type == "cube" || type == "cube_2" || type == "laser_cube" || type == "sphere")) {
-                    console.log(items[i])
                     if (items[i].userData.hasDispenser) {
-
-                        console.log("222222222")
 
                         box.mass = 0;
                         box.allowSleep = false;
@@ -325,16 +408,65 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
     }
 }
 
-function corridorColliderNames(first, corridor) {
+function corridorColliderNames(corridor, update) {
+
+    for (var i = 0; i < GLOBALS.CORRIDOR_COLLIDERS.length; i++) {
+        GLOBALS.CANNON_WORLD.removeBody(GLOBALS.CORRIDOR_COLLIDERS[i]);
+    }
+
+    GLOBALS.CORRIDOR_COLLIDERS = [];
+
+    const cloneFloorMaterial = GLOBALS.MATERIAL_FLOOR_NON_PORTAL.clone();
+    cloneFloorMaterial.side = 2;
+    const cloneCeilingMaterial = GLOBALS.MATERIAL_FLOOR_NON_PORTAL.clone();
+    cloneCeilingMaterial.side = 2;
+    cloneCeilingMaterial.envMapIntensity = 0.35;
+    cloneCeilingMaterial.roughness = 1;
+    cloneCeilingMaterial.roughnessMap = null;
+    const cloneWallMaterial = GLOBALS.MATERIAL_WALL_NON_PORTAL.clone();
+    cloneWallMaterial.side = 2;
+
     corridor.traverse(child => {
-        if (child.name.includes("Plane")) {
-            child.material = GLOBALS.MATERIAL_FLOOR_NON_PORTAL;
+        if (child.name.includes("collider")) {
+            child.visible = false;
             addCollidersToCorridor(child)
+        } else if (child.name.includes("floor")) {
+            if (!update)
+                child.material = cloneFloorMaterial;
+        } else if (child.name.includes("ceiling")) {
+            if (!update)
+                child.material = cloneCeilingMaterial;
+        } else if (child.name.includes("wall")) {
+            if (!update)
+                child.material = cloneWallMaterial;
+        } else if (child.name.includes("emissive")) {
+            if (!update) {
+                child.material = new MeshBasicMaterial();
+
+                const width = 1;
+                const height = 1;
+                const intensity = 50;
+                const rectLight = new RectAreaLight(0xffffff, intensity, width, height);
+                rectLight.rotation.x = Math.PI;
+                rectLight.position.z = 0.01;
+                child.add(rectLight);
+                /*const light = new PointLight(0xffffff, 5, 10);
+                light.translateZ(0.2)
+                child.add(light);*/
+
+                console.log(rectLight);
+            }
+        } else if (child.name.includes("light")) {
+            if (!update)
+                child.material.envMapIntensity = 0.25;
+        } else if (child.name.includes("Cylinder")) {
+            if (!update)
+                child.material = new MeshStandardMaterial();
         }
     });
 }
 
-function addCollidersToCorridor(mesh){
+function addCollidersToCorridor(mesh) {
     const result = threeToCannon(mesh, {
         type: ShapeType.BOX
     });
@@ -356,9 +488,16 @@ function addCollidersToCorridor(mesh){
     wall.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
     wall.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC
     GLOBALS.CANNON_WORLD.addBody(wall);
+    GLOBALS.CORRIDOR_COLLIDERS.push(wall);
+
+    if (mesh.name.includes("collider_door")) {
+        GLOBALS.BODY_ELEVATOR = wall;
+    }
 }
 
 export {
     colliderItemManager,
-    colliderRoom
+    colliderRoom,
+    corridorColliderNames,
+    fizzlerTrigger
 }
