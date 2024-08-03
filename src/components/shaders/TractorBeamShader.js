@@ -15,7 +15,7 @@ GLOBALS.UNIFORMS_TRACTOR_BEAM = {
     },
     iColor: {
         type: 'v3',
-        value: new Vector3(0.0, 0.35, 0.75)
+        value: new Vector3(0.0, 3.5, 7.5)
     },
 };
 
@@ -30,7 +30,7 @@ GLOBALS.UNIFORMS_TRACTOR_BEAM_ORANGE = {
     },
     iColor: {
         type: 'v3',
-        value: new Vector3(1.0, 0.5, 0.0)
+        value: new Vector3(10.0, 5.0, 0.0)
     }
 };
 
@@ -97,7 +97,7 @@ void main() {
     gl_FragColor = vec4(color, iAlpha * alpha);
 
     #include <tonemapping_fragment>
-            #include <colorspace_fragment>
+    #include <colorspace_fragment>
 }
 `;
 
@@ -136,7 +136,7 @@ void main() {
     gl_FragColor = vec4(color, iAlpha * alpha);
 
     #include <tonemapping_fragment>
-            #include <colorspace_fragment>
+    #include <colorspace_fragment>
 }
 `;
 
@@ -155,6 +155,8 @@ GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE = new ShaderMaterial({
     side: 2,
     transparent: true
 });
+
+console.log(GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE)
 
 /*window.materialBridgeOrange = new ShaderMaterial({
     uniforms: window.uniformsBridge,

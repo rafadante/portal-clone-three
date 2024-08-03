@@ -6,7 +6,8 @@ import {
     ToneMappingMode,
     Selection,
     SelectiveBloomEffect,
-    BlendFunction
+    BlendFunction,
+    BloomEffect
 } from "postprocessing";
 import {
     HalfFloatType,
@@ -58,8 +59,19 @@ function initPost() {
     selectiveBloom.selection = GLOBALS.SELECTED_FOR_BLOOM;
 
     //
+    const bloom = new BloomEffect({
+        luminanceThreshold: 1.5
+        //blendFunction: BlendFunction.ADD.
+        //width: window.innerWidth,
+        //height: window.innerHeight
+    });
+   
+    console.log(bloom)
+
+    //
     GLOBALS.COMPOSER.addPass(new EffectPass(GLOBALS.MAIN_CAMERA,
-        toneMappingEffect
+        toneMappingEffect,
+        bloom
     ));
 }
 

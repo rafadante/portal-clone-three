@@ -228,10 +228,34 @@ const updatePlayer = function (deltaTime) {
 var jumpPressed = false;
 var blockJump = false;
 
+// Function to check if the slerp is at the end quaternion
+function isSlerpComplete(currentQuat, endQuat, tolerance = 0.001) {
+    // Compute the dot product of the current quaternion and the end quaternion
+    const dot = Math.abs(currentQuat.dot(endQuat));
+
+    // The dot product should be close to 1 if the quaternions are very similar
+    return Math.abs(dot - 1) < tolerance;
+}
+
 const updateCamera = function (deltaTime) {
 
+    if (GLOBALS.TELEPORTING_TARGET_QUATERNION) {
+
+        GLOBALS.MAIN_CAMERA.quaternion.slerp(GLOBALS.TELEPORTING_TARGET_QUATERNION, 0.15);
+        
+        if (isSlerpComplete( GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.TELEPORTING_TARGET_QUATERNION)) {
+            GLOBALS.TELEPORTING_TARGET_QUATERNION = null;
+            GLOBALS.MAIN_CAMERA.rotation.z = 0;
+        }
+
+        GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
+        GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
+        GLOBALS.PORTAL_GUN_CAMERA.position.copy(GLOBALS.MAIN_CAMERA.position);
+        GLOBALS.PORTAL_GUN_CAMERA.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
+    }
+
     // always look where the camera points
-    GLOBALS.PLAYER.quaternion.setFromAxisAngle(new CANNON.Vec3(0,1,0), GLOBALS.MAIN_CAMERA.rotation.y);
+    GLOBALS.PLAYER.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), GLOBALS.MAIN_CAMERA.rotation.y);
     //GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.SMOOTHNESS);
     GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion)
 

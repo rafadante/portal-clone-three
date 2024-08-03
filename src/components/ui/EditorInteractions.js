@@ -515,3 +515,8 @@ $("body").on('click', '#header-settings', function () {
 $('#portal-gun-select').on('change', function () {
     GLOBALS.PORTAL_GUN_INITIATE = $(this).val();
 })
+
+$("body").on('click', '.portal_gun-state', function () {
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.state = $(this).data("state");
+    $("#portal_gun-state").find(".title").text($(this).data("state") + " Portals");
+});

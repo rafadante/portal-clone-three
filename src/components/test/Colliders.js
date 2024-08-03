@@ -7,7 +7,8 @@ import {
     MeshStandardMaterial,
     PlaneGeometry,
     Mesh,
-    PointLight
+    SpotLight,
+    Color
 } from 'three';
 import * as CANNON from 'cannon';
 import {
@@ -91,6 +92,7 @@ function fizzlerTrigger(body) {
         if (e.body === GLOBALS.PLAYER) {
             deletePortal(0)
             deletePortal(1)
+            GLOBALS.PORTAL_BOX =[];
         } else if (e.body.name == "sphere" || e.body.name == "cube" || e.body.name == "radio" || e.body.name == "cube_2") {
             //CREATE A CLONE TO APPLY DISSOLVE SHADER
             const clone = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.name).scene.clone();
@@ -441,18 +443,22 @@ function corridorColliderNames(corridor, update) {
                 child.material = cloneWallMaterial;
         } else if (child.name.includes("emissive")) {
             if (!update) {
-                child.material = new MeshBasicMaterial();
+                child.material = new MeshBasicMaterial({
+                    color: new Color(2,2,2)
+                });
 
-                const width = 1;
-                const height = 1;
-                const intensity = 50;
-                const rectLight = new RectAreaLight(0xffffff, intensity, width, height);
-                rectLight.rotation.x = Math.PI;
-                rectLight.position.z = 0.01;
-                child.add(rectLight);
-                /*const light = new PointLight(0xffffff, 5, 10);
-                light.translateZ(0.2)
-                child.add(light);*/
+                const light = new SpotLight(0xffffff, 20);
+                light.angle = Math.PI / 2;
+                light.penumbra = 1;
+                light.decay = 1; //2
+                light.distance = 6;
+                light.position.set(0,0.1,0);
+                child.add(light);
+                var worlPos = new Vector3();
+                child.getWorldPosition(worlPos);
+                worlPos.y -= 4;
+                light.target.position.copy(worlPos);
+                light.add(light.target);
             }
         } else if (child.name.includes("light")) {
             if (!update)

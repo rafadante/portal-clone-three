@@ -44,6 +44,14 @@ function portalButton(button, auto) {
         raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
 
         var intersectBlockPortal = raycaster2.intersectObjects(GLOBALS.BLOCK_PORTAL);
+        var blockPortal = null;
+
+        for (var i = 0; i < intersectBlockPortal.length; i++) {
+            if (intersectBlockPortal[i].object.visible) {
+                blockPortal = intersectBlockPortal[i];
+                break;
+            }
+        }
 
         var intersects = raycaster2.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
 
@@ -86,8 +94,8 @@ function portalButton(button, auto) {
                     if (GLOBALS.PLAYER.position.distanceTo(intersects[0].point) > 2)
                         GLOBALS.FLASH.visible = true;
 
-                    if (intersectBlockPortal.length > 0)
-                        tweenCamera(300, GLOBALS.FLASH.position, intersectBlockPortal[0].point);
+                    if (blockPortal)
+                        tweenCamera(300, GLOBALS.FLASH.position, blockPortal.point);
                     else
                         tweenCamera(300, GLOBALS.FLASH.position, new Vector3(x, y, z));
 
@@ -109,7 +117,7 @@ function portalButton(button, auto) {
                 }, 300);
             }
 
-            if (intersectBlockPortal.length > 0) {
+            if (blockPortal) {
                 //NONPORTABLE WALL
                 AUDIO.PORTAL_INVALID.currentTime = 0;
                 play(AUDIO.PORTAL_INVALID)
@@ -211,7 +219,7 @@ function portalButton(button, auto) {
 
                         newPortal(0, 1, point, normal, userData.body, playerUpDirection, portalPoints, userData.side)
 
-                        GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(1.0, 0.25, 0.0);
+                        GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(2.5, 0.7, 0.0);
 
                         if (GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha.value == 0.0) {
                             new TWEEN.Tween(GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha).to({
@@ -237,7 +245,7 @@ function portalButton(button, auto) {
 
                         newPortal(1, 0, point, normal, userData.body, playerUpDirection, userData.rotation, userData.side)
 
-                        GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(0.0, 0.5, 1.0);
+                        GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(0.0, 1.25, 2.5);
 
                         if (GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha.value == 0.0) {
                             new TWEEN.Tween(GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha).to({
@@ -321,10 +329,42 @@ function deletePortal(portalIndex) {
     if (GLOBALS.PORTALS[portalIndex] === null)
         return;
 
+
+    //REMOVE FIELDS THAT ARE GOING THROUGH THIS PORTAL
+    if (GLOBALS.PORTALS[portalIndex].field) {
+        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PORTALS[portalIndex].field);
+        GLOBALS.PORTALS[portalIndex].field = null;
+    }
+
+    if (GLOBALS.PORTALS[portalIndex].fieldBody) {
+
+        var body = GLOBALS.PORTALS[portalIndex].fieldBody;
+
+        setTimeout(() => {
+            GLOBALS.CANNON_WORLD.removeBody(body);
+        }, 10);
+
+        GLOBALS.PORTALS[portalIndex].fieldBodyClone = null;
+        GLOBALS.PORTALS[portalIndex].fieldBody = null;
+    }
+
+    if (GLOBALS.PORTALS[portalIndex].fieldTrigger) {
+        const index = GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.indexOf(GLOBALS.PORTALS[portalIndex].fieldTrigger);
+        if (index > -1) {
+            GLOBALS.TRACTOR_BEAM.splice(index, 1);
+            GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.splice(index, 1);
+        }
+        GLOBALS.PORTALS[portalIndex].fieldTrigger = null;
+    }
+
+    //
+
     GLOBALS.PORTALS[portalIndex].light.visible = false;
     GLOBALS.PORTAL_AUDIO[portalIndex].sound.audio.pause();
 
     if (GLOBALS.PORTALS[portalIndex].hostObjects !== null) {
+
+        GLOBALS.PORTALS[portalIndex].hostObjects.portal = false;
 
         for (var i = 0; i < GLOBALS.CANNON_BODIES.length; i++) {
             // mark this object as collideable with portal 0 bb objects

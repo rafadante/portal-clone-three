@@ -34,9 +34,11 @@ const animateShader = (time) => {
 
     if (delta > interval) {
         // The draw or time dependent code are here
-        animateShader2();
+        //animateShader2();
         delta = delta % interval;
     }
+
+    animateShader2();
 };
 
 const effectOrigin = new Vector3(1,1,5)
@@ -60,13 +62,12 @@ const animateShader2 = (time) => {
     //LIGHT BRIDGES
     let t = clock.getElapsedTime();
     GLOBALS.UNIFORMS_LIGHT_BRIDGE.time.value = t;
-    GLOBALS.UNIFORMS_LASER_FIELD.time.value = t;
 
     //TRACTOR BEAM
     GLOBALS.UNIFORMS_TRACTOR_BEAM.iTime.value += val;
     GLOBALS.UNIFORMS_TRACTOR_BEAM_ORANGE.iTime.value += val;
     GLOBALS.UNIFORMS_FIZZLER.iTime.value += val;
-
+    GLOBALS.UNIFORMS_LASER_FIELD.iTime.value += val;
 
     //GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value = effectOrigin;
     GLOBALS.UNIFORMS_DISSOLVER.u_Time.value = t;

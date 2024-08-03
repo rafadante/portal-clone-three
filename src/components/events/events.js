@@ -40,9 +40,34 @@ function updateEvents() {
 
   var id = 0;
 
+  //
+
   for (let d of GLOBALS.DYNAMIC_OBJECTS) {
 
     let pos = new Vector3(d.position.x, d.position.y, d.position.z);
+
+    var toRemove;
+    if (d.name == "player") {
+      for (var i = 0; i < GLOBALS.PORTAL_GUN_BOX.length; i++) {
+        if (GLOBALS.PORTAL_GUN_BOX[i].containsPoint(pos)) {
+          console.log("pegou")
+          toRemove = GLOBALS.PORTAL_GUN_BOX[i];
+          GLOBALS.PORTAL_GUN_BOX[i].item.visible = false;
+          GLOBALS.PORTAL_GUN_INITIATE = GLOBALS.PORTAL_GUN_BOX[i].item.userData.state;
+
+          //
+          GLOBALS.GUN.children[0].visible = true;
+          GLOBALS.GUN_CLONE.children[0].visible = true;
+          GLOBALS.GUN_CLONE2.children[0].visible = true;
+        }
+      }
+    }
+
+    if (toRemove) {
+      const index = GLOBALS.PORTAL_GUN_BOX.indexOf(toRemove);
+      GLOBALS.PORTAL_GUN_BOX.splice(index, 1);
+    }
+
 
     if (pos.distanceTo(new Vector3(0, 0, 0)) > 100) {
       if (!d.repawning) respawn(d);
@@ -318,7 +343,7 @@ function interactWithItem() {
 }
 
 function pedestalTimer(holder) {
-  
+
   holder['line'].active = false;
   holder['to'].item.userData.buttons -= 1;
   holder['line'].material.color = new Color(0xffa500);

@@ -2,7 +2,8 @@ import {
     Matrix4,
     Quaternion,
     Group,
-    Vector3
+    Vector3,
+    Object3D
 } from 'three';
 import * as CANNON from "cannon";
 import { AUDIO, play } from '../audio/Audio.js';
@@ -255,15 +256,20 @@ function teleportationState() {
                             cameraUp,
                             cameraForward.negate()
                         );
-                        GLOBALS.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat);
+
+                        /*GLOBALS.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat);
                         GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
                         GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
                         GLOBALS.PORTAL_GUN_CAMERA.position.copy(GLOBALS.MAIN_CAMERA.position);
-                        GLOBALS.PORTAL_GUN_CAMERA.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
-
+                        GLOBALS.PORTAL_GUN_CAMERA.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);*/
 
                         GLOBALS.TARGET_ROTATION_X = GLOBALS.MAIN_CAMERA.rotation.y;
                         GLOBALS.TARGET_ROTATION_Y = GLOBALS.MAIN_CAMERA.rotation.x;
+
+                        var qq = new Quaternion();
+                        qq.setFromRotationMatrix(cameraMat);
+
+                        GLOBALS.TELEPORTING_TARGET_QUATERNION = qq;
                     }
 
                     d.collisionFilterMask |=

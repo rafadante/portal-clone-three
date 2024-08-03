@@ -150,7 +150,7 @@ function viewFPS() {
         colliderItemManager();
         //
         addAudio(GLOBALS.DYMANIC_ITEMS['fizzler'], 'audio-fizzler')
-        addAudio(GLOBALS.DYMANIC_ITEMS['laser_field'], 'audio-laser-beam')
+        addAudio(GLOBALS.DYMANIC_ITEMS['laser_field'], 'audio-fizzler')
         addAudio(GLOBALS.DYMANIC_ITEMS['tractor_beam'], 'audio-tractor-beam')
 
         for (var s = 0; s < GLOBALS.DYMANIC_ITEMS["tractor_beam"].length; s++) {
@@ -167,7 +167,6 @@ function viewFPS() {
             child.frustumCulled = true;
         })
 
-        GLOBALS.FPS_MODE = true;
         animate();
         testLightsManager();
 
@@ -178,16 +177,33 @@ function viewFPS() {
         GLOBALS.RENDERER.renderLists.dispose();
 
         //GUN STATE
-        if(GLOBALS.PORTAL_GUN_INITIATE == "none"){
+        if (GLOBALS.PORTAL_GUN_INITIATE == "none") {
             GLOBALS.GUN.children[0].visible = false;
             GLOBALS.GUN_CLONE.children[0].visible = false;
             GLOBALS.GUN_CLONE2.children[0].visible = false;
-        }else{
+        } else {
             GLOBALS.GUN.children[0].visible = true;
             GLOBALS.GUN_CLONE.children[0].visible = true;
             GLOBALS.GUN_CLONE2.children[0].visible = true;
         }
-        
+
+        //
+        var holder = [];
+        for (var i = 0; i < GLOBALS.PORTAL_GUN_BOX.length; i++) {
+            if (GLOBALS.PORTAL_GUN_BOX[i].parent) {
+                var bb = new Box3(); // for re-use
+                bb.setFromObject(GLOBALS.PORTAL_GUN_BOX[i]);
+                bb.item = GLOBALS.PORTAL_GUN_BOX[i];
+                holder.push(bb);
+            }
+        }
+
+        GLOBALS.PORTAL_GUN_BOX = holder;
+        console.log(GLOBALS.PORTAL_GUN_BOX)
+
+        GLOBALS.FPS_MODE = true;
+        animate()
+
     }, 500);
 };
 
@@ -205,10 +221,10 @@ function blockPortal() {
     }
 
     for (var i = 0; i < GLOBALS.GLASS_RAYCASTER.length; i++) {
-        if (!GLOBALS.GLASS_RAYCASTER[i].item.userData.grid){
+        if (!GLOBALS.GLASS_RAYCASTER[i].item.userData.grid) {
             GLOBALS.BLOCK_PORTAL.push(GLOBALS.GLASS_RAYCASTER[i].item.continuous)
         }
-            
+
     }
 }
 

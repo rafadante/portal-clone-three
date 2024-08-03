@@ -253,6 +253,7 @@ function openFullscreen() {
 function controlsLock() {
     GLOBALS.POINTER_CONTROLS = new PointerLockControls(GLOBALS.MAIN_CAMERA, document.body);
     GLOBALS.POINTER_CONTROLS.pointerSpeed = 0.5;
+    console.log(GLOBALS.POINTER_CONTROLS)
 
     GLOBALS.POINTER_CONTROLS.addEventListener('lock', function () {
         play(AUDIO.AMBIENT)

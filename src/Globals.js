@@ -48,7 +48,7 @@ var hFOV = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180 / 2) * camera.aspec
 //CAMERA THAT ONLY RENDERS THE MAIN PORTAL GUN ON TOP OF THE SCENE
 const portalGunCamera = camera.clone();
 portalGunCamera.layers.mask = 2;
-portalGunCamera.near = 0.0001;
+portalGunCamera.near = 0.00001;
 portalGunCamera.updateProjectionMatrix();
 
 //POINT OF OBJECTS WHILE HOLDING WITH THE GUN
@@ -224,7 +224,8 @@ var GLOBALS = {
         portal_1: [],
         laser_field: [],
         fizzler: [],
-        glass: []
+        glass: [],
+        portal_gun: []
     },
 
     INTERACTIVE: [],
@@ -511,6 +512,10 @@ var GLOBALS = {
             count: 0,
             max: 100
         },
+        portal_gun: {
+            count: 0,
+            max: 2
+        },
     },
     SCENE_FPS: null,
     LISTENER: new AudioListener(),
@@ -539,7 +544,9 @@ var GLOBALS = {
     GRID_STATE: false,
     LOADED_CONNECTIONS: [],
 
-    PORTAL_GUN_INITIATE: "all"
+    PORTAL_GUN_INITIATE: "all",
+    TELEPORTING_TARGET_QUATERNION: null,
+    PORTAL_GUN_BOX: []
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
@@ -697,10 +704,15 @@ function reset() {
             count: 0,
             max: 100
         },
+        portal_gun: {
+            count: 0,
+            max: 2
+        },
     }
     GLOBALS.CONNECTIONS = [];
     GLOBALS.GLASS_PANELS = [];
     GLOBALS.LOADED_CONNECTIONS = [];
+    GLOBALS.PORTAL_GUN_BOX= []
 }
 
 export {

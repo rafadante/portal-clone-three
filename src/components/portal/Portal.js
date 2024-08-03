@@ -207,6 +207,8 @@ class Portal extends Group {
         this.debugMeshes.add(this.STBB.helper)
         this.debugMeshes.visible = false; //globals.DEBUG
         this.add(this.debugMeshes)
+
+        console.log(this)
     }
 }
 

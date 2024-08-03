@@ -1,18 +1,20 @@
 import {
     Color,
     MeshBasicMaterial,
-    DoubleSide
+    DoubleSide,
+    Vector3,
+    ShaderMaterial
 } from 'three';
 import { GLOBALS } from '../../Globals';
 
-GLOBALS.UNIFORMS_LASER_FIELD = {
+/*GLOBALS.UNIFORMS_LASER_FIELD = {
     time: {
         value: 0
     }
 }
 
 GLOBALS.MATERIAL_LASER_FIELD = new MeshBasicMaterial({
-    color: new Color(1, 0, 0),
+    color: new Color(5, 0, 0),
     side: DoubleSide,
     transparent: true,
     onBeforeCompile: shader => {
@@ -35,9 +37,9 @@ GLOBALS.MATERIAL_LASER_FIELD = new MeshBasicMaterial({
 
           float a = 0.;
           a = max(a, mainWave);
-          a = max(a, sideLines);
+          //a = max(a, sideLines);
           a = max(a, contactLines);
-          a = max(a, scanLine);
+          //a = max(a, scanLine);
           
             diffuseColor.a = a;
           `
@@ -47,4 +49,92 @@ GLOBALS.MATERIAL_LASER_FIELD = new MeshBasicMaterial({
 
 GLOBALS.MATERIAL_LASER_FIELD.defines = {
     "USE_UV": ""
+}*/
+
+GLOBALS.UNIFORMS_LASER_FIELD = {
+    iTime: {
+        type: 'f',
+        value: 1.0
+    },
+    iAlpha: {
+        type: 'f',
+        value: 1.0
+    },
+    iColor: {
+        type: 'v3',
+        value: new Vector3(25.0, 0.0, 0.0)
+    },
+};
+
+const vshader = `
+
+varying vec2 vUv; 
+
+void main()
+{
+    vUv = uv;
+
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0 );
+    gl_Position = projectionMatrix * mvPosition;
 }
+`;
+
+const fshader = `
+uniform float iTime;
+uniform float iAlpha;
+uniform vec2 iResolution;
+uniform vec3 iColor;
+varying vec2 vUv;
+
+float height(in vec2 uv) {
+    float speed = 2.0;
+
+    // Calculate normalized horizontal position
+    float horizontalPos = uv.x;
+
+    // Adjust frequency to spread waves evenly and control width
+    float horizontalWaves = sin(iTime * (speed + 2.0) + horizontalPos * 75.0);
+
+    float b = smoothstep(0.0, 4.0, horizontalWaves);
+    return b * 3.0;
+}
+
+void main() {
+    vec2 uv= -vUv;
+
+    float waveHeight = height(uv);
+    
+    // Set transparency based on wave height
+    float alpha = waveHeight; // Invert waveHeight to make black parts transparent
+    
+    vec3 color = vec3(waveHeight * iColor.x, waveHeight * iColor.y, waveHeight * iColor.z);
+
+    // Glow effect: render the object with a halo around it
+    float glowStrength = 0.2;
+    float glowSize = 0.2;
+
+    // Calculate distance from center (for circular glow)
+    float dist = length(vUv - 0.5);
+
+    // Apply glow based on distance from center
+    float glow = glowStrength * smoothstep(glowSize, 0.0, dist);
+
+    // Add glow to color
+    color += vec3(glow);
+    
+    gl_FragColor = vec4(color, iAlpha * alpha);
+
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+}
+`;
+
+GLOBALS.MATERIAL_LASER_FIELD = new ShaderMaterial({
+    uniforms: GLOBALS.UNIFORMS_LASER_FIELD,
+    vertexShader: vshader,
+    fragmentShader: fshader,
+    side: 2,
+    transparent: true
+});
+
+console.log(GLOBALS.MATERIAL_LASER_FIELD)

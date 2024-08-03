@@ -4,6 +4,7 @@ import {
     play
 } from "../audio/Audio.js";
 import { stateDoor } from "../door/Door.js";
+import { deletePortal } from "../portal/CreatePortal.js";
 
 function laserFieldState(obj) {
     obj.item.userData.state = !obj.item.userData.state;
@@ -95,6 +96,10 @@ function respawn(d) {
         play(AUDIO.DEATH);
         time = 500;
         time2 = 500;
+
+        deletePortal(0)
+        deletePortal(1)
+        GLOBALS.PORTAL_BOX = [];
     }
 
     setTimeout(() => {

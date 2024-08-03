@@ -69,7 +69,9 @@ function addItem(found, loaded) {
 
         if ((!userData.hasItem && !userData.continuousEnding) || loaded) {
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
+                var item = GLOBALS.GUN_CLONE.clone();
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
                 const box = new Object3D()
                 var item = box;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
@@ -272,7 +274,12 @@ function addItem(found, loaded) {
                 });
             }
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
+                item.scale.set(1, 1, 1);
+                item.position.y += 0.65;
+                GLOBALS.ITEMS_ADDED.add(item);
+                GLOBALS.PORTAL_GUN_BOX.push(item);
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
                 GLOBALS.ITEMS_ADDED.add(item);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
                 GLOBALS.ITEMS_ADDED.add(item);
@@ -401,7 +408,9 @@ function manageItemVariables(item, userData, instanced) {
     item.userData.friction = 0.4;
     item.userData.restitution = 0;
 
-    if (GLOBALS.ITEM_HOLDED_NAME == "door") {
+    if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
+        item.userData.state = "all";
+    }else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
         item.userData.rotationY = 0;
     } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
         GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
@@ -448,7 +457,9 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
     item.userData.friction = userDataLoadedItem.friction;
     item.userData.restitution = userDataLoadedItem.restitution;
 
-    if (GLOBALS.ITEM_HOLDED_NAME == "door") {
+    if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
+        item.userData.state = userDataLoadedItem.state;
+    }else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
         item.userData.rotationY = userDataLoadedItem.rotationY;
         item.rotation.y = item.userData.rotationY;
     } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||

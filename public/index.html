@@ -208,7 +208,9 @@
             id="glass" />
 
           <img data-content="Obtainable item: you can define how many portals it will have." data-title="PORTAL GUN"
-            class="item" data-name="gun2" src="../assets/ui/items/gun2.png" />
+            class="item" data-name="portal_gun" src="../assets/ui/items/gun2.png" 
+            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
+            id="portal_gun"/>
 
           <!--
             
@@ -437,6 +439,34 @@
           <button type="button" class="menu-btn">
             <i class="fa fa-crosshairs"></i>
             <span class="menu-text">Middle Vertical</span>
+          </button>
+        </li>
+      </ul>
+    </li>
+
+    <!---->
+    <li class="menu-item menu-item-submenu hasItem portal_gun" id="portal_gun-state" data-state="all">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-crosshairs"></i>
+        <span class="menu-text title">All Portals</span>
+      </button>
+      <ul class="menu">
+        <li data-state="all" class="menu-item portal_gun-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">All Portals</span>
+          </button>
+        </li>
+        <li data-state="left" class="menu-item portal_gun-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Only Left Portal</span>
+          </button>
+        </li>
+        <li data-state="right" class="menu-item portal_gun-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Only Right Portal</span>
           </button>
         </li>
       </ul>

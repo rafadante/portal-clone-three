@@ -146,7 +146,7 @@ function updatePhysics() {
                 }
 
                 if (property == "tractor_beam") {
-                    if (GLOBALS.DYMANIC_ITEMS[property][i].state) {
+                    if (GLOBALS.DYMANIC_ITEMS[property][i].userData.state) {
                         var dir = new Vector3(); // create once and reuse it
                         dir.copy(GLOBALS.DYMANIC_ITEMS[property][i].up).applyQuaternion(GLOBALS.DYMANIC_ITEMS[property][i].quaternion);
 

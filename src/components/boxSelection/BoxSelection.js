@@ -156,6 +156,11 @@ function raycastSelected(found, event, type) {
                     $("#glass-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
                     $("#grid-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.grid);
                 }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_gun")) {
+                    $(".portal_gun").css("display", "block");
+                    $("#portal_gun-state").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state + " Portals");
+                }
             }
 
             GLOBALS.SELECTED_ID.push(instanceId);
@@ -253,9 +258,12 @@ function raycastSelected(found, event, type) {
 
                             if (planeInstanceOld.item.name.includes("camera"))
                                 planeInstanceOld.item.translateY(0.3)
+                            else if (planeInstanceOld.item.name.includes("portal_gun"))
+                                planeInstanceOld.item.translateY(0.65)
 
                             if (planeInstanceOld.item.name.includes("camera") ||
-                                planeInstanceOld.item.name.includes("observation"))
+                                planeInstanceOld.item.name.includes("observation") ||
+                                planeInstanceOld.item.name.includes("portal_gun"))
                                 planeInstanceOld.item.rotation.set(planeInstanceNew.normal.x, planeInstanceNew.normal.y, planeInstanceNew.normal.z)
                             else if (!planeInstanceOld.item.name.includes("door-"))
                                 planeInstanceOld.item.rotation.copy(planeInstanceNew.rotation);

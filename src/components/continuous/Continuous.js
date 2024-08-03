@@ -6,7 +6,8 @@ import {
     CylinderGeometry,
     BufferAttribute,
     Mesh,
-    Box3
+    Box3,
+    PlaneGeometry
 } from 'three';
 import * as CANNON from 'cannon';
 import {
@@ -80,12 +81,14 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     } else if (item == "glass") {
         var geometry = new BoxGeometry(2, intersects[0].distance, 0.01);
     } else if (item == "laser_field" || item == "fizzler") {
-        var geometry = new BoxGeometry(2, intersects[0].distance, 0.025);
+        
 
         if (item == "laser_field") {
+            var geometry = new PlaneGeometry(2, intersects[0].distance);
             material = GLOBALS.MATERIAL_LASER_FIELD;
             object.cloneLaserID = object.userData.idInstanced + 10;
         } else if (item == "fizzler") {
+            var geometry = new BoxGeometry(2, intersects[0].distance, 0.025);
             material = GLOBALS.MATERIAL_FIZZLER;
             object.cloneFizzlerID = object.userData.idInstanced + 10;
         }
@@ -127,7 +130,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     const plane = new Mesh(geometry, material);
 
     GLOBALS.SCENE_CHILDREN.add(plane);
-    //GLOBALS.SELECTED_FOR_BLOOM.add(plane)
+    GLOBALS.SELECTED_FOR_BLOOM.add(plane)
 
     window.uuuu = plane;
 
@@ -389,6 +392,8 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
             rayItem[g].item.clone = plane;
 
+            GLOBALS.PORTALS[portal].field = plane;
+
             if (rayItem[g].name == "light_bridge") {
                 box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
                 box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
@@ -398,6 +403,9 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g] = box;
 
                 rayItem[g].item.clone.bodyBridge = box;
+
+                GLOBALS.PORTALS[portal].fieldBody = box;
+                GLOBALS.PORTALS[portal].fieldBodyClone = rayItem[g].item.clone;
             } else if (rayItem[g].name == "tractor_beam") {
 
                 var bb = new Box3(); // for re-use
@@ -410,6 +418,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
                 GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g] = plane;
                 GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = bb;
+                GLOBALS.PORTALS[portal].fieldTrigger = bb;
             }
         } else {
             if (rayItem[g].name == "light_bridge") {

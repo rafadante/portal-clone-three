@@ -327,6 +327,7 @@ function loadEnterDoor(scene) {
     planeExitDoor.position.set(0, 1.3, 0.01)
     planeExitDoor.scale.set(1, 0.5, 1)
     GLOBALS.EXIT_DOOR.add(planeExitDoor);
+    console.log(planeExitDoor)
 
     loadCorridor()
 }

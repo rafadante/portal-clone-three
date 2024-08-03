@@ -13,7 +13,8 @@ import {
     Clock,
     Matrix4,
     Frustum,
-    Vector3
+    Vector3,
+    GridHelper
 } from 'three';
 import {
     TWEEN
@@ -134,6 +135,13 @@ function init() {
     //LISTENER
     window.addEventListener('resize', onWindowResize);
     recreateRay();
+
+    const size = 50;
+    const divisions = 50;
+
+    const gridHelper = new GridHelper(size, divisions);
+    //GLOBALS.SCENE.add(gridHelper);
+    console.log(gridHelper)
 }
 
 function onWindowResize() {
@@ -153,7 +161,7 @@ function animate(time) {
     }
 
     if (!GLOBALS.FPS_MODE) {
-        //GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+        //GLOBALS.COMPOSER.render();
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
     } else if (!GLOBALS.PAUSED) {
         render(time);
@@ -266,7 +274,7 @@ function animatePortal() {
     // stencil optimization - only render parts of scene multiple
     // times when it is going to be viewed by the portal
     GLOBALS.RENDERER.autoClearStencil = false
-    GLOBALS.RENDERER.autoClear = true;
+    //GLOBALS.RENDERER.autoClear = true;
 
     if (GLOBALS.PORTAL_RECURSION_LEVELS > 0) {
         renderPortal2(0, 1)
@@ -283,7 +291,7 @@ function animatePortal() {
     }
 
     GLOBALS.SCENE_CHILDREN.visible = true;
-    GLOBALS.RENDERER.autoClear = false;
+    //GLOBALS.RENDERER.autoClear = false;
 
     GLOBALS.GUN_CLONE.visible = false;
     GLOBALS.GUN_CLONE2.visible = cloneVisible;
@@ -376,6 +384,7 @@ function renderPortal2(thisIndex, pairIndex) {
         // necessary so that we properly render recursion (otherwise the other portal might block)
         GLOBALS.RENDERER.clippingPlanes = [GLOBALS.PORTALS[pairIndex].plane.clone()]
         GLOBALS.RENDERER.setRenderTarget(GLOBALS.PORTAL_TMP_TARGETS[thisIndex])
+        GLOBALS.RENDERER.clear();
         GLOBALS.RENDERER.render(GLOBALS.SCENE, portalCamera)
 
         // need to do the swap operation:
