@@ -93,9 +93,7 @@ GLOBALS.STATS.container.style.display = "none";
 //
 const geometry = new BoxGeometry(2, 2, 2);
 const material = new MeshBasicMaterial({
-    color: 0x00ff00,
-    transparent: true,
-    opacity: 0.5
+    color: 0x00ff00
 });
 GLOBALS.ITEM_CUBE = new Mesh(geometry, material);
 GLOBALS.ITEM_CUBE.visible = false;
@@ -135,13 +133,6 @@ function init() {
     //LISTENER
     window.addEventListener('resize', onWindowResize);
     recreateRay();
-
-    const size = 50;
-    const divisions = 50;
-
-    const gridHelper = new GridHelper(size, divisions);
-    //GLOBALS.SCENE.add(gridHelper);
-    console.log(gridHelper)
 }
 
 function onWindowResize() {
@@ -163,6 +154,7 @@ function animate(time) {
     if (!GLOBALS.FPS_MODE) {
         //GLOBALS.COMPOSER.render();
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+        TWEEN.update();
     } else if (!GLOBALS.PAUSED) {
         render(time);
     }

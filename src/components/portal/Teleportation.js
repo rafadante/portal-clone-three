@@ -299,7 +299,7 @@ function addCameraBody(obj) {
         mass: 10,
         material: PHYSICS_MATERIAL,
     });
-
+    GLOBALS.CANNON_BODIES.push(box);
     box.position.copy(obj.cube.position);
     box.quaternion.copy(obj.quaternion);
     box.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;

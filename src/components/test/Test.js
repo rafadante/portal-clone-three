@@ -3,7 +3,6 @@ import {
     Vector3,
     Quaternion,
     Box3,
-    Color,
 } from 'three';
 import $ from 'jquery';
 import {
@@ -17,7 +16,6 @@ import {
     AUDIO,
     addAudio
 } from '../audio/Audio.js';
-import { stateDoor } from '../door/Door.js';
 import { initPost } from '../post/PostProcessing.js';
 import './Colliders.js';
 import {
@@ -25,6 +23,7 @@ import {
 } from './Colliders.js';
 import { testLightsManager } from '../lights/Lights.js';
 import { manageInstances } from './Instances.js';
+import './BackToEditor.js';
 
 $("body").on('click', '#view-fps', function () {
     viewFPS();
@@ -177,14 +176,17 @@ function viewFPS() {
         GLOBALS.RENDERER.renderLists.dispose();
 
         //GUN STATE
+        GLOBALS.PORTAL_GUN_INITIATE_HOLDER = GLOBALS.PORTAL_GUN_INITIATE;
         if (GLOBALS.PORTAL_GUN_INITIATE == "none") {
             GLOBALS.GUN.children[0].visible = false;
             GLOBALS.GUN_CLONE.children[0].visible = false;
             GLOBALS.GUN_CLONE2.children[0].visible = false;
+            document.getElementById("reticle-img").style.display = "none";
         } else {
             GLOBALS.GUN.children[0].visible = true;
             GLOBALS.GUN_CLONE.children[0].visible = true;
             GLOBALS.GUN_CLONE2.children[0].visible = true;
+            document.getElementById("reticle-img").style.display = "block";
         }
 
         //
@@ -199,9 +201,12 @@ function viewFPS() {
         }
 
         GLOBALS.PORTAL_GUN_BOX = holder;
-        console.log(GLOBALS.PORTAL_GUN_BOX)
-
         GLOBALS.FPS_MODE = true;
+
+        for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+            GLOBALS.CONNECTIONS[i]['line'].visible = false;
+        }
+
         animate()
 
     }, 500);

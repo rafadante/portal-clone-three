@@ -65,6 +65,8 @@ function manageConnection(instanceId, from) {
             to: GLOBALS.PLANE_USER_DATA[instanceId]
         });
 
+        console.log(from)
+
         from.item.userData.connectedTo.push(instanceId);
     }
 

@@ -60,13 +60,12 @@ function initPost() {
 
     //
     const bloom = new BloomEffect({
-        luminanceThreshold: 1.5
+        luminanceThreshold: 1.1,
+        //luminanceSmoothing: 0.2,
         //blendFunction: BlendFunction.ADD.
         //width: window.innerWidth,
         //height: window.innerHeight
     });
-   
-    console.log(bloom)
 
     //
     GLOBALS.COMPOSER.addPass(new EffectPass(GLOBALS.MAIN_CAMERA,

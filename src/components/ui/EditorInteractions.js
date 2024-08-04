@@ -271,11 +271,12 @@ $("body").on('input', '#grid-state-input', function () {
             (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.distance * 2) / 3
         )
     } else {
-        updateMaterialRepeat(
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_GLASS;
+        /*updateMaterialRepeat(
             GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous,
             GLOBALS.MATERIAL_GLASS,
             (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.distance * 2) / 3
-        )
+        )*/
     }
     //GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_GLASS;
 
@@ -469,6 +470,8 @@ $("body").on('click', '#save-level', function () {
             itemHolder.push(GLOBALS.PLANE_USER_DATA[i].item)
             GLOBALS.PLANE_USER_DATA[i].item = GLOBALS.PLANE_USER_DATA[i].item.userData;
         }
+
+        GLOBALS.PLANE_USER_DATA[i].body = null;
     }
 
     data.push(GLOBALS.PORTAL_GUN_INITIATE);
@@ -519,4 +522,31 @@ $('#portal-gun-select').on('change', function () {
 $("body").on('click', '.portal_gun-state', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.state = $(this).data("state");
     $("#portal_gun-state").find(".title").text($(this).data("state") + " Portals");
+});
+
+var fpsView = true;
+
+document.addEventListener("keypress", function (event) {
+    /*if (event.keyCode == 49) {
+        fpsView = !fpsView;
+
+        GLOBALS.CONTROLS.enabled = !fpsView;
+        //GLOBALS.FPS_MODE = fpsView;
+        window.bird = !fpsView;
+        GLOBALS.POINTER_CONTROLS.enabled = fpsView;
+
+        if (fpsView) {
+            document.getElementById("blocker").style.display = "block";
+            document.getElementById("container").style.filter = "blur(2px)";
+            animate();
+        } else {
+            document.exitPointerLock();
+
+            setTimeout(() => {
+                GLOBALS.PAUSED = false;
+                document.getElementById("blocker").style.display = "none";
+                document.getElementById("container").style.filter = "none";
+            }, 1000);
+        }
+    }*/
 });

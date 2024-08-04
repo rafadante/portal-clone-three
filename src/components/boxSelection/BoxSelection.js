@@ -69,7 +69,8 @@ function raycastSelected(found, event, type) {
                     $(".dispenser").css("display", "none");
                 }
 
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button")) {
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button") ||
+                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area")) {
                     $(".buttons").css("display", "block");
                     $("#connections").empty();
 
@@ -190,6 +191,22 @@ function raycastSelected(found, event, type) {
                                 if (index > -1) { // only splice array when item is found
                                     GLOBALS.TRACTOR_BEAM.splice(index, 1); // 2nd parameter means remove one item only
                                     GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.splice(index, 1); // 2nd parameter means remove one item only
+                                    GLOBALS.TRACTOR_BEAM_RAYCASTER.splice(index, 1); // 2nd parameter means remove one item only
+                                }
+
+                                const index2 = GLOBALS.LIGHT_BRIDGE_RAYCASTER.indexOf(planeInstanceOld.item.raycaster);
+                                if (index2 > -1) {
+                                    GLOBALS.LIGHT_BRIDGE_RAYCASTER.splice(index2, 1);
+                                }
+
+                                const index3 = GLOBALS.LASER_FIELD_RAYCASTER.indexOf(planeInstanceOld.item.raycaster);
+                                if (index3 > -1) {
+                                    GLOBALS.LASER_FIELD_RAYCASTER.splice(index3, 1);
+                                }
+
+                                const index4 = GLOBALS.FIZZLER_RAYCASTER.indexOf(planeInstanceOld.item.raycaster);
+                                if (index4 > -1) {
+                                    GLOBALS.FIZZLER_RAYCASTER.splice(index4, 1);
                                 }
 
                                 GLOBALS.SCENE_CHILDREN.remove(planeInstanceOld.item.continuous);
@@ -239,6 +256,11 @@ function raycastSelected(found, event, type) {
 
                             if (planeInstanceOld.item.continuous) {
 
+                                const index5 = GLOBALS.GLASS_RAYCASTER.indexOf(planeInstanceOld.item.raycaster);
+                                if (index5 > -1) {
+                                    GLOBALS.GLASS_RAYCASTER.splice(index5, 1);
+                                }
+
                                 GLOBALS.GRID_STATE = planeInstanceOld.item.userData.grid;
                                 GLOBALS.SCENE_CHILDREN.remove(planeInstanceOld.item.continuous);
                                 GLOBALS.ITEMS_ADDED.remove(planeInstanceOld.item);
@@ -250,6 +272,10 @@ function raycastSelected(found, event, type) {
 
                                 clickItem($("#" + planeInstanceOld.item.userData.instancedName));
                                 planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false, false);
+
+                                removeSelection();
+                                GLOBALS.SELECTED_ID[0] = instanceId;
+
                                 return;
                             }
 
@@ -260,6 +286,8 @@ function raycastSelected(found, event, type) {
                                 planeInstanceOld.item.translateY(0.3)
                             else if (planeInstanceOld.item.name.includes("portal_gun"))
                                 planeInstanceOld.item.translateY(0.65)
+                            else if (planeInstanceOld.item.name.includes("trigger_area"))
+                                planeInstanceOld.item.translateZ(1)
 
                             if (planeInstanceOld.item.name.includes("camera") ||
                                 planeInstanceOld.item.name.includes("observation") ||
@@ -271,7 +299,7 @@ function raycastSelected(found, event, type) {
                             //UPDATE PARAMETERS OF THE NEW PLACEMENT
                             planeInstanceReset(planeInstanceNew, true, planeInstanceOld.item.name, planeInstanceOld.item,
                                 planeInstanceOld.state, planeInstanceOld.canRotate, planeInstanceOld.floor,
-                                planeInstanceOld.ceiling, planeInstanceOld.walls, false, null, planeInstanceOld.allowconnection,
+                                planeInstanceOld.ceiling, planeInstanceOld.walls, false, planeInstanceOld.instancedName, planeInstanceOld.allowconnection,
                                 planeInstanceOld.continuousEnding
                             );
                             //UPDATE PARAMETERS OF THE OLD PLACEMENT

@@ -173,22 +173,22 @@ function loadMaterials() {
     //GLASS
     GLOBALS.MATERIAL_GLASS = new MeshStandardMaterial({
         transparent: true,
-        opacity: 0.3
+        opacity: 0.5
     });
     loadMaterial(
         GLOBALS.MATERIAL_GLASS,
-        "wall/glass/Glass_Frosted_001_basecolor.jpg",
-        "wall/glass/Glass_Frosted_001_normal.jpg",
-        null,
-        "wall/glass/Glass_Frosted_001_roughness.jpg",
+        "wall/glass/Image_8.png",
         null,
         null,
-        0.5,
+        null,
+        null,
+        null,
+        0.2,
         0,
-        0.5,
+        1,
         0,
-        0.5,
-        3
+        null,
+        null
     );
 }
 
@@ -328,6 +328,20 @@ function updateMaterialRepeat(mesh, newMaterial, distance) {
         cloneTexture.needsUpdate = true;
     }
 }
+
+//
+var texture = new TextureLoader().load("./assets/textures/trigger_once.jpg");
+map.colorSpace = SRGBColorSpace;
+GLOBALS.MATERIAL_TRIGGER_ONCE = new MeshBasicMaterial({
+    map: texture
+});
+
+
+var texture = new TextureLoader().load("./assets/textures/trigger_mult.jpg");
+map.colorSpace = SRGBColorSpace;
+GLOBALS.MATERIAL_TRIGGER_MULT = new MeshBasicMaterial({
+    map: texture
+});
 
 export {
     loadMaterials,

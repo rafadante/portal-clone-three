@@ -136,5 +136,3 @@ GLOBALS.MATERIAL_LASER_FIELD = new ShaderMaterial({
     side: 2,
     transparent: true
 });
-
-console.log(GLOBALS.MATERIAL_LASER_FIELD)

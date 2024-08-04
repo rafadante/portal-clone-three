@@ -156,7 +156,7 @@ GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE = new ShaderMaterial({
     transparent: true
 });
 
-console.log(GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE)
+console.log(GLOBALS.MATERIAL_TRACTOR_BEAM)
 
 /*window.materialBridgeOrange = new ShaderMaterial({
     uniforms: window.uniformsBridge,

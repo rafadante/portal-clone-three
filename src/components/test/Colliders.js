@@ -67,6 +67,7 @@ function addColliderDoorsDefault(obj) {
         mass: 0,
         material: new CANNON.Material()
     });
+    GLOBALS.CANNON_BODIES.push(door);
     door.position.copy(obj.position);
     door.quaternion.copy(obj.quaternion);
     door.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
@@ -78,6 +79,7 @@ function addColliderDoorsDefault(obj) {
     const geometry = new PlaneGeometry(2, 2);
     const plane = new Mesh(geometry, GLOBALS.MATERIAL_FIZZLER);
     plane.translateZ(-0.1)
+    obj.fizzler = plane;
     obj.add(plane);
 
     fizzlerTrigger(door)
@@ -144,8 +146,13 @@ function addColliderItem(items, type, mass, offset) {
             PHYSICS_MATERIAL.friction = items[i].userData.friction; //0.01
             //PHYSICS_MATERIAL.restitution = 0; //0.1
 
-            var pos = items[i].position;
+            var pos = items[i].position.clone();
             var rot = items[i].quaternion;
+
+            var objHolder = new Object3D();
+            objHolder.position.copy(pos);
+            objHolder.quaternion.copy(rot);
+            GLOBALS.SCENE.add(objHolder);
 
             if (type == "door") {
 
@@ -180,13 +187,13 @@ function addColliderItem(items, type, mass, offset) {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.5, 0.1));
             } else if (type == "pedestal_button") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.126, 0.35, 0.126));
-                items[i].translateY(0.35)
+                objHolder.translateY(0.35)
             } else if (type == "radio") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.11, 0.07, 0.049));
                 offset = 0.07;
             } else if (type == "button_weight") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.117, 0.5));
-                items[i].translateY(0.117)
+                objHolder.translateY(0.117)
             } else if (type == "button_box" || type == "button_circle") {
 
                 var a1, a2;
@@ -201,22 +208,22 @@ function addColliderItem(items, type, mass, offset) {
 
                 if (offset == 1) {
                     var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.14, 0.1));
-                    items[i].translateY(0.14)
-                    items[i].translateZ(a1)
+                    objHolder.translateY(0.14)
+                    objHolder.translateZ(a1)
                 } else if (offset == 2) {
                     var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.14, 0.1));
-                    items[i].translateZ(-a2)
+                    objHolder.translateZ(-a2)
                 } else if (offset == 3) {
                     var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.14, 0.5));
-                    items[i].translateZ(a1)
-                    items[i].translateX(a1)
+                    objHolder.translateZ(a1)
+                    objHolder.translateX(a1)
                 } else if (offset == 4) {
                     var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.14, 0.5));
-                    items[i].translateX(-a2)
+                    objHolder.translateX(-a2)
                 }
             } else if (type == "dispenser") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.7));
-                items[i].translateY(0.77)
+                objHolder.translateY(0.77)
             } else if (type == "ramp" || type == "ramp_half" || type == "ramp_half2" || type == "stairs") {
                 const result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), {
                     type: ShapeType.HULL
@@ -230,13 +237,15 @@ function addColliderItem(items, type, mass, offset) {
                 material: PHYSICS_MATERIAL
             })
 
-            box.position.copy(pos);
+            box.position.copy(objHolder.position);
             box.quaternion.copy(rot);
             box.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC
             box.collisionFilterMask = GLOBALS.CGROUP_ALL
             items[i].body = box;
             box.state = items[i].state;
             box.updateMassProperties();
+
+            GLOBALS.SCENE.remove(objHolder);
 
             if (type == "radio") {
                 addPositionalAudio('audio-radio', box, true, true, false, 8)
@@ -306,7 +315,7 @@ function addColliderItem(items, type, mass, offset) {
             }
 
             GLOBALS.CANNON_WORLD.addBody(box);
-            GLOBALS.CANNON_BODIES.push(box)
+            GLOBALS.CANNON_BODIES.push(box);
         }
     }
 }
@@ -406,6 +415,7 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
 
             GLOBALS.CANNON_WORLD.addBody(box);
             GLOBALS.CANNON_BODIES.push(box);
+            GLOBALS.WALL_BODIES.push(box);
         }
     }
 }
@@ -480,7 +490,7 @@ function addCollidersToCorridor(mesh) {
         mass: 0,
         material: GLOBALS.PHYSICS_MATERIAL
     });
-
+    GLOBALS.CANNON_BODIES.push(wall);
     const worldPos = new Vector3();
     mesh.getWorldPosition(worldPos);
 

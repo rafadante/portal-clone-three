@@ -71,26 +71,6 @@
           </div>
         </div>
         <div id="items">
-          <img data-content="Can be linked to an object to form a trigger. This button only accepts spheres."
-            data-title="BUTTON SPHERE" class="item" data-name="button_circle" id="button_circle"
-            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-            data-instanced="true" src="../assets/ui/items/button_sphere.png" />
-
-          <img data-content="Can be linked to an object to form a trigger. This button only accepts cubes."
-            data-title="BUTTON CUBE" class="item" data-name="button_box" src="../assets/ui/items/button_cube.png"
-            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-            data-instanced="true" id="button_box" />
-
-          <img data-content="Can be linked to an object to form a trigger. This button accepts spheres and cubes."
-            data-title="BUTTON WEIGHT" class="item" data-name="button_weight" src="../assets/ui/items/button.png"
-            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-            data-instanced="true" id="button_weight" />
-
-          <img
-            data-content="Can be linked to an object to form a trigger. The player can click on the button and it will activate the function that it is connected to. You can add a timer to your button through the properties menu."
-            data-title="PEDESTAL BUTTON" class="item" data-name="pedestal_button" data-allowconnection="false"
-            src="../assets/ui/items/pedestal_button.png" data-rotate="false" data-floor="true" data-ceiling="true"
-            data-walls="true" data-instanced="true" id="pedestal_button" />
 
           <img
             data-content="A dropper will come with it. If the player loses the cube the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
@@ -114,9 +94,50 @@
             data-name="radio" src="../assets/ui/items/radio.png" data-allowconnection="false" data-rotate="false"
             data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="radio" />
 
-          <img data-content="Purely cosmetic, it will look at the player." data-title="CAMERA" class="item"
-            data-name="camera" src="../assets/ui/items/camera.png" data-allowconnection="false" data-rotate="false"
-            data-floor="false" data-ceiling="false" data-walls="true" data-instanced="false" id="camera" />
+          <img data-content="Can be linked to an object to form a trigger. This button only accepts spheres."
+            data-title="BUTTON SPHERE" class="item" data-name="button_circle" id="button_circle"
+            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="true" src="../assets/ui/items/button_sphere.png" />
+
+          <img data-content="Can be linked to an object to form a trigger. This button only accepts cubes."
+            data-title="BUTTON CUBE" class="item" data-name="button_box" src="../assets/ui/items/button_cube.png"
+            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="true" id="button_box" />
+
+          <img data-content="Can be linked to an object to form a trigger. This button accepts spheres and cubes."
+            data-title="BUTTON WEIGHT" class="item" data-name="button_weight" src="../assets/ui/items/button.png"
+            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="true" id="button_weight" />
+
+          <img
+            data-content="Can be linked to an object to form a trigger. The player can click on the button and it will activate the function that it is connected to. You can add a timer to your button through the properties menu."
+            data-title="PEDESTAL BUTTON" class="item" data-name="pedestal_button" data-allowconnection="false"
+            src="../assets/ui/items/pedestal_button.png" data-rotate="false" data-floor="true" data-ceiling="true"
+            data-walls="true" data-instanced="true" id="pedestal_button" />
+
+          <img
+            data-content="An area that triggers once the players walks into it, you can link to items just like buttons. You can choose between a one time trigger or a multiple one."
+            data-title="TRIGGER" class="item" data-name="trigger_area" src="../assets/ui/items/trigger.jpg"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            id="trigger_area" />
+
+          <img data-content="You can link a trigger to it to activate this portal without the need of the portal gun."
+            data-title="PORTAL LEFT" class="item" data-name="portal_0" src="../assets/ui/mobile/portalOrange.png"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="false" id="portal_0" />
+
+          <img data-content="You can link a trigger to it to activate this portal without the need of the portal gun."
+            data-title="PORTAL RIGHT" class="item" data-name="portal_1" src="../assets/ui/mobile/portalBlue.png"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="false" id="portal_1" />
+
+          <img data-content="Obtainable item: you can define how many portals it will have." data-title="PORTAL GUN"
+            class="item" data-name="portal_gun" src="../assets/ui/items/gun2.png" data-allowconnection="false"
+            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" id="portal_gun" />
+
+          <img data-content="You can link a trigger to it to open the door." data-title="DOOR" class="item"
+            data-name="door" src="../assets/ui/items/door.png" data-allowconnection="true" data-rotate="true"
+            data-floor="true" data-ceiling="false" data-walls="false" data-instanced="false" id="door" />
 
           <img
             data-content="Whenever the player walks through a Tractor Beam they will float through the beam it emits. The blue beam pushes the player forward, away from the receptacle, and the orange beam pulls the player in towards it. The properties menu allows you to start the beam in reversed mode or completely off."
@@ -176,8 +197,14 @@
           -->
 
           <img
+            data-content="Glass panels can be placed in your level which the player cannot break. You can increase and decrease the size of the panel by using the arrows that appear when the object is selected. You can change the barrier type to grating within the properties menu which will allow players to place a portal on the other side."
+            data-title="GLASS PANELS" class="item" data-name="glass" src="../assets/ui/items/glass.png"
+            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            id="glass" />
+
+          <img
             data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
-            data-title="LIGHT TOP" class="item" data-name="light" src="../assets/ui/items/light.png"
+            data-title="LIGHT TOP" class="item" data-name="light" src="../assets/ui/items/stripe.png"
             data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
             data-instanced="true" id="light" />
 
@@ -187,30 +214,9 @@
             data-rotate="false" data-floor="false" data-ceiling="false" data-walls="true"
             src="../assets/ui/items/observation_room.png" id="observation_room" />
 
-          <img data-content="You can link a trigger to it to open the door." data-title="DOOR" class="item"
-            data-name="door" src="../assets/ui/items/door.png" data-allowconnection="true" data-rotate="true"
-            data-floor="true" data-ceiling="false" data-walls="false" data-instanced="false" id="door" />
-
-          <img data-content="You can link a trigger to it to activate this portal without the need of the portal gun."
-            data-title="PORTAL LEFT" class="item" data-name="portal_0" src="../assets/ui/mobile/portalOrange.png"
-            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-            data-instanced="false" id="portal_0" />
-
-          <img data-content="You can link a trigger to it to activate this portal without the need of the portal gun."
-            data-title="PORTAL RIGHT" class="item" data-name="portal_1" src="../assets/ui/mobile/portalBlue.png"
-            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-            data-instanced="false" id="portal_1" />
-
-          <img
-            data-content="Glass panels can be placed in your level which the player cannot break. You can increase and decrease the size of the panel by using the arrows that appear when the object is selected. You can change the barrier type to grating within the properties menu which will allow players to place a portal on the other side."
-            data-title="GLASS PANELS" class="item" data-name="glass" src="../assets/ui/items/glass.png"
-            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-            id="glass" />
-
-          <img data-content="Obtainable item: you can define how many portals it will have." data-title="PORTAL GUN"
-            class="item" data-name="portal_gun" src="../assets/ui/items/gun2.png" 
-            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
-            id="portal_gun"/>
+          <img data-content="Purely cosmetic, it will look at the player." data-title="CAMERA" class="item"
+            data-name="camera" src="../assets/ui/items/camera.png" data-allowconnection="false" data-rotate="false"
+            data-floor="false" data-ceiling="false" data-walls="true" data-instanced="false" id="camera" />
 
           <!--
             
@@ -439,6 +445,30 @@
           <button type="button" class="menu-btn">
             <i class="fa fa-crosshairs"></i>
             <span class="menu-text">Middle Vertical</span>
+          </button>
+        </li>
+        <li data-trigger="Top" class="menu-item glass-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Top</span>
+          </button>
+        </li>
+        <li data-trigger="Bottom" class="menu-item glass-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Bottom</span>
+          </button>
+        </li>
+        <li data-trigger="Left" class="menu-item glass-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Left</span>
+          </button>
+        </li>
+        <li data-trigger="Right" class="menu-item glass-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Right</span>
           </button>
         </li>
       </ul>

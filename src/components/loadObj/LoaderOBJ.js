@@ -327,7 +327,6 @@ function loadEnterDoor(scene) {
     planeExitDoor.position.set(0, 1.3, 0.01)
     planeExitDoor.scale.set(1, 0.5, 1)
     GLOBALS.EXIT_DOOR.add(planeExitDoor);
-    console.log(planeExitDoor)
 
     loadCorridor()
 }
@@ -468,7 +467,7 @@ function loadWindowHalfManager(scene) {
             light.position.copy(target);
             scene.add(light);
             light.position.set(0, -1, -0.8)
-            light.shadow.bias = -0.01;
+            light.shadow.bias = -0.1;
             light.castShadow = true;
             light.name = "pointLight";
         }

@@ -225,7 +225,8 @@ var GLOBALS = {
         laser_field: [],
         fizzler: [],
         glass: [],
-        portal_gun: []
+        portal_gun: [],
+        trigger_area: []
     },
 
     INTERACTIVE: [],
@@ -516,6 +517,10 @@ var GLOBALS = {
             count: 0,
             max: 2
         },
+        trigger_area: {
+            count: 0,
+            max: 10
+        },
     },
     SCENE_FPS: null,
     LISTENER: new AudioListener(),
@@ -545,8 +550,14 @@ var GLOBALS = {
     LOADED_CONNECTIONS: [],
 
     PORTAL_GUN_INITIATE: "all",
+    PORTAL_GUN_INITIATE_HOLDER: null,
     TELEPORTING_TARGET_QUATERNION: null,
-    PORTAL_GUN_BOX: []
+    PORTAL_GUN_BOX: [],
+    WALL_BODIES: [],
+    ACTIVATED: [],
+    SOUNDS_FPS: [],
+    MATERIAL_TRIGGER_ONCE: null,
+    MATERIAL_TRIGGER_MULT: null
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
@@ -707,6 +718,10 @@ function reset() {
         portal_gun: {
             count: 0,
             max: 2
+        },
+        trigger_area: {
+            count: 0,
+            max: 10
         },
     }
     GLOBALS.CONNECTIONS = [];

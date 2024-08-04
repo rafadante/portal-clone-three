@@ -36,7 +36,7 @@ function portalButton(button, auto) {
         }
     }
 
-    if (!allowPortal || GLOBALS.HOLDING_ITEM)//|| 
+    if (!allowPortal || GLOBALS.HOLDING_ITEM && !auto)//|| 
         return;
 
     if (GLOBALS.FPS_MODE && (button == 2 || button == 0 || button == 1) && GLOBALS.ALLOW_PLACE_PORTALS) {
@@ -46,12 +46,15 @@ function portalButton(button, auto) {
         var intersectBlockPortal = raycaster2.intersectObjects(GLOBALS.BLOCK_PORTAL);
         var blockPortal = null;
 
-        for (var i = 0; i < intersectBlockPortal.length; i++) {
-            if (intersectBlockPortal[i].object.visible) {
-                blockPortal = intersectBlockPortal[i];
-                break;
+        if (!auto) {
+            for (var i = 0; i < intersectBlockPortal.length; i++) {
+                if (intersectBlockPortal[i].object.visible) {
+                    blockPortal = intersectBlockPortal[i];
+                    break;
+                }
             }
         }
+
 
         var intersects = raycaster2.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
 
@@ -208,10 +211,10 @@ function portalButton(button, auto) {
 
                     if (button == 0) { // left click
 
-                        if (GLOBALS.PORTALS[1] === null)
-                            document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
-                        else
-                            document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
+                        //if (GLOBALS.PORTALS[1] === null)
+                        document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
+                        //else
+                        //    document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
 
                         // delete the old portal this new one is replacing
                         if (GLOBALS.PORTALS[0] !== null)
@@ -234,10 +237,10 @@ function portalButton(button, auto) {
                         play(AUDIO.PORTAL_GUN_ORANGE)
                     } else if (button == 2) { // left click
 
-                        if (GLOBALS.PORTALS[0] === null)
-                            document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
-                        else
-                            document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
+                        //if (GLOBALS.PORTALS[0] === null)
+                        document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
+                        //
+                        //    document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
 
                         // delete the old portal this new one is replacing
                         if (GLOBALS.PORTALS[1] !== null)
@@ -366,13 +369,13 @@ function deletePortal(portalIndex) {
 
         GLOBALS.PORTALS[portalIndex].hostObjects.portal = false;
 
-        for (var i = 0; i < GLOBALS.CANNON_BODIES.length; i++) {
+        for (var i = 0; i < GLOBALS.WALL_BODIES.length; i++) {
             // mark this object as collideable with portal 0 bb objects
-            GLOBALS.CANNON_BODIES[i].collisionFilterGroup &= ~GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[portalIndex]
+            GLOBALS.WALL_BODIES[i].collisionFilterGroup &= ~GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[portalIndex]
             // add back to environment group only if collideable with both portal objects
-            if (!(GLOBALS.CANNON_BODIES[i].collisionFilterGroup & GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[0]) &&
-                !(GLOBALS.CANNON_BODIES[i].collisionFilterGroup & GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[1])) {
-                GLOBALS.CANNON_BODIES[i].collisionFilterGroup |= GLOBALS.CGROUP_ENVIRONMENT
+            if (!(GLOBALS.WALL_BODIES[i].collisionFilterGroup & GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[0]) &&
+                !(GLOBALS.WALL_BODIES[i].collisionFilterGroup & GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[1])) {
+                GLOBALS.WALL_BODIES[i].collisionFilterGroup |= GLOBALS.CGROUP_ENVIRONMENT
             }
         }
     }
@@ -400,11 +403,11 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
 
     GLOBALS.PORTALS[thisPortalIndex].hostObjects.portal = true;
 
-    for (var i = 0; i < GLOBALS.CANNON_BODIES.length; i++) {
-        if (GLOBALS.CANNON_BODIES[i].side == side) {
-            GLOBALS.CANNON_BODIES[i].collisionFilterGroup |= GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[thisPortalIndex]
+    for (var i = 0; i < GLOBALS.WALL_BODIES.length; i++) {
+        if (GLOBALS.WALL_BODIES[i].side == side) {
+            GLOBALS.WALL_BODIES[i].collisionFilterGroup |= GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[thisPortalIndex]
             // remove this object from the environment group
-            GLOBALS.CANNON_BODIES[i].collisionFilterGroup &= ~GLOBALS.CGROUP_ENVIRONMENT
+            GLOBALS.WALL_BODIES[i].collisionFilterGroup &= ~GLOBALS.CGROUP_ENVIRONMENT
         }
     }
 

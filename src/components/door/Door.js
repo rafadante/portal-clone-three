@@ -6,14 +6,14 @@ import { corridorColliderNames } from '../test/Colliders.js';
 
 var playing = true;
 
-function stateDoor(timeToTrigger, open, enter, door) {
+function stateDoor(timeToTrigger, open, enter, door, editor) {
 
-  if (!enter) {
-    door.getObjectByName("portal_door_right_04").position.z = -10;
-    door.getObjectByName("portal_door_left_06").position.z = -10;
-  } else {
+  if (enter || editor) {
     door.getObjectByName("portal_door_right_04").position.z = 10;
     door.getObjectByName("portal_door_left_06").position.z = 10;
+  } else {
+    door.getObjectByName("portal_door_right_04").position.z = -10;
+    door.getObjectByName("portal_door_left_06").position.z = -10;
   }
 
   if (door.timeOutDoor1) {
@@ -36,10 +36,10 @@ function stateDoor(timeToTrigger, open, enter, door) {
     var vel;
 
     if (open) {
-      doorSpinner(Math.PI, door);
+      doorSpinner(Math.PI, door, editor);
       vel = 400;
     } else {
-      doorPanel(-65, door)
+      doorPanel(-65, door, editor)
       vel = 800;
     }
 
@@ -53,57 +53,67 @@ function stateDoor(timeToTrigger, open, enter, door) {
     door.timeOutDoor2 = setTimeout(() => {
 
       if (!open)
-        doorSpinner(0, door)
+        doorSpinner(0, door, editor)
       else
-        doorPanel(25, door)
+        doorPanel(25, door, editor)
 
-      if (GLOBALS.FPS_MODE) {
-        if (enter) {
-          setTimeout(() => {
-            GLOBALS.EXIT_DOOR.add(GLOBALS.CORRIDOR_ENTER);
-            corridorColliderNames(GLOBALS.CORRIDOR_ENTER, true);
-            GLOBALS.CORRIDOR_ENTER.getObjectByName("elevatorOBJ").visible = false;
-            GLOBALS.CORRIDOR_ENTER.getObjectByName("leftDoor").visible = false;
-            GLOBALS.CORRIDOR_ENTER.getObjectByName("rightDoor").visible = false;
-            
+      //if (GLOBALS.FPS_MODE) {
+      if (enter) {
+        setTimeout(() => {
+          GLOBALS.EXIT_DOOR.add(GLOBALS.CORRIDOR_ENTER);
+          corridorColliderNames(GLOBALS.CORRIDOR_ENTER, true);
+          GLOBALS.CORRIDOR_ENTER.getObjectByName("elevatorOBJ").visible = false;
+          GLOBALS.CORRIDOR_ENTER.getObjectByName("leftDoor").visible = false;
+          GLOBALS.CORRIDOR_ENTER.getObjectByName("rightDoor").visible = false;
 
-            if (GLOBALS.EXIT_DOOR.userData.connections > 0)
-              stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
-            else
-              stateDoor(0, true, false, GLOBALS.EXIT_DOOR);
-          }, 300);
-        }
 
-        if (door == GLOBALS.EXIT_DOOR) {
-          GLOBALS.CORRIDOR_ENTER.visible = open;
-        }
-      } else {
+          if (GLOBALS.EXIT_DOOR.userData.connections > 0)
+            stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
+          else
+            stateDoor(0, true, false, GLOBALS.EXIT_DOOR);
+        }, 300);
+      }
+
+      if (door == GLOBALS.EXIT_DOOR) {
+        GLOBALS.CORRIDOR_ENTER.visible = open;
+      }
+      /*} else {
         GLOBALS.CORRIDOR_ENTER.visible = false;
         GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
-      }
+      }*/
     }, vel);
   }, timeToTrigger);
 }
 
-function doorSpinner(angle, door) {
+function doorSpinner(angle, door, editor) {
 
-  tweenCamera(400, door.getObjectByName("central_spinner_right_05").rotation,
+  var time = 400;
+
+  if (editor)
+    time = 0;
+
+  tweenCamera(time, door.getObjectByName("central_spinner_right_05").rotation,
     new Vector3(angle,
       door.getObjectByName("central_spinner_right_05").rotation.y,
       door.getObjectByName("central_spinner_right_05").rotation.z))
 
-  tweenCamera(400, door.getObjectByName("central_spinner_left_07").rotation, new Vector3(angle,
+  tweenCamera(time, door.getObjectByName("central_spinner_left_07").rotation, new Vector3(angle,
     door.getObjectByName("central_spinner_left_07").rotation.y,
     door.getObjectByName("central_spinner_left_07").rotation.z))
 }
 
-function doorPanel(pos, door) {
+function doorPanel(pos, door, editor) {
 
-  tweenCamera(800, door.getObjectByName("portal_door_right_04").position,
+  var time = 400;
+
+  if (editor)
+    time = 0;
+
+  tweenCamera(time, door.getObjectByName("portal_door_right_04").position,
     new Vector3(pos, door.getObjectByName("portal_door_right_04").position.y,
       door.getObjectByName("portal_door_right_04").position.z))
 
-  tweenCamera(800, door.getObjectByName("portal_door_left_06").position,
+  tweenCamera(time, door.getObjectByName("portal_door_left_06").position,
     new Vector3(-pos, door.getObjectByName("portal_door_left_06").position.y,
       door.getObjectByName("portal_door_left_06").position.z))
 }

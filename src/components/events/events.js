@@ -46,12 +46,9 @@ function updateEvents() {
 
     let pos = new Vector3(d.position.x, d.position.y, d.position.z);
 
-    var toRemove;
     if (d.name == "player") {
       for (var i = 0; i < GLOBALS.PORTAL_GUN_BOX.length; i++) {
-        if (GLOBALS.PORTAL_GUN_BOX[i].containsPoint(pos)) {
-          console.log("pegou")
-          toRemove = GLOBALS.PORTAL_GUN_BOX[i];
+        if (GLOBALS.PORTAL_GUN_BOX[i].containsPoint(pos) && GLOBALS.PORTAL_GUN_BOX[i].item.visible) {
           GLOBALS.PORTAL_GUN_BOX[i].item.visible = false;
           GLOBALS.PORTAL_GUN_INITIATE = GLOBALS.PORTAL_GUN_BOX[i].item.userData.state;
 
@@ -59,15 +56,10 @@ function updateEvents() {
           GLOBALS.GUN.children[0].visible = true;
           GLOBALS.GUN_CLONE.children[0].visible = true;
           GLOBALS.GUN_CLONE2.children[0].visible = true;
+          document.getElementById("reticle-img").style.display = "block";
         }
       }
     }
-
-    if (toRemove) {
-      const index = GLOBALS.PORTAL_GUN_BOX.indexOf(toRemove);
-      GLOBALS.PORTAL_GUN_BOX.splice(index, 1);
-    }
-
 
     if (pos.distanceTo(new Vector3(0, 0, 0)) > 100) {
       if (!d.repawning) respawn(d);
@@ -100,6 +92,8 @@ function updateEvents() {
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
       if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("pedestal"))
         continue
+      else if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area") && GLOBALS.CONNECTIONS[i]['from'].item.visible)
+        GLOBALS.CONNECTIONS[i]['from'].item.visible = false;
 
       var notInPos = 0;
 
@@ -116,11 +110,13 @@ function updateEvents() {
               GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0x0077B6);
 
               //PLAY AUDIO POSITIVE
-              addPositionalAudio('audio-button-positive', GLOBALS.CONNECTIONS[i]['from'], true, false, true, 8);
-              var soundHolder = GLOBALS.CONNECTIONS[i]['from'];
-              setTimeout(() => {
-                GLOBALS.SCENE_FPS.remove(soundHolder.sound);
-              }, 1500);
+              if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area")) {
+                addPositionalAudio('audio-button-positive', GLOBALS.CONNECTIONS[i]['from'], true, false, true, 8);
+                var soundHolder = GLOBALS.CONNECTIONS[i]['from'];
+                setTimeout(() => {
+                  GLOBALS.SCENE_FPS.remove(soundHolder.sound);
+                }, 1500);
+              }
 
               //Manage Door Trigger
               if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
@@ -162,6 +158,9 @@ function updateEvents() {
           break;
         } else {//TRIGER ENDS
 
+          if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area"))
+            continue
+
           notInPos++;
 
           if (notInPos >= 6) {
@@ -199,6 +198,40 @@ function updateEvents() {
       }
     }
     id++;
+  }
+}
+
+function resetAll() {
+  for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+    if (GLOBALS.CONNECTIONS[i]['line'].active) {
+      GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons -= 1;
+      GLOBALS.CONNECTIONS[i]['line'].idConnection = null;
+      GLOBALS.CONNECTIONS[i]['line'].active = false;
+      GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0xffa500);
+
+      if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
+        GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
+        if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons < GLOBALS.CONNECTIONS[i]['to'].item.userData.connections) {
+          stateDoor(0, false, false, GLOBALS.CONNECTIONS[i]['to'].item);
+        }
+      } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("tractor")) {
+        if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons < GLOBALS.CONNECTIONS[i]['to'].item.userData.connections) {
+          tractorStates(GLOBALS.CONNECTIONS[i]['to']);
+        }
+      } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("light_bridge")) {
+        if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons < GLOBALS.CONNECTIONS[i]['to'].item.userData.connections) {
+          lightBridgeState(GLOBALS.CONNECTIONS[i]['to']);
+        }
+      } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field") ||
+        GLOBALS.CONNECTIONS[i]['to'].itemName.includes("fizzler")) {
+        if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons < GLOBALS.CONNECTIONS[i]['to'].item.userData.connections) {
+          laserFieldState(GLOBALS.CONNECTIONS[i]['to'])
+        }
+      } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
+        GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
+        GLOBALS.CONNECTIONS[i]['to'].item.active = false;
+      }
+    }
   }
 }
 
@@ -321,10 +354,13 @@ function interactWithItem() {
           GLOBALS.CURRENT_ITEM.body.holding = true;
         }
 
-        AUDIO.PICK_SUCESS.pause();
-        AUDIO.PICK_SUCESS.currentTime = 0;
-        play(AUDIO.PICK_SUCESS)
-        play(AUDIO.HOLD)
+        if(GLOBALS.PORTAL_GUN_INITIATE != "none"){
+          AUDIO.PICK_SUCESS.pause();
+          AUDIO.PICK_SUCESS.currentTime = 0;
+          play(AUDIO.PICK_SUCESS)
+          play(AUDIO.HOLD)
+        }
+
       } else {
         AUDIO.PICK_FAIL.pause();
         AUDIO.PICK_FAIL.currentTime = 0;
@@ -371,5 +407,6 @@ export {
   tractorStates,
   lightBridgeState,
   laserFieldState,
-  interactWithItem
+  interactWithItem,
+  resetAll
 };

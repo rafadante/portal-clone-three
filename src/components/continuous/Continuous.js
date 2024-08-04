@@ -7,7 +7,8 @@ import {
     BufferAttribute,
     Mesh,
     Box3,
-    PlaneGeometry
+    PlaneGeometry,
+    MeshStandardMaterial
 } from 'three';
 import * as CANNON from 'cannon';
 import {
@@ -144,6 +145,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     plane.rotation.copy(obj.rotation);
     plane.translateY(intersects[0].distance / 2);
     plane.distance = intersects[0].distance / 2;
+    plane.renderOrder = -1;
 
     if (item == "laser_field" || item == "fizzler") {
         plane.rotateX(Math.PI)
@@ -162,7 +164,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
         mass: 0,
         material: PHYSICS_MATERIAL
     })
-
+    GLOBALS.CANNON_BODIES.push(box);
     box.position.copy(plane.position);
     box.quaternion.copy(plane.quaternion);
 
@@ -185,11 +187,12 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
                 intersects[0].distance / 3
             )
         } else {
-            updateMaterialRepeat(
+            plane.material = GLOBALS.MATERIAL_GLASS;
+            /*updateMaterialRepeat(
                 plane,
                 GLOBALS.MATERIAL_GLASS,
                 intersects[0].distance / 3
-            )
+            )*/
         }
     }
 
@@ -380,7 +383,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 mass: 0,
                 material: PHYSICS_MATERIAL
             })
-
+            GLOBALS.CANNON_BODIES.push(box);
             box.position.copy(plane.position);
             box.quaternion.copy(plane.quaternion);
 

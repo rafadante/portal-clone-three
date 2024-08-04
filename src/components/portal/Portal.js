@@ -115,11 +115,13 @@ class Portal extends Group {
             stencilRef: 1,
             stencilFail: ReplaceStencilOp,
             depthTest: true,
-            depthWrite: false,
+            depthWrite: true,
             polygonOffset: false,
             polygonOffsetFactor: -2,
             side: DoubleSide
         });
+
+        console.log(this)
 
         this.mesh = new Mesh(geometry, material);
         this.mesh.applyMatrix4(this.transform)
@@ -207,8 +209,6 @@ class Portal extends Group {
         this.debugMeshes.add(this.STBB.helper)
         this.debugMeshes.visible = false; //globals.DEBUG
         this.add(this.debugMeshes)
-
-        console.log(this)
     }
 }
 

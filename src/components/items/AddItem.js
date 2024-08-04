@@ -69,7 +69,19 @@ function addItem(found, loaded) {
 
         if ((!userData.hasItem && !userData.continuousEnding) || loaded) {
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
+                const geometry = new BoxGeometry(2, 2, 2);
+
+                var material = GLOBALS.MATERIAL_TRIGGER_ONCE;
+
+                /*if (loaded) {
+                    if (!userDataLoadedItem.userData.state)
+                        material = GLOBALS.MATERIAL_TRIGGER_MULT;
+                }*/
+
+                const box = new Mesh(geometry, material);
+                var item = box;
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
                 var item = GLOBALS.GUN_CLONE.clone();
             } else if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
                 const box = new Object3D()
@@ -274,7 +286,25 @@ function addItem(found, loaded) {
                 });
             }
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
+
+                GLOBALS.ITEMS_ADDED.add(item);
+                item.translateY(1);
+
+                var bb = new Box3(); // for re-use
+                bb.setFromObject(item);
+
+                bb.accept = "player";
+
+                userData.box3 = bb;
+                item.userData.connectedTo = [];
+
+                GLOBALS.LOADED_CONNECTIONS.push({
+                    data: userDataLoadedItem,
+                    item: userData
+                });
+
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
                 item.scale.set(1, 1, 1);
                 item.position.y += 0.65;
                 GLOBALS.ITEMS_ADDED.add(item);
@@ -307,6 +337,9 @@ function addItem(found, loaded) {
                 item.fixed = true;
                 item.cube = cube;
                 cube.item = item;
+
+                item.initialPosition = item.position.clone();
+                item.initialRotation = item.rotation.clone();
 
 
                 GLOBALS.CAMERAS.push(item);
@@ -364,6 +397,7 @@ function addItem(found, loaded) {
                 item.userData.idInstanced = idInstanced;
                 item.scale.set(1, 1, 1);
                 item.updateMatrix();
+                item.initialPosition = item.position.clone();
                 instanced.setMatrixAt(idInstanced, item.matrix);
 
                 if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_blue") {
@@ -410,7 +444,7 @@ function manageItemVariables(item, userData, instanced) {
 
     if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
         item.userData.state = "all";
-    }else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
         item.userData.rotationY = 0;
     } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
         GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
@@ -459,7 +493,7 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
 
     if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
         item.userData.state = userDataLoadedItem.state;
-    }else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
         item.userData.rotationY = userDataLoadedItem.rotationY;
         item.rotation.y = item.userData.rotationY;
     } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||

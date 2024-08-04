@@ -7,7 +7,7 @@ var listernAdded = false;
 var listener;
 
 function play(elem) {
-    return
+    //return
     var isPlaying = elem.currentTime > 0 && !elem.paused && !elem.ended
         && elem.readyState > elem.HAVE_CURRENT_DATA;
 
@@ -66,6 +66,8 @@ function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis) {
 
     if (staticPosition)
         sound.position.copy(parent.position);
+
+    GLOBALS.SOUNDS_FPS.push(sound);
 }
 
 function addAudio(obj, name) {

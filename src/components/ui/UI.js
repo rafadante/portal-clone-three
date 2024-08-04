@@ -1,10 +1,6 @@
 import $ from 'jquery';
 import { GLOBALS } from '../../Globals.js';
-import {
-    animate
-} from '../../Main.js';
-import { AUDIO, volume, play } from '../audio/Audio.js';
-import { stateDoor } from '../door/Door.js';
+import { volume } from '../audio/Audio.js';
 
 if (!GLOBALS.MOBILE)
     $(".mobile").css("display", "none");
@@ -177,86 +173,6 @@ $("body").on('input', '#opacity-val-range', function () {
     $("#opacity-val-number").val($(this).val());
     $("#mobile-controls").css("opacity", $(this).val());
 })
-
-//BACK FROM EDITOR
-$("body").on('click', '#back-editor', function () {
-
-    GLOBALS.STATS.container.style.display = "none";
-    GLOBALS.FPS_MODE = false;
-    GLOBALS.ROOM.visible = true;
-    GLOBALS.CONTROLS.enabled = true;
-    GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;
-    GLOBALS.LIGHT_GROUP.visible = false;
-    GLOBALS.SCENE.background = null;
-    GLOBALS.CORRIDOR_ENTER.visible = false;
-    GLOBALS.SCENE.getObjectByName("window").visible = true;
-    GLOBALS.OBSERVATION_ROOM.visible = false;
-    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.SCENE_FPS);
-    GLOBALS.SCENE_FPS = null;
-    GLOBALS.LEVEL_ENTERED = false;
-    GLOBALS.DOOR_OPEN_STATE = false;
-    GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
-
-    $("#ui").css("display", "block");
-    $(".img").removeClass("image");
-    $("#mobile-controls").css("display", "none");
-    $("#container").css("filter", "none");
-
-
-    $("#blocker").css("display", "none");
-    $("#blocker").css("pointer-events", "none");
-    $("#reticle").css("display", "none");
-    GLOBALS.MAIN_CAMERA.remove(GLOBALS.GUN);
-
-    if (GLOBALS.PORTALS.length == 1) {
-        GLOBALS.SCENE.remove(GLOBALS.PORTALS[0]);
-    } else if (GLOBALS.PORTALS.length == 2) {
-        GLOBALS.SCENE.remove(GLOBALS.PORTALS[1]);
-        GLOBALS.SCENE.remove(GLOBALS.PORTALS[0]);
-    }
-    GLOBALS.PORTALS = [null, null];
-
-    GLOBALS.MAIN_CAMERA.position.set(-12.2, 17.4, 26.3)
-
-    GLOBALS.LIGHT_PORTAL_0.visible = false;
-    GLOBALS.LIGHT_PORTAL_1.visible = false;
-    GLOBALS.FLASH.visible = false;
-
-    for (var i = GLOBALS.CANNON_BODIES.length - 1; i >= 0; i--) {
-        GLOBALS.CANNON_WORLD.remove(GLOBALS.CANNON_BODIES[i]);
-    }
-
-    for (var i = 0; i < GLOBALS.RADIO_MUSIC.length; i++) {
-        GLOBALS.RADIO_MUSIC[i].stop();
-    }
-
-    GLOBALS.CANNON_BODIES = [];
-    GLOBALS.RADIO_MUSIC = [];
-
-    //setTimeout(() => {
-    GLOBALS.CONTROLS.update();
-    animate()
-    //}, 100);
-
-
-    play(AUDIO.EDITOR)
-    AUDIO.AMBIENT.pause();
-
-    GLOBALS.ENTER_DOOR.getObjectByName("portal_door_right_04").scale.set(0, 0, 0);
-    GLOBALS.ENTER_DOOR.getObjectByName("portal_door_left_06").scale.set(0, 0, 0);
-    GLOBALS.EXIT_DOOR.getObjectByName("portal_door_right_04").scale.set(0, 0, 0);
-    GLOBALS.EXIT_DOOR.getObjectByName("portal_door_left_06").scale.set(0, 0, 0);
-
-    GLOBALS.ENTER_DOOR.getObjectByName("warning").visible = true;
-    GLOBALS.EXIT_DOOR.getObjectByName("warning").visible = true;
-
-    setTimeout(() => {
-        stateDoor(1000, false, false, GLOBALS.ENTER_DOOR)
-    }, 1000);
-
-    GLOBALS.MAIN_CAMERA.near = 0.1;
-    GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
-});
 
 $("#arrow-menu").click(function () {
     if ($("#side-bar-left").css("left") == "0px") {
