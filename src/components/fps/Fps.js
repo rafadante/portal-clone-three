@@ -242,8 +242,8 @@ const updateCamera = function (deltaTime) {
     if (GLOBALS.TELEPORTING_TARGET_QUATERNION) {
 
         GLOBALS.MAIN_CAMERA.quaternion.slerp(GLOBALS.TELEPORTING_TARGET_QUATERNION, 0.15);
-        
-        if (isSlerpComplete( GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.TELEPORTING_TARGET_QUATERNION)) {
+
+        if (isSlerpComplete(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.TELEPORTING_TARGET_QUATERNION)) {
             GLOBALS.TELEPORTING_TARGET_QUATERNION = null;
             GLOBALS.MAIN_CAMERA.rotation.z = 0;
         }
@@ -383,7 +383,7 @@ function movePlayerTouch(direction, f, value) {
 
 function joystickAction(gamepad, index, gamepadButton, button) {
     if (gamepad.buttons[index].value == 1 && !gamepadButton) {
-        portalButton(button);
+        portalButton(button, null, GLOBALS.MAIN_CAMERA);
 
         /*gamepad.vibrationActuator.playEffect("dual-rumble", {
             startDelay: 0,

@@ -80,7 +80,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     if (item == "light_bridge") {
         var geometry = new BoxGeometry(0.9, intersects[0].distance, 0.025);
     } else if (item == "glass") {
-        var geometry = new BoxGeometry(2, intersects[0].distance, 0.01);
+        var geometry = new PlaneGeometry(2, intersects[0].distance);
     } else if (item == "laser_field" || item == "fizzler") {
         
 

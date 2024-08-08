@@ -109,6 +109,13 @@ async function handleZip(path, obj) {
                     loadFizzlerManager(result.scene)
                 else if (obj == "loadPortalCube2")
                     loadPortalCubeManager2(result.scene)
+                else if (obj == "loadAutoPortal")
+                    loadAutoPortalManager(result.scene)
+                else if (obj == "loadAutoPortal1")
+                    loadAutoPortalManager1(result.scene)
+                else if (obj == "loadLaserReceiver")
+                    loadLaserReceiverManager(result.scene)
+                
             });
         }
     });
@@ -188,6 +195,9 @@ function loadWindowManager(scene) {
             child.material.envMapIntensity = 0.5;
             child.material.roughness = 0.3;
         }
+
+        //if (child.name.includes("vidro") || child.name.includes("Cube005"))
+        //    child.visible = false;
     })
 
     scene.rotation.y = -Math.PI / 2;
@@ -222,6 +232,8 @@ function loadGunManager(scene) {
     GLOBALS.GUN_CLONE.add(gunClone);
 
     GLOBALS.GUN_CLONE2 = GLOBALS.GUN_CLONE.clone();
+
+    console.log(scene)
 
     scene.traverse(child => {
         child.castShadow = true;
@@ -393,13 +405,16 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity) {
         item.setMatrixAt(i, clone.matrix);
     }
 
+    item.instanceMatrix.needsUpdate = true;
+    item.computeBoundingSphere();
+
     item.name = name;
     item.receiveShadow = true;
     item.castShadow = true;
     item.material.envMap = GLOBALS.ENV_MAP;
     item.material.envMapIntensity = envIntensity;
     item.material.roughness = roughness;
-    item.frustumCulled = false;
+    item.frustumCulled = true;
 
     if (interactive)
         GLOBALS.INTERACTIVE.push(item);
@@ -415,6 +430,7 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity) {
         GLOBALS.DYMANIC_ITEMS[name].push([])
 
     GLOBALS.ITEMS_ADDED.add(item);
+    //GLOBALS.ITEMS_ADDED.visible = false;
 
     return item;
 }
@@ -433,7 +449,7 @@ function loadPortalSphereManager(scene) {
     item.clone.material.envMap = GLOBALS.ENV_MAP;
     item.clone.material.envMapIntensity = 0.5;
     item.clone.material.roughness = 0.2;
-    
+
     loadHalfWindow()
 }
 
@@ -452,6 +468,16 @@ function loadHalfWindow() {
 }
 
 function loadWindowHalfManager(scene) {
+
+    //const geometry = new BoxGeometry(1, 1, 1);
+    //const material = new MeshBasicMaterial({ color: 0x00ff00 });
+    //const cube = new Mesh(geometry, material);
+    var targetLight = new Object3D();
+    targetLight.name = "targetLight";
+    scene.add(targetLight)
+    targetLight.translateY(4);
+    targetLight.translateZ(1);
+
     scene.traverse(child => {
         child.receiveShadow = true;
         child.castShadow = true;
@@ -461,14 +487,14 @@ function loadWindowHalfManager(scene) {
         }
 
         if (child.name == "room_light") {
-            const light = new PointLight(0xffffff, 5, 25);
+            const light = new PointLight(0xffffff, 3, 3);
             var target = new Vector3(); // create once an reuse it
             child.getWorldPosition(target);
             light.position.copy(target);
             scene.add(light);
             light.position.set(0, -1, -0.8)
             light.shadow.bias = -0.1;
-            light.castShadow = true;
+            light.castShadow = false;
             light.name = "pointLight";
         }
 
@@ -700,6 +726,10 @@ function loadLaserCubeManager(scene) {
     item.userData.wall = true;
     item.userData.ground = false;
     item.userData.ceiling = true;
+    item.clone = scene;
+    item.clone.children[0].material.envMap = GLOBALS.ENV_MAP;
+    item.clone.children[0].material.envMapIntensity = 0.5;
+    item.clone.children[0].material.roughness = 0.2;
 
     loadFaithPlate()
 }
@@ -828,6 +858,11 @@ function loadAvatar() {
         GLOBALS.PLAYER_MODEL = fbx;
         GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
 
+        GLOBALS.PLAYER_MODEL.visible = false;
+        GLOBALS.PLAYER_MODEL_CLONE.visible = false;
+
+        console.log(GLOBALS.PLAYER_MODEL)
+
         GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL);
         GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE);
 
@@ -902,6 +937,48 @@ function loadPortalCubeManager2(scene) {
     item.clone.children[0].material.envMapIntensity = 0.5;
     item.clone.children[0].material.roughness = 0.2;
 
+    loadAutoPortal()
+}
+
+function loadAutoPortal() {
+    handleZip('./assets/3ds/portal_0.zip', "loadAutoPortal");
+}
+
+function loadAutoPortalManager(scene) {
+
+    var item = instancedTransform(scene, "portal_0", false, 0.1, 1)
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
+
+    loadAutoPortal1()
+}
+
+function loadAutoPortal1() {
+    handleZip('./assets/3ds/portal_1.zip', "loadAutoPortal1");
+}
+
+function loadAutoPortalManager1(scene) {
+
+    var item = instancedTransform(scene, "portal_1", false, 0.1, 1)
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
+
+    loadLaserReceiver()
+}
+
+function loadLaserReceiver() {
+    handleZip('./assets/3ds/laser_receiver.zip', "loadLaserReceiver");
+}
+
+function loadLaserReceiverManager(scene) {
+
+    var item = instancedTransform(scene, "laser_receiver", false, 0.1, 1)
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
+
     if (GLOBALS.LOADED_LEVEL) {
         loadLevelJSON()
     } else {
@@ -911,13 +988,14 @@ function loadPortalCubeManager2(scene) {
     animate();
 }
 
+
 GLOBALS.LIGHT_PORTAL_0 = new PointLight(new Color(1, 0.25, 0), 3, 2);
 GLOBALS.LIGHT_PORTAL_1 = new PointLight(new Color(0, 0.3, 1), 3, 2);
-GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
-GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
+//GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
+//GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
 
 GLOBALS.FLASH = new PointLight(0xff0000, 10);
-GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
+//GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
 
 setTimeout(() => {
     GLOBALS.LIGHT_PORTAL_0.visible = false;

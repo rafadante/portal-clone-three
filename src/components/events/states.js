@@ -140,21 +140,13 @@ function respawn(d) {
 function levelEnteredFunction() {
     if (!GLOBALS.LEVEL_ENTERED) {
         if (GLOBALS.ENTER_DOOR.box3.containsPoint(GLOBALS.PLAYER.position)) {
-            GLOBALS.LEVEL_ENTERED = true;
-            //GLOBALS.WALL_CORRIDOR_ENTER.position.y = 0;
-
             setTimeout(() => {
-                GLOBALS.SPOTLIGHT.intensity = 20;
-                //GLOBALS.RENDERER.shadowMap.autoUpdate = true;
-
-                setTimeout(() => {
-                    //GLOBALS.RENDERER.shadowMap.autoUpdate = false;
-                    for (var i = 0; i < GLOBALS.BOX_BODY.length; i++) {
-                        if (GLOBALS.BOX_BODY[i].item.userData.opened)
-                            dispenserSpawn(GLOBALS.BOX_BODY[i].item);
-                    }
-                }, 1000);
-            }, 1000);
+                for (var i = 0; i < GLOBALS.BOX_BODY.length; i++) {
+                    if (GLOBALS.BOX_BODY[i].item.userData.opened)
+                        dispenserSpawn(GLOBALS.BOX_BODY[i].item);
+                }
+                GLOBALS.LEVEL_ENTERED = true;
+            }, 3000);
             stateDoor(1000, false, true, GLOBALS.ENTER_DOOR)
         }
     }

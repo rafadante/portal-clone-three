@@ -62,9 +62,9 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
         setTimeout(() => {
           GLOBALS.EXIT_DOOR.add(GLOBALS.CORRIDOR_ENTER);
           corridorColliderNames(GLOBALS.CORRIDOR_ENTER, true);
-          GLOBALS.CORRIDOR_ENTER.getObjectByName("elevatorOBJ").visible = false;
-          GLOBALS.CORRIDOR_ENTER.getObjectByName("leftDoor").visible = false;
-          GLOBALS.CORRIDOR_ENTER.getObjectByName("rightDoor").visible = false;
+          //GLOBALS.CORRIDOR_ENTER.getObjectByName("elevatorOBJ").visible = false;
+          //GLOBALS.CORRIDOR_ENTER.getObjectByName("leftDoor").visible = false;
+          //GLOBALS.CORRIDOR_ENTER.getObjectByName("rightDoor").visible = false;
 
 
           if (GLOBALS.EXIT_DOOR.userData.connections > 0)

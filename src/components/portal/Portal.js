@@ -85,6 +85,9 @@ class Portal extends Group {
         void main() {
             gl_FragColor = texture2D(texture1, gl_FragCoord.xy / vec2(ww, wh));
 
+
+            #include <tonemapping_fragment>
+            #include <colorspace_fragment>
         }
         `
 
@@ -120,8 +123,6 @@ class Portal extends Group {
             polygonOffsetFactor: -2,
             side: DoubleSide
         });
-
-        console.log(this)
 
         this.mesh = new Mesh(geometry, material);
         this.mesh.applyMatrix4(this.transform)

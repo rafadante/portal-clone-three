@@ -37,7 +37,7 @@ function viewFPS() {
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.SCENE_FPS);
 
     GLOBALS.ITEM_CUBE.visible = false;
-    GLOBALS.SPOTLIGHT.intensity = 0;
+    //GLOBALS.SPOTLIGHT.intensity = 0;
 
     var obj = GLOBALS.ENTER_DOOR.clone();
     obj.translateZ(1);
@@ -101,6 +101,7 @@ function viewFPS() {
         setTimeout(() => {
             GLOBALS.MAIN_CAMERA.lookAt(GLOBALS.ENTER_DOOR.position);
             GLOBALS.PAUSED = false;
+            GLOBALS.CORRIDOR_ENTER.visible = true;
             setTimeout(() => {
                 GLOBALS.PAUSED = true;
             }, 100);
@@ -114,12 +115,17 @@ function viewFPS() {
 
             if (GLOBALS.MOBILE)
                 $("#mobile-controls").css("display", "block");
+
+            //GLOBALS.CUBES.remove(GLOBALS.PLANE_LEVEL_INSTANCED);
+
+            //GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+            //GLOBALS.RENDERER.dispose()
         }, 5000);
 
         GLOBALS.CONTROLS.enabled = false;
         GLOBALS.ROOM.visible = false;
 
-        GLOBALS.CORRIDOR_ENTER.visible = true;
+        
         GLOBALS.SCENE.environment = null;
         GLOBALS.LIGHT_GROUP.visible = true;
         GLOBALS.STATS.container.style.display = "block";
@@ -181,12 +187,15 @@ function viewFPS() {
             GLOBALS.GUN.children[0].visible = false;
             GLOBALS.GUN_CLONE.children[0].visible = false;
             GLOBALS.GUN_CLONE2.children[0].visible = false;
-            document.getElementById("reticle-img").style.display = "none";
+            //document.getElementById("reticle-img").style.display = "none";
+            document.getElementById("reticle-img").src = './assets/textures/crosshairNull.png';
+            document.getElementById("reticle-img").style.filter = "invert(1)";
         } else {
             GLOBALS.GUN.children[0].visible = true;
             GLOBALS.GUN_CLONE.children[0].visible = true;
             GLOBALS.GUN_CLONE2.children[0].visible = true;
-            document.getElementById("reticle-img").style.display = "block";
+            //document.getElementById("reticle-img").style.display = "block";
+            document.getElementById("reticle-img").style.filter = "none";
         }
 
         //
@@ -202,10 +211,6 @@ function viewFPS() {
 
         GLOBALS.PORTAL_GUN_BOX = holder;
         GLOBALS.FPS_MODE = true;
-
-        for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-            GLOBALS.CONNECTIONS[i]['line'].visible = false;
-        }
 
         animate()
 

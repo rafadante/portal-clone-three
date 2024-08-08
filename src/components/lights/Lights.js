@@ -1,7 +1,7 @@
 import { GLOBALS } from '../../Globals';
-import { 
-    Group, 
-    AmbientLight, 
+import {
+    Group,
+    AmbientLight,
     SpotLight,
     Color,
     PlaneGeometry,
@@ -9,7 +9,7 @@ import {
     DoubleSide,
     Mesh,
     Vector3,
-    Object3D 
+    Object3D
 } from 'three';
 
 const Lights = function () {
@@ -53,8 +53,9 @@ const Lights = function () {
 
 function testLightsManager() {
     var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("lightEmissive");
-    instanced.material.emissive = new Color(0xffffff)
-    instanced.material.emissiveIntensity = 100
+    instanced.material.color = new Color(2, 2, 2);
+    //instanced.material.emissive = new Color(0xffffff)
+    //instanced.material.emissiveIntensity = 100
 
     for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['stripe'].length; i++) {
         if (GLOBALS.DYMANIC_ITEMS['stripe'][i].id) {
@@ -86,8 +87,8 @@ function testLightsManager() {
             instanced.computeBoundingSphere();
 
             //
-            var spotLight = new SpotLight(GLOBALS.DYMANIC_ITEMS['light'][i].userData.lightColor, 100);
-            spotLight.distance = 0;
+            var spotLight = new SpotLight(GLOBALS.DYMANIC_ITEMS['light'][i].userData.lightColor, 25);
+            spotLight.distance = 25;
             spotLight.decay = 2;
             spotLight.penumbra = 1;
             spotLight.position.copy(GLOBALS.DYMANIC_ITEMS['light'][i].position);
@@ -108,6 +109,8 @@ function testLightsManager() {
                 spotLight.position.z + (dir.y * 10));
 
             GLOBALS.SCENE_FPS.add(spotLight);
+
+            spotLight.target.updateMatrixWorld();
         }
     }
 
@@ -122,6 +125,14 @@ function testLightsManager() {
             cloneObsRoom.rotation.copy(GLOBALS.ITEMS_ADDED.children[i].rotation);
 
             cloneObsRoom.getObjectByName("pointLight").color = new Color(GLOBALS.ITEMS_ADDED.children[i].userData.lightColor);
+            var light = GLOBALS.SPOTLIGHT.clone();
+            cloneObsRoom.add(light);
+
+            light.color = cloneObsRoom.getObjectByName("pointLight").color;
+            light.intensity = 5;
+            light.distance = 12;
+            light.position.set(0, -1, -0.5);
+            light.target = cloneObsRoom.getObjectByName("targetLight");
         }
     }
 }

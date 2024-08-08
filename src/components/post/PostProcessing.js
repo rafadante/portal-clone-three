@@ -68,10 +68,17 @@ function initPost() {
     });
 
     //
-    GLOBALS.COMPOSER.addPass(new EffectPass(GLOBALS.MAIN_CAMERA,
-        toneMappingEffect,
-        bloom
-    ));
+    if(GLOBALS.MOBILE){
+        GLOBALS.COMPOSER.addPass(new EffectPass(GLOBALS.MAIN_CAMERA,
+            toneMappingEffect
+        ));
+    }else{
+        GLOBALS.COMPOSER.addPass(new EffectPass(GLOBALS.MAIN_CAMERA,
+            toneMappingEffect,
+            bloom
+        ));
+    }
+    
 }
 
 export { initPost }

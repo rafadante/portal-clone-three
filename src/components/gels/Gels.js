@@ -22,7 +22,7 @@ var instancedMeshGel, gelBallBlue, gelBallOrange, gelBallBodyBlue, gelBallBodyOr
 
 function initGels() {
 
-    GLOBALS.INK_MATERIAL.envMap = GLOBALS.ENV_MAP;
+    /*GLOBALS.INK_MATERIAL.envMap = GLOBALS.ENV_MAP;
     const geometryDecal = new PlaneGeometry(2, 2);
 
     instancedMeshGel = new InstancedMesh(geometryDecal.clone(), GLOBALS.INK_MATERIAL, 100);
@@ -41,7 +41,7 @@ function initGels() {
         instancedMeshGel.setMatrixAt(i, clone.matrix);
 
         GLOBALS.GELS.push(false);
-    }
+    }*/
 }
 
 

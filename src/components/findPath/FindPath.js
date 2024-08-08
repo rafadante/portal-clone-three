@@ -20,7 +20,11 @@ var scene = new Group();
 var dgraph,lineFollow,count;
 var isDrawStart = false;
 
-function findPath(ini, target, found) {
+function findPath(ini, target, found,found2) {
+
+    scene = new Group();
+    shapes = [];
+    visited = {};
 
     var nodes = [];
 
@@ -34,14 +38,14 @@ function findPath(ini, target, found) {
         map: GLOBALS.IMG_CLOSE,
     });
     const plane = new Mesh(geometryCheck, materialCheck);
-    GLOBALS.SCENE_CHILDREN.add(plane);
+    //GLOBALS.SCENE_CHILDREN.add(plane);
 
     var side = true;
 
-    if (GLOBALS.PLANE_USER_DATA[found.instanceId].side == "up") {
+    if (found.side == "up") {
         plane.rotation.x = Math.PI / 2;
         plane.position.set(found.normal.z * 1.3 + (target.x), (target.y), found.normal.x * 1.3 + (target.z))
-    } else if (GLOBALS.PLANE_USER_DATA[found.instanceId].side == "down") {
+    } else if (found.side == "down") {
         plane.rotation.x = -Math.PI / 2;
         plane.position.set((target.x), (target.y), (target.z))
         side = false;
@@ -62,10 +66,13 @@ function findPath(ini, target, found) {
     GLOBALS.SELECTED_FOR_CONNECTION.check = plane;
 
     for (var j = 0; j < GLOBALS.PLANE_USER_DATA.length; j++) {
-        if (GLOBALS.PLANE_USER_DATA[j].exists) {
+        if (GLOBALS.PLANE_USER_DATA[j].exists && !GLOBALS.PLANE_USER_DATA[j].hasItem) {
             nodes.push(GLOBALS.PLANE_USER_DATA[j]);
         }
     }
+
+    nodes.push(found)
+    nodes.push(found2)
 
     var dmap = {};
 
@@ -73,6 +80,7 @@ function findPath(ini, target, found) {
         var obj = new Object3D;
         obj.position.copy(nodes[j].position);
         obj.rotation.copy(nodes[j].rotation);
+        obj.node = nodes[j]
         obj.name = nodes[j].name;
         scene.add(obj)
         shapes.push(obj);
@@ -93,10 +101,10 @@ function findPath(ini, target, found) {
 
     path2(dgraph,
         scene.getObjectByName(ini.x + '/' + ini.y + '/' + ini.z).id,
-        scene.getObjectByName(target.x + '/' + target.y + '/' + target.z).id, side)
+        scene.getObjectByName(target.x + '/' + target.y + '/' + target.z).id, side, found, found2)
 }
 
-function path2(dgraph, start, end, side) {
+function path2(dgraph, start, end, side,found,found2) {
 
     var shortestpath = dgraph.findShortestPath(start, end);
 
@@ -121,6 +129,8 @@ function path2(dgraph, start, end, side) {
         var toObj = scene.getObjectById(parseInt(to), true);
         d += dist(fromObj.position, toObj.position);
 
+        fromObj.node.hasLine = true;
+
         points.push(fromObj.position)
         rotPoints.push(fromObj.rotation)
 
@@ -134,7 +144,7 @@ function path2(dgraph, start, end, side) {
 
     for (var j = 1; j < points.length; j++) {
 
-        if (points[j - 1].distanceTo(points[j]) != 2) {
+        if (points[j - 1].distanceTo(points[j]) != 2 && direction) {
 
             var dir = new Vector3(); // create once an reuse it
             dir.subVectors(points[j], points[j - 1]).normalize();
@@ -239,7 +249,13 @@ function path2(dgraph, start, end, side) {
     var circlePAth = new Mesh(mergedGeometry, circleMaterial);
 
     GLOBALS.SCENE_CHILDREN.add(circlePAth);
-    GLOBALS.SELECTED_FOR_CONNECTION.circle = circlePAth;
+    //GLOBALS.SELECTED_FOR_CONNECTION.circle = circlePAth;
+
+    GLOBALS.CONNECTIONS.push({
+        line: circlePAth,
+        from: found2,
+        to: found
+    });
 }
 
 function dist(t0, t1) {

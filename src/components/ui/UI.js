@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import { GLOBALS } from '../../Globals.js';
 import { volume } from '../audio/Audio.js';
+import "./Custom.js";
 
 if (!GLOBALS.MOBILE)
     $(".mobile").css("display", "none");

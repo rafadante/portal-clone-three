@@ -12,6 +12,10 @@ import {
     Raycaster
 } from 'three';
 import $ from 'jquery';
+import {
+    updateLaserCubeRaycaster,
+    updateLaserEmitterRaycaster
+} from './components/lasers/Laser.js';
 
 // return the cannon world
 // Setup our world
@@ -70,8 +74,11 @@ const cannonDebugger = new CannonDebugger(GLOBALS.SCENE, world, {
 
 var coords = new Vector3();
 var raycaster = new Raycaster();
+var updateLasers = true;
+
 
 function updatePhysics() {
+
     if (GLOBALS.HOLDING_ITEM) {
         // Project the mouse onto the movement plane
         var hitPoint = new Vector3(); // create once an reuse it
@@ -121,6 +128,9 @@ function updatePhysics() {
         moveJoint(hitPoint);
     }
 
+    if (updateLasers)
+        updateLaserEmitterRaycaster();
+
     for (const property in GLOBALS.DYMANIC_ITEMS) {
 
         var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(property);
@@ -131,15 +141,16 @@ function updatePhysics() {
             property == "ramp_half" || property == "ramp_half2" || property == "stairs" ||
             property == "light_bridge" || property == "laser_emitter" ||
             property == "door" || property == "light" || property == "stripe" || property == "gel_blue" ||
-            property == "gel_orange" || property == "laser_field" || property == "fizzler")
+            property == "gel_orange" || property == "laser_field" || property == "fizzler" ||
+            property == "portal_0" || property == "portal_1" || property == "laser_receiver")
             continue;
 
         for (var i = 0; i < GLOBALS.DYMANIC_ITEMS[property].length; i++) {
 
             if (GLOBALS.DYMANIC_ITEMS[property][i].length != 0) {
 
-                if(GLOBALS.DYMANIC_ITEMS[property][i].body){
-                    if(GLOBALS.DYMANIC_ITEMS[property][i].body.sound){
+                if (GLOBALS.DYMANIC_ITEMS[property][i].body) {
+                    if (GLOBALS.DYMANIC_ITEMS[property][i].body.sound) {
                         GLOBALS.DYMANIC_ITEMS[property][i].body.sound.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
                         GLOBALS.DYMANIC_ITEMS[property][i].body.sound.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
                     }
@@ -179,6 +190,10 @@ function updatePhysics() {
                     instanced.setMatrixAt(i, item.matrix)
                     instanced.instanceMatrix.needsUpdate = true;
                     instanced.computeBoundingSphere();
+
+                    if (property == "laser_cube" && updateLasers) {
+                        updateLaserCubeRaycaster(item, GLOBALS.DYMANIC_ITEMS[property][i].body.laser);
+                    }
                 }
             }
         }
@@ -195,6 +210,13 @@ function updatePhysics() {
 
     if (debugColision)
         cannonDebugger.update();
+
+    if (updateLasers) {
+        updateLasers = false;
+        setTimeout(() => {
+            updateLasers = true;
+        }, 40);
+    }
 }
 
 // This functions moves the joint body to a new postion in space

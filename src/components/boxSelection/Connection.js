@@ -12,6 +12,7 @@ import {
 } from 'three';
 import $ from 'jquery';
 import { animate } from '../../Main';
+import { findPath } from '../findPath/FindPath.js';
 
 function manageConnection(instanceId, from) {
     GLOBALS.CONNECTING = false;
@@ -62,12 +63,12 @@ function manageConnection(instanceId, from) {
         GLOBALS.CONNECTIONS.push({
             line: line,
             from: from,
-            to: GLOBALS.PLANE_USER_DATA[instanceId]
+            to:  GLOBALS.PLANE_USER_DATA[instanceId]
         });
 
-        console.log(from)
-
         from.item.userData.connectedTo.push(instanceId);
+
+        //findPath(from.position, GLOBALS.PLANE_USER_DATA[instanceId].position, GLOBALS.PLANE_USER_DATA[instanceId], from)
     }
 
     GLOBALS.ITEM_CUBE.visible = false;

@@ -145,6 +145,8 @@ function onWindowResize() {
         GLOBALS.COMPOSER.setSize(window.innerWidth, window.innerHeight);
 }
 
+GLOBALS.RENDERER.info.autoReset = true;
+
 function animate(time) {
 
     if (GLOBALS.FPS_MODE) {
@@ -155,6 +157,7 @@ function animate(time) {
         //GLOBALS.COMPOSER.render();
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         TWEEN.update();
+        document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
     } else if (!GLOBALS.PAUSED) {
         render(time);
     }
@@ -188,12 +191,21 @@ function fixedUpdate() { //60 fps always for physics
     }
 }
 
+var updatingShadowMap = false;
+var statsBegin = false;
+
 function render(time) {
 
-    GLOBALS.STATS.begin();
+    //
+    if (GLOBALS.LEVEL_ENTERED) {
+        GLOBALS.STATS.begin();
+        statsBegin = true;
+    }
+
+
     fixedUpdate();
     animateShader();
-    renderGoo();
+    //renderGoo();
     updatePhysics();
     updateCamera(time);
     teleportationState()
@@ -221,12 +233,19 @@ function render(time) {
     GLOBALS.RENDERER.setRenderTarget(currentRenderTarget);
     GLOBALS.RENDERER.localClippingEnabled = false;
     GLOBALS.RENDERER.clippingPlanes = [];
+
     GLOBALS.COMPOSER.render();
     //GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
     //GLOBALS.COMPOSER2.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
-    //GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
+    /*GLOBALS.RENDERER.autoClear = false;
+    GLOBALS.RENDERER.clear();
+    GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+    document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
+    GLOBALS.RENDERER.clearDepth()
+    GLOBALS.RENDERER.render(GLOBALS.GUN, GLOBALS.PORTAL_GUN_CAMERA);*/
 
-    GLOBALS.STATS.end();
+    if (statsBegin)
+        GLOBALS.STATS.end();
 }
 
 function animatePortal() {

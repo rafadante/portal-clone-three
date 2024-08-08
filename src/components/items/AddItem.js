@@ -27,6 +27,10 @@ import { ContinuousTrigger } from '../continuous/Continuous.js';
 import { getPlaneByName } from '../../Utils.js';
 import $ from 'jquery';
 import { planeInstanceReset } from './Items.js';
+import { 
+    laserEmitterRaycast,
+    laserEmitterPosition
+ } from '../lasers/Laser.js';
 
 var itemCount = 0;
 
@@ -83,36 +87,15 @@ function addItem(found, loaded) {
                 var item = box;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
                 var item = GLOBALS.GUN_CLONE.clone();
+                const camera = GLOBALS.MAIN_CAMERA.clone();
+                camera.position.set(0,0,0)
+                camera.rotation.set(0,0,0)
+                item.add(camera);
+                item.camera = camera;
+                window.ttt = camera;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
                 const box = new Object3D()
                 var item = box;
-            } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
-
-                var map2 = new TextureLoader().load(GLOBALS.DRAGGED_ITEM_ELEMENT.attr("src"));
-                map2.colorSpace = SRGBColorSpace;
-
-                const geometry = new BoxGeometry(2, 0, 2);
-                const material = new MeshBasicMaterial({ map: map2, transparent: true, visible: false });
-                const plane = new Mesh(geometry, material);
-
-                var color;
-
-                if (GLOBALS.ITEM_HOLDED_NAME == "portal_0")
-                    color = new Color(0xff9a00);
-                else if (GLOBALS.ITEM_HOLDED_NAME == "portal_1")
-                    color = new Color(0x27a7d8);
-
-                const geometry2 = new BoxGeometry(0.1, 0.1, 2);
-                const material2 = new MeshStandardMaterial({ color: color, roughness: 0.2, envMap: GLOBALS.ENV_MAP });
-                const box = new Mesh(geometry2, material2);
-                const box2 = box.clone()
-                box.translateX(0.65)
-                box2.translateX(-0.65)
-
-                plane.add(box)
-                plane.add(box2)
-
-                var item = plane;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
                 var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
 
@@ -135,12 +118,13 @@ function addItem(found, loaded) {
                 const circle = new Mesh(geometry, material);
                 circle.rotation.x = -Math.PI / 2;
                 circle.name = "circle_rotation";
-                item.add(circle);
+                //item.add(circle);
                 circle.translateZ(0.01);
 
                 const door = SkeletonUtils.clone(GLOBALS.ENTER_DOOR);
                 door.position.set(0, 0, 0);
                 door.rotation.set(0, 0, 0);
+                //door.visible=false
                 item.add(door);
                 door.translateZ(-1);
                 door.translateY(1);
@@ -286,6 +270,17 @@ function addItem(found, loaded) {
                 });
             }
 
+            //LASER EMITTER
+            if(GLOBALS.ITEM_HOLDED_NAME == "laser_emitter"){
+                laserEmitterRaycast(item, false,GLOBALS.LASER_EMITTER_RAYCASTER)
+            }else if(GLOBALS.ITEM_HOLDED_NAME == "laser_receiver"){
+                item.userData.connectedTo = [];
+                GLOBALS.LOADED_CONNECTIONS.push({
+                    data: userDataLoadedItem,
+                    item: userData
+                });
+            }
+
             if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
 
                 GLOBALS.ITEMS_ADDED.add(item);
@@ -311,9 +306,6 @@ function addItem(found, loaded) {
                 GLOBALS.PORTAL_GUN_BOX.push(item);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
                 GLOBALS.ITEMS_ADDED.add(item);
-            } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_0" || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
-                GLOBALS.ITEMS_ADDED.add(item);
-                item.translateY(0.01);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
 
                 item.translateY(0.3)
@@ -444,7 +436,7 @@ function manageItemVariables(item, userData, instanced) {
 
     if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
         item.userData.state = "all";
-    } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "door" || GLOBALS.ITEM_HOLDED_NAME == "pedestal_button") {
         item.userData.rotationY = 0;
     } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
         GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
@@ -496,6 +488,24 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
     } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
         item.userData.rotationY = userDataLoadedItem.rotationY;
         item.rotation.y = item.userData.rotationY;
+    }  else if (GLOBALS.ITEM_HOLDED_NAME == "pedestal_button") {
+
+        item.userData.rotationY = userDataLoadedItem.rotationY;
+        var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName("pedestal_button");
+
+        var dummy = new Object3D();
+        dummy.position.copy(item.position);
+        dummy.rotation.copy(item.rotation);
+
+        dummy.rotation.y = item.userData.rotationY;
+
+        dummy.updateMatrix();
+        instanced2.setMatrixAt(item.userData.id, dummy.matrix)
+
+        instanced2.instanceMatrix.needsUpdate = true;
+        instanced2.computeBoundingSphere();
+
+        item.rotation.copy(dummy.rotation);
     } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
         GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
         item.userData.hasDispenser = userDataLoadedItem.hasDispenser;
@@ -526,7 +536,17 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         item.userData.reversed = userDataLoadedItem.reversed;
         item.userData.triggers = userDataLoadedItem.triggers;
         createLightBridges("tractor_beam", GLOBALS.TRACTOR_BEAM_RAYCASTER, item, null, false);
+    }else if (GLOBALS.ITEM_HOLDED_NAME == "laser_emitter") {
+        item.userData.state = userDataLoadedItem.state;
+        item.userData.triggers = userDataLoadedItem.triggers;
+        laserEmitterPosition(item, item.userData.triggers, $("#laser_emitter-trigger"), "laser_emitter");
+    }else if (GLOBALS.ITEM_HOLDED_NAME == "laser_receiver") {
+        item.userData.state = userDataLoadedItem.state;
+        item.userData.triggers = userDataLoadedItem.triggers;
+        laserEmitterPosition(item, item.userData.triggers, $("#laser_receiver-trigger"), "laser_receiver");
     }
+
+    
 }
 
 function clickItem(elem) {

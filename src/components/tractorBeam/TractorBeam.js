@@ -82,9 +82,9 @@ function tractorBeam() {
                         }
                     } else {
 
-                        var val = 0.025;
+                        var val = 0.03;
                         if (GLOBALS.TRACTOR_BEAM[j].item.userData.reversed)
-                            val = -0.025;
+                            val = -0.03;
 
                         pos.add(vec.clone().multiplyScalar(val)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side
                         d.position.copy(pos);

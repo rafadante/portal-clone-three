@@ -21,7 +21,6 @@ import {
     reset
 } from '../../Globals.js';
 import '../shaders/MainMenuShader.js';
-import { findPath } from '../findPath/FindPath.js';
 import { init } from '../../Main.js';
 import { AUDIO, play } from '../audio/Audio.js';
 import { manageConnection } from '../boxSelection/Connection.js';
@@ -60,7 +59,7 @@ if (!stopMenuLoop) {
         planeFitPerspectiveCamera(plane1, GLOBALS.MAIN_CAMERA)
 
         animate();
-        window.addEventListener('resize', onWindowResize);
+        //window.addEventListener('resize', onWindowResize);
 
         setTimeout(() => {
             getMonitorFPS = false;
@@ -89,7 +88,7 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
 
 var level;
 $("body").on('click', '#option-single-load', function () {
-    fetch("./levels/1.json")
+    fetch("./levels/current.json")
         .then(response => response.json())
         .then(json => {
             level = json;
@@ -108,11 +107,15 @@ $("body").on('click', '#option-single-load', function () {
 })
 
 function loadLevelJSON() {
-    loadLevel(level[0]);
 
-    for (var i = 0; i < level[1].length; i++) {
+    $("#portal-gun-select").val(level[0]).change();
+    loadLevel(level[1])
+
+    //loadLevel(level[0]);
+
+    /*for (var i = 0; i < level[1].length; i++) {
         AddGoo(level[1][i], true);
-    }
+    }*/
 
     viewFPS();
 }
@@ -305,9 +308,11 @@ function loadLevel(data) {
                 var instanced = GLOBALS.ITEMS_ADDED.children[i];
                 var dummy = new Object3D();
                 dummy.scale.set(0, 0, 0);
+                dummy.position.set(100000, 100000, 100000);
                 dummy.updateMatrix();
                 instanced.setMatrixAt(j, dummy.matrix);
                 instanced.instanceMatrix.needsUpdate = true;
+                instanced.computeBoundingSphere();
             }
         } else {
             toRemove.push(GLOBALS.ITEMS_ADDED.children[i])
@@ -320,19 +325,29 @@ function loadLevel(data) {
 
     reset();
 
+    console.log(GLOBALS.PLANE_USER_DATA)
+    console.log(data)
+
     GLOBALS.PLANE_USER_DATA = data;
     GLOBALS.CUBES.remove(GLOBALS.PLANE_LEVEL_INSTANCED);
 
+    //GLOBALS.RENDERER.renderLists.dispose();
+    //GLOBALS.PLANE_LEVEL_INSTANCED.dispose();
+
     const geometry = new PlaneGeometry(2, 2);
+
+    GLOBALS.BUDGET = 1500;
 
     GLOBALS.PLANE_LEVEL_INSTANCED = new InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
     GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = true;
-    GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = true;
-    GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = true;
+    GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = false;
+    GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = false;
     GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
     GLOBALS.CUBES.add(GLOBALS.PLANE_LEVEL_INSTANCED);
 
     var clone = new Object3D();
+
+    console.log(GLOBALS.BUDGET)
 
     for (var i = 0; i < GLOBALS.BUDGET; i++) {
         clone.scale.set(0, 0, 0);

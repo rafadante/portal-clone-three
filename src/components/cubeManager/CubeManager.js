@@ -8,10 +8,14 @@ import {
 import { GLOBALS } from '../../Globals.js';
 import { getPlaneByName, warning } from '../../Utils.js';
 import { checkToUpdateContinuous } from './UpdateRaycast.js';
+import { removeSelection } from '../boxSelection/BoxSelection.js';
 
 var IndexArray = [];
+var remove;
 
 function cubeState(button) {
+
+    remove = false;
 
     if (button == "plus") {
         //
@@ -57,6 +61,10 @@ function cubeState(button) {
     IndexArray = [];
 
     checkToUpdateContinuous();
+
+    if(remove){
+        removeSelection();
+    }
 }
 
 function trasnlatePlane(id, val, portal) {
@@ -117,6 +125,7 @@ function trasnlatePlane(id, val, portal) {
         //
 
         GLOBALS.BUDGET += 2;
+        remove=true;
     } else {
 
         GLOBALS.PLANE_USER_DATA[id].position = dummy.position.clone();
@@ -268,10 +277,13 @@ function buildIniCubes(obj) {
 
         GLOBALS.PLANE_LEVEL_INSTANCED = new InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
         GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = true;
-        GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = true;
-        GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = true;
+        GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = false;
+        GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = false;
         GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
         GLOBALS.CUBES.add(GLOBALS.PLANE_LEVEL_INSTANCED);
+
+        console.log(GLOBALS.PLANE_LEVEL_INSTANCED)
+        console.log(GLOBALS.SCENE)
 
         var clone = new Object3D();
 
@@ -294,6 +306,9 @@ function buildIniCubes(obj) {
         buildLayer(-1, -1, 16, 'z', 'y', 'x', 4, 6, "right", new Vector3(0, -Math.PI / 2, 0), new Vector3(Math.PI / 2, 0, Math.PI / 2));
         //WALL LEFT
         buildLayer(-1, -1, 0, 'z', 'y', 'x', 4, 6, "left", new Vector3(0, Math.PI / 2, 0), new Vector3(Math.PI / 2, 0, -Math.PI / 2));
+
+        GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
+        GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
     }
 }
 

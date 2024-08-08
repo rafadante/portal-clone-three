@@ -20,12 +20,13 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import { AUDIO, play } from '../audio/Audio.js';
+import { createLaserFromPortal } from '../lasers/Laser.js';
 
 var coords = new Vector3();
 var raycaster2 = new Raycaster();
 var allowPortal = true;
 
-function portalButton(button, auto) {
+function portalButton(button, auto, camera) {
 
     if (!auto) {
         if (GLOBALS.PORTAL_GUN_INITIATE == "none" ||
@@ -41,7 +42,7 @@ function portalButton(button, auto) {
 
     if (GLOBALS.FPS_MODE && (button == 2 || button == 0 || button == 1) && GLOBALS.ALLOW_PLACE_PORTALS) {
 
-        raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
+        raycaster2.setFromCamera(coords, camera);
 
         var intersectBlockPortal = raycaster2.intersectObjects(GLOBALS.BLOCK_PORTAL);
         var blockPortal = null;
@@ -212,7 +213,11 @@ function portalButton(button, auto) {
                     if (button == 0) { // left click
 
                         //if (GLOBALS.PORTALS[1] === null)
-                        document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
+                        if (!auto) {
+                            document.getElementById("reticle-img").style.filter = "none";
+                            document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
+                        }
+
                         //else
                         //    document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
 
@@ -232,13 +237,20 @@ function portalButton(button, auto) {
 
                         GLOBALS.PORTALS[0].normal = normal;
 
-                        AUDIO.PORTAL_GUN_ORANGE.pause();
-                        AUDIO.PORTAL_GUN_ORANGE.currentTime = 0;
-                        play(AUDIO.PORTAL_GUN_ORANGE)
+                        if(!auto){
+                            AUDIO.PORTAL_GUN_ORANGE.pause();
+                            AUDIO.PORTAL_GUN_ORANGE.currentTime = 0;
+                            play(AUDIO.PORTAL_GUN_ORANGE)
+                        }
+                        
                     } else if (button == 2) { // left click
 
+                        if (!auto) {
+                            document.getElementById("reticle-img").style.filter = "none";
+                            document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
+                        }
                         //if (GLOBALS.PORTALS[0] === null)
-                        document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
+
                         //
                         //    document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
 
@@ -258,20 +270,25 @@ function portalButton(button, auto) {
 
                         GLOBALS.PORTALS[1].normal = normal;
 
-                        AUDIO.PORTAL_GUN_BLUE.pause();
-                        AUDIO.PORTAL_GUN_BLUE.currentTime = 0;
-                        play(AUDIO.PORTAL_GUN_BLUE)
+                        if(!auto){
+                            AUDIO.PORTAL_GUN_BLUE.pause();
+                            AUDIO.PORTAL_GUN_BLUE.currentTime = 0;
+                            play(AUDIO.PORTAL_GUN_BLUE)
+                        }
+                        
                     }
 
                     setTimeout(() => {
                         if (button == 0) {
                             createLightBridgesFromPortal(1, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
                             createLightBridgesFromPortal(1, GLOBALS.TRACTOR_BEAM_RAYCASTER);
-                            createLightBridgesFromPortal(1, GLOBALS.LASER_EMITTER_RAYCASTER);
+                            //createLightBridgesFromPortal(1, GLOBALS.LASER_EMITTER_RAYCASTER);
+                            //createLaserFromPortal(1, GLOBALS.LASER_EMITTER_RAYCASTER);
                         } else if (button == 2) {
                             createLightBridgesFromPortal(0, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
                             createLightBridgesFromPortal(0, GLOBALS.TRACTOR_BEAM_RAYCASTER);
-                            createLightBridgesFromPortal(0, GLOBALS.LASER_EMITTER_RAYCASTER);
+                            //createLightBridgesFromPortal(0, GLOBALS.LASER_EMITTER_RAYCASTER);
+                            //createLaserFromPortal(0, GLOBALS.LASER_EMITTER_RAYCASTER);
                         }
                     }, 300);
                 } else {
@@ -400,6 +417,8 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
         portalPoints)
     GLOBALS.PORTALS[thisPortalIndex].mesh.scale.set(0, 0, 0);
     GLOBALS.PORTALS[thisPortalIndex].portalShader.scale.set(0, 0, 0);
+    GLOBALS.PORTALS[thisPortalIndex].side = side;
+    GLOBALS.PORTALS[thisPortalIndex].normal = normal;
 
     GLOBALS.PORTALS[thisPortalIndex].hostObjects.portal = true;
 

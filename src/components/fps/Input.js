@@ -311,7 +311,7 @@ $("body").on('pointerup', '#crouch', function () {
 
 document.addEventListener('mousedown', (event) => {
     if (!GLOBALS.MOBILE && document.pointerLockElement !== null)
-        portalButton(event.button)
+        portalButton(event.button,null,GLOBALS.MAIN_CAMERA)
 });
 
 //LEFT PORTAL MOBILE
@@ -319,14 +319,14 @@ document.getElementById("portal_l").addEventListener('pointerdown', portal_l_Tou
 
 function portal_l_Touch() {
     GLOBALS.ALLOW_PLACE_PORTALS = true;
-    portalButton(0);
+    portalButton(0,null,GLOBALS.MAIN_CAMERA);
 }
 //RIGHT PORTAL MOBILE
 document.getElementById("portal_r").addEventListener('pointerdown', portal_r_Touch, false);
 
 function portal_r_Touch() {
     GLOBALS.ALLOW_PLACE_PORTALS = true;
-    portalButton(2)
+    portalButton(2,null,GLOBALS.MAIN_CAMERA)
 }
 //JUMP MOBILE
 document.getElementById("jump").addEventListener('pointerdown', jumpTouch, false);

@@ -56,7 +56,11 @@ function updateEvents() {
           GLOBALS.GUN.children[0].visible = true;
           GLOBALS.GUN_CLONE.children[0].visible = true;
           GLOBALS.GUN_CLONE2.children[0].visible = true;
-          document.getElementById("reticle-img").style.display = "block";
+          //document.getElementById("reticle-img").style.display = "block";
+
+
+          document.getElementById("reticle-img").style.filter = "none";
+          document.getElementById("reticle-img").src = './assets/textures/crosshairNone.png';
         }
       }
     }
@@ -90,7 +94,7 @@ function updateEvents() {
 
     //Go through each connection to check for triggers
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-      if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("pedestal"))
+      if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("pedestal") || GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_receiver"))
         continue
       else if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area") && GLOBALS.CONNECTIONS[i]['from'].item.visible)
         GLOBALS.CONNECTIONS[i]['from'].item.visible = false;
@@ -108,6 +112,8 @@ function updateEvents() {
               GLOBALS.CONNECTIONS[i]['line'].idConnection = id;
               GLOBALS.CONNECTIONS[i]['line'].active = true;
               GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0x0077B6);
+              //GLOBALS.BATCHED_BLUE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, false);
+              //GLOBALS.BATCHED_ORANGE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, true);
 
               //PLAY AUDIO POSITIVE
               if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area")) {
@@ -149,9 +155,9 @@ function updateEvents() {
                 GLOBALS.CONNECTIONS[i]['to'].item.active = true;
 
                 if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0"))
-                  portalButton(0, GLOBALS.CONNECTIONS[i]['to'].item)
+                  portalButton(0, GLOBALS.CONNECTIONS[i]['to'].item, GLOBALS.MAIN_CAMERA)
                 else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1"))
-                  portalButton(2, GLOBALS.CONNECTIONS[i]['to'].item)
+                  portalButton(2, GLOBALS.CONNECTIONS[i]['to'].item, GLOBALS.MAIN_CAMERA)
               }
             }
           }
@@ -169,6 +175,8 @@ function updateEvents() {
               GLOBALS.CONNECTIONS[i]['line'].idConnection = null;
               GLOBALS.CONNECTIONS[i]['line'].active = false;
               GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0xffa500);
+              //GLOBALS.BATCHED_BLUE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, true);
+              //GLOBALS.BATCHED_ORANGE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, false);
 
               if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
@@ -256,6 +264,7 @@ function interactWithItem() {
     GLOBALS.CURRENT_ITEM.body.holding = false;
     GLOBALS.CURRENT_ITEM.body.angularDamping = 0;
     GLOBALS.CURRENT_ITEM.body.allowSleep = true;
+    GLOBALS.CURRENT_ITEM.body.mass = GLOBALS.CURRENT_ITEM.body.initialMass;
     GLOBALS.CURRENT_ITEM = null;
     GLOBALS.CURRENT_ITEM_ID = null;
     itemHolder = null;
@@ -284,6 +293,8 @@ function interactWithItem() {
               //GLOBALS.CONNECTIONS[i]['line'].idConnection = id;
               GLOBALS.CONNECTIONS[i]['line'].active = true;
               GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0x0077B6);
+              //GLOBALS.BATCHED_BLUE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, false);
+              //GLOBALS.BATCHED_ORANGE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, true);
 
               //PLAY AUDIO POSITIVE
               addPositionalAudio('audio-button-positive', GLOBALS.CONNECTIONS[i]['from'], true, false, true, 8);
@@ -317,9 +328,9 @@ function interactWithItem() {
                 GLOBALS.CONNECTIONS[i]['to'].item.active = true;
 
                 if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0"))
-                  portalButton(0, GLOBALS.CONNECTIONS[i]['to'].item)
+                  portalButton(0, GLOBALS.CONNECTIONS[i]['to'].item, GLOBALS.MAIN_CAMERA)
                 else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1"))
-                  portalButton(2, GLOBALS.CONNECTIONS[i]['to'].item)
+                  portalButton(2, GLOBALS.CONNECTIONS[i]['to'].item, GLOBALS.MAIN_CAMERA)
               }
 
               if (!GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalInfinity) {
@@ -354,7 +365,10 @@ function interactWithItem() {
           GLOBALS.CURRENT_ITEM.body.holding = true;
         }
 
-        if(GLOBALS.PORTAL_GUN_INITIATE != "none"){
+        GLOBALS.CURRENT_ITEM.body.collisionResponse = 1;
+        GLOBALS.CURRENT_ITEM.body.wakeUp();
+
+        if (GLOBALS.PORTAL_GUN_INITIATE != "none") {
           AUDIO.PICK_SUCESS.pause();
           AUDIO.PICK_SUCESS.currentTime = 0;
           play(AUDIO.PICK_SUCESS)
@@ -383,6 +397,8 @@ function pedestalTimer(holder) {
   holder['line'].active = false;
   holder['to'].item.userData.buttons -= 1;
   holder['line'].material.color = new Color(0xffa500);
+  //GLOBALS.BATCHED_BLUE.setVisibleAt(holder['line'].lineInstancedId, true);
+  //GLOBALS.BATCHED_ORANGE.setVisibleAt(holder['line'].lineInstancedId, false);
 
   if (holder['to'].itemName.includes("door") || holder['to'].itemName.includes("exitDoor")) {
     if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections)
@@ -402,11 +418,105 @@ function pedestalTimer(holder) {
   }
 }
 
+function laserReceiverTrigger(item, state) {
+
+  item = GLOBALS.PLANE_USER_DATA[item.userData.planeInstancedId];
+
+  //console.log(item)
+
+  if (state) {
+    //Go through each connection to check for triggers
+    for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+      if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_receiver")) {
+        continue
+      }
+
+      //if item or player touches the trigger
+      if (item == GLOBALS.CONNECTIONS[i]['from']) {//TRIGER START
+        //Verify if the button accepts the body
+        if (!GLOBALS.CONNECTIONS[i]['line'].active) {
+          item.item.connection = GLOBALS.CONNECTIONS[i];
+          GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
+          GLOBALS.CONNECTIONS[i]['line'].active = true;
+          GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0x0077B6);
+
+          //PLAY AUDIO POSITIVE
+          addPositionalAudio('audio-button-positive', GLOBALS.CONNECTIONS[i]['from'], true, false, true, 8);
+          var soundHolder = GLOBALS.CONNECTIONS[i]['from'];
+          setTimeout(() => {
+            GLOBALS.SCENE_FPS.remove(soundHolder.sound);
+          }, 1500);
+
+          //Manage Door Trigger
+          if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
+            GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
+            if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
+              stateDoor(0, true, false, GLOBALS.CONNECTIONS[i]['to'].item);
+          } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("cube") ||
+            GLOBALS.CONNECTIONS[i]['to'].itemName.includes("sphere")) {
+            if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
+              dispenserSpawn(GLOBALS.CONNECTIONS[i]['to'].item);
+          } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("tractor")) {
+            if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
+              tractorStates(GLOBALS.CONNECTIONS[i]['to']);
+          } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("light_bridge")) {
+            if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
+              lightBridgeState(GLOBALS.CONNECTIONS[i]['to'])
+          } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field") ||
+            GLOBALS.CONNECTIONS[i]['to'].itemName.includes("fizzler")) {
+            if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
+              laserFieldState(GLOBALS.CONNECTIONS[i]['to'])
+          } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
+            GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
+
+            GLOBALS.CONNECTIONS[i]['to'].item.active = true;
+
+            if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0"))
+              portalButton(0, GLOBALS.CONNECTIONS[i]['to'].item, GLOBALS.MAIN_CAMERA)
+            else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1"))
+              portalButton(2, GLOBALS.CONNECTIONS[i]['to'].item, GLOBALS.MAIN_CAMERA)
+          }
+        }
+      }
+    }
+  } else {
+
+    console.log(item)
+
+    var holder = item.item.connection;
+
+    holder['line'].active = false;
+    holder['to'].item.userData.buttons -= 1;
+    holder['line'].material.color = new Color(0xffa500);
+    //GLOBALS.BATCHED_BLUE.setVisibleAt(holder['line'].lineInstancedId, true);
+    //GLOBALS.BATCHED_ORANGE.setVisibleAt(holder['line'].lineInstancedId, false);
+
+    if (holder['to'].itemName.includes("door") || holder['to'].itemName.includes("exitDoor")) {
+      if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections)
+        stateDoor(0, false, false, holder['to'].item);
+    } else if (holder['to'].itemName.includes("tractor")) {
+      if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections)
+        tractorStates(holder['to']);
+    } else if (holder['to'].itemName.includes("light_bridge")) {
+      if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections)
+        lightBridgeState(holder['to']);
+    } else if (holder['to'].itemName.includes("laser_field") || holder['to'].itemName.includes("fizzler")) {
+      if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections)
+        laserFieldState(holder['to'])
+    } else if (holder['to'].itemName.includes("portal_0") ||
+      holder['to'].itemName.includes("portal_1")) {
+      holder['to'].item.active = false;
+    }
+  }
+
+}
+
 export {
   updateEvents,
   tractorStates,
   lightBridgeState,
   laserFieldState,
   interactWithItem,
-  resetAll
+  resetAll,
+  laserReceiverTrigger
 };

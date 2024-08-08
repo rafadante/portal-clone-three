@@ -24,7 +24,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.2,
+        0.4,
         0,
         null,
         null
@@ -42,7 +42,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.1,
+        0.2,
         0,
         null,
         null
@@ -60,7 +60,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.1,
+        0.2,
         0,
         null,
         null
@@ -77,7 +77,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.1,
+        0.2,
         0,
         null,
         null
@@ -94,7 +94,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.1,
+        0.2,
         0,
         null,
         null
@@ -111,7 +111,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.1,
+        0.2,
         0,
         null,
         null
@@ -129,7 +129,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.2,
+        0.4,
         0,
         null,
         null
@@ -146,14 +146,17 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.2,
+        0.4,
         0,
         null,
         null
     );
 
     //GRID
-    GLOBALS.MATERIAL_GRID = new MeshStandardMaterial();
+    GLOBALS.MATERIAL_GRID = new MeshStandardMaterial({
+        side: 2
+    });
+    
     loadMaterial(
         GLOBALS.MATERIAL_GRID,
         "wall/grid/Metal_Grill_024_basecolor.jpg",
@@ -173,7 +176,8 @@ function loadMaterials() {
     //GLASS
     GLOBALS.MATERIAL_GLASS = new MeshStandardMaterial({
         transparent: true,
-        opacity: 0.5
+        opacity: 1,
+        side: 2
     });
     loadMaterial(
         GLOBALS.MATERIAL_GLASS,
@@ -183,7 +187,7 @@ function loadMaterials() {
         null,
         null,
         null,
-        0.2,
+        0.4,
         0,
         1,
         0,
@@ -248,8 +252,12 @@ function loadMaterial(material, base, normal, ao, rough, metal, alpha, roughValu
     }
 
     material.envMap = GLOBALS.ENV_MAP;
-    material.envMapIntensity = envIntensity;
     material.alphaTest = alphaTest;
+
+    if (GLOBALS.MOBILE)
+        material.envMapIntensity = 0.5;
+    else
+        material.envMapIntensity = envIntensity;
 }
 
 function applyRepeat(map, repeatX, repeatY) {

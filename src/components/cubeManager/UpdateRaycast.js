@@ -2,6 +2,7 @@ import { GLOBALS } from '../../Globals.js';
 import { createLightBridges } from '../continuous/Continuous.js';
 import { ContinuousTrigger } from '../continuous/Continuous.js';
 import $ from 'jquery';
+import { laserEmitterRaycast } from '../lasers/Laser.js';
 
 function checkToUpdateContinuous() {
 
@@ -76,6 +77,16 @@ function checkToUpdateContinuous() {
             GLOBALS.GLASS_RAYCASTER[i].item.userData.triggers,
             $("#glass-trigger"),
             "glass");
+    }
+
+    console.log(GLOBALS.LASER_EMITTER_RAYCASTER)
+
+    for (var i = 0; i < GLOBALS.LASER_EMITTER_RAYCASTER.length; i++) {
+        laserEmitterRaycast(
+            GLOBALS.LASER_EMITTER_RAYCASTER[i].item,
+            true,
+            GLOBALS.LASER_EMITTER_RAYCASTER[i],
+            i);
     }
 }
 

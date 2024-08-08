@@ -1,7 +1,10 @@
 import {
     PlaneGeometry,
     Object3D,
-    InstancedMesh
+    InstancedMesh,
+    Color,
+    BatchedMesh,
+    Matrix4
 } from 'three';
 import {
     GLOBALS
@@ -13,10 +16,18 @@ import {
 import {
     colliderRoom
 } from './Colliders.js';
+import {
+    MeshLineGeometry,
+    MeshLineMaterial
+} from 'meshline';
+import { func } from 'three/examples/jsm/nodes/Nodes.js';
 
 var id = 0;
 
 function manageInstances() {
+
+    manageBatchesLines();
+    manageBatcheGlass();
 
     var meshesWallPortal = [];
     var meshesWallNonPortal = [];
@@ -30,6 +41,7 @@ function manageInstances() {
     var sideLeft = [];
 
     //SEPARETE MESHS FOR INSTANCING
+    console.log(GLOBALS.PLANE_USER_DATA.length)
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
 
         if (GLOBALS.PLANE_USER_DATA[i].exists) {
@@ -101,7 +113,7 @@ function createInstances(meshes, material) {
     if (meshes.length == 0)
         return;
 
-    //material.depthWrite = false;
+    //material.visible = false;
     material.polygonOffset = true;
     material.polygonOffsetFactor = 2;
 
@@ -130,12 +142,15 @@ function createInstances(meshes, material) {
             meshes[i].position.z == Math.round(leftWindowObsRoom.position.z)
         )) {
             dummy.scale.set(0, 0, 0);
+            dummy.position.set(100000, 100000, 100000);
             meshes[i].portal = false;
         }
 
         if (meshes[i].itemName) {
-            if (meshes[i].itemName.includes("observation_room"))
+            if (meshes[i].itemName.includes("observation_room")) {
                 dummy.scale.set(0, 0, 0);
+                dummy.position.set(100000, 100000, 100000);
+            }
         }
 
         dummy.rotation.set(0, 0, 0);
@@ -147,6 +162,101 @@ function createInstances(meshes, material) {
     }
 
     GLOBALS.SCENE.remove(leftWindowObsRoom)
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere();
 }
 
-export {manageInstances}
+//
+const material = new MeshLineMaterial({
+    color: 0x0077B6,//0xffa500
+    side: 2,
+    depthTest: true,
+    transparent: true
+})
+material.uniforms.alphaTest.value = 0;
+material.uniforms.dashArray.value = 0.01;
+material.uniforms.lineWidth.value = 0.1;
+material.uniforms.useDash.value = 1;
+
+function manageBatchesLines() {
+    /*GLOBALS.BATCHED_BLUE = new BatchedMesh(100000, 100000, 100000, material);
+    GLOBALS.BATCHED_BLUE.frustumCulled = false;
+    //GLOBALS.SCENE_FPS.add(GLOBALS.BATCHED_BLUE);
+
+    //console.log(GLOBALS.CONNECTIONS)
+
+    for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+        //GLOBALS.CONNECTIONS[i]['line'].visible = false;
+        batchedMesh(GLOBALS.BATCHED_BLUE, GLOBALS.CONNECTIONS[i]['line'], true)
+    }
+
+    const material2 = material.clone();
+    material2.color = new Color(0xffa500);
+
+    GLOBALS.BATCHED_ORANGE = new BatchedMesh(100000, 100000, 100000, material2);
+    GLOBALS.BATCHED_ORANGE.frustumCulled = false;
+    //GLOBALS.SCENE_FPS.add(GLOBALS.BATCHED_ORANGE);
+
+    for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+        batchedMesh(GLOBALS.BATCHED_ORANGE, GLOBALS.CONNECTIONS[i]['line'], false)
+    }*/
+}
+
+function batchedMesh(batched, line, visible) {
+
+    line.updateMatrix();
+    const geometry = line.geometry.clone()
+    geometry.applyMatrix4(line.matrix);
+
+    const matrix = new Matrix4();
+    const lineGeometryId = batched.addGeometry(geometry);
+    const lineInstancedId = batched.addInstance(lineGeometryId);
+    batched.setMatrixAt(lineInstancedId, matrix);
+    batched.setVisibleAt(lineInstancedId, visible);
+    line.lineInstancedId = lineInstancedId;
+}
+
+function manageBatcheGlass() {
+
+    GLOBALS.BATCHED_GLASS = new BatchedMesh(1000, 5000, 10000, GLOBALS.MATERIAL_GLASS.clone());
+    GLOBALS.BATCHED_GLASS.frustumCulled = false;
+    GLOBALS.SCENE_FPS.add(GLOBALS.BATCHED_GLASS);
+
+    for (var i = 0; i < GLOBALS.GLASS_RAYCASTER.length; i++) {
+        if (!GLOBALS.GLASS_RAYCASTER[i].item.userData.grid) {
+            GLOBALS.GLASS_RAYCASTER[i].item.continuous.material.visible = false;
+
+            GLOBALS.GLASS_RAYCASTER[i].item.continuous.updateMatrix();
+            const geometry = GLOBALS.GLASS_RAYCASTER[i].item.continuous.geometry.clone()
+            geometry.applyMatrix4(GLOBALS.GLASS_RAYCASTER[i].item.continuous.matrix);
+
+            const matrix = new Matrix4();
+            const lineGeometryId = GLOBALS.BATCHED_GLASS.addGeometry(geometry);
+            const lineInstancedId = GLOBALS.BATCHED_GLASS.addInstance(lineGeometryId);
+            GLOBALS.BATCHED_GLASS.setMatrixAt(lineInstancedId, matrix);
+        }
+    }
+
+    GLOBALS.BATCHED_GRID = new BatchedMesh(1000, 5000, 10000, GLOBALS.MATERIAL_GRID.clone());
+    GLOBALS.BATCHED_GRID.frustumCulled = false;
+    GLOBALS.SCENE_FPS.add(GLOBALS.BATCHED_GRID);
+
+    for (var i = 0; i < GLOBALS.GLASS_RAYCASTER.length; i++) {
+        if (GLOBALS.GLASS_RAYCASTER[i].item.userData.grid) {
+            GLOBALS.GLASS_RAYCASTER[i].item.continuous.material.visible = false;
+
+            GLOBALS.GLASS_RAYCASTER[i].item.continuous.updateMatrix();
+            const geometry = GLOBALS.GLASS_RAYCASTER[i].item.continuous.geometry.clone()
+            geometry.applyMatrix4(GLOBALS.GLASS_RAYCASTER[i].item.continuous.matrix);
+
+            const matrix = new Matrix4();
+            const lineGeometryId = GLOBALS.BATCHED_GRID.addGeometry(geometry);
+            const lineInstancedId = GLOBALS.BATCHED_GRID.addInstance(lineGeometryId);
+            GLOBALS.BATCHED_GRID.setMatrixAt(lineInstancedId, matrix);
+        }
+    }
+}
+
+export {
+    manageInstances
+}

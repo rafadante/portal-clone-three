@@ -38,30 +38,32 @@ $("body").on('click', '#side-bar-left, #ui-top', function () {
 
 $("body").on('click', '#rotate-item', function () {
     if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("door") ||
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("faith_plate")) {
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("faith_plate") ||
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("portal_0") ||
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("portal_1")) {
 
         var door = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName);
         door.rotation.y += Math.PI / 2;
         door.userData.rotationY = door.rotation.y;
     } else {
-        for (var i = 0; i < 1; i++) { //GLOBALS.SELECTED_ID.length
 
-            var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].itemName);
+        var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName);
 
-            var dummy = new Object3D();
-            dummy.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.position);
-            dummy.rotation.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation);
+        var dummy = new Object3D();
+        dummy.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.position);
+        dummy.rotation.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.rotation);
 
-            dummy.rotation.y += Math.PI / 2;
+        dummy.rotation.y += Math.PI / 2;
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.rotationY = dummy.rotation.y;
 
-            dummy.updateMatrix();
-            instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.userData.id, dummy.matrix)
+        dummy.updateMatrix();
+        instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.id, dummy.matrix)
 
-            instanced.instanceMatrix.needsUpdate = true;
-            instanced.computeBoundingSphere();
+        instanced.instanceMatrix.needsUpdate = true;
+        instanced.computeBoundingSphere();
 
-            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].item.rotation.copy(dummy.rotation);
-        }
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.rotation.copy(dummy.rotation);
+
     }
 
     animate();
@@ -72,7 +74,8 @@ $("body").on('click', '#delete', function () {
     if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].isInstanced) {
 
         if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous) {
-            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide.hasItem = false;
+            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide)
+                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide.hasItem = false;
             GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous);
         }
 
@@ -159,8 +162,9 @@ $("body").on('input', '#dispenser-opened', function () {
 
 $("body").on('input', '#state-lines', function () {
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-        if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName)
-            GLOBALS.CONNECTIONS[i]["line"].visible = this.checked;
+        if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName){
+            //GLOBALS.CONNECTIONS[i]["line"].visible = this.checked;
+        }
     }
 
     animate();

@@ -94,6 +94,23 @@
             data-name="radio" src="../assets/ui/items/radio.png" data-allowconnection="false" data-rotate="false"
             data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="radio" />
 
+            <img
+            data-content="Once the laser emitter hits the catcher you can have it trigger a function such as opening a door, or enabling a set of stairs."
+            data-title="LASER EMITTER" class="item" data-name="laser_emitter"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true"
+            src="../assets/ui/items/laser_emitter.png" id="laser_emitter" />
+
+          <img data-content="Trigger with the laser." data-title="LASER RECEIVER" class="item"
+            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true"
+            data-name="laser_receiver" src="../assets/ui/items/laser_receiver.png" id="laser_receiver"/>
+
+          <img data-content="Trigger with the laser." data-title="LASER RELAYS" class="item" data-name="laser_relays"
+            src="../assets/ui/items/laser_relays.png" />
+
+          <img data-content="Reflects the laser." data-title="LASER CUBE" class="item" data-name="laser_cube"
+          data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true"
+            src="../assets/ui/items/laser_cube.png" id="laser_cube"/>
+
           <img data-content="Can be linked to an object to form a trigger. This button only accepts spheres."
             data-title="BUTTON SPHERE" class="item" data-name="button_circle" id="button_circle"
             data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
@@ -112,7 +129,7 @@
           <img
             data-content="Can be linked to an object to form a trigger. The player can click on the button and it will activate the function that it is connected to. You can add a timer to your button through the properties menu."
             data-title="PEDESTAL BUTTON" class="item" data-name="pedestal_button" data-allowconnection="false"
-            src="../assets/ui/items/pedestal_button.png" data-rotate="false" data-floor="true" data-ceiling="true"
+            src="../assets/ui/items/pedestal_button.png" data-rotate="true" data-floor="true" data-ceiling="true"
             data-walls="true" data-instanced="true" id="pedestal_button" />
 
           <img
@@ -241,19 +258,7 @@
             data-title="TRACK PLATFORMS" class="item" data-name="track_platforms"
             src="../assets/ui/items/track_platforms.png" />
 
-            <img
-            data-content="Once the laser emitter hits the catcher you can have it trigger a function such as opening a door, or enabling a set of stairs."
-            data-title="LASER EMITTER" class="item" data-name="laser_emitter"
-            src="../assets/ui/items/laser_emitter.png" />
-
-          <img data-content="Trigger with the laser." data-title="LASER RECEIVER" class="item"
-            data-name="laser_receiver" src="../assets/ui/items/laser_receiver.png" />
-
-          <img data-content="Trigger with the laser." data-title="LASER RELAYS" class="item" data-name="laser_relays"
-            src="../assets/ui/items/laser_relays.png" />
-
-          <img data-content="Reflects the laser." data-title="LASER CUBE" class="item" data-name="laser_cube"
-            src="../assets/ui/items/laser_cube.png" />-->
+            -->
 
           <!--<img
             data-content="You can place automatic portals on the scene, it can be static or activated by a trigger. You can choose which portal color on the level editor. If the player has a portal gun and shoots a portal with the same color as the automatic portal, the automatic portal will be destroyed and vice versa."
@@ -414,6 +419,88 @@
           </button>
         </li>
         <li data-trigger="Right" class="menu-item light-bridge-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Right</span>
+          </button>
+        </li>
+      </ul>
+    </li>
+
+    <!---->
+    <li class="menu-item menu-item-submenu hasItem laser_emitter" id="laser_emitter-trigger"
+      data-trigger="Middle Horizontal">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-crosshairs"></i>
+        <span class="menu-text title">Middle Horizontal</span>
+      </button>
+      <ul class="menu">
+        <li data-trigger="Middle Horizontal" class="menu-item laser_emitter-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Middle Horizontal</span>
+          </button>
+        </li>
+        <li data-trigger="Top" class="menu-item laser_emitter-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Top</span>
+          </button>
+        </li>
+        <li data-trigger="Bottom" class="menu-item laser_emitter-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Bottom</span>
+          </button>
+        </li>
+        <li data-trigger="Left" class="menu-item laser_emitter-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Left</span>
+          </button>
+        </li>
+        <li data-trigger="Right" class="menu-item laser_emitter-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Right</span>
+          </button>
+        </li>
+      </ul>
+    </li>
+
+    <!---->
+    <li class="menu-item menu-item-submenu hasItem laser_receiver" id="laser_receiver-trigger"
+      data-trigger="Middle Horizontal">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-crosshairs"></i>
+        <span class="menu-text title">Middle Horizontal</span>
+      </button>
+      <ul class="menu">
+        <li data-trigger="Middle Horizontal" class="menu-item laser_receiver-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Middle Horizontal</span>
+          </button>
+        </li>
+        <li data-trigger="Top" class="menu-item laser_receiver-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Top</span>
+          </button>
+        </li>
+        <li data-trigger="Bottom" class="menu-item laser_receiver-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Bottom</span>
+          </button>
+        </li>
+        <li data-trigger="Left" class="menu-item laser_receiver-triggers">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-crosshairs"></i>
+            <span class="menu-text">Left</span>
+          </button>
+        </li>
+        <li data-trigger="Right" class="menu-item laser_receiver-triggers">
           <button type="button" class="menu-btn">
             <i class="fa fa-crosshairs"></i>
             <span class="menu-text">Right</span>
@@ -1196,7 +1283,6 @@
   width: 100px;
   height: 50px;
   background: black;
-  display: none;
   justify-content: center;
   align-items: center;"></span>
 

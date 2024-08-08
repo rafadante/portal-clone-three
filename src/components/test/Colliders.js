@@ -25,11 +25,14 @@ import {
 } from '../../Utils.js';
 import { interactWithItem } from '../events/events.js';
 import { respawn } from '../events/states.js';
+import { addLaserToCube } from '../lasers/Laser.js';
 
 function colliderItemManager() {
 
     //CORRIDOR ENTER COLLIDERS
     corridorColliderNames(GLOBALS.CORRIDOR_ENTER, false);
+
+    console.log(GLOBALS.DYMANIC_ITEMS)
 
     //
     addColliderItem(GLOBALS.DYMANIC_ITEMS['cube'], "cube", 10)
@@ -53,7 +56,7 @@ function colliderItemManager() {
     addColliderItem(GLOBALS.DYMANIC_ITEMS['ramp_half'], "ramp_half", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['ramp_half2'], "ramp_half2", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['stairs'], "stairs", 0)
-    addColliderItem(GLOBALS.DYMANIC_ITEMS['laser_cube'], "laser_cube", 5)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['laser_cube'], "laser_cube", 10)
     addColliderItem(GLOBALS.DOORS, "door", 0)
 
     addColliderDoorsDefault(GLOBALS.ENTER_DOOR);
@@ -159,11 +162,12 @@ function addColliderItem(items, type, mass, offset) {
                 var shape = new CANNON.Box(new CANNON.Vec3(1, 1, 0.01));
 
                 var vec = new Vector3();
-                items[i].children[1].getWorldPosition(vec)
+                items[i].children[0].getWorldPosition(vec)
                 var pos = vec;
+                objHolder.position.copy(pos);
 
                 var vec = new Quaternion();
-                items[i].children[1].getWorldQuaternion(vec)
+                items[i].children[0].getWorldQuaternion(vec)
                 var rot = vec;
             } else if (type == "cube" || type == "cube_2" || type == "laser_cube") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.3, 0.3));
@@ -251,6 +255,8 @@ function addColliderItem(items, type, mass, offset) {
                 addPositionalAudio('audio-radio', box, true, true, false, 8)
             } else if (type == "door") {
                 addPositionalAudio('audio-door', items[i], false, false, true, 8)
+            }else if(type == "laser_cube"){
+                addLaserToCube(box)
             }
 
             if (mass > 0) {
@@ -274,7 +280,7 @@ function addColliderItem(items, type, mass, offset) {
 
                 box.spawnPosition = items[i].position.clone();
                 box.sleepSpeedLimit = 0.1;
-                box.sleepTimeLimit = 2.0;
+                box.sleepTimeLimit = 1.0;
                 GLOBALS.DYNAMIC_OBJECTS.push(box);
                 box.gelJumping = false;
                 box.waiting = false;
@@ -282,6 +288,7 @@ function addColliderItem(items, type, mass, offset) {
                 box.arrayPos = [];
                 box.arrayRot = [];
                 box.name = type;
+                box.initialMass = mass;
 
                 const clone = GLOBALS.ITEMS_ADDED.getObjectByName(type).clone.clone();
                 clone.visible = false;
@@ -305,6 +312,12 @@ function addColliderItem(items, type, mass, offset) {
 
                 box.addEventListener("sleep", function (event) {
                     box.sleeping = true;
+
+                    if(box.name == "laser_cube"){
+                        //box.mass = 0;
+                        //box.collisionResponse = 0;
+                        console.log("sleep")
+                    }
                 });
 
                 box.addEventListener('wakeup', (event) => {

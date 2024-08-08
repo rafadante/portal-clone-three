@@ -47,7 +47,9 @@ function raycastSelected(found, event, type) {
 
             if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem &&
                 (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("door") ||
-                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("ramp") ||
+                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_0") ||
+                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_1") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal_button") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("faith_plate"))) {
                 $("#rotate-item").css("display", "block");
             } else {
@@ -69,7 +71,7 @@ function raycastSelected(found, event, type) {
                     $(".dispenser").css("display", "none");
                 }
 
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button") ||
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_receiver") ||
                 GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area")) {
                     $(".buttons").css("display", "block");
                     $("#connections").empty();
@@ -162,6 +164,16 @@ function raycastSelected(found, event, type) {
                     $(".portal_gun").css("display", "block");
                     $("#portal_gun-state").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state + " Portals");
                 }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_emitter")) {
+                    $(".laser_emitter").css("display", "block");
+                    $("#laser_emitter-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
+                }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_receiver")) {
+                    $(".laser_receiver").css("display", "block");
+                    $("#laser_receiver-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
+                }
             }
 
             GLOBALS.SELECTED_ID.push(instanceId);
@@ -207,6 +219,11 @@ function raycastSelected(found, event, type) {
                                 const index4 = GLOBALS.FIZZLER_RAYCASTER.indexOf(planeInstanceOld.item.raycaster);
                                 if (index4 > -1) {
                                     GLOBALS.FIZZLER_RAYCASTER.splice(index4, 1);
+                                }
+
+                                const index5 = GLOBALS.LASER_EMITTER_RAYCASTER.indexOf(planeInstanceOld.item.raycaster);
+                                if (index5 > -1) { // only splice array when item is found
+                                    GLOBALS.LASER_EMITTER_RAYCASTER.splice(index5, 1); // 2nd parameter means remove one item only
                                 }
 
                                 GLOBALS.SCENE_CHILDREN.remove(planeInstanceOld.item.continuous);
@@ -291,7 +308,7 @@ function raycastSelected(found, event, type) {
 
                             if (planeInstanceOld.item.name.includes("camera") ||
                                 planeInstanceOld.item.name.includes("observation") ||
-                                planeInstanceOld.item.name.includes("portal_gun"))
+                                planeInstanceOld.item.name.includes("portal_"))
                                 planeInstanceOld.item.rotation.set(planeInstanceNew.normal.x, planeInstanceNew.normal.y, planeInstanceNew.normal.z)
                             else if (!planeInstanceOld.item.name.includes("door-"))
                                 planeInstanceOld.item.rotation.copy(planeInstanceNew.rotation);
@@ -413,5 +430,6 @@ function showMenu(x, y) {
 }
 
 export {
-    raycastSelected
+    raycastSelected,
+    removeSelection
 }

@@ -21,7 +21,7 @@ var pixelRatio, shadowMap, portalsRecursive, fov, mobile, antialias;
 if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     mobile = true;
     pixelRatio = 0.5;
-    shadowMap = true;
+    shadowMap = false;
     portalsRecursive = 1;
     fov = 63;
     antialias = false;
@@ -39,7 +39,7 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
 }
 
 //MAIN CAMERA
-const camera = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 100);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 
@@ -62,7 +62,7 @@ camera.add(cubeHolder);
 const renderer = new WebGLRenderer({
     alpha: true,
     powerPreference: "high-performance",
-    antialias: antialias,
+    antialias: antialias
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -76,6 +76,8 @@ renderer.localClippingEnabled = true;
 //renderer.physicallyCorrectLights = true;
 renderer.domElement.id = "viewer-3d";
 renderer.shadowMap.autoUpdate = true;
+
+console.log(renderer)
 
 //CONTROLS
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -117,7 +119,7 @@ var GLOBALS = {
     //LEVEL EDITOR
     PLANE_USER_DATA: [],
     PLANE_LEVEL_INSTANCED: null,
-    BUDGET: 3000,
+    BUDGET: 1500,
 
     //PORTALS
     PORTALS: [null, null],
@@ -211,6 +213,7 @@ var GLOBALS = {
         light_bridge: [],
         tractor_beam: [],
         laser_emitter: [],
+        laser_receiver: [],
         laser_cube: [],
         faith_plate: [],
         door: [],
@@ -226,7 +229,7 @@ var GLOBALS = {
         fizzler: [],
         glass: [],
         portal_gun: [],
-        trigger_area: []
+        trigger_area: [],
     },
 
     INTERACTIVE: [],
@@ -453,6 +456,10 @@ var GLOBALS = {
             count: 0,
             max: 10
         },
+        laser_receiver: {
+            count: 0,
+            max: 10
+        },
         laser_cube: {
             count: 0,
             max: 10
@@ -521,6 +528,10 @@ var GLOBALS = {
             count: 0,
             max: 10
         },
+        portal: {
+            count: 0,
+            max: 10
+        },
     },
     SCENE_FPS: null,
     LISTENER: new AudioListener(),
@@ -557,7 +568,15 @@ var GLOBALS = {
     ACTIVATED: [],
     SOUNDS_FPS: [],
     MATERIAL_TRIGGER_ONCE: null,
-    MATERIAL_TRIGGER_MULT: null
+    MATERIAL_TRIGGER_MULT: null,
+    BATCHED_ORANGE: null,
+    BATCHED_BLUE: null,
+    BATCHED_GLASS: null,
+    BATCHED_GRID: null,
+    LASER_EMITTER_PORTAL_CLONES: [],
+    DYNAMIC_BODIES: [],
+    LASER_EMITTER_TRIGGER: null,
+    LASER_RECEIVER_TRIGGER: null
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
@@ -652,6 +671,10 @@ function reset() {
             max: 10
         },
         laser_emitter: {
+            count: 0,
+            max: 10
+        },
+        laser_receiver: {
             count: 0,
             max: 10
         },
