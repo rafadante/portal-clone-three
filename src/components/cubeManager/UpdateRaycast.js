@@ -79,8 +79,6 @@ function checkToUpdateContinuous() {
             "glass");
     }
 
-    console.log(GLOBALS.LASER_EMITTER_RAYCASTER)
-
     for (var i = 0; i < GLOBALS.LASER_EMITTER_RAYCASTER.length; i++) {
         laserEmitterRaycast(
             GLOBALS.LASER_EMITTER_RAYCASTER[i].item,

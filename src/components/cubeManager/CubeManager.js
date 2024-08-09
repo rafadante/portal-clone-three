@@ -274,6 +274,7 @@ function buildIniCubes(obj) {
     if (!GLOBALS.LOADED_LEVEL) {
 
         const geometry = new PlaneGeometry(2, 2);
+        geometry.computeBoundsTree();
 
         GLOBALS.PLANE_LEVEL_INSTANCED = new InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
         GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = true;

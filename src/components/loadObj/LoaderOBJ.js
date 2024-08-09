@@ -115,6 +115,9 @@ async function handleZip(path, obj) {
                     loadAutoPortalManager1(result.scene)
                 else if (obj == "loadLaserReceiver")
                     loadLaserReceiverManager(result.scene)
+                else if (obj == "loadLaserRelay")
+                    loadLaserRelayManager(result.scene)
+                
                 
             });
         }
@@ -392,6 +395,7 @@ function loadPortalCubeManager(scene) {
 function instancedTransform(scene, name, interactive, roughness, envIntensity) {
     var geometry = scene.children[0].geometry.clone();
     geometry.computeVertexNormals();
+    geometry.computeBoundsTree();
 
     var item = new InstancedMesh(geometry, scene.children[0].material.clone(), 20);
     item.instanceMatrix.setUsage(DynamicDrawUsage); // will be updated every frame
@@ -975,6 +979,23 @@ function loadLaserReceiver() {
 function loadLaserReceiverManager(scene) {
 
     var item = instancedTransform(scene, "laser_receiver", false, 0.1, 1)
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
+
+    loadLaserRelay()
+}
+
+function loadLaserRelay() {
+    handleZip('./assets/3ds/laser_relay.zip', "loadLaserRelay");
+}
+
+function loadLaserRelayManager(scene) {
+
+    
+
+    var item = instancedTransform(scene, "laser_relay", false, 0, 1)
+    console.log(item)
     item.userData.wall = true;
     item.userData.ground = true;
     item.userData.ceiling = true;

@@ -20,7 +20,6 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import { AUDIO, play } from '../audio/Audio.js';
-import { createLaserFromPortal } from '../lasers/Laser.js';
 
 var coords = new Vector3();
 var raycaster2 = new Raycaster();
@@ -283,12 +282,10 @@ function portalButton(button, auto, camera) {
                             createLightBridgesFromPortal(1, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
                             createLightBridgesFromPortal(1, GLOBALS.TRACTOR_BEAM_RAYCASTER);
                             //createLightBridgesFromPortal(1, GLOBALS.LASER_EMITTER_RAYCASTER);
-                            //createLaserFromPortal(1, GLOBALS.LASER_EMITTER_RAYCASTER);
                         } else if (button == 2) {
                             createLightBridgesFromPortal(0, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
                             createLightBridgesFromPortal(0, GLOBALS.TRACTOR_BEAM_RAYCASTER);
                             //createLightBridgesFromPortal(0, GLOBALS.LASER_EMITTER_RAYCASTER);
-                            //createLaserFromPortal(0, GLOBALS.LASER_EMITTER_RAYCASTER);
                         }
                     }, 300);
                 } else {

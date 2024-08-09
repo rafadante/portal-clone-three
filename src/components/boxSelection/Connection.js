@@ -58,17 +58,17 @@ function manageConnection(instanceId, from) {
         material.uniforms.useDash.value = 1;
         const line = new Mesh(geometry, material)
 
-        GLOBALS.SCENE_CHILDREN.add(line);
+        /*GLOBALS.SCENE_CHILDREN.add(line);
 
         GLOBALS.CONNECTIONS.push({
             line: line,
             from: from,
             to:  GLOBALS.PLANE_USER_DATA[instanceId]
-        });
+        });*/
 
         from.item.userData.connectedTo.push(instanceId);
 
-        //findPath(from.position, GLOBALS.PLANE_USER_DATA[instanceId].position, GLOBALS.PLANE_USER_DATA[instanceId], from)
+        findPath(from.position, GLOBALS.PLANE_USER_DATA[instanceId].position, GLOBALS.PLANE_USER_DATA[instanceId], from)
     }
 
     GLOBALS.ITEM_CUBE.visible = false;

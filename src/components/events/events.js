@@ -94,7 +94,9 @@ function updateEvents() {
 
     //Go through each connection to check for triggers
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-      if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("pedestal") || GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_receiver"))
+      if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("pedestal")
+        || GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_receiver")
+        || GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_relay"))
         continue
       else if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area") && GLOBALS.CONNECTIONS[i]['from'].item.visible)
         GLOBALS.CONNECTIONS[i]['from'].item.visible = false;
@@ -111,7 +113,7 @@ function updateEvents() {
               GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
               GLOBALS.CONNECTIONS[i]['line'].idConnection = id;
               GLOBALS.CONNECTIONS[i]['line'].active = true;
-              GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0x0077B6);
+              GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(2, 1.3, 0);
               //GLOBALS.BATCHED_BLUE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, false);
               //GLOBALS.BATCHED_ORANGE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, true);
 
@@ -174,7 +176,7 @@ function updateEvents() {
               GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons -= 1;
               GLOBALS.CONNECTIONS[i]['line'].idConnection = null;
               GLOBALS.CONNECTIONS[i]['line'].active = false;
-              GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0xffa500);
+              GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0, 2.0, 5.0);
               //GLOBALS.BATCHED_BLUE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, true);
               //GLOBALS.BATCHED_ORANGE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, false);
 
@@ -215,7 +217,7 @@ function resetAll() {
       GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons -= 1;
       GLOBALS.CONNECTIONS[i]['line'].idConnection = null;
       GLOBALS.CONNECTIONS[i]['line'].active = false;
-      GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0xffa500);
+      GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0, 2.0, 5.0);
 
       if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
         GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
@@ -264,7 +266,7 @@ function interactWithItem() {
     GLOBALS.CURRENT_ITEM.body.holding = false;
     GLOBALS.CURRENT_ITEM.body.angularDamping = 0;
     GLOBALS.CURRENT_ITEM.body.allowSleep = true;
-    GLOBALS.CURRENT_ITEM.body.mass = GLOBALS.CURRENT_ITEM.body.initialMass;
+    //GLOBALS.CURRENT_ITEM.body.mass = GLOBALS.CURRENT_ITEM.body.initialMass;
     GLOBALS.CURRENT_ITEM = null;
     GLOBALS.CURRENT_ITEM_ID = null;
     itemHolder = null;
@@ -292,7 +294,7 @@ function interactWithItem() {
               GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
               //GLOBALS.CONNECTIONS[i]['line'].idConnection = id;
               GLOBALS.CONNECTIONS[i]['line'].active = true;
-              GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0x0077B6);
+              GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(2, 1.3, 0);
               //GLOBALS.BATCHED_BLUE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, false);
               //GLOBALS.BATCHED_ORANGE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, true);
 
@@ -396,7 +398,7 @@ function pedestalTimer(holder) {
 
   holder['line'].active = false;
   holder['to'].item.userData.buttons -= 1;
-  holder['line'].material.color = new Color(0xffa500);
+  holder['line'].material.color = new Color(0, 2.0, 5.0);
   //GLOBALS.BATCHED_BLUE.setVisibleAt(holder['line'].lineInstancedId, true);
   //GLOBALS.BATCHED_ORANGE.setVisibleAt(holder['line'].lineInstancedId, false);
 
@@ -418,16 +420,16 @@ function pedestalTimer(holder) {
   }
 }
 
-function laserReceiverTrigger(item, state) {
+function laserReceiverTrigger(obj, state) {
 
-  item = GLOBALS.PLANE_USER_DATA[item.userData.planeInstancedId];
+  const item = GLOBALS.PLANE_USER_DATA[obj.userData.planeInstancedId];
 
   //console.log(item)
 
   if (state) {
     //Go through each connection to check for triggers
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-      if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_receiver")) {
+      if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_receiver") && !GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_relay")) {
         continue
       }
 
@@ -436,9 +438,12 @@ function laserReceiverTrigger(item, state) {
         //Verify if the button accepts the body
         if (!GLOBALS.CONNECTIONS[i]['line'].active) {
           item.item.connection = GLOBALS.CONNECTIONS[i];
+          GLOBALS.CONNECTIONS[i]['from'].item.userData.state = true;
           GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
           GLOBALS.CONNECTIONS[i]['line'].active = true;
-          GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0x0077B6);
+          GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(2, 1.3, 0);
+
+          GLOBALS.LASER_TRIGGERS.push(obj);
 
           //PLAY AUDIO POSITIVE
           addPositionalAudio('audio-button-positive', GLOBALS.CONNECTIONS[i]['from'], true, false, true, 8);
@@ -481,13 +486,18 @@ function laserReceiverTrigger(item, state) {
     }
   } else {
 
-    console.log(item)
+    const index = GLOBALS.LASER_TRIGGERS.indexOf(obj);
+    if (index > -1) {
+      console.log("removed");
+      GLOBALS.LASER_TRIGGERS.splice(index, 1);
+    }
 
     var holder = item.item.connection;
 
     holder['line'].active = false;
     holder['to'].item.userData.buttons -= 1;
-    holder['line'].material.color = new Color(0xffa500);
+    holder['line'].material.color = new Color(0, 2.0, 5.0);
+    holder['from'].item.userData.state = false;
     //GLOBALS.BATCHED_BLUE.setVisibleAt(holder['line'].lineInstancedId, true);
     //GLOBALS.BATCHED_ORANGE.setVisibleAt(holder['line'].lineInstancedId, false);
 

@@ -118,6 +118,7 @@ function createInstances(meshes, material) {
     material.polygonOffsetFactor = 2;
 
     const geometry = new PlaneGeometry(2, 2);
+    geometry.computeBoundsTree();
     var mesh = new InstancedMesh(geometry.clone(), material, meshes.length);
     mesh.castShadow = true;
     mesh.receiveShadow = true;

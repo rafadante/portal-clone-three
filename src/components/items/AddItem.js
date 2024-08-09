@@ -27,10 +27,10 @@ import { ContinuousTrigger } from '../continuous/Continuous.js';
 import { getPlaneByName } from '../../Utils.js';
 import $ from 'jquery';
 import { planeInstanceReset } from './Items.js';
-import { 
+import {
     laserEmitterRaycast,
     laserEmitterPosition
- } from '../lasers/Laser.js';
+} from '../lasers/Laser.js';
 
 var itemCount = 0;
 
@@ -88,8 +88,8 @@ function addItem(found, loaded) {
             } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
                 var item = GLOBALS.GUN_CLONE.clone();
                 const camera = GLOBALS.MAIN_CAMERA.clone();
-                camera.position.set(0,0,0)
-                camera.rotation.set(0,0,0)
+                camera.position.set(0, 0, 0)
+                camera.rotation.set(0, 0, 0)
                 item.add(camera);
                 item.camera = camera;
                 window.ttt = camera;
@@ -271,15 +271,18 @@ function addItem(found, loaded) {
             }
 
             //LASER EMITTER
-            if(GLOBALS.ITEM_HOLDED_NAME == "laser_emitter"){
-                laserEmitterRaycast(item, false,GLOBALS.LASER_EMITTER_RAYCASTER)
-            }else if(GLOBALS.ITEM_HOLDED_NAME == "laser_receiver"){
+            if (GLOBALS.ITEM_HOLDED_NAME == "laser_emitter") {
+                laserEmitterRaycast(item, false, GLOBALS.LASER_EMITTER_RAYCASTER)
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_receiver" || GLOBALS.ITEM_HOLDED_NAME == "laser_relay") {
                 item.userData.connectedTo = [];
                 GLOBALS.LOADED_CONNECTIONS.push({
                     data: userDataLoadedItem,
                     item: userData
                 });
             }
+
+            item.initialPosition = item.position.clone();
+            item.initialRotation = item.rotation.clone();
 
             if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
 
@@ -329,10 +332,6 @@ function addItem(found, loaded) {
                 item.fixed = true;
                 item.cube = cube;
                 cube.item = item;
-
-                item.initialPosition = item.position.clone();
-                item.initialRotation = item.rotation.clone();
-
 
                 GLOBALS.CAMERAS.push(item);
                 GLOBALS.ITEMS_ADDED.add(item);
@@ -468,6 +467,14 @@ function manageItemVariables(item, userData, instanced) {
         item.userData.reversed = false;
         item.userData.triggers = "State";
         createLightBridges("tractor_beam", GLOBALS.TRACTOR_BEAM_RAYCASTER, item, null, false);
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_emitter") {
+        item.userData.state = true;
+        item.userData.triggers = GLOBALS.LASER_EMITTER_TRIGGER;
+        laserEmitterPosition(item, item.userData.triggers, $("#laser_emitter-trigger"), "laser_emitter");
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_receiver") {
+        item.userData.state = true;
+        item.userData.triggers = GLOBALS.LASER_RECEIVER_TRIGGER;
+        laserEmitterPosition(item, item.userData.triggers, $("#laser_receiver-trigger"), "laser_receiver");
     }
 }
 
@@ -488,7 +495,7 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
     } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
         item.userData.rotationY = userDataLoadedItem.rotationY;
         item.rotation.y = item.userData.rotationY;
-    }  else if (GLOBALS.ITEM_HOLDED_NAME == "pedestal_button") {
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "pedestal_button") {
 
         item.userData.rotationY = userDataLoadedItem.rotationY;
         var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName("pedestal_button");
@@ -536,17 +543,17 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         item.userData.reversed = userDataLoadedItem.reversed;
         item.userData.triggers = userDataLoadedItem.triggers;
         createLightBridges("tractor_beam", GLOBALS.TRACTOR_BEAM_RAYCASTER, item, null, false);
-    }else if (GLOBALS.ITEM_HOLDED_NAME == "laser_emitter") {
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_emitter") {
         item.userData.state = userDataLoadedItem.state;
         item.userData.triggers = userDataLoadedItem.triggers;
         laserEmitterPosition(item, item.userData.triggers, $("#laser_emitter-trigger"), "laser_emitter");
-    }else if (GLOBALS.ITEM_HOLDED_NAME == "laser_receiver") {
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_receiver") {
         item.userData.state = userDataLoadedItem.state;
         item.userData.triggers = userDataLoadedItem.triggers;
         laserEmitterPosition(item, item.userData.triggers, $("#laser_receiver-trigger"), "laser_receiver");
     }
 
-    
+
 }
 
 function clickItem(elem) {

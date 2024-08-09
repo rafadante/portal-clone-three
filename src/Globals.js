@@ -8,13 +8,21 @@ import {
     Group,
     Scene,
     WebGLRenderTarget,
-    AudioListener
+    AudioListener,
+    Mesh,
+    BufferGeometry
 } from 'three';
 import * as CANNON from 'cannon';
 import "./components/materials/Materials.js"
 import {
     OrbitControls
 } from 'three/addons/controls/OrbitControls.js';
+import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh';
+
+// Add the extension functions
+BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
+BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
+Mesh.prototype.raycast = acceleratedRaycast;
 
 var pixelRatio, shadowMap, portalsRecursive, fov, mobile, antialias;
 
@@ -214,6 +222,7 @@ var GLOBALS = {
         tractor_beam: [],
         laser_emitter: [],
         laser_receiver: [],
+        laser_relay: [],
         laser_cube: [],
         faith_plate: [],
         door: [],
@@ -460,6 +469,10 @@ var GLOBALS = {
             count: 0,
             max: 10
         },
+        laser_relay :{
+            count: 0,
+            max: 10
+        },
         laser_cube: {
             count: 0,
             max: 10
@@ -575,8 +588,9 @@ var GLOBALS = {
     BATCHED_GRID: null,
     LASER_EMITTER_PORTAL_CLONES: [],
     DYNAMIC_BODIES: [],
-    LASER_EMITTER_TRIGGER: null,
-    LASER_RECEIVER_TRIGGER: null
+    LASER_EMITTER_TRIGGER: "Bottom",
+    LASER_RECEIVER_TRIGGER: "Bottom",
+    LASER_TRIGGERS: []
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
@@ -675,6 +689,10 @@ function reset() {
             max: 10
         },
         laser_receiver: {
+            count: 0,
+            max: 10
+        },
+        laser_relay: {
             count: 0,
             max: 10
         },

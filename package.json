@@ -24,6 +24,7 @@
     "sass": "^1.68.0",
     "stats-gl": "^1.0.5",
     "three": "^0.166.1",
+    "three-mesh-bvh": "^0.7.6",
     "three-pathfinding": "^1.2.0",
     "three-to-cannon": "^4.3.0",
     "web-vitals": "^2.1.4"

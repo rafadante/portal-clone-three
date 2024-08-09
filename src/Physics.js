@@ -16,6 +16,7 @@ import {
     updateLaserCubeRaycaster,
     updateLaserEmitterRaycaster
 } from './components/lasers/Laser.js';
+import { laserReceiverTrigger } from './components/events/events.js';
 
 // return the cannon world
 // Setup our world
@@ -142,7 +143,7 @@ function updatePhysics() {
             property == "light_bridge" || property == "laser_emitter" ||
             property == "door" || property == "light" || property == "stripe" || property == "gel_blue" ||
             property == "gel_orange" || property == "laser_field" || property == "fizzler" ||
-            property == "portal_0" || property == "portal_1" || property == "laser_receiver")
+            property == "portal_0" || property == "portal_1")
             continue;
 
         for (var i = 0; i < GLOBALS.DYMANIC_ITEMS[property].length; i++) {
@@ -156,30 +157,12 @@ function updatePhysics() {
                     }
                 }
 
-                if (property == "tractor_beam") {
+                if (property == "tractor_beam" || property == "laser_receiver"|| property == "laser_relay") {
                     if (GLOBALS.DYMANIC_ITEMS[property][i].userData.state) {
-                        var dir = new Vector3(); // create once and reuse it
-                        dir.copy(GLOBALS.DYMANIC_ITEMS[property][i].up).applyQuaternion(GLOBALS.DYMANIC_ITEMS[property][i].quaternion);
-
-                        var val = 0.05;
-                        if (GLOBALS.DYMANIC_ITEMS[property][i].userData.reversed)
-                            val = -0.05;
-
-                        if (Math.round(Math.abs(dir.z)) == 1)
-                            GLOBALS.DYMANIC_ITEMS[property][i].rotation.y += val;
-                        else if (Math.round(Math.abs(dir.x)) == 1)
-                            GLOBALS.DYMANIC_ITEMS[property][i].rotation.x += val;
-                        else if (Math.round(Math.abs(dir.y)) == 1)
-                            GLOBALS.DYMANIC_ITEMS[property][i].rotation.y += val;
-
-                        var item = new Object3D();
-                        item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].position);
-                        item.rotation.copy(GLOBALS.DYMANIC_ITEMS[property][i].rotation);
-
-                        item.updateMatrix();
-                        instanced.setMatrixAt(i, item.matrix)
-                        instanced.instanceMatrix.needsUpdate = true;
-                        instanced.computeBoundingSphere();
+                        if (property == "tractor_beam")
+                            rotateInstanced(instanced, GLOBALS.DYMANIC_ITEMS[property][i], i, 0.05)
+                        else if (property == "laser_receiver"|| property == "laser_relay")
+                            rotateInstanced(instanced, GLOBALS.DYMANIC_ITEMS[property][i], i, -0.075)
                     }
                 } else {
                     var item = new Object3D();
@@ -199,6 +182,12 @@ function updatePhysics() {
         }
     }
 
+    for (var i = 0; i < GLOBALS.LASER_TRIGGERS.length; i++) {
+        if (!GLOBALS.LASER_TRIGGERS[i].emitterState && GLOBALS.LASER_TRIGGERS[i].fromLaserCube) {
+            laserReceiverTrigger(GLOBALS.LASER_TRIGGERS[i], false);
+        }
+    }
+
     for (var i = 0; i < GLOBALS.CAMERAS.length; i++) {
         if (!GLOBALS.CAMERAS[i].fixed) {
             GLOBALS.CAMERAS[i].position.copy(GLOBALS.CAMERAS[i].body.position);
@@ -211,12 +200,40 @@ function updatePhysics() {
     if (debugColision)
         cannonDebugger.update();
 
-    if (updateLasers) {
-        updateLasers = false;
-        setTimeout(() => {
-            updateLasers = true;
-        }, 40);
+    if (GLOBALS.HOLDING_ITEM) {
+        updateLasers = true;
+    } else {
+        if (updateLasers) {
+            updateLasers = false;
+            setTimeout(() => {
+                updateLasers = true;
+            }, 100);
+        }
     }
+}
+
+function rotateInstanced(instanced, item, i, speed) {
+    var dir = new Vector3(); // create once and reuse it
+    dir.copy(item.up).applyQuaternion(item.quaternion);
+
+    if (item.userData.reversed)
+        speed = -speed;
+
+    if (Math.round(Math.abs(dir.z)) == 1)
+        item.rotation.y += speed;
+    else if (Math.round(Math.abs(dir.x)) == 1)
+        item.rotation.x += speed;
+    else if (Math.round(Math.abs(dir.y)) == 1)
+        item.rotation.y += speed;
+
+    var dummy = new Object3D();
+    dummy.position.copy(item.position);
+    dummy.rotation.copy(item.rotation);
+
+    dummy.updateMatrix();
+    instanced.setMatrixAt(i, dummy.matrix)
+    instanced.instanceMatrix.needsUpdate = true;
+    instanced.computeBoundingSphere();
 }
 
 // This functions moves the joint body to a new postion in space

@@ -7,7 +7,8 @@ import {
     Object3D,
     Vector3,
     CircleGeometry,
-    Matrix4
+    Matrix4,
+    Color
 } from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import {
@@ -63,7 +64,7 @@ function findPath(ini, target, found,found2) {
     GLOBALS.SCENE_CHILDREN.remove(lineFollow);
     count = 0;
 
-    GLOBALS.SELECTED_FOR_CONNECTION.check = plane;
+    //GLOBALS.SELECTED_FOR_CONNECTION.check = plane;
 
     for (var j = 0; j < GLOBALS.PLANE_USER_DATA.length; j++) {
         if (GLOBALS.PLANE_USER_DATA[j].exists && !GLOBALS.PLANE_USER_DATA[j].hasItem) {
@@ -196,7 +197,7 @@ function path2(dgraph, start, end, side,found,found2) {
     const circleGeometry = new CircleGeometry(0.05, 32);
     const circleMaterial = new MeshBasicMaterial({
         side: 2,
-        color: 0x03e8fc,
+        color: new Color(0, 0.7, 1.0),
         emissiveIntensity: 100,
         polygonOffset: true,
         polygonOffsetFactor: -5,

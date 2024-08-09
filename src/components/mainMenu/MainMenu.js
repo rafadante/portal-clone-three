@@ -325,9 +325,6 @@ function loadLevel(data) {
 
     reset();
 
-    console.log(GLOBALS.PLANE_USER_DATA)
-    console.log(data)
-
     GLOBALS.PLANE_USER_DATA = data;
     GLOBALS.CUBES.remove(GLOBALS.PLANE_LEVEL_INSTANCED);
 
@@ -346,8 +343,6 @@ function loadLevel(data) {
     GLOBALS.CUBES.add(GLOBALS.PLANE_LEVEL_INSTANCED);
 
     var clone = new Object3D();
-
-    console.log(GLOBALS.BUDGET)
 
     for (var i = 0; i < GLOBALS.BUDGET; i++) {
         clone.scale.set(0, 0, 0);

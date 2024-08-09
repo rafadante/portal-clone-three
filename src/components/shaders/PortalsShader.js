@@ -133,6 +133,7 @@ const generateMeshPortalShader = () => {
     });
 
     var planegeometry = new CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
+    planegeometry.computeBoundsTree();
     var plane = new Mesh(planegeometry, mat);
     plane.name = "portal-0";
     plane.renderOrder = -1;
@@ -164,6 +165,7 @@ const generateMeshPortalShader = () => {
     });
 
     var planegeometry = new CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
+    planegeometry.computeBoundsTree();
     var plane = new Mesh(planegeometry, mat2);
     plane.renderOrder = -1;
     plane.name = "portal-1";

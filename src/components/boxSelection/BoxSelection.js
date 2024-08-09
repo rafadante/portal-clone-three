@@ -72,7 +72,7 @@ function raycastSelected(found, event, type) {
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_receiver") ||
-                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area")) {
+                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_relay")) {
                     $(".buttons").css("display", "block");
                     $("#connections").empty();
 

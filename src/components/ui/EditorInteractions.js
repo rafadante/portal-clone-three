@@ -111,6 +111,14 @@ $("body").on('click', '#delete', function () {
             }
         }
 
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "laser_emitter") {
+            const index = GLOBALS.LASER_EMITTER_RAYCASTER.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.raycaster);
+            if (index > -1) { // only splice array when item is found
+                GLOBALS.LASER_EMITTER_RAYCASTER.splice(index, 1); // 2nd parameter means remove one item only
+                console.log("111111111111")
+            }
+        }
+
         deleteItemInstanced(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false);
     } else {
 
