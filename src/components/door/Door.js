@@ -65,12 +65,6 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
           //GLOBALS.CORRIDOR_ENTER.getObjectByName("elevatorOBJ").visible = false;
           //GLOBALS.CORRIDOR_ENTER.getObjectByName("leftDoor").visible = false;
           //GLOBALS.CORRIDOR_ENTER.getObjectByName("rightDoor").visible = false;
-
-
-          if (GLOBALS.EXIT_DOOR.userData.connections > 0)
-            stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
-          else
-            stateDoor(0, true, false, GLOBALS.EXIT_DOOR);
         }, 300);
       }
 

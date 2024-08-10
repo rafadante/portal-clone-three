@@ -92,6 +92,10 @@ function respawn(d) {
     var time2 = 0;
 
     if (d.name == "player") {
+
+        document.getElementById("death-screen").style.backgroundColor = "rgb(255, 0, 0)";
+        document.getElementById("death-screen").style.opacity = 0.75;
+
         AUDIO.DEATH.currentTime = 0;
         play(AUDIO.DEATH);
         time = 500;

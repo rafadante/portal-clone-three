@@ -273,7 +273,7 @@ function addItem(found, loaded) {
             //LASER EMITTER
             if (GLOBALS.ITEM_HOLDED_NAME == "laser_emitter") {
                 laserEmitterRaycast(item, false, GLOBALS.LASER_EMITTER_RAYCASTER)
-            } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_receiver" || GLOBALS.ITEM_HOLDED_NAME == "laser_relay") {
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_receiver" || GLOBALS.ITEM_HOLDED_NAME == "laser_relay"|| GLOBALS.ITEM_HOLDED_NAME == "pellet_catcher") {
                 item.userData.connectedTo = [];
                 GLOBALS.LOADED_CONNECTIONS.push({
                     data: userDataLoadedItem,

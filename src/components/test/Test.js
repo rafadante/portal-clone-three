@@ -24,6 +24,7 @@ import {
 import { testLightsManager } from '../lights/Lights.js';
 import { manageInstances } from './Instances.js';
 import './BackToEditor.js';
+import { stateDoor } from '../door/Door.js';
 
 $("body").on('click', '#view-fps', function () {
     viewFPS();
@@ -211,6 +212,12 @@ function viewFPS() {
 
         GLOBALS.PORTAL_GUN_BOX = holder;
         GLOBALS.FPS_MODE = true;
+
+        //stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
+        /*if (GLOBALS.EXIT_DOOR.userData.connections > 0)
+            stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
+          else
+            stateDoor(0, true, false, GLOBALS.EXIT_DOOR);*/
 
         animate()
 

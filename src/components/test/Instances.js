@@ -41,7 +41,6 @@ function manageInstances() {
     var sideLeft = [];
 
     //SEPARETE MESHS FOR INSTANCING
-    console.log(GLOBALS.PLANE_USER_DATA.length)
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
 
         if (GLOBALS.PLANE_USER_DATA[i].exists) {
@@ -183,8 +182,6 @@ function manageBatchesLines() {
     /*GLOBALS.BATCHED_BLUE = new BatchedMesh(100000, 100000, 100000, material);
     GLOBALS.BATCHED_BLUE.frustumCulled = false;
     //GLOBALS.SCENE_FPS.add(GLOBALS.BATCHED_BLUE);
-
-    //console.log(GLOBALS.CONNECTIONS)
 
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
         //GLOBALS.CONNECTIONS[i]['line'].visible = false;

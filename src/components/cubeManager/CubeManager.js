@@ -283,9 +283,6 @@ function buildIniCubes(obj) {
         GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
         GLOBALS.CUBES.add(GLOBALS.PLANE_LEVEL_INSTANCED);
 
-        console.log(GLOBALS.PLANE_LEVEL_INSTANCED)
-        console.log(GLOBALS.SCENE)
-
         var clone = new Object3D();
 
         for (var i = 0; i < GLOBALS.BUDGET; i++) {

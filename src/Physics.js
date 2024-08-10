@@ -143,7 +143,8 @@ function updatePhysics() {
             property == "light_bridge" || property == "laser_emitter" ||
             property == "door" || property == "light" || property == "stripe" || property == "gel_blue" ||
             property == "gel_orange" || property == "laser_field" || property == "fizzler" ||
-            property == "portal_0" || property == "portal_1")
+            property == "portal_0" || property == "portal_1"|| property == "pellet_launcher" ||
+            property == "pellet_catcher")
             continue;
 
         for (var i = 0; i < GLOBALS.DYMANIC_ITEMS[property].length; i++) {

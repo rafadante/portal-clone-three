@@ -12,6 +12,7 @@ import { cannonToThreeVector3, threeToFour, fourToThree } from '../../Utils.js';
 import {
     GLOBALS
 } from '../../Globals.js';
+import { resetBall } from '../pellet/Pellet.js';
 
 var teleported = false;
 var cameraRotatingTimeout;
@@ -224,7 +225,22 @@ function teleportationState() {
                 if (d.holding) {
                     d.teleportingHolding = true;
                 } else {
+
                     teleportPhysicalObject(d, GLOBALS.PORTALS[p]);
+
+                    if (d.name == "pellet") {
+                        var direction = new Vector3(0, 1, 0).applyQuaternion(GLOBALS.PORTALS[p].output.mesh.quaternion);
+                        d.direction = direction;
+
+                        d.pellet.position.copy(d.position);
+                        d.pellet.quaternion.copy(d.quaternion);
+
+                        if (!d.pellet.infinity) {
+                            clearTimeout(d.pellet.timeout);
+                            resetBall(d.pellet, false);
+                        }
+
+                    }
 
                     if (dd == 0) {
 

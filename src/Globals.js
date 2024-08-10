@@ -85,8 +85,6 @@ renderer.localClippingEnabled = true;
 renderer.domElement.id = "viewer-3d";
 renderer.shadowMap.autoUpdate = true;
 
-console.log(renderer)
-
 //CONTROLS
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.minDistance = 0;
@@ -239,6 +237,8 @@ var GLOBALS = {
         glass: [],
         portal_gun: [],
         trigger_area: [],
+        pellet_launcher: [],
+        pellet_catcher: [],
     },
 
     INTERACTIVE: [],
@@ -473,6 +473,14 @@ var GLOBALS = {
             count: 0,
             max: 10
         },
+        pellet_launcher :{
+            count: 0,
+            max: 10
+        },
+        pellet_catcher :{
+            count: 0,
+            max: 10
+        },
         laser_cube: {
             count: 0,
             max: 10
@@ -590,7 +598,8 @@ var GLOBALS = {
     DYNAMIC_BODIES: [],
     LASER_EMITTER_TRIGGER: "Bottom",
     LASER_RECEIVER_TRIGGER: "Bottom",
-    LASER_TRIGGERS: []
+    LASER_TRIGGERS: [],
+    MATERIAL_CONE: null
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
@@ -689,6 +698,14 @@ function reset() {
             max: 10
         },
         laser_receiver: {
+            count: 0,
+            max: 10
+        },
+        pellet_launcher :{
+            count: 0,
+            max: 10
+        },
+        pellet_catcher :{
             count: 0,
             max: 10
         },

@@ -119,11 +119,18 @@ const AddGoo = function (found, loading) {
 
     const geometry = new PlaneGeometry(2, 2);
     const geometries = [];
-    const matrix = new Matrix4();
+
+    window.ooo = new Mesh(geometry, new MeshBasicMaterial())
+    window.ooo.position.copy(goo[0])
+    window.ooo.rotation.x = -Math.PI / 2;
+    window.ooo.translateZ(1.79);
+    window.ooo.updateMatrixWorld();
 
     GLOBALS.GOO_PLANES.push(goo)
 
     for (let i = 0; i < goo.length; i++) {
+
+        const matrix = new Matrix4();
 
         var dummy = new Object3D();
 
@@ -164,14 +171,14 @@ const AddGoo = function (found, loading) {
             sunDirection: new Vector3(),
             sunColor: 0xffffff,
             waterColor: 0x001e0f,
-            distortionScale: 0.4,
+            distortionScale: 0.2,
             alpha: 0.8
         }
     );
 
     water2.push(water)
 
-    //water.updateMatrix();
+    water.updateMatrixWorld();
 
     //water.rotation.x = -Math.PI / 2;
     //water.position.set(0, -0.2, 0)

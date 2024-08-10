@@ -72,7 +72,8 @@ function raycastSelected(found, event, type) {
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_receiver") ||
-                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_relay")) {
+                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_relay") ||
+                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_catcher")) {
                     $(".buttons").css("display", "block");
                     $("#connections").empty();
 
@@ -173,6 +174,18 @@ function raycastSelected(found, event, type) {
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_receiver")) {
                     $(".laser_receiver").css("display", "block");
                     $("#laser_receiver-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
+                }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_launcher")) {
+                    $(".pellet").css("display", "block");
+                    $("#state-pellet-infinity").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalInfinity);
+                    $("#pellet-timer-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalValue);
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalInfinity) {
+                        $("#pellet-timer").addClass("disabled");
+                    } else {
+                        $("#pellet-timer").removeClass("disabled");
+                    }
                 }
             }
 

@@ -6,6 +6,7 @@ import {
 import { GLOBALS } from "../../Globals.js";
 import { stateDoor } from '../door/Door.js';
 import { tractorBeam } from "../tractorBeam/TractorBeam.js";
+import { pelletUpdate } from "../pellet/Pellet.js";
 import {
   portalButton
 } from '../portal/CreatePortal.js';
@@ -35,8 +36,10 @@ var coords = new Vector3();
 var raycaster2 = new Raycaster();
 
 function updateEvents() {
+
   levelEnteredFunction();
   tractorBeam();
+  pelletUpdate();
 
   var id = 0;
 
@@ -73,8 +76,7 @@ function updateEvents() {
       if (GLOBALS.GOO_BOXES[j].containsPoint(pos)) {
         if (!d.repawning) {
           if (d.name == "player") {
-            document.getElementById("death-screen").style.backgroundColor = "rgb(111, 55, 0)";
-            document.getElementById("death-screen").style.opacity = 1;
+
           }
 
 
@@ -96,7 +98,8 @@ function updateEvents() {
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
       if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("pedestal")
         || GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_receiver")
-        || GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_relay"))
+        || GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_relay")
+        || GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("pellet_catcher"))
         continue
       else if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area") && GLOBALS.CONNECTIONS[i]['from'].item.visible)
         GLOBALS.CONNECTIONS[i]['from'].item.visible = false;
@@ -420,16 +423,16 @@ function pedestalTimer(holder) {
   }
 }
 
-function laserReceiverTrigger(obj, state) {
+function laserReceiverTrigger(obj, state, catcher) {
 
   const item = GLOBALS.PLANE_USER_DATA[obj.userData.planeInstancedId];
-
-  //console.log(item)
 
   if (state) {
     //Go through each connection to check for triggers
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-      if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_receiver") && !GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_relay")) {
+      if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_receiver") &&
+        !GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_relay") &&
+        !GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("pellet_catcher")) {
         continue
       }
 
@@ -443,7 +446,8 @@ function laserReceiverTrigger(obj, state) {
           GLOBALS.CONNECTIONS[i]['line'].active = true;
           GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(2, 1.3, 0);
 
-          GLOBALS.LASER_TRIGGERS.push(obj);
+          if (!catcher)
+            GLOBALS.LASER_TRIGGERS.push(obj);
 
           //PLAY AUDIO POSITIVE
           addPositionalAudio('audio-button-positive', GLOBALS.CONNECTIONS[i]['from'], true, false, true, 8);
@@ -486,9 +490,12 @@ function laserReceiverTrigger(obj, state) {
     }
   } else {
 
+    if (catcher) {
+      return;
+    }
+
     const index = GLOBALS.LASER_TRIGGERS.indexOf(obj);
     if (index > -1) {
-      console.log("removed");
       GLOBALS.LASER_TRIGGERS.splice(index, 1);
     }
 

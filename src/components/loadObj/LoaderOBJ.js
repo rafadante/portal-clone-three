@@ -117,7 +117,11 @@ async function handleZip(path, obj) {
                     loadLaserReceiverManager(result.scene)
                 else if (obj == "loadLaserRelay")
                     loadLaserRelayManager(result.scene)
-                
+                else if (obj == "loadPelletLauncher")
+                    loadPelletLauncherManager(result.scene)
+                else if (obj == "loadPelletCatcher")
+                    loadPelletCatcherManager(result.scene)
+
                 
             });
         }
@@ -235,8 +239,6 @@ function loadGunManager(scene) {
     GLOBALS.GUN_CLONE.add(gunClone);
 
     GLOBALS.GUN_CLONE2 = GLOBALS.GUN_CLONE.clone();
-
-    console.log(scene)
 
     scene.traverse(child => {
         child.castShadow = true;
@@ -865,8 +867,6 @@ function loadAvatar() {
         GLOBALS.PLAYER_MODEL.visible = false;
         GLOBALS.PLAYER_MODEL_CLONE.visible = false;
 
-        console.log(GLOBALS.PLAYER_MODEL)
-
         GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL);
         GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE);
 
@@ -992,10 +992,37 @@ function loadLaserRelay() {
 
 function loadLaserRelayManager(scene) {
 
-    
-
     var item = instancedTransform(scene, "laser_relay", false, 0, 1)
-    console.log(item)
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
+
+    loadPelletLauncher();
+}
+
+function loadPelletLauncher() {
+    handleZip('./assets/3ds/pellet_launcher.zip', "loadPelletLauncher");
+}
+
+function loadPelletLauncherManager(scene) {
+
+    var item = instancedTransform(scene, "pellet_launcher", false, 0, 1)
+    item.material.polygonOffset = true;
+    item.material.polygonOffsetFactor = -10;
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
+
+    loadPelletCatcher();
+}
+
+function loadPelletCatcher() {
+    handleZip('./assets/3ds/pellet_catcher.zip', "loadPelletCatcher");
+}
+
+function loadPelletCatcherManager(scene) {
+
+    var item = instancedTransform(scene, "pellet_catcher", false, 0, 1)
     item.userData.wall = true;
     item.userData.ground = true;
     item.userData.ceiling = true;

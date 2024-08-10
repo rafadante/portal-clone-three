@@ -24,7 +24,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.4,
+        0.2,
         0,
         null,
         null
@@ -42,7 +42,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.2,
+        0.05,
         0,
         null,
         null
@@ -60,7 +60,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.2,
+        0.05,
         0,
         null,
         null
@@ -77,7 +77,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.2,
+        0.05,
         0,
         null,
         null
@@ -94,7 +94,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.2,
+        0.05,
         0,
         null,
         null
@@ -111,7 +111,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.2,
+        0.05,
         0,
         null,
         null
@@ -129,7 +129,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.4,
+        0.2,
         0,
         null,
         null
@@ -146,7 +146,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.4,
+        0.2,
         0,
         null,
         null
@@ -182,14 +182,14 @@ function loadMaterials() {
     loadMaterial(
         GLOBALS.MATERIAL_GLASS,
         "wall/glass/Image_8.png",
+        "wall/glass/normal.png",
         null,
         null,
         null,
         null,
-        null,
-        0.4,
+        0.1,
         0,
-        1,
+        0.8,
         0,
         null,
         null
@@ -349,6 +349,16 @@ var texture = new TextureLoader().load("./assets/textures/trigger_mult.jpg");
 map.colorSpace = SRGBColorSpace;
 GLOBALS.MATERIAL_TRIGGER_MULT = new MeshBasicMaterial({
     map: texture
+});
+
+var texture = new TextureLoader().load("./assets/textures/cone.png");
+map.colorSpace = SRGBColorSpace;
+GLOBALS.MATERIAL_CONE = new MeshStandardMaterial({
+    map: texture,
+    transparent: true,
+    opacity: 0.05,
+    emissive: new Color(2,2,0),
+    side: 2
 });
 
 export {

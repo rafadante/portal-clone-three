@@ -205,7 +205,7 @@ function render(time) {
 
     fixedUpdate();
     animateShader();
-    //renderGoo();
+    renderGoo();
     updatePhysics();
     updateCamera(time);
     teleportationState()
