@@ -43,7 +43,7 @@ function teleportPhysicalObject(object, portal) {
 
     let velocity = cannonToThreeVector3(object.velocity);
 
-    if (GLOBALS.PORTALS[0].normal.y != GLOBALS.PORTALS[1].normal.y) {
+    /*if (GLOBALS.PORTALS[0].normal.y != GLOBALS.PORTALS[1].normal.y) {
         if (object.looping == true) {
             const heightDifference = getHeightDifference(portal.portalShader.position, portal.output.portalShader.position);
             velocity.y = -calculateVelocity(Math.abs(heightDifference), 9.8);
@@ -52,7 +52,7 @@ function teleportPhysicalObject(object, portal) {
         } else {
             object.looping = true;
         }
-    }
+    }*/
 
     let force = cannonToThreeVector3(object.force);
 
@@ -64,28 +64,6 @@ function teleportPhysicalObject(object, portal) {
     previousPosition = getTeleportedPositionalVector(previousPosition, portal)
     velocity = getTeleportedDirectionalVector(velocity, portal)
     force = getTeleportedDirectionalVector(force, portal)
-
-    /*if (teleportLooping) {
-        if (velocity.x > 10) {
-            velocity.x = 10;
-        } else if (velocity.x < -10)
-            velocity.x = -10;
-
-        if (velocity.y > 10) {
-            velocity.y = 10;
-        } else if (velocity.y < -10)
-            velocity.y = -10;
-
-        if (velocity.z > 10) {
-            velocity.z = 10;
-        } else if (velocity.z < -10)
-            velocity.z = -10;
-
-        if (Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) {
-            velocity.x *= 0.5;
-            velocity.z *= 0.5;
-        }
-    }*/
 
     object.previousPosition.copy(previousPosition)
     object.position.copy(position)
@@ -231,7 +209,7 @@ function teleportationState() {
                     if (d.name == "pellet") {
                         var direction = new Vector3(0, 1, 0).applyQuaternion(GLOBALS.PORTALS[p].output.mesh.quaternion);
                         d.direction = direction;
-
+                        d.previousDirection = direction;
                         d.pellet.position.copy(d.position);
                         d.pellet.quaternion.copy(d.quaternion);
 

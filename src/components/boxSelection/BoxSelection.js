@@ -41,16 +41,13 @@ function raycastSelected(found, event, type) {
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "enterDoor" &&
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "window") {
 
-            if (GLOBALS.PLANE_USER_DATA[instanceId].continuousEnding) {
-
-            }
+            console.log(GLOBALS.PLANE_USER_DATA[instanceId])
 
             if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem &&
                 (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("door") ||
                 GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_0") ||
                 GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_1") ||
-                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal_button") ||
-                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("faith_plate"))) {
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal_button") )) {
                 $("#rotate-item").css("display", "block");
             } else {
                 $("#rotate-item").css("display", "none");
@@ -186,6 +183,12 @@ function raycastSelected(found, event, type) {
                     } else {
                         $("#pellet-timer").removeClass("disabled");
                     }
+                }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("faith_plate")) {
+                    $(".faith_plate").css("display", "block");
+                    $("#plate-max-height-value").prop("min", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height - 2);
+                    $("#plate-max-height-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height);
                 }
             }
 

@@ -25,6 +25,7 @@ import {
 import { addItem } from '../items/AddItem.js';
 import { manageRaycasterGlassPanel } from '../glassPanel/GlassPanel.js';
 import { updateMaterialRepeat } from '../materials/Materials.js';
+import { hex2rgb } from '../../Utils.js';
 
 window.addEventListener("contextmenu", e => e.preventDefault());
 
@@ -169,7 +170,7 @@ $("body").on('input', '#dispenser-opened', function () {
 
 $("body").on('input', '#state-lines', function () {
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-        if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName){
+        if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName) {
             //GLOBALS.CONNECTIONS[i]["line"].visible = this.checked;
         }
     }
@@ -561,3 +562,19 @@ document.addEventListener("keypress", function (event) {
         }
     }*/
 });
+
+$("body").on('input', '#portal-gun-color', function () {
+    var color = hex2rgb(this.value);
+    localStorage.setItem("portal_gun_color", this.value);
+    GLOBALS.GUN.getObjectByName("Object_6").material.color = new Color(color.r/255, color.g/255, color.b/255);
+})
+
+$("body").on('input', '#portal-gun-roughness', function () {
+    localStorage.setItem("portal_gun_roughness", this.value);
+    GLOBALS.GUN.getObjectByName("Object_6").material.roughness = this.value;
+})
+
+$("body").on('input', '#portal-gun-metalness', function () {
+    localStorage.setItem("portal_gun_metalness", this.value);
+    GLOBALS.GUN.getObjectByName("Object_6").material.metalness = this.value;
+})

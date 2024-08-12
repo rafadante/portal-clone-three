@@ -19,6 +19,9 @@ function tractorBeam() {
             if (GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j]) {
 
                 if (!GLOBALS.TRACTOR_BEAM[j].item.userData.state) {
+                    if (d.inTractor) {
+                        outOfTheTractor(d, j);
+                    }
                     continue;
                 }
 

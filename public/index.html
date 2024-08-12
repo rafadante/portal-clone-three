@@ -181,9 +181,7 @@
             data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" data-allowconnection="true"
             id="fizzler" />
           <!--
-          <img
-            data-content="If a player walks onto a Faith Plate it will cause them to get bounced into the air. When you place a Faith Plate within the editor it will also create a bullseye and a yellow ball. The Bullseye is where the player will ultimately land, and the yellow ball is the trajectory the player will travel."
-            data-title="FAITH PLATE" class="item" data-name="faith_plate" src="../assets/ui/items/faith_plate.png" />
+          
 
           <img
             data-content=" Any contact with the lasers will result in instant death. However, the Field allows objects to pass through without harm."
@@ -311,6 +309,11 @@
             <img data-content="If the player steps in Deadly Goo they will be instantly killed." data-title="DEADLY GOO"
             data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="false"
             class="item" data-name="goo" src="../assets/ui/items/goo.png" />
+
+            <img
+            data-content="If a player walks onto a Faith Plate it will cause them to get bounced into the air. When you place a Faith Plate within the editor it will also create a bullseye and a yellow ball. The Bullseye is where the player will ultimately land, and the yellow ball is the trajectory the player will travel."
+            data-allowconnection="true" data-rotate="true" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="false"
+            data-title="FAITH PLATE" class="item" id="faith_plate" data-name="faith_plate" src="../assets/ui/items/faith_plate.png" />
         </div>
       </div>
     </div>
@@ -813,6 +816,13 @@
       </a>
     </li>
 
+    <!--FAITH PLATE-->
+    <li id="plate-max-height" class="menu-item hasItem faith_plate">
+      <a href="#" class="menu-btn">
+        <input type="number" style="width: 50px;" max="100" min="0" value="3" id="plate-max-height-value" step="1"/>
+        <span class="menu-text">Max Height</span>
+      </a>
+    </li>
 
     <!--<li class="menu-item menu-item-submenu">
       <button type="button" class="menu-btn">
@@ -1211,6 +1221,25 @@
             <span class="option-name" id="">Debug Collisions</span>
             <div class="option-value">
               <input id="debug-input" type="checkbox" />
+            </div>
+          </div>
+          <!--PORTAL GUN PROPERTIES-->
+          <div class="options-row">
+            <span class="option-name" id="">Portal gun Color</span>
+            <div class="option-value">
+              <input id="portal-gun-color" type="color" />
+            </div>
+          </div>
+          <div class="options-row">
+            <span class="option-name" id="">Portal gun Roughness</span>
+            <div class="option-value">
+              <input id="portal-gun-roughness" value="1" type="number" min="0" max="1" step="0.1" style="pointer-events: all !important;" />
+            </div>
+          </div>
+          <div class="options-row">
+            <span class="option-name" id="">Portal gun Metalness</span>
+            <div class="option-value">
+              <input id="portal-gun-metalness" value="0" type="number" min="0" max="1" step="0.1" style="pointer-events: all !important;"/>
             </div>
           </div>
         </div>

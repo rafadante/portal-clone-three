@@ -37,14 +37,14 @@ function colliderItemManager() {
     corridorColliderNames(GLOBALS.CORRIDOR_ENTER, false);
 
     //
-    addColliderItem(GLOBALS.DYMANIC_ITEMS['cube'], "cube", 10)
-    addColliderItem(GLOBALS.DYMANIC_ITEMS['cube_2'], "cube_2", 10)
-    addColliderItem(GLOBALS.DYMANIC_ITEMS["sphere"], "sphere", 10)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['cube'], "cube", 5)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['cube_2'], "cube_2", 5)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS["sphere"], "sphere", 5)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['gel_gun_blue'], "gel_gun_blue", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['gel_gun_orange'], "gel_gun_orange", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['gel_gun_white'], "gel_gun_white", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['pedestal_button'], "pedestal_button", 0)
-    addColliderItem(GLOBALS.DYMANIC_ITEMS['radio'], "radio", 10)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['radio'], "radio", 5)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['button_weight'], "button_weight", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['button_box'], "button_box", 0, 1)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['button_box'], "button_box", 0, 2)
@@ -58,7 +58,7 @@ function colliderItemManager() {
     addColliderItem(GLOBALS.DYMANIC_ITEMS['ramp_half'], "ramp_half", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['ramp_half2'], "ramp_half2", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['stairs'], "stairs", 0)
-    addColliderItem(GLOBALS.DYMANIC_ITEMS['laser_cube'], "laser_cube", 10)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['laser_cube'], "laser_cube", 5)
     addColliderItem(GLOBALS.DOORS, "door", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['pellet_launcher'], "pellet_launcher", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['pellet_catcher'], "pellet_catcher", 0)
@@ -264,8 +264,15 @@ function addColliderItem(items, type, mass, offset) {
             box.updateMassProperties();
             box.item = items[i];
             box.name = type;
+            box.initialMass = mass;
+            //box.invMass = 0.1;
+            //box.invMassSolve = 0.1;
+
+            console.log(box)
 
             GLOBALS.SCENE.remove(objHolder);
+
+            console.log(box)
 
             if (type == "radio") {
                 addPositionalAudio('audio-radio', box, true, true, false, 8)
@@ -303,7 +310,6 @@ function addColliderItem(items, type, mass, offset) {
                 box.offset = offset;
                 box.arrayPos = [];
                 box.arrayRot = [];
-                box.initialMass = mass;
 
                 const clone = GLOBALS.ITEMS_ADDED.getObjectByName(type).clone.clone();
                 clone.visible = false;
@@ -436,6 +442,7 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
             box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
             box.room = true;
             box.side = side;
+            box.name = "wall";
 
             for (var c = 0; c < columsNew[i][j].length; c++)
                 GLOBALS.PLANE_USER_DATA[columsNew[i][j][c].i].body = box;

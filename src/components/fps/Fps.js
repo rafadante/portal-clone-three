@@ -345,6 +345,10 @@ function setAction(action) {
 }
 
 function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
+
+    if(GLOBALS.BLOCK_PLAYER_MOVE)
+        return;
+
     if (AUDIO.WALK.paused && !GLOBALS.PLAYER.inJump && !GLOBALS.PLAYER.lightBridge) {
 
         if (!AUDIO.WALK_LIGHT_BRIDGE.paused)
@@ -370,6 +374,10 @@ function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
 }
 
 function movePlayerJoystick(direction, f, movementMultiplier, gamepadPressed) {
+
+    if(GLOBALS.BLOCK_PLAYER_MOVE)
+        return;
+
     GLOBALS.PLAYER.applyForce(direction.clone().multiplyScalar(f * movementMultiplier), GLOBALS.PLAYER.position)
     GLOBALS.PLAYER_MOVING = true;
     gamepadPressed++;
@@ -377,6 +385,10 @@ function movePlayerJoystick(direction, f, movementMultiplier, gamepadPressed) {
 }
 
 function movePlayerTouch(direction, f, value) {
+
+    if(GLOBALS.BLOCK_PLAYER_MOVE)
+        return;
+    
     GLOBALS.PLAYER.applyForce(direction.clone().multiplyScalar(f * value), GLOBALS.PLAYER.position)
     GLOBALS.PLAYER_MOVING = true;
 }

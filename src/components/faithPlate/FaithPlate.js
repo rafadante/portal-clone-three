@@ -1,16 +1,44 @@
+import {
+  Vector3,
+  PlaneGeometry,
+  MeshBasicMaterial,
+  Mesh,
+  TextureLoader,
+  Quaternion,
+  CatmullRomCurve3,
+  BufferGeometry,
+  LineBasicMaterial,
+  Line
+} from "three";
+import { tweenCamera } from "../../Utils.js";
+import { GLOBALS } from "../../Globals.js";
+import { AUDIO, play } from "../audio/Audio.js";
+import * as CANNON from 'cannon';
+import { vec3 } from "three/examples/jsm/nodes/Nodes.js";
+import $ from 'jquery';
+import { animate } from "../../Main.js";
+
+//TARGET
+const map = new TextureLoader().load('./assets/textures/target.png');
+
+const geometry = new PlaneGeometry(2, 2);
+const material = new MeshBasicMaterial({
+  map: map,
+  transparent: true,
+  polygonOffset: true,
+  polygonOffsetUnits: -10
+});
+const target = new Mesh(geometry, material);
+
 var launch = false;
 
-function tractorBeam() {
-  var hh = 0;
+function faithPlate() {
 
   for (let d of GLOBALS.DYNAMIC_OBJECTS) {
-    let pos = new THREE.Vector3(d.position.x, d.position.y - 1, d.position.z);
 
-    hh++;
+    let pos = new Vector3(d.position.x, d.position.y - 1, d.position.z);
 
     if (d.holding) continue;
-
-    //FAITH PLATE
 
     for (var j = 0; j < GLOBALS.FAITH_PLATE_CONTACT_BOX.length; j++) {
       if (GLOBALS.FAITH_PLATE_CONTACT_BOX[j].containsPoint(pos)) {
@@ -22,17 +50,12 @@ function tractorBeam() {
             launch = false;
           }, 150);
 
-          var ff = GLOBALS.FAITH_PLATE_TO_ROTATE[j];
+          var rotationHolder = GLOBALS.FAITH_PLATE_TO_ROTATE[j].rotation;
 
-          tweenCamera(200, ff.rotation, new THREE.Vector3(Math.PI * 0.7, 0, 0));
+          tweenCamera(200, rotationHolder, new Vector3(Math.PI * 0.7, 0, 0));
           setTimeout(() => {
-            tweenCamera(200, ff.rotation, new THREE.Vector3(Math.PI / 2, 0, 0));
+            tweenCamera(200, rotationHolder, new Vector3(Math.PI / 2, 0, 0));
           }, 200);
-
-          // Position
-          d.previousPosition.setZero();
-          d.interpolatedPosition.setZero();
-          d.initPosition.setZero();
 
           // Velocity
           d.velocity.setZero();
@@ -44,159 +67,170 @@ function tractorBeam() {
           d.force.setZero();
           d.torque.setZero();
 
-          d.position.x = GLOBALS.FAITH_PLATE_CONTACT_BOX[j].position.x;
-          d.position.z = GLOBALS.FAITH_PLATE_CONTACT_BOX[j].position.z;
+          const s = 1;
 
-          var up;
-          var f;
-
-          var up = new THREE.Vector3();
-          GLOBALS.FAITH_PLATE_CONTACT_BOX[j].item.getWorldDirection(up);
-          up.y = 1;
-          up.x *= 0.55;
-          up.z *= 0.55;
-
-          if (d.name == "player") f = 53000;
-          else {
-            if (up.z == -0.55) f = 4325;
-            else f = 4300;
-          }
-
-          if (up.x == -0.55) {
-            //f = 70000;
-            up.x = -1.2;
-            up.y = 1.2;
-          }
-
-          d.applyImpulse(up.clone().multiplyScalar((f * 1) / 60), d.position);
-
-          const initialPosition = new CANNON.Vec3(-15, 0, 21);
-
-          // Set the desired final position
-          const finalPosition = new CANNON.Vec3(-15, 0, -3);
-
-          // Set the desired maximum height
-          const maxHeight = 2; // meters
-
-          // Set the gravitational acceleration
-          const gravity = new CANNON.Vec3(0, -9.8, 0);
-
-          // Calculate the required initial velocity to reach the desired maximum height
-          const initialVelocity = Math.sqrt(2 * maxHeight * gravity.length());
-
-          // Calculate the time of flight to reach the desired final position
-          const timeToReachDestination = Math.sqrt(
-            (2 * Math.abs(finalPosition.z - initialPosition.z)) /
-            gravity.length()
-          );
-
-          // Calculate the required constant force to achieve the desired initial velocity
-          const requiredForce = new CANNON.Vec3();
-          gravity.scale(d.mass, requiredForce);
-          requiredForce.scale(
-            initialVelocity / timeToReachDestination,
-            requiredForce
-          );
-        }
-      }
-    }
-
-    pos.y += 1;
-
-    //TRACTOR BEAM
-
-    for (var j = 0; j < GLOBALS.TRACTOR_BEAM.length; j++) {
-      if (GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j]) {
-        if (d.inTractor && d.tractor != j) continue;
-
-
-        if (!GLOBALS.TRACTOR_BEAM[j].item.userData.opened) {
-
-          if (d.inTractor) {
-            if (d.name == "player") d.mass = 50;
-            else d.mass = 5;
-
-            d.inTractor = false;
-            GLOBALS.TRACTOR_BEAM[j].inTractor = false;
-            d.tractor = null;
-            d.wakeUp()
-
-            if (d.name == "player")
-              GLOBALS.MATERIAL_TRACTOR_BEAM.side = 0;
-          }
-
-        } else if (GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].containsPoint(pos)) {
-          var vec = new THREE.Vector3(0, 0, 1);
-          //GLOBALS.TRACTOR_BEAM[j].getWorldDirection(vec);
-
-          if (!d.inTractor) {
-
-            if (d.name == "player")
-              GLOBALS.MATERIAL_TRACTOR_BEAM.side = 1;
-
-            d.inTractorPositionY = d.position.clone().y;
-            d.inTractor = true;
-            d.tractor = j;
-            GLOBALS.TRACTOR_BEAM[j].inTractor = true;
-            aa = true;
-            d.mass = 0;
-
-            // Velocity
-            d.velocity.setZero();
-            d.initVelocity.setZero();
-            d.angularVelocity.setZero();
-            d.initAngularVelocity.setZero();
-
-            // Force
-            d.force.setZero();
-            d.torque.setZero();
-
-            if (!d.inArea) {
-              var center = new THREE.Vector3(
-                Math.abs(vec.x - 1) * GLOBALS.TRACTOR_BEAM[j].position.x +
-                d.position.x * vec.x,
-                Math.abs(vec.y - 1) * GLOBALS.TRACTOR_BEAM[j].position.y +
-                d.position.y * vec.y,
-                Math.abs(vec.z - 1) * GLOBALS.TRACTOR_BEAM[j].position.z +
-                d.position.z * vec.z
-              );
-
-              tweenCamera(500, d.position, center);
-            }
-          } else {
-            pos.add(vec.clone().multiplyScalar(0.025)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side
-            d.position.copy(pos);
-            d.angularVelocity.setZero();
-            d.velocity.setZero();
-          }
-        } else {
-          if (d.inTractor && d.tractor == j) {
-            //&& GLOBALS.TRACTOR_BEAM[j].inTractor
-            if (d.name == "player") d.mass = 50;
-            else d.mass = 5;
-
-            d.inTractor = false;
-            GLOBALS.TRACTOR_BEAM[j].inTractor = false;
-            d.tractor = null;
-
-            if (d.name == "player")
-              GLOBALS.MATERIAL_TRACTOR_BEAM.side = 0;
-          }
-        }
-      } else {
-        if (d.inTractor && d.tractor == j) {
-          //&& GLOBALS.TRACTOR_BEAM[j].inTractor
-          if (d.name == "player") d.mass = 50;
-          else d.mass = 5;
-
-          d.inTractor = false;
-          GLOBALS.TRACTOR_BEAM[j].inTractor = false;
-          d.tractor = null;
+          const targetPos = GLOBALS.FAITH_PLATE_CONTACT_BOX[j].item.target.position.clone();
+          targetPos.multiplyScalar(s);
 
           if (d.name == "player")
-            GLOBALS.MATERIAL_TRACTOR_BEAM.side = 0;
+            GLOBALS.PLAYER.inJump = true;
+
+          var imp = calculateImpulse(
+            new CANNON.Vec3(d.position.x * s, d.position.y * s, d.position.z * s),
+            new CANNON.Vec3(targetPos.x, targetPos.y, targetPos.z),
+            GLOBALS.FAITH_PLATE_CONTACT_BOX[j].item.userData.height * s,
+            d.mass,
+            d.name
+          );
+          d.applyImpulse(imp, d.position);
         }
       }
     }
   }
+}
+
+function calculateImpulse(initialPosition, finalPosition, maxHeight, mass, name) {
+
+  const g = 9.81; // gravity
+
+  // Calculate the horizontal distance and direction (ignoring y)
+  const direction = new CANNON.Vec3(
+    finalPosition.x - initialPosition.x,
+    0, // Ignoring y for horizontal direction
+    finalPosition.z - initialPosition.z
+  );
+
+  // Normalize the direction vector to get unit direction
+  direction.normalize();
+
+  const horizontalDistance = Math.sqrt(
+    Math.pow(finalPosition.x - initialPosition.x, 2) +
+    Math.pow(finalPosition.z - initialPosition.z, 2)
+  );
+
+  // Calculate the total vertical displacement
+  const totalVerticalDisplacement = finalPosition.y - initialPosition.y;
+
+  // Time to reach max height
+  const t_up = Math.sqrt(2 * maxHeight / g);
+
+  // Total time of flight considering the vertical displacement
+  const t_total_vertical = t_up + Math.sqrt(2 * (maxHeight - totalVerticalDisplacement) / g);
+
+  // Horizontal velocity needed to cover the distance in time t_total_vertical
+  const vx = (horizontalDistance / t_total_vertical) * direction.x;
+  const vz = (horizontalDistance / t_total_vertical) * direction.z;
+
+  // Initial vertical velocity to reach max height
+  const vy = Math.sqrt(2 * g * maxHeight);
+
+  // Impulse vector with direction
+  const impulse = new CANNON.Vec3(
+    mass * vx,
+    mass * vy,
+    mass * vz
+  );
+
+  if (name == "player") {
+    console.log(t_total_vertical)
+    GLOBALS.BLOCK_PLAYER_MOVE = true;
+    setTimeout(() => {
+      GLOBALS.BLOCK_PLAYER_MOVE = false;
+    }, t_total_vertical * 1000);
+  }
+
+  return impulse;
+}
+
+function targetFaithPlateStart(item) {
+
+  console.log(item)
+  GLOBALS.FAITH_PLATE_TARGET = item;
+
+  GLOBALS.CONNECTING = true;
+  GLOBALS.MATERIAL_PORTAL_EDITOR.opacity = 0.25;
+  GLOBALS.MATERIAL_NON_PORTAL_EDITOR.opacity = 0.25;
+  GLOBALS.MATERIAL_PORTAL_EDITOR.transparent = true;
+  GLOBALS.MATERIAL_NON_PORTAL_EDITOR.transparent = true;
+}
+
+function targetFaithPlateUpdate(target) {
+  //ROTATE FAITH PLATE IN THE DIRECTION OF THE TARGET
+  const targetPosition = new Vector3(target.position.x, GLOBALS.FAITH_PLATE_TARGET.position.y, target.position.z)
+  GLOBALS.FAITH_PLATE_TARGET.lookAt(targetPosition);
+}
+
+function targetFaithPlateEnd(item, h) {
+  console.log(item);
+  const clone = target.clone();
+  clone.position.copy(item.position);
+  clone.rotation.copy(item.rotation);
+  GLOBALS.SCENE.add(clone);
+
+  GLOBALS.FAITH_PLATE_TARGET.target = clone;
+
+  if (h) {
+    height = h;
+  } else {
+    var height = GLOBALS.FAITH_PLATE_TARGET.position.y + 2;
+
+    if (GLOBALS.FAITH_PLATE_TARGET.position.y < clone.position.y) {
+      height = clone.position.y + 2;
+    }
+  }
+
+  console.log(height)
+
+
+  GLOBALS.FAITH_PLATE_TARGET.userData.height = height;
+  GLOBALS.FAITH_PLATE_TARGET.userData.targetPos = clone.position;
+  GLOBALS.FAITH_PLATE_TARGET.userData.targetRot = clone.rotation;
+
+  createCurve(GLOBALS.FAITH_PLATE_TARGET.position, clone.position, height, clone)
+
+  GLOBALS.FAITH_PLATE_TARGET = null;
+}
+
+function createCurve(start, end, height, target) {
+
+  //Find the middle
+  const middlePoint = new Vector3().addVectors(start, end).multiplyScalar(0.5);
+  middlePoint.y = height;
+
+  //Create a closed wavey loop
+  const curve = new CatmullRomCurve3([
+    start,
+    middlePoint,
+    end
+  ]);
+
+  const points = curve.getPoints(50);
+  const geometry = new BufferGeometry().setFromPoints(points);
+
+  const material = new LineBasicMaterial({ color: 0xff0000 });
+
+  // Create the final object to add to the scene
+  const curveObject = new Line(geometry, material);
+  target.line = curveObject;
+  GLOBALS.SCENE.add(curveObject);
+}
+
+$('#plate-max-height-value').on('change', function () {
+  GLOBALS.SCENE.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.target.line);
+  GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.height = parseInt(this.value);
+  createCurve(
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.position,
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.target.position,
+    parseInt(this.value),
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.target
+  )
+
+  animate();
+});
+
+export {
+  faithPlate,
+  targetFaithPlateStart,
+  targetFaithPlateUpdate,
+  targetFaithPlateEnd
 }

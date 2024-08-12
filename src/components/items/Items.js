@@ -17,6 +17,7 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import { clickItem } from './AddItem.js';
+import { targetFaithPlateUpdate } from '../faithPlate/FaithPlate.js';
 
 let lineFollow;
 let isDrawStart = false;
@@ -134,8 +135,11 @@ function hoverItem(found, connecting) {
 
     var userData = GLOBALS.PLANE_USER_DATA[found[0].instanceId];
 
+    if(GLOBALS.FAITH_PLATE_TARGET)
+        targetFaithPlateUpdate(GLOBALS.ITEM_CUBE);
+
     if (connecting) {
-        if (userData.allowconnection) {
+        if (userData.allowconnection || GLOBALS.FAITH_PLATE_TARGET) {
             GLOBALS.ITEM_CUBE.material.color = new Color(0x00ff00)
             GLOBALS.ITEM_CUBE.place = true;
         } else {
@@ -143,7 +147,7 @@ function hoverItem(found, connecting) {
             GLOBALS.ITEM_CUBE.place = false;
         }
     } else {
-        if ((userData.hasItem || userData.continuousEnding) ||
+        if ((userData.continuousEnding) ||//userData.hasItem || 
             (userData.side == "down" && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("floor")) ||
             (userData.side == "up" && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("ceiling")) ||
             ((userData.side == "front" || userData.side == "back" || userData.side == "left" || userData.side == "right")

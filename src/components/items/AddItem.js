@@ -31,6 +31,11 @@ import {
     laserEmitterRaycast,
     laserEmitterPosition
 } from '../lasers/Laser.js';
+import { 
+    targetFaithPlateStart,
+    targetFaithPlateEnd,
+    targetFaithPlateUpdate
+} from '../faithPlate/FaithPlate.js';
 
 var itemCount = 0;
 
@@ -39,7 +44,7 @@ function addItem(found, loaded) {
     if (!GLOBALS.ITEM_CUBE.place && !loaded)
         return
 
-    if (GLOBALS.ITEM_HOLDED_NAME == "goo") {
+    if (GLOBALS.ITEM_HOLDED_NAME == "goo" && !loaded) {
         AddGoo(found, false);
         return;
     }
@@ -71,7 +76,7 @@ function addItem(found, loaded) {
             userData.hasItem = false; //delete here
         }
 
-        if ((!userData.hasItem && !userData.continuousEnding) || loaded) {
+        if ((!userData.continuousEnding) || loaded) {//!userData.hasItem && 
 
             if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
                 const geometry = new BoxGeometry(2, 2, 2);
@@ -284,6 +289,10 @@ function addItem(found, loaded) {
             item.initialPosition = item.position.clone();
             item.initialRotation = item.rotation.clone();
 
+            if(GLOBALS.ITEM_HOLDED_NAME == "faith_plate" && !loaded){
+                targetFaithPlateStart(item);
+            }
+
             if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
 
                 GLOBALS.ITEMS_ADDED.add(item);
@@ -355,6 +364,7 @@ function addItem(found, loaded) {
                     }
                 })
 
+                item.side = userData.side;
                 GLOBALS.ITEMS_ADDED.add(item);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
                 GLOBALS.ITEMS_ADDED.add(item);
@@ -551,6 +561,19 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         item.userData.state = userDataLoadedItem.state;
         item.userData.triggers = userDataLoadedItem.triggers;
         laserEmitterPosition(item, item.userData.triggers, $("#laser_receiver-trigger"), "laser_receiver");
+    }else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
+        item.userData.state = userDataLoadedItem.state;
+        item.userData.target = userDataLoadedItem.target;
+
+        GLOBALS.FAITH_PLATE_TARGET = item;
+
+        const dummy = new Object3D();
+        dummy.position.copy(userDataLoadedItem.targetPos);
+        dummy.rotation.copy(userDataLoadedItem.targetRot);
+
+        targetFaithPlateUpdate(dummy)
+        targetFaithPlateEnd(dummy, userDataLoadedItem.height);
+        console.log("loaded");
     }
 
 

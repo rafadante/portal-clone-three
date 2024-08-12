@@ -26,6 +26,8 @@ GLOBALS.PLAYER.addShape(physicsShape);
 GLOBALS.PLAYER.position.set(5, 5, 5);
 GLOBALS.PLAYER.linearDamping = 0.999;
 GLOBALS.PLAYER.name = "player";
+GLOBALS.PLAYER.invMass = 0.1;
+GLOBALS.PLAYER.invMassSolve = 0.1;
 
 // keep the player upright
 GLOBALS.PLAYER.angularDamping = 1
@@ -61,6 +63,10 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
 })
 
 GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
+
+    if (GLOBALS.BLOCK_PLAYER_MOVE)
+        return
+
     GLOBALS.PLAYER.inJump = true;
     if (GLOBALS.CANNON_WORLD.contacts.length > 0) {
 
@@ -79,9 +85,9 @@ GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
 
                 GLOBALS.PLAYER.inJump = (contactNormal.dot(upVector) <= 0.5);
 
-                if (!GLOBALS.PLAYER.inJump) {
+                /*if (!GLOBALS.PLAYER.inJump) {
                     window.PLAYER_JUMPING_FROM_BLUE_GEL = false;
-                }
+                }*/
 
                 break;
             }

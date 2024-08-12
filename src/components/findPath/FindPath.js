@@ -8,7 +8,8 @@ import {
     Vector3,
     CircleGeometry,
     Matrix4,
-    Color
+    Color,
+    SphereGeometry
 } from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import {
@@ -111,6 +112,7 @@ function path2(dgraph, start, end, side,found,found2) {
 
     var d = 0;
     var pathPoints = [];
+    var pathPointsRot = [];
     var rotPoints = [];
     var direction;
     var points = [];
@@ -132,6 +134,8 @@ function path2(dgraph, start, end, side,found,found2) {
 
         fromObj.node.hasLine = true;
 
+        console.log(fromObj)
+
         points.push(fromObj.position)
         rotPoints.push(fromObj.rotation)
 
@@ -142,12 +146,15 @@ function path2(dgraph, start, end, side,found,found2) {
     }
 
     pathPoints.push(points[0])
+    pathPointsRot.push(rotPoints[0])
+    //console.log(points)
+    //console.log(rotPoints)
 
     for (var j = 1; j < points.length; j++) {
 
-        if (points[j - 1].distanceTo(points[j]) != 2 && direction) {
+        if (points[j - 1].distanceTo(points[j]) != 2) {
 
-            var dir = new Vector3(); // create once an reuse it
+            /*var dir = new Vector3(); // create once an reuse it
             dir.subVectors(points[j], points[j - 1]).normalize();
 
             if (direction.z != 0) {
@@ -160,13 +167,25 @@ function path2(dgraph, start, end, side,found,found2) {
             var val = points[j - 1].clone();
             val.x -= direction.round().x;
             val.y -= direction.round().y;
-            val.z -= direction.round().z;
+            val.z -= direction.round().z;*/
 
-            pathPoints.push(val)
+            //pathPoints.push(val)
 
-            rotPoints.push(fromObj.rotation)
+            const holderObj = new Object3D();
+            holderObj.position.copy(points[j - 1])
+            holderObj.rotation.copy(rotPoints[j - 1])
+            GLOBALS.SCENE.add(holderObj)
+            holderObj.translateY(1);
+
+            pathPointsRot.push(holderObj.rotation)
+            pathPoints.push(holderObj.position)
+            GLOBALS.SCENE.remove(holderObj)
+
+
+            pathPointsRot.push(rotPoints[j])
             pathPoints.push(points[j])
         } else {
+            pathPointsRot.push(rotPoints[j])
             pathPoints.push(points[j])
         }
 
@@ -194,14 +213,14 @@ function path2(dgraph, start, end, side,found,found2) {
     const numberOfCircles = totalLength * 4;
 
     // Create circles evenly spaced along the path
-    const circleGeometry = new CircleGeometry(0.05, 32);
+    const circleGeometry = new SphereGeometry(0.04, 16,8);
     const circleMaterial = new MeshBasicMaterial({
-        side: 2,
         color: new Color(0, 0.7, 1.0),
-        emissiveIntensity: 100,
-        polygonOffset: true,
-        polygonOffsetFactor: -5,
+        emissiveIntensity: 100
     });
+
+    console.log(pathPoints)
+    console.log(pathPointsRot)
 
     for (let i = 0; i < numberOfCircles; i++) {
         const targetDistance = (i / (numberOfCircles - 1)) * totalLength;
@@ -217,7 +236,7 @@ function path2(dgraph, start, end, side,found,found2) {
                 const point = new Vector3().lerpVectors(pathPoints[j], pathPoints[j + 1], t);
 
                 nodesPos.push(point);
-                nodesRot.push(rotPoints[j]);
+                nodesRot.push(pathPointsRot[j]);
 
                 break;
             }

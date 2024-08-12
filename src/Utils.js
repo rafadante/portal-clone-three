@@ -95,6 +95,15 @@ function fourToThree(v) {
     return new Vector3(v.x, v.y, v.z).multiplyScalar(1 / v.w)
 }
 
+const hex2rgb = (hex) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+
+    // return {r, g, b} 
+    return { r, g, b };
+}
+
 export {
     getPlaneByName,
     warning,
@@ -105,5 +114,6 @@ export {
     threeToCannonVector3,
     cannonToThreeVector3,
     threeToFour,
-    fourToThree
+    fourToThree,
+    hex2rgb
 }

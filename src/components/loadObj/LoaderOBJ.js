@@ -39,6 +39,7 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+import { hex2rgb } from '../../Utils.js';
 
 async function handleZip(path, obj) {
     await JSZipUtils.getBinaryContent(path, function (err, data) {
@@ -262,6 +263,23 @@ function loadGunManager(scene) {
             GLOBALS.PORTAL_GUN_FLASH = child;
     });
 
+    //LOAD PRPERTIES
+    if(localStorage.getItem("portal_gun_color")){
+        var color = hex2rgb(localStorage.getItem("portal_gun_color"));
+        scene.getObjectByName("Object_6").material.color = new Color(color.r/255, color.g/255, color.b/255);
+    }
+
+    if(localStorage.getItem("portal_gun_roughness")){
+        scene.getObjectByName("Object_6").material.roughness = localStorage.getItem("portal_gun_roughness");
+    }
+
+    if(localStorage.getItem("portal_gun_metalness")){
+        scene.getObjectByName("Object_6").material.metalnessMap = null;
+        scene.getObjectByName("Object_6").material.metalness = localStorage.getItem("portal_gun_metalness");
+    }
+
+    console.log(scene.getObjectByName("Object_6").material)
+        
     GLOBALS.GUN.name = "GUN";
     GLOBALS.SCENE.add(GLOBALS.GUN);
     scene.scale.set(0.001, 0.001, 0.001)
@@ -864,8 +882,8 @@ function loadAvatar() {
         GLOBALS.PLAYER_MODEL = fbx;
         GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
 
-        GLOBALS.PLAYER_MODEL.visible = false;
-        GLOBALS.PLAYER_MODEL_CLONE.visible = false;
+        GLOBALS.PLAYER_MODEL.position.y = 100000;
+        GLOBALS.PLAYER_MODEL_CLONE.position.y = 100000;
 
         GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL);
         GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE);

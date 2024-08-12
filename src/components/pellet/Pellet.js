@@ -8,7 +8,12 @@ import {
     PointLight,
     CylinderGeometry,
     Raycaster,
-    CircleGeometry
+    CircleGeometry,
+    PlaneGeometry,
+    Euler,
+    BoxGeometry,
+    InstancedMesh,
+    TextureLoader
 } from 'three';
 import { GLOBALS } from '../../Globals';
 import * as CANNON from 'cannon';
@@ -16,6 +21,8 @@ import $ from 'jquery';
 import { respawn } from '../events/states';
 import { laserReceiverTrigger } from '../events/events.js';
 import { Group } from 'three/examples/jsm/libs/tween.module.js';
+import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';
+import { cannonToThreeVector3 } from '../../Utils.js';
 
 var pellets = [];
 var raycaster = new Raycaster();
@@ -74,8 +81,26 @@ function addPelletBall(item) {
     ball.clone = energyBallClone;
     ball.name = "pellet";
     ball.pellet = energyBall;
+    ball.previousDirection = new Vector3(0, 0, 0);
 
     ball.addEventListener("collide", function (event) {
+
+        if (!event.target.pellet.active)
+            return;
+
+        if (event.body.name == "wall") {
+            const obj = new Object3D();
+            obj.quaternion.copy(event.body.quaternion);
+            obj.updateMatrix();
+
+            // The contact position in the world coordinate
+            var contactPoint = new CANNON.Vec3();
+            event.contact.bi.position.vadd(event.contact.rj, contactPoint)
+
+            //console.log(contactPoint)
+            checkRotation(event.contact)
+            addDecalOnHit(cannonToThreeVector3(event.target.position), obj.rotation, new Vector3(10, 10, 10));
+        }
 
         if (event.body.name == "player") {
             clearTimeout(event.target.pellet.timeout);
@@ -95,13 +120,10 @@ function addPelletBall(item) {
                 if (event.target.pellet.infinity) {
                     resetBall(event.target.pellet, true);
                 } else {
-                    //event.target.mass = 0;
                     event.target.pellet.active = false;
-                    GLOBALS.SCENE_FPS.remove(event.target.pellet);
-                    GLOBALS.SCENE_FPS.remove(ball.clone);
+                    event.target.pellet.position.set(100000, 10000, 10000)
 
                     setTimeout(() => {
-                        console.log(event.target.name)
                         event.target.removeEventListener("collide")
                         GLOBALS.CANNON_WORLD.removeBody(event.target);
                     }, 10);
@@ -116,9 +138,18 @@ function addPelletBall(item) {
         const normal = contact.ni;  // Normal vector of the contact
 
         // Convert the normal vector to Three.js format if needed
-        const threeNormal = new Vector3(normal.x, normal.y, normal.z);
+        const threeNormal = new Vector3(normal.x, normal.y, normal.z).negate();
 
-        event.target.direction = threeNormal.negate();
+        /*        console.log("--------------------------")
+                console.log(threeNormal)
+                console.log(event.target.previousDirection.round())*/
+
+        if (threeNormal.equals(event.target.previousDirection.round()))
+            event.target.direction = threeNormal.negate();
+        else
+            event.target.direction = threeNormal;
+
+        event.target.previousDirection = event.target.direction;
     });
 
     GLOBALS.DYNAMIC_OBJECTS.push(ball);
@@ -172,10 +203,10 @@ function pelletUpdate() {
     if (GLOBALS.LEVEL_ENTERED) {
         for (var i = 0; i < pellets.length; i++) {
 
-            if(pellets[i].body.inTractor)
+            if (pellets[i].body.inTractor)
                 continue;
 
-            if(first){
+            if (first) {
                 resetBall(pellets[i], true)
             }
 
@@ -190,7 +221,7 @@ function pelletUpdate() {
 
                 pellets[i].position.copy(pellets[i].body.position)
                 pellets[i].quaternion.copy(pellets[i].body.quaternion)
-            }else{
+            } else {
 
             }
         }
@@ -232,6 +263,65 @@ $("body").on('input', '#state-pellet-infinity', function () {
 $("body").on('input', '#pellet-timer-value', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.pedestalValue = parseInt(this.value);
 });
+
+const geometryHit = new PlaneGeometry(0.6, 0.6);
+const map = new TextureLoader().load('./assets/textures/burn01a.png');
+const instancePelletHit = new InstancedMesh(geometryHit, new MeshBasicMaterial({
+    side: 1,
+    map: map,
+    transparent: true,
+    opacity: 1,
+    color: new Color(0,0,0)
+}), 1000);
+instancePelletHit.current = 0;
+
+
+console.log(instancePelletHit)
+
+function addDecalOnHit(position, orientation, size) {
+
+    console.log("-------------------")
+    console.log(position)
+    console.log(orientation)
+
+    if (!instancePelletHit.parent) {
+        GLOBALS.SCENE_FPS.add(instancePelletHit);
+    }
+
+    const dummy = new Object3D();
+    dummy.position.copy(position);
+    dummy.rotation.copy(orientation);
+    dummy.updateMatrix();
+    instancePelletHit.setMatrixAt(instancePelletHit.current, dummy.matrix);
+    instancePelletHit.current += 1;
+    instancePelletHit.needsUpdate = true;
+    instancePelletHit.computeBoundingBox();
+}
+
+function checkRotation(contact) {
+    // Get the bodies involved in the collision
+    var bodyA = contact.bi;
+    var bodyB = contact.bj;
+
+    // Get the rotation quaternion of body A
+    var rotationA = bodyA.quaternion;
+    console.log('Rotation of body A:', rotationA);
+
+    // Get the rotation quaternion of body B
+    var rotationB = bodyB.quaternion;
+    console.log('Rotation of body B:', rotationB);
+
+    // If you want the orientation of a particular contact point in the world space:
+    var contactPointA = new CANNON.Vec3();
+    rotationA.vmult(contact.ri, contactPointA); // Apply rotation to the local contact point on body A
+    contactPointA.vadd(bodyA.position, contactPointA); // Convert to world coordinates
+    console.log('Contact point on body A in world coordinates:', contactPointA);
+
+    var contactPointB = new CANNON.Vec3();
+    rotationB.vmult(contact.rj, contactPointB); // Apply rotation to the local contact point on body B
+    contactPointB.vadd(bodyB.position, contactPointB); // Convert to world coordinates
+    console.log('Contact point on body B in world coordinates:', contactPointB);
+}
 
 export {
     pelletUpdate,
