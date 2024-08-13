@@ -18,6 +18,7 @@ import {
     OrbitControls
 } from 'three/addons/controls/OrbitControls.js';
 import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh';
+import { groupByPercentage } from './Utils.js';
 
 // Add the extension functions
 BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
@@ -125,7 +126,7 @@ var GLOBALS = {
     //LEVEL EDITOR
     PLANE_USER_DATA: [],
     PLANE_LEVEL_INSTANCED: null,
-    BUDGET: 1500,
+    BUDGET: 3000,
 
     //PORTALS
     PORTALS: [null, null],
@@ -601,7 +602,9 @@ var GLOBALS = {
     LASER_TRIGGERS: [],
     MATERIAL_CONE: null,
     BLOCK_PLAYER_MOVE: false,
-    FAITH_PLATE_TARGET: null
+    FAITH_PLATE_TARGET: null,
+    GROUP_LINE_TRAGECTORY: new Group(),
+    GOO_REFLECTIONS: true
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)

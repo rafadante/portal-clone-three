@@ -566,7 +566,7 @@ document.addEventListener("keypress", function (event) {
 $("body").on('input', '#portal-gun-color', function () {
     var color = hex2rgb(this.value);
     localStorage.setItem("portal_gun_color", this.value);
-    GLOBALS.GUN.getObjectByName("Object_6").material.color = new Color(color.r/255, color.g/255, color.b/255);
+    GLOBALS.GUN.getObjectByName("Object_6").material.color = new Color(color.r / 255, color.g / 255, color.b / 255);
 })
 
 $("body").on('input', '#portal-gun-roughness', function () {
@@ -578,3 +578,14 @@ $("body").on('input', '#portal-gun-metalness', function () {
     localStorage.setItem("portal_gun_metalness", this.value);
     GLOBALS.GUN.getObjectByName("Object_6").material.metalness = this.value;
 })
+
+
+$("body").on('change', '#option-goo-reflections', function () {
+    GLOBALS.GOO_REFLECTIONS = this.checked;
+    localStorage.setItem("goo_reflections", this.checked);
+})
+
+if (localStorage.getItem("goo_reflections")){
+    GLOBALS.GOO_REFLECTIONS = localStorage.getItem("goo_reflections") == "true";
+    $("#option-goo-reflections").prop('checked', GLOBALS.GOO_REFLECTIONS);
+}

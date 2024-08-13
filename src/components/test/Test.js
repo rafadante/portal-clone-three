@@ -126,7 +126,7 @@ function viewFPS() {
         GLOBALS.CONTROLS.enabled = false;
         GLOBALS.ROOM.visible = false;
 
-        
+
         GLOBALS.SCENE.environment = null;
         GLOBALS.LIGHT_GROUP.visible = true;
         GLOBALS.STATS.container.style.display = "block";
@@ -218,6 +218,8 @@ function viewFPS() {
             stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
           else
             stateDoor(0, true, false, GLOBALS.EXIT_DOOR);*/
+
+        GLOBALS.GROUP_LINE_TRAGECTORY.visible = false;
 
         animate()
 

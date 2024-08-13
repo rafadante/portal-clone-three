@@ -7,7 +7,7 @@ var listernAdded = false;
 var listener;
 
 function play(elem) {
-    return
+    //return
     var isPlaying = elem.currentTime > 0 && !elem.paused && !elem.ended
         && elem.readyState > elem.HAVE_CURRENT_DATA;
 
@@ -28,7 +28,7 @@ function play(elem) {
     }
 }
 
-function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis) {
+function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, volume) {
 
     if (!listernAdded) {
         listernAdded = true;
@@ -46,6 +46,7 @@ function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis) {
     sound.setRefDistance(1);
     sound.setMaxDistance(maxDis);
     sound.setDistanceModel("linear");
+    sound.volume = 0.5;
     sound.audio = audioClone;
     sound.audio.loop = loop;
 
@@ -86,7 +87,7 @@ ambient.volume = 0.15;
 ambient.loop = true;
 
 const walk = new Audio('audio/tile1.wav')
-walk.volume = 0.5;
+walk.volume = 0.25;
 walk.loop = true;
 walk.pause();
 
@@ -119,6 +120,10 @@ falling.loop = true;
 const hold = new Audio('audio/hold_loop.wav')
 hold.loop = true;
 
+const aerial = document.getElementById("faith_plate_loop");
+aerial.volume = 1;
+aerial.loop = false;
+
 function volume(val) {
 }
 
@@ -139,7 +144,8 @@ var AUDIO = {
     DEATH: deathAudio,
     WALK: walk,
     JUMP: jump,
-    WALK_LIGHT_BRIDGE: walkLightBridde
+    WALK_LIGHT_BRIDGE: walkLightBridde,
+    AERIAL: aerial
 }
 
 export {

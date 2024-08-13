@@ -144,7 +144,7 @@ function updatePhysics() {
             property == "door" || property == "light" || property == "stripe" || property == "gel_blue" ||
             property == "gel_orange" || property == "laser_field" || property == "fizzler" ||
             property == "portal_0" || property == "portal_1"|| property == "pellet_launcher" ||
-            property == "pellet_catcher")
+            property == "pellet_catcher"||property == "faith_plate")
             continue;
 
         for (var i = 0; i < GLOBALS.DYMANIC_ITEMS[property].length; i++) {

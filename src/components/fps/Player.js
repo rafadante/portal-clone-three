@@ -6,6 +6,7 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import { AUDIO, play } from '../audio/Audio.js';
+import { faithPlate } from '../faithPlate/FaithPlate.js';
 
 var upVector;
 var slipperyMaterial = new CANNON.Material();
@@ -50,6 +51,30 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
 
     GLOBALS.PLAYER.looping = false;
 
+    if (event.body.name == "faith_plate" && !GLOBALS.PLAYER.block) {
+
+        GLOBALS.PLAYER.block = true;
+        setTimeout(() => {
+            GLOBALS.PLAYER.block = false;
+        }, 10);
+
+        clearTimeout(AUDIO.AERIAL.timeout)
+        AUDIO.AERIAL.volume = 1;
+
+        if (AUDIO.AERIAL.duration > 0 && !AUDIO.AERIAL.paused) {
+            //already playing
+        } else {
+            AUDIO.AERIAL.currentTime = 0;
+            AUDIO.AERIAL.play()
+        }
+
+        GLOBALS.BLOCK_PLAYER_MOVE = true;
+        GLOBALS.PLAYER.inJump = true;
+        GLOBALS.PLAYER_MOVING = true;
+        GLOBALS.PLAYER.linearDamping = 0.01
+        faithPlate(event.body, event.target)
+    }
+
     if (event.contact.bj.name == "light_bridge") {
         GLOBALS.PLAYER.lightBridge = true;
     } else {
@@ -64,10 +89,11 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
 
 GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
 
+    GLOBALS.PLAYER.inJump = true;
+
     if (GLOBALS.BLOCK_PLAYER_MOVE)
         return
 
-    GLOBALS.PLAYER.inJump = true;
     if (GLOBALS.CANNON_WORLD.contacts.length > 0) {
 
         for (let contact of GLOBALS.CANNON_WORLD.contacts) {

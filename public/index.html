@@ -75,7 +75,7 @@
           <img
             data-content="A dropper will come with it. If the player loses the cube the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
             data-title="CUBE" class="item" data-name="cube" src="../assets/ui/items/cube_pink.png"
-            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="false"
             data-instanced="true" id="cube" />
 
           <img
@@ -1213,7 +1213,7 @@
           <div class="options-row">
             <span class="option-name" id="">Goo Reflections</span>
             <div class="option-value">
-              <input id="option-goo-reflections" type="checkbox" />
+              <input id="option-goo-reflections" type="checkbox" checked/>
             </div>
           </div>
           <!--DEBUG-->
@@ -1240,6 +1240,13 @@
             <span class="option-name" id="">Portal gun Metalness</span>
             <div class="option-value">
               <input id="portal-gun-metalness" value="0" type="number" min="0" max="1" step="0.1" style="pointer-events: all !important;"/>
+            </div>
+          </div>
+          <!--FAITH PLATE LINE-->
+          <div class="options-row">
+            <span class="option-name" id="">Faith Plate Trajectory</span>
+            <div class="option-value">
+              <input id="faith-plate-line" type="checkbox"/>
             </div>
           </div>
         </div>
@@ -1388,6 +1395,18 @@
 
   <audio id="audio-button-negative">
     <source src="./audio/button_synth_negative_01.wav" type="audio/wav">
+  </audio>
+
+  <audio id="faith_plate_hit">
+    <source src="./audio/faith_plate_hit.wav" type="audio/wav">
+  </audio>
+
+  <audio id="faith_plate_loop" preload="auto">
+    <source src="./audio/aerial.mp3" type="audio/mp3">
+  </audio>
+
+  <audio id="pelletHit" preload="auto">
+    <source src="./audio/pelletHit.wav" type="audio/wav">
   </audio>
 
 </body>

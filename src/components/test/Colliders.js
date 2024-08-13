@@ -26,10 +26,11 @@ import {
 import { interactWithItem } from '../events/events.js';
 import { respawn } from '../events/states.js';
 import { addLaserToCube } from '../lasers/Laser.js';
-import { 
+import {
     addPelletBall,
     addPelletCatcher
- } from '../pellet/Pellet.js';
+} from '../pellet/Pellet.js';
+import { faithPlate } from '../faithPlate/FaithPlate.js';
 
 function colliderItemManager() {
 
@@ -62,6 +63,7 @@ function colliderItemManager() {
     addColliderItem(GLOBALS.DOORS, "door", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['pellet_launcher'], "pellet_launcher", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['pellet_catcher'], "pellet_catcher", 0)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['faith_plate'], "faith_plate", 0)
 
     addColliderDoorsDefault(GLOBALS.ENTER_DOOR);
     addColliderDoorsDefault(GLOBALS.EXIT_DOOR);
@@ -101,7 +103,7 @@ function fizzlerTrigger(body) {
         if (e.body === GLOBALS.PLAYER) {
             deletePortal(0)
             deletePortal(1)
-            GLOBALS.PORTAL_BOX =[];
+            GLOBALS.PORTAL_BOX = [];
         } else if (e.body.name == "sphere" || e.body.name == "cube" || e.body.name == "radio" || e.body.name == "cube_2") {
             //CREATE A CLONE TO APPLY DISSOLVE SHADER
             const clone = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.name).scene.clone();
@@ -237,16 +239,18 @@ function addColliderItem(items, type, mass, offset) {
                     type: ShapeType.HULL
                 });
                 var shape = result.shape;
-            }else if (type == "pellet_launcher") {
+            } else if (type == "pellet_launcher") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.6, 0.3, 0.6));
                 objHolder.translateY(0.3)
 
                 addPelletBall(items[i]);
-            }else if (type == "pellet_catcher") {
+            } else if (type == "pellet_catcher") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.3, 0.5));
                 objHolder.translateY(0.3);
 
                 addPelletCatcher(items[i]);
+            } else if (type == "faith_plate") {
+                var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.1, 1));
             }
 
             var box = new CANNON.Body({
@@ -268,18 +272,19 @@ function addColliderItem(items, type, mass, offset) {
             //box.invMass = 0.1;
             //box.invMassSolve = 0.1;
 
-            console.log(box)
-
             GLOBALS.SCENE.remove(objHolder);
-
-            console.log(box)
 
             if (type == "radio") {
                 addPositionalAudio('audio-radio', box, true, true, false, 8)
             } else if (type == "door") {
                 addPositionalAudio('audio-door', items[i], false, false, true, 8)
-            }else if(type == "laser_cube"){
+            } else if (type == "laser_cube") {
                 addLaserToCube(box)
+            }
+
+            if (type == "faith_plate") {
+                box.collisionResponse = 0;
+                addPositionalAudio('faith_plate_hit', box, false, false, true, 20)
             }
 
             if (mass > 0) {
@@ -294,7 +299,7 @@ function addColliderItem(items, type, mass, offset) {
                             items[i].dispenserPosition.z));
                         items[i].position.copy(box.position);
 
-                        
+
                         GLOBALS.BOX_BODY.push(box);
                     } else {
                         box.allowSleep = true;
@@ -316,25 +321,33 @@ function addColliderItem(items, type, mass, offset) {
                 GLOBALS.SCENE_FPS.add(clone);
                 box.clone = clone;
 
-                if (type != "radio") {
+                if (type != "radio")
                     addPositionalAudio('audio-impact', box, false, false, true, 8);
 
-                    box.addEventListener("collide", function (event) {
-                        if (Math.abs(event.target.velocity.x) > 1.5 ||
-                            Math.abs(event.target.velocity.y) > 1.5 ||
-                            Math.abs(event.target.velocity.z) > 1.5) {
-                            event.target.sound.position.copy(event.target.position)
-                            //event.target.sound.audio.currentTime = 0;
-                            event.target.sound.audio.play();
-                        }
-                    });
-                }
+                box.addEventListener("collide", function (event) {
+
+                    if (event.body.name == "faith_plate") {
+                        faithPlate(event.body, event.target)
+                    }
+
+                    if(event.target.name == "radio")
+                        return;
+
+                    if (Math.abs(event.target.velocity.x) > 1.5 ||
+                        Math.abs(event.target.velocity.y) > 1.5 ||
+                        Math.abs(event.target.velocity.z) > 1.5) {
+                        event.target.sound.position.copy(event.target.position)
+                        //event.target.sound.audio.currentTime = 0;
+                        event.target.sound.audio.play();
+                    }
+                });
+                //}
 
 
                 box.addEventListener("sleep", function (event) {
                     box.sleeping = true;
 
-                    if(box.name == "laser_cube"){
+                    if (box.name == "laser_cube") {
                         //box.mass = 0;
                         //box.collisionResponse = 0;
                     }
@@ -443,6 +456,7 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
             box.room = true;
             box.side = side;
             box.name = "wall";
+            box.wallRotation = array[0].normal;
 
             for (var c = 0; c < columsNew[i][j].length; c++)
                 GLOBALS.PLANE_USER_DATA[columsNew[i][j][c].i].body = box;
@@ -488,7 +502,7 @@ function corridorColliderNames(corridor, update) {
         } else if (child.name.includes("emissive")) {
             if (!update) {
                 child.material = new MeshBasicMaterial({
-                    color: new Color(2,2,2)
+                    color: new Color(2, 2, 2)
                 });
 
                 const light = new SpotLight(0xffffff, 20);
@@ -496,7 +510,7 @@ function corridorColliderNames(corridor, update) {
                 light.penumbra = 1;
                 light.decay = 1; //2
                 light.distance = 6;
-                light.position.set(0,0.1,0);
+                light.position.set(0, 0.1, 0);
                 child.add(light);
                 var worlPos = new Vector3();
                 child.getWorldPosition(worlPos);

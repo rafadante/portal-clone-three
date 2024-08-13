@@ -26,7 +26,7 @@ function cubeState(button) {
         //
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
 
-            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == 6 ||
+            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == 20 ||
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == -30) {
                 warning("You can not spawn more cubes on this direction");
                 return;

@@ -214,10 +214,27 @@ class Water extends Mesh {
 
 		scope.material = material;
 
+		var first = true;
+
 		scope.onBeforeRender = function (renderer, scene, camera) {
 
 			if (!GLOBALS.FPS_MODE) {
 				return;
+			}
+
+			if (!GLOBALS.GOO_REFLECTIONS) {
+				if(first){
+					first = false;
+					renderer.state.buffers.depth.setMask(true);
+					renderer.clear();
+					material.uniforms['mirrorSampler'].value = null;
+				}
+				return;
+			}else{
+				if(!first){
+					first = true;
+					material.uniforms['mirrorSampler'].value = renderTarget.texture;
+				}
 			}
 
 			mirrorWorldPosition.setFromMatrixPosition(window.ooo.matrixWorld);

@@ -333,8 +333,6 @@ function loadLevel(data) {
 
     const geometry = new PlaneGeometry(2, 2);
 
-    GLOBALS.BUDGET = 1500;
-
     GLOBALS.PLANE_LEVEL_INSTANCED = new InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
     GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = true;
     GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = false;

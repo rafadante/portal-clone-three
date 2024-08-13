@@ -2,6 +2,7 @@ import {
     Vector3,
     Mesh,
     MeshBasicMaterial,
+    Color
 } from 'three';
 import {
     LightningStrike
@@ -84,17 +85,17 @@ function recreateRay() {
 
     lightningStrike = new LightningStrike(rayParams1);
     lightningStrikeMesh = new Mesh(lightningStrike, new MeshBasicMaterial({
-        color: 0xffffff
+        color: new Color(2,2,2)
     }));
 
     lightningStrike2 = new LightningStrike(rayParams2);
     lightningStrikeMesh2 = new Mesh(lightningStrike2, new MeshBasicMaterial({
-        color: 0xffffff
+        color: new Color(2,2,2)
     }));
 
     lightningStrike3 = new LightningStrike(rayParams3);
     lightningStrikeMesh3 = new Mesh(lightningStrike3, new MeshBasicMaterial({
-        color: 0xffffff
+        color: new Color(2,2,2)
     }));
 
     //GLOBALS.SELECTED_FOR_BLOOM.add(lightningStrikeMesh);

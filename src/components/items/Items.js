@@ -135,7 +135,7 @@ function hoverItem(found, connecting) {
 
     var userData = GLOBALS.PLANE_USER_DATA[found[0].instanceId];
 
-    if(GLOBALS.FAITH_PLATE_TARGET)
+    if (GLOBALS.FAITH_PLATE_TARGET)
         targetFaithPlateUpdate(GLOBALS.ITEM_CUBE);
 
     if (connecting) {
@@ -147,7 +147,7 @@ function hoverItem(found, connecting) {
             GLOBALS.ITEM_CUBE.place = false;
         }
     } else {
-        if ((userData.continuousEnding) ||//userData.hasItem || 
+        if ((userData.hasItem || userData.continuousEnding) ||//
             (userData.side == "down" && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("floor")) ||
             (userData.side == "up" && !GLOBALS.DRAGGED_ITEM_ELEMENT.data("ceiling")) ||
             ((userData.side == "front" || userData.side == "back" || userData.side == "left" || userData.side == "right")

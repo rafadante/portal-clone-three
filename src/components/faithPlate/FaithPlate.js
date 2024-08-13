@@ -30,62 +30,50 @@ const material = new MeshBasicMaterial({
 });
 const target = new Mesh(geometry, material);
 
-var launch = false;
+GLOBALS.SCENE.add(GLOBALS.GROUP_LINE_TRAGECTORY);
 
-function faithPlate() {
+function faithPlate(plate, body) {
 
-  for (let d of GLOBALS.DYNAMIC_OBJECTS) {
+  if (body.holding)
+    return;
 
-    let pos = new Vector3(d.position.x, d.position.y - 1, d.position.z);
+  if (!plate.launch) {
 
-    if (d.holding) continue;
+    plate.sound.audio.currentTime = 0;
+    plate.sound.audio.play();
 
-    for (var j = 0; j < GLOBALS.FAITH_PLATE_CONTACT_BOX.length; j++) {
-      if (GLOBALS.FAITH_PLATE_CONTACT_BOX[j].containsPoint(pos)) {
-        if (!launch) {
-          launch = true;
-          d.launch = true;
+    plate.launch = true;
+    setTimeout(() => {
+      plate.launch = false;
+    }, 150);
 
-          setTimeout(() => {
-            launch = false;
-          }, 150);
+    var rotationHolder = plate.item.ToRotate.rotation;
 
-          var rotationHolder = GLOBALS.FAITH_PLATE_TO_ROTATE[j].rotation;
+    tweenCamera(200, rotationHolder, new Vector3(Math.PI * 0.7, 0, 0));
+    setTimeout(() => {
+      tweenCamera(200, rotationHolder, new Vector3(Math.PI / 2, 0, 0));
+    }, 200);
 
-          tweenCamera(200, rotationHolder, new Vector3(Math.PI * 0.7, 0, 0));
-          setTimeout(() => {
-            tweenCamera(200, rotationHolder, new Vector3(Math.PI / 2, 0, 0));
-          }, 200);
+    // Velocity
+    body.velocity.setZero();
+    body.initVelocity.setZero();
+    body.angularVelocity.setZero();
+    body.initAngularVelocity.setZero();
 
-          // Velocity
-          d.velocity.setZero();
-          d.initVelocity.setZero();
-          d.angularVelocity.setZero();
-          d.initAngularVelocity.setZero();
+    // Force
+    body.force.setZero();
+    body.torque.setZero();
 
-          // Force
-          d.force.setZero();
-          d.torque.setZero();
+    const targetPos = plate.item.target.position.clone();
 
-          const s = 1;
-
-          const targetPos = GLOBALS.FAITH_PLATE_CONTACT_BOX[j].item.target.position.clone();
-          targetPos.multiplyScalar(s);
-
-          if (d.name == "player")
-            GLOBALS.PLAYER.inJump = true;
-
-          var imp = calculateImpulse(
-            new CANNON.Vec3(d.position.x * s, d.position.y * s, d.position.z * s),
-            new CANNON.Vec3(targetPos.x, targetPos.y, targetPos.z),
-            GLOBALS.FAITH_PLATE_CONTACT_BOX[j].item.userData.height * s,
-            d.mass,
-            d.name
-          );
-          d.applyImpulse(imp, d.position);
-        }
-      }
-    }
+    var imp = calculateImpulse(
+      new CANNON.Vec3(body.position.x, body.position.y, body.position.z),
+      new CANNON.Vec3(targetPos.x, targetPos.y, targetPos.z),
+      plate.item.userData.height,
+      body.mass,
+      body.name
+    );
+    body.applyImpulse(imp, body.position);
   }
 }
 
@@ -132,19 +120,27 @@ function calculateImpulse(initialPosition, finalPosition, maxHeight, mass, name)
   );
 
   if (name == "player") {
-    console.log(t_total_vertical)
-    GLOBALS.BLOCK_PLAYER_MOVE = true;
-    setTimeout(() => {
+    AUDIO.AERIAL.timeout = setTimeout(() => {
       GLOBALS.BLOCK_PLAYER_MOVE = false;
+      fade()
     }, t_total_vertical * 1000);
   }
 
   return impulse;
 }
 
+function fade() {
+
+  if (AUDIO.AERIAL.volume > 0.1) {
+    AUDIO.AERIAL.volume -= 0.1;
+    AUDIO.AERIAL.timeout =  setTimeout(fade, 100);
+  } else {
+    AUDIO.AERIAL.pause();
+  }
+}
+
 function targetFaithPlateStart(item) {
 
-  console.log(item)
   GLOBALS.FAITH_PLATE_TARGET = item;
 
   GLOBALS.CONNECTING = true;
@@ -161,7 +157,7 @@ function targetFaithPlateUpdate(target) {
 }
 
 function targetFaithPlateEnd(item, h) {
-  console.log(item);
+
   const clone = target.clone();
   clone.position.copy(item.position);
   clone.rotation.copy(item.rotation);
@@ -178,8 +174,6 @@ function targetFaithPlateEnd(item, h) {
       height = clone.position.y + 2;
     }
   }
-
-  console.log(height)
 
 
   GLOBALS.FAITH_PLATE_TARGET.userData.height = height;
@@ -212,11 +206,11 @@ function createCurve(start, end, height, target) {
   // Create the final object to add to the scene
   const curveObject = new Line(geometry, material);
   target.line = curveObject;
-  GLOBALS.SCENE.add(curveObject);
+  GLOBALS.GROUP_LINE_TRAGECTORY.add(curveObject);
 }
 
 $('#plate-max-height-value').on('change', function () {
-  GLOBALS.SCENE.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.target.line);
+  GLOBALS.GROUP_LINE_TRAGECTORY.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.target.line);
   GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.height = parseInt(this.value);
   createCurve(
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.position,
@@ -226,6 +220,10 @@ $('#plate-max-height-value').on('change', function () {
   )
 
   animate();
+});
+
+$('#faith-plate-line').on('change', function () {
+  GLOBALS.GROUP_LINE_TRAGECTORY.visible = this.checked;
 });
 
 export {

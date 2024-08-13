@@ -30,7 +30,6 @@ import {
   levelEnteredFunction,
   wakeUpAll
 } from "./states.js";
-import { faithPlate } from "../faithPlate/FaithPlate.js";
 
 var itemHolder = null;
 var coords = new Vector3();
@@ -41,7 +40,6 @@ function updateEvents() {
   levelEnteredFunction();
   tractorBeam();
   pelletUpdate();
-  faithPlate();
 
   var id = 0;
 

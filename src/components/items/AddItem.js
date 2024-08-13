@@ -76,7 +76,7 @@ function addItem(found, loaded) {
             userData.hasItem = false; //delete here
         }
 
-        if ((!userData.continuousEnding) || loaded) {//!userData.hasItem && 
+        if ((!userData.hasItem &&!userData.continuousEnding) || loaded) {// 
 
             if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
                 const geometry = new BoxGeometry(2, 2, 2);
@@ -350,7 +350,7 @@ function addItem(found, loaded) {
             } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
                 item.translateY(0.025);
 
-                var bb = new Box3(); // for re-use
+                /*var bb = new Box3(); // for re-use
                 bb.setFromObject(item);
                 bb.side = 1;
                 bb.position = item.position;
@@ -365,6 +365,16 @@ function addItem(found, loaded) {
                 })
 
                 item.side = userData.side;
+                GLOBALS.ITEMS_ADDED.add(item);*/
+
+                item.traverse(child => {
+                    if (child.name == "launch") {
+                        item.ToRotate = child;
+                        //GLOBALS.FAITH_PLATE_TO_ROTATE.push(child)
+                    }
+                })
+
+                GLOBALS.DYMANIC_ITEMS['faith_plate'].push(item)
                 GLOBALS.ITEMS_ADDED.add(item);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
                 GLOBALS.ITEMS_ADDED.add(item);
