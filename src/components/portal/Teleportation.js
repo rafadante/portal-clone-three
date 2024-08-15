@@ -97,13 +97,18 @@ function getTeleportedDirectionalVector(v, portal) {
 
 function teleportationState() {
 
-    const playerPos = cannonToThreeVector3(GLOBALS.PLAYER.position)
-    GLOBALS.MAIN_CAMERA.position.copy(playerPos)
-    GLOBALS.MAIN_CAMERA.position.y += 0.3;
-    GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
+    const playerPos = cannonToThreeVector3(GLOBALS.PLAYER.position);
+    GLOBALS.PIVOT.position.copy(playerPos);
 
-    GLOBALS.PORTAL_GUN_CAMERA.position.copy(GLOBALS.MAIN_CAMERA.position)
-    GLOBALS.PORTAL_GUN_CAMERA.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion)
+    if (GLOBALS.PLAYER.PURPLE_CONTACT)
+        GLOBALS.PIVOT.translateY(0.3)
+    else
+        GLOBALS.PIVOT.position.y += 0.3;
+
+    GLOBALS.GUN.position.copy(GLOBALS.PIVOT.position);
+
+    GLOBALS.PORTAL_GUN_CAMERA.position.copy(GLOBALS.PIVOT.position)
+    GLOBALS.PORTAL_GUN_CAMERA.quaternion.copy(GLOBALS.PIVOT.quaternion)
 
     if (teleported) {
         teleported = false;
@@ -231,7 +236,7 @@ function teleportationState() {
                         play(AUDIO.PORTAL_EXIT);*/
 
                         removeJointConstraint();
-                        teleportObject3D(GLOBALS.MAIN_CAMERA, GLOBALS.PORTALS[p]);
+                        teleportObject3D(GLOBALS.PIVOT, GLOBALS.PORTALS[p]);
                         GLOBALS.PLAYER_MODEL_CLONE.visible = false;
                         GLOBALS.PLAYER_MODEL.visible = false;
                         teleported = true;

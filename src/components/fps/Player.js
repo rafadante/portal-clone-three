@@ -1,14 +1,16 @@
 import {
+    Euler,
     Vector3
 } from 'three';
 import * as CANNON from 'cannon';
 import {
     GLOBALS
 } from '../../Globals.js';
-import { AUDIO, play } from '../audio/Audio.js';
+import { AUDIO, fadeAudio, play } from '../audio/Audio.js';
 import { faithPlate } from '../faithPlate/FaithPlate.js';
+import { gelTrigger } from '../gels/Gels.js';
+import { tweenCamera } from '../../Utils.js';
 
-var upVector;
 var slipperyMaterial = new CANNON.Material();
 slipperyMaterial.friction = 0.00;
 
@@ -27,14 +29,13 @@ GLOBALS.PLAYER.addShape(physicsShape);
 GLOBALS.PLAYER.position.set(5, 5, 5);
 GLOBALS.PLAYER.linearDamping = 0.999;
 GLOBALS.PLAYER.name = "player";
-GLOBALS.PLAYER.invMass = 0.1;
-GLOBALS.PLAYER.invMassSolve = 0.1;
 
 // keep the player upright
 GLOBALS.PLAYER.angularDamping = 1
 
 // set additional properties
 GLOBALS.PLAYER.inJump = true
+GLOBALS.PLAYER.DIR = 1;
 
 // construct the physical body
 GLOBALS.PLAYER.updateMassProperties()
@@ -44,10 +45,54 @@ GLOBALS.CANNON_WORLD.addBody(GLOBALS.PLAYER);
 // so need to check contacts to detect if grounded or not
 // https://github.com/schteppe/cannon.js/issues/313
 
-upVector = new CANNON.Vec3(0, 1, 0);
+GLOBALS.PLAYER.upVector = new CANNON.Vec3(0, 1, 0);
+GLOBALS.PLAYER.upVectorThree = new Vector3(0, 1, 0);
 let contactNormal = new CANNON.Vec3(0, 0, 0);
 
+GLOBALS.PLAYER.addEventListener('beginContact', () => {
+    console.log('contact!!!')
+})
+
+GLOBALS.PLAYER.addEventListener('endContact', () => {
+    console.log('end contact!!!')
+})
+
 GLOBALS.PLAYER.addEventListener("collide", function (event) {
+
+    if (event.body.type == "orange") {
+        GLOBALS.SPEED = 3;
+        GLOBALS.HEAD_BOB_SPEED = 10;
+    } else {
+        if (event.target.OrangeContact) {
+            event.target.OrangeContact = false;
+            GLOBALS.SPEED = 1;
+            GLOBALS.HEAD_BOB_SPEED = 5;
+            AUDIO.WALK.volume = 0.25;
+            fadeAudio(AUDIO.PROPULSION)
+        }
+    }
+
+    if (event.body.name == "gel") {
+        gelTrigger(event);
+    }
+
+    if (event.body.type != "purple" && event.body.mass == 0) {
+        if (GLOBALS.PLAYER.customGravity && GLOBALS.PLAYER.PURPLE_CONTACT) {
+            clearTimeout(event.target.timeout);
+            event.target.timeout = setTimeout(() => {
+                playerExitPurpleGel();
+            }, 10);
+        }
+    }
+
+    if (event.body.type != "blue") {
+        if (event.target.verticalVelocity) {
+            clearTimeout(event.target.timeout);
+            event.target.timeout = setTimeout(() => {
+                event.target.verticalVelocity = null;
+            }, 10);
+        }
+    }
 
     GLOBALS.PLAYER.looping = false;
 
@@ -109,7 +154,7 @@ GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
                     contactNormal = contact.ni
                 }
 
-                GLOBALS.PLAYER.inJump = (contactNormal.dot(upVector) <= 0.5);
+                GLOBALS.PLAYER.inJump = (contactNormal.dot(GLOBALS.PLAYER.upVector) <= 0.5);
 
                 /*if (!GLOBALS.PLAYER.inJump) {
                     window.PLAYER_JUMPING_FROM_BLUE_GEL = false;
@@ -121,6 +166,10 @@ GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
     }
 
     GLOBALS.PLAYER_MOVING = GLOBALS.PLAYER.inJump;
+
+    for (let d of GLOBALS.DYNAMIC_OBJECTS) {
+        d.firstCollisionHandled = false;
+    }
 })
 
 GLOBALS.DYNAMIC_OBJECTS.push(GLOBALS.PLAYER);
@@ -128,4 +177,55 @@ GLOBALS.DYNAMIC_OBJECTS.push(GLOBALS.PLAYER);
 for (let d of GLOBALS.DYNAMIC_OBJECTS) {
     d.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC
     d.collisionFilterMask = GLOBALS.CGROUP_ALL
+}
+
+function playerExitPurpleGel() {
+    console.log("999999999999999")
+    GLOBALS.HEAD_BOB_SPEED = 5;
+    GLOBALS.PLAYER.PURPLE_CONTACT = false;
+    GLOBALS.PLAYER.customGravity = null;
+    GLOBALS.PLAYER.side = null;
+    GLOBALS.PLAYER.EULER = null;
+    GLOBALS.PLAYER.DIR = 1;
+    const index = GLOBALS.CUSTOM_GRAVITY.indexOf(GLOBALS.PLAYER);
+    GLOBALS.SPEED = 1;
+    if (index > -1) {
+
+        AUDIO.WALK_PAINT.pause();
+        AUDIO.WALK = AUDIO.WALK_NORMAL;
+
+        GLOBALS.PLAYER.EULER = null;
+        GLOBALS.CUSTOM_GRAVITY.splice(index, 1);
+
+        GLOBALS.PLAYER.upVector = new CANNON.Vec3(0, 1, 0);
+        GLOBALS.PLAYER.upVectorThree = new Vector3(0, 1, 0);
+        window.nnn = false;
+
+        GLOBALS.POINTER_CONTROLS.maxPolarAngle = Math.PI;
+        GLOBALS.POINTER_CONTROLS._euler = new Euler(0, 0, 0, 'YXZ');
+
+        // Velocity
+        GLOBALS.PLAYER.velocity.setZero();
+        GLOBALS.PLAYER.initVelocity.setZero();
+        GLOBALS.PLAYER.angularVelocity.setZero();
+        GLOBALS.PLAYER.initAngularVelocity.setZero();
+
+        // Force
+        GLOBALS.PLAYER.force.setZero();
+        GLOBALS.PLAYER.torque.setZero();
+
+        tweenCamera(500, GLOBALS.MAIN_CAMERA_GROUP.rotation, new Vector3(0, 0, 0))
+
+        setTimeout(() => {
+
+            GLOBALS.MAIN_CAMERA.position.copy(GLOBALS.MAIN_CAMERA_GROUP.position)
+            GLOBALS.MAIN_CAMERA_GROUP.position.set(0, 0, 0)
+
+            GLOBALS.PIVOT = GLOBALS.MAIN_CAMERA;
+        }, 500);
+    }
+}
+
+export {
+    playerExitPurpleGel
 }

@@ -37,6 +37,7 @@ function raycastSelected(found, event, type) {
     }
 
     if (event.button == 2) {
+
         if (GLOBALS.PLANE_USER_DATA[instanceId].itemName != "exitDoor" &&
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "enterDoor" &&
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "window") {
@@ -45,9 +46,9 @@ function raycastSelected(found, event, type) {
 
             if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem &&
                 (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("door") ||
-                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_0") ||
-                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_1") ||
-                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal_button") )) {
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_0") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_1") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal_button"))) {
                 $("#rotate-item").css("display", "block");
             } else {
                 $("#rotate-item").css("display", "none");
@@ -69,8 +70,8 @@ function raycastSelected(found, event, type) {
                 }
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_receiver") ||
-                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_relay") ||
-                GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_catcher")) {
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_relay") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_catcher")) {
                     $(".buttons").css("display", "block");
                     $("#connections").empty();
 
@@ -358,10 +359,7 @@ function raycastSelected(found, event, type) {
             currentID = instanceId;
 
             for (var i = 0; i < GLOBALS.SELECTED_ID_ORANGE.length; i++) {
-                if (GLOBALS.SELECTED_ID_ORANGE[i].portal)
-                    GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID_ORANGE[i].id_instanced, new Color(0xffffff));
-                else
-                    GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID_ORANGE[i].id_instanced, new Color(0x808080));
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID_ORANGE[i].id_instanced, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID_ORANGE[i].id_instanced].planeColor);
             }
 
             GLOBALS.SELECTED_ID_ORANGE = [];
@@ -425,10 +423,7 @@ function raycastSelected(found, event, type) {
 function removeSelection() {
     for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
 
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal)
-            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(0xffffff));
-        else
-            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(0x808080));
+        GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor);
 
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].selected = false;

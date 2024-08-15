@@ -1,4 +1,5 @@
 import {
+    Object3D,
     Vector3,
     Vector4
 } from 'three';
@@ -104,6 +105,36 @@ const hex2rgb = (hex) => {
     return { r, g, b };
 }
 
+function tweenBack(duration, ini, final) {
+
+    var obj = new Object3D();
+    //GLOBALS.SCENE_CHILDREN.add(obj)
+    obj.quaternion.copy(ini.clone());
+
+    new TWEEN.Tween(ini).to(final, duration)
+        .onUpdate((tween) => {
+
+            obj.quaternion.slerp(final, 0.1);
+            GLOBALS.MAIN_CAMERA_GROUP.quaternion.copy(obj.quaternion);
+            GLOBALS.PLAYER.quaternion.copy(obj.quaternion);
+        })
+
+    var aa = {
+        value: 0
+    };
+
+    new TWEEN.Tween(aa, false)
+        .to({
+            value: 1
+        }, 1000)
+        .onUpdate(() => {
+            obj.quaternion.slerp(final, 0.1);
+            GLOBALS.MAIN_CAMERA_GROUP.quaternion.copy(obj.quaternion);
+            GLOBALS.PLAYER.quaternion.copy(obj.quaternion);
+        })
+        .start();
+}
+
 export {
     getPlaneByName,
     warning,
@@ -115,5 +146,6 @@ export {
     cannonToThreeVector3,
     threeToFour,
     fourToThree,
-    hex2rgb
+    hex2rgb,
+    tweenBack
 }

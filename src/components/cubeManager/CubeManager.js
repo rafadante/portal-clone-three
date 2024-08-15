@@ -62,7 +62,7 @@ function cubeState(button) {
 
     checkToUpdateContinuous();
 
-    if(remove){
+    if (remove) {
         removeSelection();
     }
 }
@@ -125,7 +125,7 @@ function trasnlatePlane(id, val, portal) {
         //
 
         GLOBALS.BUDGET += 2;
-        remove=true;
+        remove = true;
     } else {
 
         GLOBALS.PLANE_USER_DATA[id].position = dummy.position.clone();
@@ -199,10 +199,14 @@ function checkSides(dummy, val, id, side, portal) {
 
         GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(idEmptyToFill, dummy.matrix);
 
-        if (portal)
+        var planeColor = new Color(0x808080);
+
+        if (portal) {
             GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(idEmptyToFill, new Color().setHex(0xffffff));
-        else
+            planeColor = new Color(0xffffff);
+        } else {
             GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(idEmptyToFill, new Color().setHex(0x808080));
+        }
 
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
@@ -253,7 +257,8 @@ function checkSides(dummy, val, id, side, portal) {
             id_instanced: idEmptyToFill,
             portal: portal,
             tile: 1,
-            normal: normal
+            normal: normal,
+            planeColor: planeColor
         };
 
         GLOBALS.BUDGET -= 1;
@@ -335,6 +340,7 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
             GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(a, clone.matrix);
 
             var portal;
+            var planeColor = new Color(0x808080);
 
             if (clone.position.x <= 5 && clone.position.z >= 7 && clone.position.y <= 5) {
                 portal = false;
@@ -348,6 +354,7 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
             } else {
                 portal = true;
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new Color().setHex(0xffffff));
+                planeColor = new Color(0xffffff);
             }
 
             var hasItem = false;
@@ -407,7 +414,8 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
                 connected: [],
                 idConnection: [],
                 line: [],
-                normal: normal
+                normal: normal,
+                planeColor: planeColor
             }
 
             GLOBALS.BUDGET -= 1;

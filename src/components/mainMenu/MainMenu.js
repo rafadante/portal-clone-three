@@ -40,7 +40,7 @@ $("#loading-parent").css("pointer-events", "none");
 
 $("body").on('click', '#option-community-build, #option-single-load', function () { //
     setTimeout(() => {
-        play(AUDIO.EDITOR);
+        //play(AUDIO.EDITOR);
         init();
     }, 2000);
 });
@@ -370,6 +370,14 @@ function loadLevel(data) {
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(i, new Color().setHex(0x808080));
 
             GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+
+            var planeColor = new Color(0x808080);
+
+            if (data[i].portal) {
+                planeColor = new Color(0xffffff);
+            }
+
+            data[i].planeColor = planeColor;
         }
 
         if (data[i].itemName == "exitDoor") {

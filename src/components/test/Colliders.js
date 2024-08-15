@@ -31,6 +31,7 @@ import {
     addPelletCatcher
 } from '../pellet/Pellet.js';
 import { faithPlate } from '../faithPlate/FaithPlate.js';
+import { gelTrigger } from '../gels/Gels.js';
 
 function colliderItemManager() {
 
@@ -326,11 +327,49 @@ function addColliderItem(items, type, mass, offset) {
 
                 box.addEventListener("collide", function (event) {
 
+                    if (event.body.type != "blue") {
+                        if (event.target.verticalVelocity) {
+                            clearTimeout(event.target.timeout);
+                            event.target.timeout = setTimeout(() => {
+                                event.target.verticalVelocity = null;
+                            }, 10);
+                        }
+                    }
+
+                    if (event.body.name == "gel") {
+                        gelTrigger(event)
+                    }
+
+                    if (event.body.type != "purple" && event.body.mass == 0) {
+                        if (event.target.customGravity) {
+                            clearTimeout(event.target.timeout);
+                            event.target.timeout = setTimeout(() => {
+                                event.target.customGravity = null;
+                                const index = GLOBALS.CUSTOM_GRAVITY.indexOf(event.target);
+                                if (index > -1) {
+                                    GLOBALS.CUSTOM_GRAVITY.splice(index, 1);
+
+                                    // Velocity
+                                    event.target.velocity.setZero();
+                                    event.target.initVelocity.setZero();
+                                    event.target.angularVelocity.setZero();
+                                    event.target.initAngularVelocity.setZero();
+
+                                    // Force
+                                    event.target.force.setZero();
+                                    event.target.torque.setZero();
+
+                                    console.log(GLOBALS.CUSTOM_GRAVITY)
+                                }
+                            }, 10);
+                        }
+                    }
+
                     if (event.body.name == "faith_plate") {
                         faithPlate(event.body, event.target)
                     }
 
-                    if(event.target.name == "radio")
+                    if (event.target.name == "radio")
                         return;
 
                     if (Math.abs(event.target.velocity.x) > 1.5 ||

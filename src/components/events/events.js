@@ -380,6 +380,12 @@ function interactWithItem() {
           play(AUDIO.HOLD)
         }
 
+        GLOBALS.CURRENT_ITEM.body.customGravity = null;
+        GLOBALS.CURRENT_ITEM.body.side = null;
+        const index = GLOBALS.CUSTOM_GRAVITY.indexOf(GLOBALS.CURRENT_ITEM.body);
+        if (index > -1) {
+          GLOBALS.CUSTOM_GRAVITY.splice(index, 1);
+        }
       } else {
         AUDIO.PICK_FAIL.pause();
         AUDIO.PICK_FAIL.currentTime = 0;

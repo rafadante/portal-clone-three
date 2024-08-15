@@ -94,23 +94,24 @@
             data-name="radio" src="../assets/ui/items/radio.png" data-allowconnection="false" data-rotate="false"
             data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="radio" />
 
-            <img
+          <img
             data-content="Once the laser emitter hits the catcher you can have it trigger a function such as opening a door, or enabling a set of stairs."
-            data-title="LASER EMITTER" class="item" data-name="laser_emitter"
-            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true"
+            data-title="LASER EMITTER" class="item" data-name="laser_emitter" data-allowconnection="true"
+            data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true"
             src="../assets/ui/items/laser_emitter.png" id="laser_emitter" />
 
           <img data-content="Trigger with the laser." data-title="LASER RECEIVER" class="item"
-            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true"
-            data-name="laser_receiver" src="../assets/ui/items/laser_receiver.png" id="laser_receiver"/>
+            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="true" data-name="laser_receiver" src="../assets/ui/items/laser_receiver.png"
+            id="laser_receiver" />
 
           <img data-content="Trigger with the laser." data-title="LASER RELAY" class="item" data-name="laser_relay"
-          data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true"
-            src="../assets/ui/items/laser_relays.png" id="laser_relay"/>
+            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="true" src="../assets/ui/items/laser_relays.png" id="laser_relay" />
 
           <img data-content="Reflects the laser." data-title="LASER CUBE" class="item" data-name="laser_cube"
-          data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true"
-            src="../assets/ui/items/laser_cube.png" id="laser_cube"/>
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
+            data-instanced="true" src="../assets/ui/items/laser_cube.png" id="laser_cube" />
 
           <img data-content="Can be linked to an object to form a trigger. This button only accepts spheres."
             data-title="BUTTON SPHERE" class="item" data-name="button_circle" id="button_circle"
@@ -266,7 +267,36 @@
 
           -->
 
+          <!---->
+
           <!--<img
+            data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
+            data-title="GEL CLEAR" class="item" data-name="ramp" src="../assets/ui/items/gel_new.png" />
+
+            <img
+            data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
+            data-title="GEL CLEAR" class="item" data-name="ramp_half2" src="../assets/ui/items/gel_new.png" />-->
+
+          <img data-content="" data-title="ENERGY PELLET LAUNCHER" class="item" data-name="pellet_launcher"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="true" src="../assets/ui/items/pellet_launcher.png" id="pellet_launcher" />
+
+          <img data-content="" data-title="ENERGY PELLET CATCHER" class="item" data-name="pellet_catcher"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="true" src="../assets/ui/items/pellet_catcher.png" id="pellet_catcher" />
+
+          <img data-content="If the player steps in Deadly Goo they will be instantly killed." data-title="DEADLY GOO"
+            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
+            data-instanced="false" class="item" data-name="goo" src="../assets/ui/items/goo.png" />
+
+          <img
+            data-content="If a player walks onto a Faith Plate it will cause them to get bounced into the air. When you place a Faith Plate within the editor it will also create a bullseye and a yellow ball. The Bullseye is where the player will ultimately land, and the yellow ball is the trajectory the player will travel."
+            data-allowconnection="true" data-rotate="true" data-floor="true" data-ceiling="false" data-walls="false"
+            data-instanced="false" data-title="FAITH PLATE" class="item" id="faith_plate" data-name="faith_plate"
+            src="../assets/ui/items/faith_plate.png" />
+
+          <!--GELS-->
+          <img
             data-content="Blue will cause the player to bounce. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
             data-title="GEL BLUE" class="item" data-name="gel_blue" src="../assets/ui/items/gel_blue.png" />
 
@@ -284,36 +314,7 @@
 
           <img
             data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL CLEAR" class="item" data-name="gel_new" src="../assets/ui/items/gel_new.png" />-->
-
-          <!--<img
-            data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL CLEAR" class="item" data-name="ramp" src="../assets/ui/items/gel_new.png" />
-
-            <img
-            data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL CLEAR" class="item" data-name="ramp_half2" src="../assets/ui/items/gel_new.png" />-->
-
-            <img
-            data-content=""
-            data-title="ENERGY PELLET LAUNCHER" class="item" data-name="pellet_launcher"
-            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true"
-            src="../assets/ui/items/pellet_launcher.png" id="pellet_launcher" />
-
-            <img
-            data-content=""
-            data-title="ENERGY PELLET CATCHER" class="item" data-name="pellet_catcher"
-            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true"
-            src="../assets/ui/items/pellet_catcher.png" id="pellet_catcher" />
-
-            <img data-content="If the player steps in Deadly Goo they will be instantly killed." data-title="DEADLY GOO"
-            data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="false"
-            class="item" data-name="goo" src="../assets/ui/items/goo.png" />
-
-            <img
-            data-content="If a player walks onto a Faith Plate it will cause them to get bounced into the air. When you place a Faith Plate within the editor it will also create a bullseye and a yellow ball. The Bullseye is where the player will ultimately land, and the yellow ball is the trajectory the player will travel."
-            data-allowconnection="true" data-rotate="true" data-floor="true" data-ceiling="false" data-walls="false" data-instanced="false"
-            data-title="FAITH PLATE" class="item" id="faith_plate" data-name="faith_plate" src="../assets/ui/items/faith_plate.png" />
+            data-title="GEL CLEAR" class="item" data-name="gel_new" src="../assets/ui/items/gel_new.png" />
         </div>
       </div>
     </div>
@@ -819,9 +820,48 @@
     <!--FAITH PLATE-->
     <li id="plate-max-height" class="menu-item hasItem faith_plate">
       <a href="#" class="menu-btn">
-        <input type="number" style="width: 50px;" max="100" min="0" value="3" id="plate-max-height-value" step="1"/>
+        <input type="number" style="width: 50px;" max="100" min="0" value="3" id="plate-max-height-value" step="1" />
         <span class="menu-text">Max Height</span>
       </a>
+    </li>
+
+    <!--GELS-->
+    <li class="menu-separator"></li>
+    <li id="add-gel" class="menu-item gel">
+      <a href="#" class="menu-btn">
+        <span class="menu-text">Add Gel</span>
+      </a>
+    </li>
+    <li id="remove-gel" class="menu-item gel">
+      <a href="#" class="menu-btn">
+        <span class="menu-text">Remove Gel</span>
+      </a>
+    </li>
+    <li class="menu-item menu-item-submenu gel" id="gel-type" data-gel="blue" data-color="rgb(30,144,255)">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-pallete"></i>
+        <span class="menu-text title">Gel Type: Blue</span>
+      </button>
+      <ul class="menu">
+        <li data-gel="blue" data-color="rgb(30,144,255)" class="menu-item gel-type">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-pallete"></i>
+            <span class="menu-text">Blue</span>
+          </button>
+        </li>
+        <li data-gel="orange" data-color="rgb(255,140,0)" class="menu-item gel-type">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-pallete"></i>
+            <span class="menu-text">Orange</span>
+          </button>
+        </li>
+        <li data-gel="purple" data-color="rgb(75,0,130)" class="menu-item gel-type">
+          <button type="purple" class="menu-btn">
+            <i class="fa fa-pallete"></i>
+            <span class="menu-text">Purple</span>
+          </button>
+        </li>
+      </ul>
     </li>
 
     <!--<li class="menu-item menu-item-submenu">
@@ -1213,7 +1253,7 @@
           <div class="options-row">
             <span class="option-name" id="">Goo Reflections</span>
             <div class="option-value">
-              <input id="option-goo-reflections" type="checkbox" checked/>
+              <input id="option-goo-reflections" type="checkbox" checked />
             </div>
           </div>
           <!--DEBUG-->
@@ -1233,20 +1273,22 @@
           <div class="options-row">
             <span class="option-name" id="">Portal gun Roughness</span>
             <div class="option-value">
-              <input id="portal-gun-roughness" value="1" type="number" min="0" max="1" step="0.1" style="pointer-events: all !important;" />
+              <input id="portal-gun-roughness" value="1" type="number" min="0" max="1" step="0.1"
+                style="pointer-events: all !important;" />
             </div>
           </div>
           <div class="options-row">
             <span class="option-name" id="">Portal gun Metalness</span>
             <div class="option-value">
-              <input id="portal-gun-metalness" value="0" type="number" min="0" max="1" step="0.1" style="pointer-events: all !important;"/>
+              <input id="portal-gun-metalness" value="0" type="number" min="0" max="1" step="0.1"
+                style="pointer-events: all !important;" />
             </div>
           </div>
           <!--FAITH PLATE LINE-->
           <div class="options-row">
             <span class="option-name" id="">Faith Plate Trajectory</span>
             <div class="option-value">
-              <input id="faith-plate-line" type="checkbox"/>
+              <input id="faith-plate-line" type="checkbox" />
             </div>
           </div>
         </div>
@@ -1341,7 +1383,7 @@
 
   </div>
 
-  <span id="drawcalls" style="    position: absolute;
+  <span id="drawcalls" style="    position: absolute; display: none;
   bottom: 0px;
   left: 0px;
   z-index: 109000;

@@ -12,7 +12,7 @@ import {
 } from "three";
 import { tweenCamera } from "../../Utils.js";
 import { GLOBALS } from "../../Globals.js";
-import { AUDIO, play } from "../audio/Audio.js";
+import { AUDIO, fadeAudio, play } from "../audio/Audio.js";
 import * as CANNON from 'cannon';
 import { vec3 } from "three/examples/jsm/nodes/Nodes.js";
 import $ from 'jquery';
@@ -122,21 +122,11 @@ function calculateImpulse(initialPosition, finalPosition, maxHeight, mass, name)
   if (name == "player") {
     AUDIO.AERIAL.timeout = setTimeout(() => {
       GLOBALS.BLOCK_PLAYER_MOVE = false;
-      fade()
+      fadeAudio(AUDIO.AERIAL)
     }, t_total_vertical * 1000);
   }
 
   return impulse;
-}
-
-function fade() {
-
-  if (AUDIO.AERIAL.volume > 0.1) {
-    AUDIO.AERIAL.volume -= 0.1;
-    AUDIO.AERIAL.timeout =  setTimeout(fade, 100);
-  } else {
-    AUDIO.AERIAL.pause();
-  }
 }
 
 function targetFaithPlateStart(item) {

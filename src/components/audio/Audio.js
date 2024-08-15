@@ -91,6 +91,11 @@ walk.volume = 0.25;
 walk.loop = true;
 walk.pause();
 
+const walkGel = new Audio('audio/walkGel.wav')
+walkGel.volume = 0.25;
+walkGel.loop = true;
+walkGel.pause();
+
 const walkLightBridde = new Audio('audio/fs_fm_lightbridge_01.wav')
 walkLightBridde.volume = 0.5;
 walkLightBridde.loop = true;
@@ -124,7 +129,26 @@ const aerial = document.getElementById("faith_plate_loop");
 aerial.volume = 1;
 aerial.loop = false;
 
+const propulsion = new Audio('audio/propulsion.mp3');
+propulsion.volume = 1;
+propulsion.loop = true;
+
 function volume(val) {
+}
+
+function fadeAudio(audio) {
+
+    const a = audio;
+
+    if (audio.volume > 0.1) {
+        audio.volume -= 0.1;
+        audio.timeout = setTimeout(() => {
+            fadeAudio(a)
+        }, 100);
+    } else {
+        audio.pause();
+        audio.volume = 1;
+    }
 }
 
 var AUDIO = {
@@ -145,7 +169,10 @@ var AUDIO = {
     WALK: walk,
     JUMP: jump,
     WALK_LIGHT_BRIDGE: walkLightBridde,
-    AERIAL: aerial
+    AERIAL: aerial,
+    WALK_NORMAL: walk,
+    WALK_PAINT: walkGel,
+    PROPULSION: propulsion
 }
 
 export {
@@ -153,5 +180,6 @@ export {
     AUDIO,
     volume,
     play,
-    addAudio
+    addAudio,
+    fadeAudio
 }

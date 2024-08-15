@@ -25,6 +25,7 @@ import { testLightsManager } from '../lights/Lights.js';
 import { manageInstances } from './Instances.js';
 import './BackToEditor.js';
 import { stateDoor } from '../door/Door.js';
+import { addGel } from '../gels/Gels.js';
 
 $("body").on('click', '#view-fps', function () {
     viewFPS();
@@ -58,6 +59,7 @@ function viewFPS() {
 
         initPost();
         manageInstances();
+        addGel();
 
         addPositionalAudio('audio-door', GLOBALS.EXIT_DOOR, false, false, true, 8);
         addPositionalAudio('audio-door', GLOBALS.ENTER_DOOR, false, false, true, 8);

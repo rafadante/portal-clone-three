@@ -14,7 +14,8 @@ import {
     Matrix4,
     Frustum,
     Vector3,
-    GridHelper
+    GridHelper,
+    Quaternion
 } from 'three';
 import {
     TWEEN
@@ -51,9 +52,7 @@ import {
 import {
     RoomEnvironment
 } from 'three/addons/environments/RoomEnvironment.js';
-import {
-    initGels
-} from './components/gels/Gels.js';
+import './components/gels/Gels.js';
 import {
     GLOBALS
 } from './Globals.js';
@@ -111,7 +110,9 @@ function init() {
     GLOBALS.ROOM.add(GLOBALS.CUBES);
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.ITEM_CUBE);
     // CAMERA
-    GLOBALS.SCENE.add(GLOBALS.MAIN_CAMERA);
+    GLOBALS.SCENE.add(GLOBALS.MAIN_CAMERA_GROUP);
+    GLOBALS.MAIN_CAMERA_GROUP.add(GLOBALS.MAIN_CAMERA);
+    GLOBALS.PIVOT = GLOBALS.MAIN_CAMERA;
     //LIGHT GROUP
     GLOBALS.LIGHT_GROUP = new Lights();
     GLOBALS.LIGHT_GROUP.name = "LIGHT_GROUP";
@@ -129,7 +130,7 @@ function init() {
     //
     loadCube();
     loadMaterials();
-    initGels();
+    //initGels();
     //LISTENER
     window.addEventListener('resize', onWindowResize);
     recreateRay();
@@ -215,7 +216,7 @@ function render(time) {
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {
         if (GLOBALS.CAMERAS[i].fixed) {
-            GLOBALS.CAMERA_OBJ_HORIZONTAL[i].lookAt(GLOBALS.MAIN_CAMERA.position);
+            GLOBALS.CAMERA_OBJ_HORIZONTAL[i].lookAt(GLOBALS.PIVOT.position);
             GLOBALS.CAMERA_OBJ_HORIZONTAL[i].rotation.x = 0;
             GLOBALS.CAMERA_OBJ_HORIZONTAL[i].rotation.y = 0;
         }
@@ -223,7 +224,7 @@ function render(time) {
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_VERTICAL.length; i++) {
         if (GLOBALS.CAMERAS[i].fixed) {
-            GLOBALS.CAMERA_OBJ_VERTICAL[i].lookAt(GLOBALS.MAIN_CAMERA.position);
+            GLOBALS.CAMERA_OBJ_VERTICAL[i].lookAt(GLOBALS.PIVOT.position);
             GLOBALS.CAMERA_OBJ_VERTICAL[i].rotation.z = 0;
             GLOBALS.CAMERA_OBJ_VERTICAL[i].rotation.y = 0;
         }
@@ -234,15 +235,15 @@ function render(time) {
     GLOBALS.RENDERER.localClippingEnabled = false;
     GLOBALS.RENDERER.clippingPlanes = [];
 
-    GLOBALS.COMPOSER.render();
+    //GLOBALS.COMPOSER.render();
     //GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
     //GLOBALS.COMPOSER2.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
-    /*GLOBALS.RENDERER.autoClear = false;
+    GLOBALS.RENDERER.autoClear = false;
     GLOBALS.RENDERER.clear();
     GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
     document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
     GLOBALS.RENDERER.clearDepth()
-    GLOBALS.RENDERER.render(GLOBALS.GUN, GLOBALS.PORTAL_GUN_CAMERA);*/
+    GLOBALS.RENDERER.render(GLOBALS.GUN, GLOBALS.PORTAL_GUN_CAMERA);
 
     if (statsBegin)
         GLOBALS.STATS.end();
@@ -338,7 +339,13 @@ function renderPortal2(thisIndex, pairIndex) {
     if (GLOBALS.PORTALS[thisIndex] === null || GLOBALS.PORTALS[pairIndex] === null)
         return
 
-    let portalCamera = GLOBALS.MAIN_CAMERA.clone()
+    var qua = new Quaternion();
+    GLOBALS.MAIN_CAMERA.getWorldQuaternion(qua)
+
+    let portalCamera = GLOBALS.MAIN_CAMERA.clone();
+
+    portalCamera.position.copy(GLOBALS.PIVOT.position);
+    portalCamera.quaternion.copy(qua);
 
     // ensure that uniforms and render target are correctly sized
     const {

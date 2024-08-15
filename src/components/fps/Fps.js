@@ -1,17 +1,7 @@
-import {
-    Vector3,
-    Quaternion,
-    Clock
-} from 'three';
-import {
-    portalButton
-} from '../portal/CreatePortal.js'
-import {
-    interactWithItem
-} from '../events/events.js'
-import {
-    GLOBALS
-} from '../../Globals.js';
+import { Vector3, Quaternion, Clock } from 'three';
+import { portalButton } from '../portal/CreatePortal.js'
+import { interactWithItem } from '../events/events.js'
+import { GLOBALS } from '../../Globals.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { AUDIO, play } from '../audio/Audio.js';
 import "./Player.js";
@@ -19,6 +9,7 @@ import "./Input.js";
 import { INPUT } from './index.js';
 import { Crouch } from './Input.js';
 import * as CANNON from "cannon";
+import { playerExitPurpleGel } from './Player.js';
 
 var gamepadButton1 = false;
 var gamepadButton3 = false;
@@ -27,14 +18,12 @@ var gamepadButton6 = false;
 var gamepadButton7 = false;
 var gamepadButton12 = false;
 var gamepadButton15 = false;
-var headBobSpeed = 5;
 var headBobHeight = 0.0000006;//
 let controllerIndex = null;
 var finalRotationY;
 window.PLAYER_JUMPING_FROM_BLUE_GEL = false;
 var rotationMobile = 0.1;
 var vv = false;
-var up = new Vector3(0, 1, 0)
 var lastTimeStamp = 0;
 var activeAction, lastAction;
 const clock = new Clock();
@@ -71,9 +60,9 @@ const updatePlayer = function (deltaTime) {
     let cameraDirection = new Vector3()
     GLOBALS.MAIN_CAMERA.getWorldDirection(cameraDirection)
 
-    const forward = cameraDirection.projectOnPlane(up).normalize()
+    const forward = cameraDirection.projectOnPlane(GLOBALS.PLAYER.upVectorThree).normalize()
     const backward = forward.clone().negate()
-    const left = up.clone().cross(forward).normalize()
+    const left = GLOBALS.PLAYER.upVectorThree.clone().cross(forward).normalize()
     const right = left.clone().negate()
 
     // physics changes while jumping
@@ -94,7 +83,7 @@ const updatePlayer = function (deltaTime) {
 
     // apply forces in WASD directions when pressed
 
-    const f = velocity * GLOBALS.PLAYER.mass * jumpMultiplier * deltaTime;
+    const f = velocity * GLOBALS.PLAYER.mass * jumpMultiplier * deltaTime * GLOBALS.SPEED;
 
     if (GLOBALS.GEL_ORANGE)
         GLOBALS.PLAYER.applyForce(forward.clone().multiplyScalar(f * 3), GLOBALS.PLAYER.position)
@@ -113,7 +102,7 @@ const updatePlayer = function (deltaTime) {
 
             if (INPUT.shouldJump) {
                 GLOBALS.PLAYER.inJump = true
-                GLOBALS.PLAYER.applyImpulse(up.clone().multiplyScalar(f * 0.25), GLOBALS.PLAYER.position)
+                GLOBALS.PLAYER.applyImpulse(GLOBALS.PLAYER.upVectorThree.clone().multiplyScalar(f * 0.25), GLOBALS.PLAYER.position)
             }
 
             INPUT.shouldJump = false;
@@ -209,12 +198,15 @@ const updatePlayer = function (deltaTime) {
                 AUDIO.WALK_LIGHT_BRIDGE.pause();
                 jumpPressed = true;
                 GLOBALS.PLAYER.inJump = true
-                GLOBALS.PLAYER.applyImpulse(up.clone().multiplyScalar(230), GLOBALS.PLAYER.position)
+                GLOBALS.PLAYER.applyImpulse(GLOBALS.PLAYER.upVectorThree.clone().multiplyScalar(230), GLOBALS.PLAYER.position)
 
                 blockJump = true;
                 setTimeout(() => {
                     blockJump = false;
                 }, 100);
+
+                if (GLOBALS.PLAYER.customGravity)
+                    playerExitPurpleGel();
             }
         }
     }
@@ -222,7 +214,7 @@ const updatePlayer = function (deltaTime) {
     updateHeadBob(deltaTime);
 
     if (GLOBALS.PLAYER_MOVING)
-        GLOBALS.GUN.children[0].position.x += Math.sin(INPUT.headBobTimer * headBobSpeed) * headBobHeight;
+        GLOBALS.GUN.children[0].position.x += Math.sin(INPUT.headBobTimer * GLOBALS.HEAD_BOB_SPEED) * headBobHeight;
 }
 
 var jumpPressed = false;
@@ -236,6 +228,8 @@ function isSlerpComplete(currentQuat, endQuat, tolerance = 0.001) {
     // The dot product should be close to 1 if the quaternions are very similar
     return Math.abs(dot - 1) < tolerance;
 }
+
+window.gg = false;
 
 const updateCamera = function (deltaTime) {
 
@@ -255,9 +249,26 @@ const updateCamera = function (deltaTime) {
     }
 
     // always look where the camera points
-    GLOBALS.PLAYER.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), GLOBALS.MAIN_CAMERA.rotation.y);
+    //GLOBALS.PLAYER.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), GLOBALS.MAIN_CAMERA.rotation.y);
+
+    if (window.nnn) {
+
+        const euler = GLOBALS.PLAYER.EULER; // Example: Rotate 90 degrees around Y axis
+        euler.y = GLOBALS.MAIN_CAMERA.rotation.y;
+
+        // Convert Euler to Quaternion
+        const quaternion = new Quaternion();
+        quaternion.setFromEuler(euler);
+
+        GLOBALS.PLAYER.quaternion.copy(quaternion);
+        //GLOBALS.MAIN_CAMERA.rotation.x = Math.PI/2;
+    } else {
+        GLOBALS.PLAYER.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), GLOBALS.MAIN_CAMERA.rotation.y);
+    }
+
+
     //GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.SMOOTHNESS);
-    GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion)
+    GLOBALS.GUN.quaternion.copy(GLOBALS.PIVOT.quaternion)
 
     if (GLOBALS.MAIN_CAMERA.position.distanceTo(new Vector3(0, 0, 0)) > 100) {
         var obj = GLOBALS.ENTER_DOOR.clone();
@@ -267,12 +278,13 @@ const updateCamera = function (deltaTime) {
 
     // copy position and rotation so player model aligns with the physical body
     if (GLOBALS.PLAYER_MODEL) {
-        GLOBALS.PLAYER_MODEL.position.copy(GLOBALS.PLAYER.position).add(new Vector3(0, -1, 0))
-        GLOBALS.PLAYER_MODEL.translateY(0.2)
+        GLOBALS.PLAYER_MODEL.position.copy(GLOBALS.PLAYER.position).add(GLOBALS.PLAYER.upVectorThree.clone().multiplyScalar(-1))
+        //
         GLOBALS.PLAYER_MODEL.quaternion.copy(GLOBALS.PLAYER.quaternion)
         GLOBALS.PLAYER_MODEL.quaternion.multiply(new Quaternion(0, 50, 0)).normalize()
 
-        GLOBALS.PLAYER_MODEL.position.y += 0.2;
+        //GLOBALS.PLAYER_MODEL.position.y += 0.2;
+        GLOBALS.PLAYER_MODEL.translateY(0.4)
 
         GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLAYER_MODEL_CLONE)
         GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
@@ -346,7 +358,7 @@ function setAction(action) {
 
 function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
 
-    if(GLOBALS.BLOCK_PLAYER_MOVE)
+    if (GLOBALS.BLOCK_PLAYER_MOVE)
         return;
 
     if (AUDIO.WALK.paused && !GLOBALS.PLAYER.inJump && !GLOBALS.PLAYER.lightBridge) {
@@ -375,7 +387,7 @@ function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
 
 function movePlayerJoystick(direction, f, movementMultiplier, gamepadPressed) {
 
-    if(GLOBALS.BLOCK_PLAYER_MOVE)
+    if (GLOBALS.BLOCK_PLAYER_MOVE)
         return;
 
     GLOBALS.PLAYER.applyForce(direction.clone().multiplyScalar(f * movementMultiplier), GLOBALS.PLAYER.position)
@@ -386,9 +398,9 @@ function movePlayerJoystick(direction, f, movementMultiplier, gamepadPressed) {
 
 function movePlayerTouch(direction, f, value) {
 
-    if(GLOBALS.BLOCK_PLAYER_MOVE)
+    if (GLOBALS.BLOCK_PLAYER_MOVE)
         return;
-    
+
     GLOBALS.PLAYER.applyForce(direction.clone().multiplyScalar(f * value), GLOBALS.PLAYER.position)
     GLOBALS.PLAYER_MOVING = true;
 }
@@ -422,8 +434,8 @@ function joystickGel(gamepad, index, gamepadButton, mode, value) {
 const updateHeadBob = function (deltaTime) {
     if (INPUT.headBobActive && GLOBALS.PLAYER_MOVING) {
         const wavLength = Math.PI;
-        const nextStep = 1 + Math.floor(((INPUT.headBobTimer + 0.0000001) * headBobSpeed) / wavLength);
-        const nextStepTime = nextStep * wavLength / headBobSpeed;
+        const nextStep = 1 + Math.floor(((INPUT.headBobTimer + 0.0000001) * GLOBALS.HEAD_BOB_SPEED) / wavLength);
+        const nextStepTime = nextStep * wavLength / GLOBALS.HEAD_BOB_SPEED;
         INPUT.headBobTimer = Math.min(INPUT.headBobTimer + deltaTime, nextStepTime);
     }
 }

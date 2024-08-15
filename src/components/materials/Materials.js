@@ -24,7 +24,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.2,
+        0.4,
         0,
         null,
         null
@@ -42,7 +42,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.1,
+        0.2,
         0,
         null,
         null
@@ -60,7 +60,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.1,
+        0.2,
         0,
         null,
         null
@@ -77,7 +77,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.1,
+        0.2,
         0,
         null,
         null
@@ -94,7 +94,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.1,
+        0.2,
         0,
         null,
         null
@@ -111,7 +111,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.1,
+        0.2,
         0,
         null,
         null
@@ -129,7 +129,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.2,
+        0.4,
         0,
         null,
         null
@@ -146,7 +146,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.2,
+        0.4,
         0,
         null,
         null

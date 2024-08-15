@@ -17,6 +17,7 @@ import {
     updateLaserEmitterRaycaster
 } from './components/lasers/Laser.js';
 import { laserReceiverTrigger } from './components/events/events.js';
+import { applyCustomGravity } from './components/gels/Gels.js';
 
 // return the cannon world
 // Setup our world
@@ -79,6 +80,8 @@ var updateLasers = true;
 
 
 function updatePhysics() {
+
+    applyCustomGravity();
 
     if (GLOBALS.HOLDING_ITEM) {
         // Project the mouse onto the movement plane

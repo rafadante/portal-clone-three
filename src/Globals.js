@@ -97,6 +97,8 @@ var GLOBALS = {
     SCENE: new Scene(),
     SCENE_CHILDREN: new Group(),
     MAIN_CAMERA: camera,
+    MAIN_CAMERA_GROUP: new Group(),
+    PIVOT: null,
     PORTAL_GUN_CAMERA: portalGunCamera,
     CONTROLS: controls,
     POINTER_CONTROLS: null,
@@ -604,7 +606,10 @@ var GLOBALS = {
     BLOCK_PLAYER_MOVE: false,
     FAITH_PLATE_TARGET: null,
     GROUP_LINE_TRAGECTORY: new Group(),
-    GOO_REFLECTIONS: true
+    GOO_REFLECTIONS: true,
+    CUSTOM_GRAVITY: [],
+    SPEED: 1,
+    HEAD_BOB_SPEED: 5
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)

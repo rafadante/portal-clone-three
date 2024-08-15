@@ -1,725 +1,299 @@
-import {
-    PlaneGeometry,
-    InstancedMesh,
-    Object3D,
-    IcosahedronGeometry,
-    Mesh,
-    Vector3,
-    Color,
-    ShaderMaterial
-} from 'three';
-import * as CANNON from 'cannon';
-import {
-    GLOBALS
-} from '../../Globals.js';
-import { getPlaneByName } from '../../Utils.js';
+import $ from 'jquery';
+import { GLOBALS } from '../../Globals.js';
+import { Color, InstancedMesh, Mesh, MeshStandardMaterial, PlaneGeometry, Object3D, TextureLoader, Vector3, Euler, Group, Quaternion } from 'three';
+import CANNON from 'cannon';
+import { cannonToThreeVector3, threeToCannonVector3, tweenCamera } from '../../Utils.js';
+import { tweenBack } from '../../Utils.js';
+import { AUDIO } from '../audio/Audio.js';
 
-var vv = false;
-var destroyed = false;
-var cc = false;
-var tt = 0;
-var instancedMeshGel, gelBallBlue, gelBallOrange, gelBallBodyBlue, gelBallBodyOrange;
+function addGel() {
 
-function initGels() {
+    const geometryGel = new PlaneGeometry(2, 2);
+    const materialGel = new MeshStandardMaterial({
+        envMap: GLOBALS.ENV_MAP,
+        roughness: 0.2,
+        normalMap: new TextureLoader().load("./assets/textures/decal/normal.jpg")
+    });
+    const instancedGelPlane = new InstancedMesh(geometryGel, materialGel, 10000);
+    instancedGelPlane.current = 0;
 
-    /*GLOBALS.INK_MATERIAL.envMap = GLOBALS.ENV_MAP;
-    const geometryDecal = new PlaneGeometry(2, 2);
-
-    instancedMeshGel = new InstancedMesh(geometryDecal.clone(), GLOBALS.INK_MATERIAL, 100);
-    instancedMeshGel.castShadow = true;
-    instancedMeshGel.receiveShadow = true;
-    instancedMeshGel.frustumCulled = true;
-    instancedMeshGel.name = "gel-parent";
-    GLOBALS.SCENE_CHILDREN.add(instancedMeshGel);
-
-    var clone = new Object3D();
-
-    for (var i = 0; i < 100; i++) {
-        clone.scale.set(0, 0, 0);
-        clone.rotation.x = -Math.PI / 2;
-        clone.updateMatrix();
-        instancedMeshGel.setMatrixAt(i, clone.matrix);
-
-        GLOBALS.GELS.push(false);
-    }*/
-}
-
-
-function updateGels() {
-    if (gelBallBlue) {
-        gelBallBlue.position.copy(gelBallBodyBlue.position);
-        gelBallBlue.quaternion.copy(gelBallBodyBlue.quaternion);
+    var dummy = new Object3D();
+    for (var i = 0; i < 10000; i++) {
+        dummy.position.set(100000, 100000, 100000);
+        dummy.updateMatrix();
+        instancedGelPlane.setMatrixAt(i, dummy.matrix);
     }
 
-    if (gelBallOrange) {
-        gelBallOrange.position.copy(gelBallBodyOrange.position);
-        gelBallOrange.quaternion.copy(gelBallBodyOrange.quaternion);
-    }
-}
-
-var vv2 = false;
-
-window['createOrangeGel'] = function () {
-
-    destroyed = false;
-
-    for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['gel_orange'].length; i++) {
-        if (GLOBALS.DYMANIC_ITEMS['gel_orange'][i].length != 0) {
-
-            if (!vv2) {
-                let PHYSICS_MATERIAL = new CANNON.Material();
-                PHYSICS_MATERIAL.friction = 0; //0.01
-                PHYSICS_MATERIAL.restitution = 0; //0.1
-
-                var shape = new CANNON.Sphere(0.3);
-                gelBallBodyOrange = new CANNON.Body({
-                    shape: shape,
-                    mass: 100,
-                    material: PHYSICS_MATERIAL
-                })
-
-                const geometry = new IcosahedronGeometry(20, 4);
-                gelBallOrange = new Mesh(geometry, mat2);
-                GLOBALS.SCENE_CHILDREN.add(gelBallOrange);
-
-                gelBallOrange.scale.set(0.022, 0.022, 0.022)
-
-                gelBallBodyOrange.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC
-                gelBallBodyOrange.collisionFilterMask = GLOBALS.CGROUP_ENVIRONMENT
-                gelBallBodyOrange.gel = true;
-
-                GLOBALS.CANNON_WORLD.addBody(gelBallBodyOrange);
-                gelBallBodyOrange.name = "ball_gel"
-                GLOBALS.DYNAMIC_OBJECTS.push(gelBallBodyOrange);
-            } else {
-                // Velocity
-                gelBallBodyOrange.velocity.setZero();
-                gelBallBodyOrange.initVelocity.setZero();
-                gelBallBodyOrange.angularVelocity.setZero();
-                gelBallBodyOrange.initAngularVelocity.setZero();
-
-                // Force
-                gelBallBodyOrange.force.setZero();
-                gelBallBodyOrange.torque.setZero();
-
-                // Position
-                gelBallBodyOrange.position.setZero();
-                gelBallBodyOrange.previousPosition.setZero();
-                gelBallBodyOrange.interpolatedPosition.setZero();
-                gelBallBodyOrange.initPosition.setZero();
-
-                console.log("4444444444444444")
-            }
-
-            var pos = GLOBALS.DYMANIC_ITEMS['gel_orange'][i].position.clone();
-            pos.y -= 0.5;
-            gelBallBodyOrange.position.copy(pos);
-            gelBallOrange.position.copy(pos);
-
-            console.log(pos)
-
-            gelBallOrange.visible = false;
-            console.log(gelBallBodyOrange)
-
-            if (!vv2) {
-                gelBallBodyOrange.addEventListener('collide', (event) => {
-
-                    if (event.target.inArea || event.target.teleporting) {
-
-                    } else if (event.body.room && !cc2) {
-
-                        //cc2 = true;
-
-                        if (event.target.name == "player") {
-
-                            gelBallOrange.visible = false;
-                            window['createOrangeGel']();
-
-                            setTimeout(() => {
-                                //cc2 = false;
-                            }, 10);
-                        } else {
-
-                            console.log("111111111111111")
-
-                            const pos = new Vector3(event.target.position.x, event.body.position.y, event.target.position.z);
-                            const pos2 = pos.round();
-                            var plane = getPlaneByName((2 * Math.floor(pos2.x / 2) + 1) + "/" +
-                                pos2.y + "/" +
-                                (2 * Math.floor(pos2.z / 2) + 1))
-
-                            if (plane.length > 0) {
-
-                                if (!plane[0].painted) {
-                                    console.log("22222222222222")
-                                    createGelOrange(pos2, plane[0]);
-                                }
-
-                                plane[0].painted = true;
-                            }
-
-                            gelBallOrange.visible = false;
-
-                            setTimeout(() => {
-                                console.log("3333333333")
-                               // window['createOrangeGel']();
-
-                                setTimeout(() => {
-                                    //cc2 = false;
-                                }, 10);
-                            }, 2000);
-                        }
-                    }
-                })
-            }
-
-        }
-    }
-
-    vv2 = true;
-}
-
-var cc2 = false;
-
-function createGelOrange(pos, plane) {
-
-    var id;
+    instancedGelPlane.instanceMatrix.needsUpdate = true;
+    instancedGelPlane.computeBoundingSphere();
+    GLOBALS.SCENE_FPS.add(instancedGelPlane);
 
     for (var i = 0; i < GLOBALS.GELS.length; i++) {
-        if (!GLOBALS.GELS[i]) {
-            GLOBALS.GELS[i] = true;
-            id = i;
-            break;
-        }
+
+        var dummy = new Object3D();
+        dummy.position.copy(GLOBALS.GELS[i].position);
+        dummy.rotation.copy(GLOBALS.GELS[i].rotation);
+        dummy.updateMatrix();
+
+        instancedGelPlane.setMatrixAt(i, dummy.matrix);
+        instancedGelPlane.setColorAt(i, GLOBALS.GELS[i].planeColor);
+        instancedGelPlane.current += 1;
+
+        gelCollider(dummy, GLOBALS.GELS[i].gelType, GLOBALS.GELS[i].normal, GLOBALS.GELS[i].side);
+
+        instancedGelPlane.instanceColor.needsUpdate = true;
     }
 
+    instancedGelPlane.instanceMatrix.needsUpdate = true;
+    instancedGelPlane.computeBoundingSphere();
+}
 
-    var gel = new Object3D();
-    gel.scale.set(1, 1, 1);
-    gel.position.copy(pos);
-
-    //
-
-    let PHYSICS_MATERIAL = new CANNON.Material();
-    PHYSICS_MATERIAL.friction = 0.01; //0.01
-    PHYSICS_MATERIAL.restitution = 0.1; //0.1
-
-    var shape = new CANNON.Box(new CANNON.Vec3(1, 1, 0.01));
-
-    var box = new CANNON.Body({
+function gelCollider(dummy, type, normal, side) {
+    var shape = new CANNON.Box(new CANNON.Vec3(1, 1, 0.05));
+    var gel = new CANNON.Body({
         shape: shape,
         mass: 0,
-        material: PHYSICS_MATERIAL
-    })
+        material: GLOBALS.PHYSICS_MATERIAL
+    });
 
+    gel.position.copy(dummy.position);
+    gel.quaternion.copy(dummy.quaternion);
+    //gel.collisionResponse = 0;
+    gel.name = "gel";
+    gel.type = type;
+    gel.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
+    gel.collisionFilterMask = GLOBALS.CGROUP_ALL;
+    gel.side = side;
 
-    gel.rotation.copy(plane.rotation)
-    box.up = new Vector3(0, 1, 0)
-    box.vel = new Vector3(1, 0, 1)
+    if (side == "down")
+        gel.normal = new Vector3(0, 1, 0)
 
-    gel.updateMatrix();
-    instancedMeshGel.setMatrixAt(id, gel.matrix);
-    instancedMeshGel.setColorAt(id, new Color(0xFF8C00));
-    instancedMeshGel.instanceColor.needsUpdate = true;
-    instancedMeshGel.instanceMatrix.needsUpdate = true;
-    instancedMeshGel.computeBoundingSphere();
+    GLOBALS.CANNON_BODIES.push(gel);
+    GLOBALS.CANNON_WORLD.addBody(gel);
+}
 
-    box.position.copy(pos);
-    box.quaternion.copy(gel.quaternion)
-    box.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC
-    box.collisionFilterMask = GLOBALS.CGROUP_ALL
-    box.linearDamping = 0.01;
-    box.name = "gel-orange";
-    box.side = plane.side;
+function gelTrigger(event) {
 
-    GLOBALS.CANNON_WORLD.addBody(box);
+    if (event.body.type == "blue" && !event.target.gelJumping) {
 
-    GLOBALS.PLAYER.addEventListener('collide', (event) => {
-        if (event.body.name == "gel-orange") {
-            GLOBALS.GEL_ORANGE = true;
+        clearTimeout(event.target.timeout)
+
+        event.target.firstCollisionHandled = true;
+        event.target.gelJumping = true;
+        const holder = event.target;
+        setTimeout(() => {
+            holder.gelJumping = false;
+        }, 100);
+
+        if (!event.target.verticalVelocity){
+
+            if(event.target.velocity.y < 0.1 && event.target.velocity.y > -8){
+                event.target.verticalVelocity = -8;
+                event.target.velocity.y = -8;
+            }else{
+                event.target.verticalVelocity = event.target.velocity.y;
+            }
+            
+        }
+
+        console.log(event.target.velocity.y)
+
+        // Apply impulse only if the object is moving downwards
+        if (event.target.verticalVelocity < 0) {
+            // The impulse should reverse the current downward velocity
+            const impulseStrength = -2 * event.target.mass * event.target.verticalVelocity;
+            const impulse = new CANNON.Vec3(0, impulseStrength, 0);
+
+            console.log(impulse)
+
+            event.target.applyImpulse(impulse, event.target.position);
+        }
+
+        //const impulse = event.body.normal.clone().multiplyScalar(event.target.mass * 1 * relativeVelocity);
+
+        //console.log(impulse)
+        //console.log(event.target.position)
+
+        // Velocity
+        //event.target.velocity.y = 0;
+        //event.target.initVelocity.setZero();
+        //event.target.angularVelocity.setZero();
+        //event.target.initAngularVelocity.setZero();
+
+        // Force
+        //event.target.force.setZero();
+        //event.target.torque.setZero();
+
+        //event.target.applyImpulse(impulse, event.target.position);
+
+        // Calculate the relative velocity at the point of contact
+        //const contactNormal = event.contact.ni.clone(); // Normal of the contact point
+        //if (event.contact.bi === event.body) {
+        //    contactNormal.negate(); // Ensure the normal points towards the object body
+        //}
+
+        // Calculate relative velocity in the direction of the contact normal
+        //const relativeVelocity = new CANNON.Vec3();
+        //event.target.velocity.vsub(event.body.velocity, relativeVelocity);
+        //const velocityAlongNormal = contactNormal.dot(relativeVelocity);
+
+        //console.log(contactNormal)
+        //console.log(event)
+
+        // Only apply impulse if the object is moving towards the trampoline
+        /*if (velocityAlongNormal < 0) {
+            const impulseStrength = -20 * velocityAlongNormal * event.target.mass; // Impulse magnitude (negative to reverse the direction)
+            const impulse = contactNormal.scale(impulseStrength);
+
+            // Apply the impulse at the point of contact
+            event.target.applyImpulse(impulse, event.contact.rj.vadd(event.target.position));
+        }*/
+    } else if (event.body.type == "orange") {
+        if (!event.target.OrangeContact) {
+            AUDIO.PROPULSION.currentTime = 0;
+            AUDIO.PROPULSION.play();
+            AUDIO.WALK.volume = 0;
+        }
+
+        event.target.OrangeContact = true;
+    } else if (event.body.type == "purple") {
+
+        clearTimeout(event.target.timeout);
+
+        const normalThree = cannonToThreeVector3(event.contact.ni).round().negate();
+        const normalCannon = threeToCannonVector3(normalThree);
+
+        if (event.target.name == "player") {
+            if (event.target.side != event.body.side) {
+
+                GLOBALS.HEAD_BOB_SPEED = 3;
+                GLOBALS.PLAYER.PURPLE_CONTACT = false;
+                setTimeout(() => {
+                    GLOBALS.PLAYER.PURPLE_CONTACT = true;
+                }, 500);
+
+                event.target.side = event.body.side;
+                event.target.customGravity = new CANNON.Vec3(normalCannon.x * -9.8, normalCannon.y * -9.8, normalCannon.z * -9.8);
+
+                GLOBALS.PLAYER.upVector = normalCannon;
+                GLOBALS.PLAYER.upVectorThree = normalThree;
+
+                if (!GLOBALS.PLAYER.EULER) {
+                    GLOBALS.MAIN_CAMERA_GROUP.position.copy(GLOBALS.MAIN_CAMERA.position);
+                    GLOBALS.MAIN_CAMERA.position.set(0, 0, 0);
+                    GLOBALS.PIVOT = GLOBALS.MAIN_CAMERA_GROUP;
+                    GLOBALS.CUSTOM_GRAVITY.push(event.target);
+                }
+
+                window.direction = 1;
+
+                if (event.body.side == "front") {
+                    GLOBALS.PLAYER.EULER = new Euler(Math.PI / 2, 0, 0, 'XYZ');
+                    tweenCamera(500, GLOBALS.MAIN_CAMERA_GROUP.rotation, new Vector3(Math.PI / 2, 0, 0))
+                    GLOBALS.PLAYER.DIR = 1;
+                } else if (event.body.side == "back") {
+                    GLOBALS.PLAYER.EULER = new Euler(-Math.PI / 2, 0, 0, 'XYZ');
+                    tweenCamera(500, GLOBALS.MAIN_CAMERA_GROUP.rotation, new Vector3(-Math.PI / 2, 0, 0))
+                    GLOBALS.PLAYER.DIR = -1;
+                } else if (event.body.side == "up") {
+                    GLOBALS.PLAYER.EULER = new Euler(Math.PI * GLOBALS.PLAYER.DIR, 0, 0, 'XYZ');
+                    tweenCamera(500, GLOBALS.MAIN_CAMERA_GROUP.rotation, new Vector3(Math.PI * GLOBALS.PLAYER.DIR, 0, 0))
+                } else if (event.body.side == "left") {
+                    GLOBALS.PLAYER.EULER = new Euler(0, 0, -Math.PI / 2, 'XYZ');
+                    tweenCamera(500, GLOBALS.MAIN_CAMERA_GROUP.rotation, new Vector3(0, 0, -Math.PI / 2))
+                    GLOBALS.PLAYER.DIR = -1;
+                } else if (event.body.side == "right") {
+                    GLOBALS.PLAYER.EULER = new Euler(0, 0, Math.PI / 2, 'XYZ');
+                    tweenCamera(500, GLOBALS.MAIN_CAMERA_GROUP.rotation, new Vector3(0, 0, Math.PI / 2))
+                    GLOBALS.PLAYER.DIR = 1;
+                }
+
+                window.nnn = true;
+                GLOBALS.SPEED = 0.75;
+                AUDIO.WALK_NORMAL.pause();
+                AUDIO.WALK = AUDIO.WALK_PAINT;
+            }
         } else {
-            GLOBALS.GEL_ORANGE = false;
-        }
-    })
-
-    GLOBALS.DYNAMIC_OBJECTS.push(box);
-}
-
-window['createBlueGel'] = function () {
-
-    destroyed = false;
-
-    for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['gel_blue'].length; i++) {
-        if (GLOBALS.DYMANIC_ITEMS['gel_blue'][i].length != 0) {
-
-            if (!vv) {
-                let PHYSICS_MATERIAL = new CANNON.Material();
-                PHYSICS_MATERIAL.friction = 0; //0.01
-                PHYSICS_MATERIAL.restitution = 0; //0.1
-
-                var shape = new CANNON.Sphere(0.3);
-                gelBallBodyBlue = new CANNON.Body({
-                    shape: shape,
-                    mass: 100,
-                    material: PHYSICS_MATERIAL
-                })
-
-                const geometry = new IcosahedronGeometry(20, 4);
-                gelBallBlue = new Mesh(geometry, mat);
-                GLOBALS.SCENE_CHILDREN.add(gelBallBlue);
-
-                gelBallBlue.scale.set(0.022, 0.022, 0.022)
-
-                gelBallBodyBlue.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC
-                gelBallBodyBlue.collisionFilterMask = GLOBALS.CGROUP_ENVIRONMENT
-                gelBallBodyBlue.gel = true;
-
-                GLOBALS.CANNON_WORLD.addBody(gelBallBodyBlue);
-                gelBallBodyBlue.name = "ball_gel"
-                GLOBALS.DYNAMIC_OBJECTS.push(gelBallBodyBlue);
-            } else {
-                // Velocity
-                gelBallBodyBlue.velocity.setZero();
-                gelBallBodyBlue.initVelocity.setZero();
-                gelBallBodyBlue.angularVelocity.setZero();
-                gelBallBodyBlue.initAngularVelocity.setZero();
-
-                // Force
-                gelBallBodyBlue.force.setZero();
-                gelBallBodyBlue.torque.setZero();
+            if (!event.target.customGravity) {
+                GLOBALS.CUSTOM_GRAVITY.push(event.target);
+                event.target.customGravity = new CANNON.Vec3(normalCannon.x * -9.8, normalCannon.y * -9.8, normalCannon.z * -9.8);
             }
-
-            var pos = GLOBALS.DYMANIC_ITEMS['gel_blue'][i].position.clone();
-            pos.y -= 0.5;
-            gelBallBodyBlue.position.copy(pos);
-            gelBallBlue.position.copy(pos);
-
-            gelBallBlue.visible = false;
-
-            if (!vv) {
-                gelBallBodyBlue.addEventListener('collide', (event) => {
-
-                    if (event.target.inArea || event.target.teleporting) {
-
-                    } else if (event.body.room && !cc) {
-
-                        //cc = true;
-
-                        if (event.target.name == "player") {
-
-                            gelBallBlue.visible = false;
-                            window['createBlueGel']();
-
-                            setTimeout(() => {
-                                //cc = false;
-                            }, 10);
-                        } else {
-
-                            const pos = new Vector3(event.target.position.x, event.body.position.y, event.target.position.z);
-                            const pos2 = pos.round();
-                            var plane = getPlaneByName((2 * Math.floor(pos2.x / 2) + 1) + "/" +
-                                pos2.y + "/" +
-                                (2 * Math.floor(pos2.z / 2) + 1))
-
-                            if (plane.length > 0) {
-
-
-
-                                if (!plane[0].painted) {
-                                    createGel(pos2, plane[0]);
-                                }
-
-                                plane[0].painted = true;
-                            }
-
-                            gelBallBlue.visible = false;
-
-                            setTimeout(() => {
-                                //window['createBlueGel']();
-
-                                setTimeout(() => {
-                                    //cc = false;
-                                }, 10);
-                            }, 2000);
-                        }
-
-
-                    }
-                })
-            }
-
-        }
-    }
-
-    vv = true;
-}
-
-function createGel(pos, plane) {
-
-    var id;
-
-    for (var i = 0; i < GLOBALS.GELS.length; i++) {
-        if (!GLOBALS.GELS[i]) {
-            GLOBALS.GELS[i] = true;
-            id = i;
-            break;
-        }
-    }
-
-    //const geometry = new PlaneGeometry(2, 2);
-    //const material = new MeshBasicMaterial();
-    //const gel = new Mesh(geometry, material);
-
-    var gel = new Object3D();
-    gel.scale.set(1, 1, 1);
-    //pos.y -= 0.01;
-    gel.position.copy(pos);
-
-    //
-
-    let PHYSICS_MATERIAL = new CANNON.Material();
-    PHYSICS_MATERIAL.friction = 0.01; //0.01
-    PHYSICS_MATERIAL.restitution = 0.1; //0.1
-
-    var shape = new CANNON.Box(new CANNON.Vec3(1, 1, 0.01));
-
-    var box = new CANNON.Body({
-        shape: shape,
-        mass: 0,
-        material: PHYSICS_MATERIAL
-    })
-
-    //gel.rotation.x = -Math.PI / 2;
-    gel.rotation.copy(plane.rotation)
-    box.up = new Vector3(0, 1, 0)
-    box.vel = new Vector3(1, 0, 1)
-
-
-    gel.updateMatrix();
-    instancedMeshGel.setMatrixAt(id, gel.matrix);
-
-
-    instancedMeshGel.setColorAt(id, new Color(0x108ac8));
-
-    instancedMeshGel.instanceColor.needsUpdate = true;
-    instancedMeshGel.instanceMatrix.needsUpdate = true;
-    instancedMeshGel.computeBoundingSphere();
-
-    box.position.copy(pos);
-    box.quaternion.copy(gel.quaternion)
-    box.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC
-    box.collisionFilterMask = GLOBALS.CGROUP_ALL
-    box.linearDamping = 0.01;
-    box.name = "gel";
-    //box.posIni = box.position.y;
-    //box.posMinus = box.position.y - 100;
-
-    if (plane.side == "down") {
-        box.up = new Vector3(0, 1, 0)
-        box.vel = new Vector3(1, 0, 1)
-    } else if (plane.side == "up") {
-        box.up = new Vector3(0, -1, 0)
-        box.vel = new Vector3(1, 0, 1)
-    } else if (plane.side == "back") {
-        box.up = new Vector3(0.6, 0.15, -1)
-        box.vel = new Vector3(1, 1, 0)
-    } else if (plane.side == "left") {
-        box.up = new Vector3(1, 0, 0)
-        box.vel = new Vector3(0, 1, 1)
-    } else if (plane.side == "right") {
-        box.up = new Vector3(-1, 0, 0)
-        box.vel = new Vector3(0, 1, 1)
-    } else if (plane.side == "front") {
-        box.up = new Vector3(0.6, 0.15, 1)
-        box.vel = new Vector3(1, 1, 0)
-    }
-
-    box.side = plane.side;
-
-    // When a body collides with another body, they both dispatch the "collide" event.
-    box.addEventListener('collide', (event) => {
-
-        if (event.body.gel) {
-            return;
         }
 
-        if (!event.body.gelJumping) {
-
-            var relativeVelocity = event.contact.getImpactVelocityAlongNormal();
-
-            if (event.target.side == "front" || event.target.side == "back")
-                relativeVelocity = 1;
-
-            event.body.gelJumping = true;
-
-            var holder = event.body;
-
-            setTimeout(() => {
-                holder.gelJumping = false;
-            }, 10);
-
-            if (event.target.side == "front" || event.target.side == "back")
-                event.body.velocity.setZero();
-            else
-                event.body.velocity.set(event.body.velocity.x * event.target.vel.x,
-                    event.body.velocity.y * event.target.vel.y,
-                    event.body.velocity.z * event.target.vel.z);
-
-            window.PLAYER_JUMPING_FROM_BLUE_GEL = true;
-
-            event.body.applyImpulse(event.target.up.clone().multiplyScalar(10 * event.body.mass * Math.abs((relativeVelocity * 0.045) + 1)), event.body.position)
-        }
-    })
-
-    GLOBALS.CANNON_WORLD.addBody(box);
-    GLOBALS.DYNAMIC_OBJECTS.push(box);
-}
-
-const vshader = `
-// Include the Ashima code here!
-
-varying vec2 vUv;
-varying float noise;
-uniform float time;
-  
-  vec3 mod289(vec3 x)
-{
-  return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 mod289(vec4 x)
-{
-  return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 permute(vec4 x)
-{
-  return mod289(((x*34.0)+1.0)*x);
-}
-
-vec4 taylorInvSqrt(vec4 r)
-{
-  return 1.79284291400159 - 0.85373472095314 * r;
-}
-
-vec3 fade(vec3 t) {
-  return t*t*t*(t*(t*6.0-15.0)+10.0);
-}
-
-// Classic Perlin noise
-float cnoise(vec3 P)
-{
-  vec3 Pi0 = floor(P); // Integer part for indexing
-  vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1
-  Pi0 = mod289(Pi0);
-  Pi1 = mod289(Pi1);
-  vec3 Pf0 = fract(P); // Fractional part for interpolation
-  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
-  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-  vec4 iy = vec4(Pi0.yy, Pi1.yy);
-  vec4 iz0 = Pi0.zzzz;
-  vec4 iz1 = Pi1.zzzz;
-
-  vec4 ixy = permute(permute(ix) + iy);
-  vec4 ixy0 = permute(ixy + iz0);
-  vec4 ixy1 = permute(ixy + iz1);
-
-  vec4 gx0 = ixy0 * (1.0 / 7.0);
-  vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
-  gx0 = fract(gx0);
-  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
-  vec4 sz0 = step(gz0, vec4(0.0));
-  gx0 -= sz0 * (step(0.0, gx0) - 0.5);
-  gy0 -= sz0 * (step(0.0, gy0) - 0.5);
-
-  vec4 gx1 = ixy1 * (1.0 / 7.0);
-  vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
-  gx1 = fract(gx1);
-  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
-  vec4 sz1 = step(gz1, vec4(0.0));
-  gx1 -= sz1 * (step(0.0, gx1) - 0.5);
-  gy1 -= sz1 * (step(0.0, gy1) - 0.5);
-
-  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
-  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
-  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
-  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
-  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
-  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
-  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
-  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
-
-  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
-  g000 *= norm0.x;
-  g010 *= norm0.y;
-  g100 *= norm0.z;
-  g110 *= norm0.w;
-  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
-  g001 *= norm1.x;
-  g011 *= norm1.y;
-  g101 *= norm1.z;
-  g111 *= norm1.w;
-
-  float n000 = dot(g000, Pf0);
-  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
-  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
-  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
-  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
-  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
-  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
-  float n111 = dot(g111, Pf1);
-
-  vec3 fade_xyz = fade(Pf0);
-  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
-  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
-  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
-  return 2.2 * n_xyz;
-}
-
-// Classic Perlin noise, periodic variant
-float pnoise(vec3 P, vec3 rep)
-{
-  vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period
-  vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period
-  Pi0 = mod289(Pi0);
-  Pi1 = mod289(Pi1);
-  vec3 Pf0 = fract(P); // Fractional part for interpolation
-  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
-  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-  vec4 iy = vec4(Pi0.yy, Pi1.yy);
-  vec4 iz0 = Pi0.zzzz;
-  vec4 iz1 = Pi1.zzzz;
-
-  vec4 ixy = permute(permute(ix) + iy);
-  vec4 ixy0 = permute(ixy + iz0);
-  vec4 ixy1 = permute(ixy + iz1);
-
-  vec4 gx0 = ixy0 * (1.0 / 7.0);
-  vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
-  gx0 = fract(gx0);
-  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
-  vec4 sz0 = step(gz0, vec4(0.0));
-  gx0 -= sz0 * (step(0.0, gx0) - 0.5);
-  gy0 -= sz0 * (step(0.0, gy0) - 0.5);
-
-  vec4 gx1 = ixy1 * (1.0 / 7.0);
-  vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
-  gx1 = fract(gx1);
-  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
-  vec4 sz1 = step(gz1, vec4(0.0));
-  gx1 -= sz1 * (step(0.0, gx1) - 0.5);
-  gy1 -= sz1 * (step(0.0, gy1) - 0.5);
-
-  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
-  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
-  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
-  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
-  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
-  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
-  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
-  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
-
-  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
-  g000 *= norm0.x;
-  g010 *= norm0.y;
-  g100 *= norm0.z;
-  g110 *= norm0.w;
-  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
-  g001 *= norm1.x;
-  g011 *= norm1.y;
-  g101 *= norm1.z;
-  g111 *= norm1.w;
-
-  float n000 = dot(g000, Pf0);
-  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
-  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
-  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
-  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
-  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
-  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
-  float n111 = dot(g111, Pf1);
-
-  vec3 fade_xyz = fade(Pf0);
-  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
-  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
-  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); 
-  return 2.2 * n_xyz;
-}
-
-float turbulence( vec3 p ) {
-    float w = 100.0;
-    float t = -.5;
-    for (float f = 1.0 ; f <= 10.0 ; f++ ){
-        float power = pow( 2.0, f );
-        t += abs( pnoise( vec3( power * p ), vec3( 10.0, 10.0, 10.0 ) ) / power );
-    }
-    return t;
-}
-
-void main() {
-
-    vUv = uv;
-
-    // add time to the noise parameters so it's animated
-    noise = 10.0 *  -.10 * turbulence( .5 * normal + time );
-    float b = 5.0 * pnoise( 0.05 * position + vec3( 2.0 * time ), vec3( 100.0 ) );
-    float displacement = - noise + b;
-    
-    vec3 newPosition = position + normal * displacement;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
-
-}
-
-`;
-
-const fshader = `
-varying vec2 vUv;
-varying float noise;
-
-void main() {
-
-    // compose the colour using the UV coordinate
-    // and modulate it with the noise like ambient occlusion
-    vec3 color = vec3(0.06, 0.54, 0.78);
-    gl_FragColor = vec4( color.rgb, 1.0 );
-}
-
-`;
-
-const fshader2 = `
-varying vec2 vUv;
-varying float noise;
-
-void main() {
-
-    // compose the colour using the UV coordinate
-    // and modulate it with the noise like ambient occlusion
-    vec3 color = vec3(1.0, 0.5, 0.0);
-    gl_FragColor = vec4( color.rgb, 1.0 );
-}
-
-`;
-
-GLOBALS.UNIFORMS_GEL = {
-    time: { // float initialized to 0
-        type: "f",
-        value: 0.0
     }
 }
 
-var mat = new ShaderMaterial({
-    uniforms: GLOBALS.UNIFORMS_GEL,
-    vertexShader: vshader,
-    fragmentShader: fshader,
+function applyCustomGravity() {
+    for (var i = 0; i < GLOBALS.CUSTOM_GRAVITY.length; i++) {
+
+        const customGravity = GLOBALS.CUSTOM_GRAVITY[i].customGravity;
+        const body = GLOBALS.CUSTOM_GRAVITY[i];
+
+        // Calculate the difference between the global gravity and custom gravity
+        const gravityDifference = new CANNON.Vec3(
+            customGravity.x - GLOBALS.CANNON_WORLD.gravity.x,
+            customGravity.y - GLOBALS.CANNON_WORLD.gravity.y,
+            customGravity.z - GLOBALS.CANNON_WORLD.gravity.z
+        );
+
+        // Apply this difference as an additional force
+        const additionalForce = new CANNON.Vec3(
+            gravityDifference.x * body.mass,
+            gravityDifference.y * body.mass,
+            gravityDifference.z * body.mass
+        );
+
+        body.applyForce(additionalForce, body.position);
+    }
+}
+
+//UI STUFF
+
+$("body").on('click', '#add-gel', function () {
+    for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].hasItem = true;
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].itemName = "gel";
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].gelType = $("#gel-type").data("gel");
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor = new Color($("#gel-type").data("color"));
+        GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color($("#gel-type").data("color")));
+        GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+        GLOBALS.GELS.push(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
+    }
 });
 
-var mat2 = new ShaderMaterial({
-    uniforms: GLOBALS.UNIFORMS_GEL,
-    vertexShader: vshader,
-    fragmentShader: fshader2,
+$("body").on('click', '#remove-gel', function () {
+    for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].gelType) {
+            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].hasItem = false;
+            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].itemName = null;
+            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].gelType = null;
+
+            var color;
+            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal)
+                color = new Color(0xffffff);
+            else
+                color = new Color(0x808080)
+
+            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor = color;
+            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], color);
+            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+
+            const index = GLOBALS.GELS.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
+            if (index > -1) {
+                GLOBALS.GELS.splice(index, 1);
+            }
+        }
+    }
+});
+
+$("body").on('click', '.gel-type', function () {
+    $("#gel-type").find(".title").text("Gel type: " + $(this).data("gel"))
+    $("#gel-type").data("gel", $(this).data("gel"))
+    $("#gel-type").data("color", $(this).data("color"))
 });
 
 export {
-    updateGels,
-    initGels
+    addGel,
+    gelTrigger,
+    applyCustomGravity
 }

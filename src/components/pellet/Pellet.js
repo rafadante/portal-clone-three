@@ -30,7 +30,7 @@ function addPelletBall(item) {
     var color = new Color(0, 5, 0);
 
     if (!item.userData.pedestalInfinity) {
-        color = new Color(8, 5, 0);
+        color = new Color(8, 3.5, 0);
     }
 
     var origin = new Object3D();

@@ -457,10 +457,14 @@ $("body").on('click', '#portalable', function () {
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
             GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].portal;
 
-            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal)
+            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal) {
+                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor = new Color(0xffffff);
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(0xffffff));
-            else
+            }
+            else {
+                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor = new Color(0x808080);
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(0x808080));
+            }
 
             GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
         }
@@ -585,7 +589,7 @@ $("body").on('change', '#option-goo-reflections', function () {
     localStorage.setItem("goo_reflections", this.checked);
 })
 
-if (localStorage.getItem("goo_reflections")){
+if (localStorage.getItem("goo_reflections")) {
     GLOBALS.GOO_REFLECTIONS = localStorage.getItem("goo_reflections") == "true";
     $("#option-goo-reflections").prop('checked', GLOBALS.GOO_REFLECTIONS);
 }
