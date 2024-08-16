@@ -231,8 +231,10 @@ var GLOBALS = {
         lightEmissive: [],
         stripe: [],
         gel_blue: [],
+        gel_clear: [],
         gel_orange: [],
         gel_purple: [],
+        gel_white: [],
         camera: [],
         portal_0: [],
         portal_1: [],
@@ -514,6 +516,14 @@ var GLOBALS = {
             count: 0,
             max: 10
         },
+        gel_clear: {
+            count: 0,
+            max: 10
+        },
+        gel_white: {
+            count: 0,
+            max: 10
+        },
         angled_panel: {
             count: 0,
             max: 10
@@ -620,7 +630,8 @@ var GLOBALS = {
     CUSTOM_GRAVITY: [],
     SPEED: 1,
     HEAD_BOB_SPEED: 5,
-    ANGLED_PANELS: []
+    ANGLED_PANELS: [],
+    INSTANCED_WHITE_GEL: []
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
@@ -759,6 +770,14 @@ function reset() {
             max: 10
         },
         gel_blue: {
+            count: 0,
+            max: 10
+        },
+        gel_clear: {
+            count: 0,
+            max: 10
+        },
+        gel_white: {
             count: 0,
             max: 10
         },

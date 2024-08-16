@@ -84,6 +84,9 @@ function colliderItemManager() {
                 material: new CANNON.Material()
             });
 
+            body.name = "panel";
+            body.panel = panel;
+
             var worldPos = new Vector3();
             cube.getWorldPosition(worldPos)
             body.position.copy(worldPos);
@@ -352,6 +355,7 @@ function addColliderItem(items, type, mass, offset) {
                 box.offset = offset;
                 box.arrayPos = [];
                 box.arrayRot = [];
+                box.dynamic = true;
 
                 const clone = GLOBALS.ITEMS_ADDED.getObjectByName(type).clone.clone();
                 clone.visible = false;
@@ -364,10 +368,11 @@ function addColliderItem(items, type, mass, offset) {
                 box.addEventListener("collide", function (event) {
 
                     if (event.body.type != "blue") {
-                        if (event.target.verticalVelocity) {
+                        if (event.target.impactVelocity) {
                             clearTimeout(event.target.timeout);
                             event.target.timeout = setTimeout(() => {
-                                event.target.verticalVelocity = null;
+                                event.target.impactVelocity = null;
+                                event.target.impactSide = null;
                             }, 10);
                         }
                     }
@@ -586,12 +591,16 @@ function corridorColliderNames(corridor, update) {
                 light.decay = 1; //2
                 light.distance = 6;
                 light.position.set(0, 0.1, 0);
+                light.name = "spot"
                 child.add(light);
-                var worlPos = new Vector3();
-                child.getWorldPosition(worlPos);
-                worlPos.y -= 4;
-                light.target.position.copy(worlPos);
-                light.add(light.target);
+                window.worlPos = new Object3D();
+                child.getWorldPosition(window.worlPos.position);
+                GLOBALS.SCENE_FPS.add(window.worlPos)
+                window.worlPos.position.y -= 4;
+                light.target = window.worlPos;
+            }else{
+                child.getWorldPosition(window.worlPos.position);
+                window.worlPos.position.y -= 4;
             }
         } else if (child.name.includes("light")) {
             if (!update)

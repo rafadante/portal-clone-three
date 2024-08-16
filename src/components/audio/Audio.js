@@ -7,7 +7,7 @@ var listernAdded = false;
 var listener;
 
 function play(elem) {
-    //return
+    return
     var isPlaying = elem.currentTime > 0 && !elem.paused && !elem.ended
         && elem.readyState > elem.HAVE_CURRENT_DATA;
 
@@ -87,7 +87,7 @@ ambient.volume = 0.15;
 ambient.loop = true;
 
 const walk = new Audio('audio/tile1.wav')
-walk.volume = 0.25;
+walk.volume = 0;//0.25
 walk.loop = true;
 walk.pause();
 
@@ -103,7 +103,7 @@ walkLightBridde.playbackRate = 1.5;
 walkLightBridde.pause();
 
 const jump = new Audio('audio/p2_fs_jump_land_tile_01.wav')
-jump.volume = 0.3;
+jump.volume = 0;//0.3
 
 const playerInsideTractorBeam = new Audio('audio/player_enter_tbeam_lp_01.wav')
 playerInsideTractorBeam.volume = 0.5;

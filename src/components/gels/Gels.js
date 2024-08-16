@@ -1,19 +1,18 @@
 import $ from 'jquery';
 import { GLOBALS } from '../../Globals.js';
-import { Color, InstancedMesh, Mesh, MeshStandardMaterial, PlaneGeometry, Object3D, TextureLoader, Vector3, Euler, Group, Quaternion } from 'three';
+import { Color, InstancedMesh, MeshStandardMaterial, PlaneGeometry, Object3D, TextureLoader, Vector3, Euler } from 'three';
 import CANNON from 'cannon';
 import { cannonToThreeVector3, threeToCannonVector3, tweenCamera } from '../../Utils.js';
-import { tweenBack } from '../../Utils.js';
 import { AUDIO } from '../audio/Audio.js';
 import { addGelBlob } from './GelDispenser.js';
-
-
 
 //
 const geometryGel = new PlaneGeometry(2, 2);
 const materialGel = new MeshStandardMaterial({
     roughness: 0.2,
-    normalMap: new TextureLoader().load("./assets/textures/decal/normal.jpg")
+    normalMap: new TextureLoader().load("./assets/textures/decal/normal.jpg"),
+    polygonOffset: true,
+    polygonOffsetFactor: 1
 });
 
 const instancedGelPlane = new InstancedMesh(geometryGel, materialGel, 1000);
@@ -37,7 +36,9 @@ const materialGelDynamic = new MeshStandardMaterial({
     normalMap: new TextureLoader().load("./assets/textures/decal/decal-normal.jpg"),
     map: new TextureLoader().load("./assets/textures/decal/decal-diffuse.png"),
     transparent: true,
-    depthWrite: false
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: 1
 });
 
 const instancedGelPlaneDynamic = new InstancedMesh(geometryGelDynamic, materialGelDynamic, 1000);
@@ -54,8 +55,21 @@ for (var i = 0; i < 1000; i++) {
 instancedGelPlaneDynamic.instanceMatrix.needsUpdate = true;
 instancedGelPlaneDynamic.computeBoundingSphere();
 
+//WHITE GEL INSTANCES
+GLOBALS.INSTANCED_WHITE_GEL = new InstancedMesh(geometryGelDynamic, materialGelDynamic, 1000);
+GLOBALS.INSTANCED_WHITE_GEL.current = 0;
+GLOBALS.INSTANCED_WHITE_GEL.frustumCulled = true;
+GLOBALS.INSTANCED_WHITE_GEL.array = [];
 
-console.log(instancedGelPlaneDynamic)
+var dummy = new Object3D();
+for (var i = 0; i < 1000; i++) {
+    dummy.position.set(100000, 100000, 100000);
+    dummy.updateMatrix();
+    GLOBALS.INSTANCED_WHITE_GEL.setMatrixAt(i, dummy.matrix);
+}
+
+GLOBALS.INSTANCED_WHITE_GEL.instanceMatrix.needsUpdate = true;
+GLOBALS.INSTANCED_WHITE_GEL.computeBoundingSphere();
 
 function addGel() {
 
@@ -64,6 +78,9 @@ function addGel() {
 
     instancedGelPlaneDynamic.material.envMap = GLOBALS.ENV_MAP;
     GLOBALS.SCENE_FPS.add(instancedGelPlaneDynamic);
+
+    GLOBALS.INSTANCED_WHITE_GEL.material.envMap = GLOBALS.ENV_MAP;
+    GLOBALS.SCENE_FPS.add(GLOBALS.INSTANCED_WHITE_GEL);
 
     for (var i = 0; i < GLOBALS.GELS.length; i++) {
         spawnInstanced(GLOBALS.GELS[i], GLOBALS.GELS[i].planeColor, GLOBALS.GELS[i].gelType, GLOBALS.GELS[i].side, false, 1)
@@ -76,7 +93,9 @@ function spawnInstanced(item, color, gelType, side, dynamic, size) {
 
     var instanced;
 
-    if (dynamic)
+    if (gelType == "white")
+        instanced = GLOBALS.INSTANCED_WHITE_GEL;
+    else if (dynamic)
         instanced = instancedGelPlaneDynamic;
     else
         instanced = instancedGelPlane;
@@ -88,29 +107,26 @@ function spawnInstanced(item, color, gelType, side, dynamic, size) {
 
     instanced.setMatrixAt(instanced.current, dummy.matrix);
     instanced.setColorAt(instanced.current, color);
-    instanced.current += 1;
 
-    gelCollider(dummy, gelType, side, size);
+    gelCollider(dummy, gelType, side, size, instanced, color);
 
     instanced.instanceColor.needsUpdate = true;
     instanced.instanceMatrix.needsUpdate = true;
     instanced.computeBoundingSphere();
+    instanced.current += 1;
 }
 
-function gelCollider(dummy, type, side, size) {
-    var shape = new CANNON.Box(new CANNON.Vec3(size, size, 0.05));
+function gelCollider(dummy, type, side, size, instanced,color) {
+    var shape = new CANNON.Box(new CANNON.Vec3(size, size, 0.1));
     var gel = new CANNON.Body({
         shape: shape,
         mass: 0,
         material: GLOBALS.PHYSICS_MATERIAL
     });
-
     gel.position.copy(dummy.position);
     gel.quaternion.copy(dummy.quaternion);
 
-    if (type == "purple")
-        gel.collisionResponse = 1;
-    else
+    //if (type != "purple")
         gel.collisionResponse = 0;
 
     gel.name = "gel";
@@ -118,12 +134,28 @@ function gelCollider(dummy, type, side, size) {
     gel.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
     gel.collisionFilterMask = GLOBALS.CGROUP_ALL;
     gel.side = side;
+    gel.color = color;
 
-    if (side == "down")
-        gel.normal = new Vector3(0, 1, 0)
+    if (side == "front")
+        gel.normal = new Vector3(0, 0, 1)
+    else if (side == "back")
+        gel.normal = new Vector3(0, 0, -0.01)
+    else if (side == "right")
+        gel.normal = new Vector3(-0.01, 0, 0)
+    else if (side == "left")
+        gel.normal = new Vector3(1, 0, 0)
+    else if (side == "up")
+        gel.normal = new Vector3(0, -0.01, 0)
+    else if (side == "down")
+        gel.normal = new Vector3(0, 1.01, 0)
 
     GLOBALS.CANNON_BODIES.push(gel);
     GLOBALS.CANNON_WORLD.addBody(gel);
+
+    if (type == "white") {
+        console.log(instanced)
+        instanced.array.push(gel);
+    }
 }
 
 function gelTrigger(event) {
@@ -139,21 +171,52 @@ function gelTrigger(event) {
             holder.gelJumping = false;
         }, 100);
 
-        if (!event.target.verticalVelocity) {
-            if (event.target.velocity.y < 0.1 && event.target.velocity.y > -8) {
-                event.target.verticalVelocity = -8;
-                event.target.velocity.y = -8;
-            } else
-                event.target.verticalVelocity = event.target.velocity.y * 1.05;
+        //NORMAL
+        var normalContact = event.body.normal;
+
+        if (event.target.impactSide != event.body.side) {
+
+            if (Math.abs(normalContact.x) > 0) {
+                event.target.axisImpact = "x";
+            } else if (Math.abs(normalContact.y) > 0) {
+                event.target.axisImpact = "y";
+            } else if (Math.abs(normalContact.z) > 0) {
+                event.target.axisImpact = "z";
+            }
+
+            if (Math.abs(event.target.velocity[event.target.axisImpact]) < 1 &&
+                event.target.name == "player" &&
+                event.body.side == "down") {
+                event.target.jumpVelocity = -7;
+                event.target.impactVelocity = -7;
+                return;
+            } else if ((Math.abs(event.target.velocity[event.target.axisImpact]) < 7))
+                event.target.impactVelocity = -7;
+            else
+                event.target.impactVelocity = -Math.abs(event.target.velocity[event.target.axisImpact]);
+
+            event.target.impactSide = event.body.side;
+        } else if (event.target.jumpVelocity) {
+            return;
         }
 
-        // Apply impulse only if the object is moving downwards
-        if (event.target.verticalVelocity < 0) {
-            // The impulse should reverse the current downward velocity
-            const impulseStrength = -2 * event.target.mass * event.target.verticalVelocity;
-            const impulse = new CANNON.Vec3(0, impulseStrength, 0);
+        event.target.velocity[event.target.axisImpact] = event.target.impactVelocity;
 
-            console.log(impulse)
+        // Apply impulse only if the object is moving downwards
+        if (event.target.impactVelocity < 0) {
+            // The impulse should reverse the current downward velocity
+            const impulseStrength = -2 * event.target.mass * event.target.impactVelocity;
+
+            var impulse = new CANNON.Vec3(
+                impulseStrength * normalContact.x,
+                impulseStrength * normalContact.y,
+                impulseStrength * normalContact.z
+            );
+
+            if (event.body.side != "down") {
+                event.target.velocity.y = 0.65;
+                impulse.y = 85;
+            }
 
             event.target.applyImpulse(impulse, event.target.position);
         }

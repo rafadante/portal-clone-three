@@ -1,7 +1,7 @@
 
 import { Color, Euler, Mesh, MeshBasicMaterial, Object3D, SphereGeometry, Vector3 } from "three";
 import { GLOBALS } from "../../Globals";
-import CANNON from "cannon";
+import CANNON, { Quaternion } from "cannon";
 import { spawnInstanced } from "./Gels";
 import { cannonToThreeVector3 } from "../../Utils";
 
@@ -9,6 +9,8 @@ const geometry = new SphereGeometry(0.6, 8, 4);
 const materialBlue = new MeshBasicMaterial({ color: new Color('rgb(30,144,255)') });
 const materialOrange = new MeshBasicMaterial({ color: new Color('rgb(255,140,0)') });
 const materialPurple = new MeshBasicMaterial({ color: new Color('rgb(75,0,130)') });
+const materialWhite = new MeshBasicMaterial({ color: new Color(0.8, 0.8, 0.8) });
+const materialClear = new MeshBasicMaterial({ color: new Color(0xa7dcdd), transparent: true, opacity: 0.5 });
 const sphere = new Mesh(geometry, materialBlue);
 var spheres = [];
 
@@ -29,6 +31,18 @@ function addGelBlob() {
     for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['gel_purple'].length; i++) {
         if (GLOBALS.DYMANIC_ITEMS['gel_purple'][i].length != 0) {
             addBody(GLOBALS.DYMANIC_ITEMS['gel_purple'][i], "purple", new Color('rgb(75,0,130)'), materialPurple);
+        }
+    }
+
+    for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['gel_white'].length; i++) {
+        if (GLOBALS.DYMANIC_ITEMS['gel_white'][i].length != 0) {
+            addBody(GLOBALS.DYMANIC_ITEMS['gel_white'][i], "white", new Color(0.8, 0.8, 0.8), materialWhite);
+        }
+    }
+
+    for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['gel_clear'].length; i++) {
+        if (GLOBALS.DYMANIC_ITEMS['gel_clear'][i].length != 0) {
+            addBody(GLOBALS.DYMANIC_ITEMS['gel_clear'][i], "clear", new Color(0xa7dcdd), materialClear);
         }
     }
 }
@@ -60,6 +74,9 @@ function addBody(obj, type, color, material) {
     gelBlob.item = obj;
     gelBlob.updateMassProperties();
     gelBlob.clone = new Object3D();
+    gelBlob.spawnPositions = [];
+    gelBlob.typeGel = type;
+    gelBlob.colorGel = color;
 
     GLOBALS.CANNON_WORLD.addBody(gelBlob);
     GLOBALS.CANNON_BODIES.push(gelBlob);
@@ -67,8 +84,24 @@ function addBody(obj, type, color, material) {
 
     gelBlob.addEventListener("collide", function (event) {
 
-        if (event.body.name != "wall")
-            return;
+        if(event.body.name == "gel")
+            return
+
+        if (event.body.dynamic) {
+            console.log(event.body)
+            console.log(event.target)
+            console.log(gelBlob)
+            const instanced = GLOBALS.ITEMS_ADDED.getObjectByName(event.body.item.userData.instancedName);
+
+            if (gelBlob.typeGel == "clear")
+                instanced.setColorAt(event.body.item.userData.idInstanced, new Color(1, 1, 1));
+            else
+                instanced.setColorAt(event.body.item.userData.idInstanced, gelBlob.colorGel);
+
+            instanced.instanceColor.needsUpdate = true;
+        }
+
+        console.log("repawns")
 
         gelBlob.sphereClone.visible = false;
         gelBlob.mass = 0;
@@ -94,12 +127,39 @@ function addBody(obj, type, color, material) {
             gelBlob.sphereClone.visible = true;
         }, 2000);
 
+        //
+        if (event.target.inArea)
+            return;
+
+        if (event.body.name != "wall" && event.body.name != "panel")
+            return;
+
         const item = new Object3D();
         item.position.copy(cannonToThreeVector3(getContactPosition(event.contact)));
-        item.rotation.copy(getContactRotation(event.body.side));
 
-        spawnInstanced(item, color, type, event.body.side, true, 1)
+        if (event.body.name == "wall")
+            item.rotation.copy(getContactRotation(event.body.side));
+        else {
+            item.quaternion.copy(event.body.quaternion);
+            item.rotateY(Math.PI)
+
+            var worldPos = new Vector3();
+            event.body.panel.getWorldPosition(worldPos);
+            item.position.copy(worldPos);
+        }
+
+        const contactPosition = cannonToThreeVector3(getContactPosition(event.contact));
+        if (isVectorInArray(contactPosition, gelBlob.spawnPositions)) {
+            return;
+        }
+
+        spawnInstanced(item, color, type, event.body.side, true, 1);
+        gelBlob.spawnPositions.push(contactPosition);
     });
+}
+
+function isVectorInArray(vector, array) {
+    return array.some(v => v.equals(vector))
 }
 
 function getContactPosition(contact) {

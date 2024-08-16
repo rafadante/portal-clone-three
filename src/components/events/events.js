@@ -380,8 +380,10 @@ function interactWithItem() {
           play(AUDIO.HOLD)
         }
 
+        GLOBALS.CURRENT_ITEM.body.impactVelocity = null;
         GLOBALS.CURRENT_ITEM.body.customGravity = null;
         GLOBALS.CURRENT_ITEM.body.side = null;
+        GLOBALS.CURRENT_ITEM.body.impactSide = null;
         const index = GLOBALS.CUSTOM_GRAVITY.indexOf(GLOBALS.CURRENT_ITEM.body);
         if (index > -1) {
           GLOBALS.CUSTOM_GRAVITY.splice(index, 1);

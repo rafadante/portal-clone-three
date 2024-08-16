@@ -197,8 +197,25 @@ const updatePlayer = function (deltaTime) {
                 AUDIO.WALK.pause();
                 AUDIO.WALK_LIGHT_BRIDGE.pause();
                 jumpPressed = true;
-                GLOBALS.PLAYER.inJump = true
-                GLOBALS.PLAYER.applyImpulse(GLOBALS.PLAYER.upVectorThree.clone().multiplyScalar(230), GLOBALS.PLAYER.position)
+                GLOBALS.PLAYER.inJump = true;
+
+                console.log(GLOBALS.PLAYER.jumpVelocity)
+
+                if(GLOBALS.PLAYER.jumpVelocity){
+                    GLOBALS.PLAYER.linearDamping = 0.01
+                    const impulseStrength = -1 * GLOBALS.PLAYER.mass * GLOBALS.PLAYER.jumpVelocity;
+                    const impulse = new CANNON.Vec3(
+                        impulseStrength * GLOBALS.PLAYER.upVectorThree.x,
+                        impulseStrength * GLOBALS.PLAYER.upVectorThree.y,
+                        impulseStrength * GLOBALS.PLAYER.upVectorThree.z
+                    );
+                    console.log(impulse)
+                    GLOBALS.PLAYER.applyImpulse(impulse, GLOBALS.PLAYER.position)
+                    GLOBALS.PLAYER.jumpVelocity = null;
+                }else{
+                    GLOBALS.PLAYER.applyImpulse(GLOBALS.PLAYER.upVectorThree.clone().multiplyScalar(230), GLOBALS.PLAYER.position)
+                }
+                
 
                 blockJump = true;
                 setTimeout(() => {
@@ -251,7 +268,7 @@ const updateCamera = function (deltaTime) {
     // always look where the camera points
     //GLOBALS.PLAYER.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), GLOBALS.MAIN_CAMERA.rotation.y);
 
-    if (window.nnn) {
+    if (window.nnn && GLOBALS.PLAYER.EULER) {
 
         const euler = GLOBALS.PLAYER.EULER; // Example: Rotate 90 degrees around Y axis
         euler.y = GLOBALS.MAIN_CAMERA.rotation.y;

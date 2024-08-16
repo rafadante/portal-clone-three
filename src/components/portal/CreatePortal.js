@@ -12,6 +12,7 @@ import {
     createLightBridgesFromPortal
 } from '../continuous/Continuous.js';
 import {
+    cannonToThreeVector3,
     tweenCamera
 } from '../../Utils.js';
 import {
@@ -60,6 +61,7 @@ function portalButton(button, auto, camera) {
         var intersectPanel = raycaster2.intersectObjects(GLOBALS.ANGLED_PANELS);
         console.log(intersectPanel)
 
+        var intersectsGelWhite = raycaster2.intersectObject(GLOBALS.INSTANCED_WHITE_GEL);
 
         var intersects = raycaster2.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
 
@@ -134,7 +136,7 @@ function portalButton(button, auto, camera) {
 
             if (GLOBALS.GUN_MODE == 1) {
 
-                if (auto || (userData.portal)) {//!userData.hasItem || (userData.itemName.includes("camera"))
+                if (auto || (userData.portal) || intersectsGelWhite.length > 0|| intersectPanel.length > 0) {//!userData.hasItem || (userData.itemName.includes("camera"))
                     var point = new Vector3(x, y, z);
                     // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                     // define playerUpDirection
@@ -232,9 +234,33 @@ function portalButton(button, auto, camera) {
                         point = worldPos;
 
                         body = intersectPanel[0].object.body;
+                    } else if (intersectsGelWhite.length > 0) {
 
-                        console.log(point)
-                    }else{
+                        body = GLOBALS.INSTANCED_WHITE_GEL.array[intersectsGelWhite[0].instanceId];
+
+
+                        if (body.side == "front")
+                            normal = new Vector3(0, 0, 1)
+                        else if (body.side == "back")
+                            normal = new Vector3(0, 0, -1)
+                        else if (body.side == "right")
+                            normal = new Vector3(-1, 0, 0)
+                        else if (body.side == "left")
+                            normal = new Vector3(1, 0, 0)
+                        else if (body.side == "up") {
+                            playerUpDirection.applyQuaternion(GLOBALS.MAIN_CAMERA.quaternion)
+                            normal = new Vector3(0, -1, 0)
+                        } else if (body.side == "down") {
+                            playerUpDirection.applyQuaternion(GLOBALS.MAIN_CAMERA.quaternion)
+                            normal = new Vector3(0, 1, 0)
+                        }
+
+                        point = cannonToThreeVector3(body.position);
+
+                        console.log(GLOBALS.INSTANCED_WHITE_GEL)
+                        console.log(body)
+                        console.log(normal)
+                    } else {
                         body = userData.body;
                     }
 

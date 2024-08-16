@@ -59,6 +59,10 @@ GLOBALS.PLAYER.addEventListener('endContact', () => {
 
 GLOBALS.PLAYER.addEventListener("collide", function (event) {
 
+    if (event.body.name == "gel") {
+        gelTrigger(event);
+    }
+
     if(GLOBALS.PLAYER.ROTATING)
         return;
 
@@ -73,10 +77,6 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
             AUDIO.WALK.volume = 0.25;
             fadeAudio(AUDIO.PROPULSION)
         }
-    }
-
-    if (event.body.name == "gel") {
-        gelTrigger(event);
     }
 
     if (event.body.type != "purple" && event.body.mass == 0) {
@@ -100,10 +100,12 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
     }
 
     if (event.body.type != "blue") {
-        if (event.target.verticalVelocity) {
+        if (event.target.impactVelocity) {
             clearTimeout(event.target.timeout);
             event.target.timeout = setTimeout(() => {
-                event.target.verticalVelocity = null;
+                event.target.impactVelocity = null;
+                event.target.jumpVelocity = null;
+                event.target.impactSide = null;
             }, 10);
         }
     }

@@ -130,7 +130,11 @@ async function handleZip(path, obj) {
                     loadGelPurpleManager(result.scene)
                 else if (obj == "loadAngledPanel")
                     loadAngledPanelManager(result.scene)
-                
+                else if (obj == "loadGelWhite")
+                    loadGelWhiteManager(result.scene)
+                else if (obj == "loadGelClear")
+                    loadGelClearManager(result.scene)
+            
             });
         }
     });
@@ -1094,12 +1098,41 @@ function loadGelPurpleManager(scene) {
     item.userData.ground = false;
     item.userData.ceiling = true;
 
+    loadGelWhite();
+}
+
+function loadGelWhite() {
+    handleZip('./assets/3ds/gel_white.zip', "loadGelWhite");
+}
+
+function loadGelWhiteManager(scene) {
+
+    var item = instancedTransform(scene, "gel_white", false, 0, 1)
+    item.userData.wall = false;
+    item.userData.ground = false;
+    item.userData.ceiling = true;
+
+    loadGelClear();
+}
+
+function loadGelClear() {
+    handleZip('./assets/3ds/gel_clear.zip', "loadGelClear");
+}
+
+function loadGelClearManager(scene) {
+
+    var item = instancedTransform(scene, "gel_clear", false, 0, 1)
+    item.userData.wall = false;
+    item.userData.ground = false;
+    item.userData.ceiling = true;
+
     loadAngledPanel();
 }
 
 function loadAngledPanel() {
     handleZip('./assets/3ds/angled_panel.zip', "loadAngledPanel");
 }
+
 
 function loadAngledPanelManager(scene) {
     scene.name = "angled_panel";
