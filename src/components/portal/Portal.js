@@ -133,7 +133,7 @@ class Portal extends Group {
         this.add(this.mesh)
         this.mesh.renderOrder = 100;
 
-        this.mesh.translateY(-0.5);
+        this.mesh.translateY(-0.1);
 
         /*this.mesh.onAfterRender = function (renderer) {
             renderer.clearStencil();

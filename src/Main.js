@@ -235,15 +235,15 @@ function render(time) {
     GLOBALS.RENDERER.localClippingEnabled = false;
     GLOBALS.RENDERER.clippingPlanes = [];
 
-    //GLOBALS.COMPOSER.render();
+    GLOBALS.COMPOSER.render();
     //GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
     //GLOBALS.COMPOSER2.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
-    GLOBALS.RENDERER.autoClear = false;
+    /*GLOBALS.RENDERER.autoClear = false;
     GLOBALS.RENDERER.clear();
     GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
     document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
     GLOBALS.RENDERER.clearDepth()
-    GLOBALS.RENDERER.render(GLOBALS.GUN, GLOBALS.PORTAL_GUN_CAMERA);
+    GLOBALS.RENDERER.render(GLOBALS.GUN, GLOBALS.PORTAL_GUN_CAMERA);*/
 
     if (statsBegin)
         GLOBALS.STATS.end();

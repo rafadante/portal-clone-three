@@ -140,7 +140,7 @@ var GLOBALS = {
     PORTAL_EPS: 0.01,
     PORTAL_COLORS: [0x00e1ff, 0xffc600],
     PORTAL_CDBB_HEIGHT: 3,
-    PORTAL_HEIGHT: 1.0,
+    PORTAL_HEIGHT: 0.2,
     PORTAL_RING_THICKNESS: 0.3,
     PORTAL_SHADER: [],
     PORTAL_BOX: [],
@@ -232,6 +232,7 @@ var GLOBALS = {
         stripe: [],
         gel_blue: [],
         gel_orange: [],
+        gel_purple: [],
         camera: [],
         portal_0: [],
         portal_1: [],
@@ -242,6 +243,7 @@ var GLOBALS = {
         trigger_area: [],
         pellet_launcher: [],
         pellet_catcher: [],
+        angled_panel: []
     },
 
     INTERACTIVE: [],
@@ -512,7 +514,15 @@ var GLOBALS = {
             count: 0,
             max: 10
         },
+        angled_panel: {
+            count: 0,
+            max: 10
+        },
         gel_orange: {
+            count: 0,
+            max: 10
+        },
+        gel_purple: {
             count: 0,
             max: 10
         },
@@ -609,7 +619,8 @@ var GLOBALS = {
     GOO_REFLECTIONS: true,
     CUSTOM_GRAVITY: [],
     SPEED: 1,
-    HEAD_BOB_SPEED: 5
+    HEAD_BOB_SPEED: 5,
+    ANGLED_PANELS: []
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
@@ -751,7 +762,15 @@ function reset() {
             count: 0,
             max: 10
         },
+        angled_panel: {
+            count: 0,
+            max: 10
+        },
         gel_orange: {
+            count: 0,
+            max: 10
+        },
+        gel_purple: {
             count: 0,
             max: 10
         },

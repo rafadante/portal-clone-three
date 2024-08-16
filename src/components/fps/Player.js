@@ -59,6 +59,9 @@ GLOBALS.PLAYER.addEventListener('endContact', () => {
 
 GLOBALS.PLAYER.addEventListener("collide", function (event) {
 
+    if(GLOBALS.PLAYER.ROTATING)
+        return;
+
     if (event.body.type == "orange") {
         GLOBALS.SPEED = 3;
         GLOBALS.HEAD_BOB_SPEED = 10;
@@ -77,12 +80,23 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
     }
 
     if (event.body.type != "purple" && event.body.mass == 0) {
+
+        /*if (event.target.currentPurpleBody)
+            event.target.currentPurpleBody.collisionResponse = 0;*/
+
         if (GLOBALS.PLAYER.customGravity && GLOBALS.PLAYER.PURPLE_CONTACT) {
             clearTimeout(event.target.timeout);
             event.target.timeout = setTimeout(() => {
                 playerExitPurpleGel();
             }, 10);
         }
+    } else {
+
+        /**if (event.target.currentPurpleBody)
+            event.target.currentPurpleBody.collisionResponse = 0;
+
+        event.target.currentPurpleBody = event.body;
+        event.body.collisionResponse = 1; */
     }
 
     if (event.body.type != "blue") {
@@ -214,7 +228,7 @@ function playerExitPurpleGel() {
         GLOBALS.PLAYER.force.setZero();
         GLOBALS.PLAYER.torque.setZero();
 
-        tweenCamera(500, GLOBALS.MAIN_CAMERA_GROUP.rotation, new Vector3(0, 0, 0))
+        tweenCamera(400, GLOBALS.MAIN_CAMERA_GROUP.rotation, new Vector3(0, 0, 0))
 
         setTimeout(() => {
 

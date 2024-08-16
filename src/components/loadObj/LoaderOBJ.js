@@ -122,7 +122,14 @@ async function handleZip(path, obj) {
                     loadPelletLauncherManager(result.scene)
                 else if (obj == "loadPelletCatcher")
                     loadPelletCatcherManager(result.scene)
-
+                else if (obj == "loadGelBlue")
+                    loadGelBlueManager(result.scene)
+                else if (obj == "loadGelOrange")
+                    loadGelOrangeManager(result.scene)
+                else if (obj == "loadGelPurple")
+                    loadGelPurpleManager(result.scene)
+                else if (obj == "loadAngledPanel")
+                    loadAngledPanelManager(result.scene)
                 
             });
         }
@@ -1044,6 +1051,76 @@ function loadPelletCatcherManager(scene) {
     item.userData.wall = true;
     item.userData.ground = true;
     item.userData.ceiling = true;
+
+    loadGelBlue();
+}
+
+function loadGelBlue() {
+    handleZip('./assets/3ds/gel_blue.zip', "loadGelBlue");
+}
+
+function loadGelBlueManager(scene) {
+
+    var item = instancedTransform(scene, "gel_blue", false, 0, 1)
+    item.userData.wall = false;
+    item.userData.ground = false;
+    item.userData.ceiling = true;
+
+    loadGelOrange()
+}
+
+function loadGelOrange() {
+    handleZip('./assets/3ds/gel_orange.zip', "loadGelOrange");
+}
+
+function loadGelOrangeManager(scene) {
+
+    var item = instancedTransform(scene, "gel_orange", false, 0, 1)
+    item.userData.wall = false;
+    item.userData.ground = false;
+    item.userData.ceiling = true;
+
+    loadGelPurple()
+}
+
+function loadGelPurple() {
+    handleZip('./assets/3ds/gel_purple.zip', "loadGelPurple");
+}
+
+function loadGelPurpleManager(scene) {
+
+    var item = instancedTransform(scene, "gel_purple", false, 0, 1)
+    item.userData.wall = false;
+    item.userData.ground = false;
+    item.userData.ceiling = true;
+
+    loadAngledPanel();
+}
+
+function loadAngledPanel() {
+    handleZip('./assets/3ds/angled_panel.zip', "loadAngledPanel");
+}
+
+function loadAngledPanelManager(scene) {
+    scene.name = "angled_panel";
+    scene.userData.wall = true;
+    scene.userData.ground = true;
+    scene.userData.ceiling = true;
+    GLOBALS.ITEMS.add(scene);
+    scene.traverse(child => {
+        if(child.name.includes("panel") && child.material){
+            child.material.side = 2;
+            child.material.envMap = GLOBALS.ENV_MAP;
+            child.material.envMapIntensity = 0.2;
+            child.material.roughness = 1;
+            console.log(child.material)
+        }
+
+        if(child.material){
+            child.material.polygonOffset = true;
+            child.material.polygonOffsetFactor = 2;
+        }
+    });
 
     if (GLOBALS.LOADED_LEVEL) {
         loadLevelJSON()

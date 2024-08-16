@@ -2,7 +2,8 @@ import {
     Vector3,
     Raycaster,
     Color,
-    Box3
+    Box3,
+    Matrix3
 } from 'three';
 import {
     TWEEN
@@ -20,6 +21,7 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import { AUDIO, play } from '../audio/Audio.js';
+import { globalEval } from 'jquery';
 
 var coords = new Vector3();
 var raycaster2 = new Raycaster();
@@ -54,6 +56,9 @@ function portalButton(button, auto, camera) {
                 }
             }
         }
+
+        var intersectPanel = raycaster2.intersectObjects(GLOBALS.ANGLED_PANELS);
+        console.log(intersectPanel)
 
 
         var intersects = raycaster2.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
@@ -130,7 +135,7 @@ function portalButton(button, auto, camera) {
             if (GLOBALS.GUN_MODE == 1) {
 
                 if (auto || (userData.portal)) {//!userData.hasItem || (userData.itemName.includes("camera"))
-                    const point = new Vector3(x, y, z);
+                    var point = new Vector3(x, y, z);
                     // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                     // define playerUpDirection
                     let playerUpDirection = new Vector3(0, 1, 0)
@@ -209,6 +214,30 @@ function portalButton(button, auto, camera) {
                         }
                     }
 
+                    var body;
+
+                    if (intersectPanel.length > 0) {
+                        // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
+                        const objectMatrix = new Matrix3().getNormalMatrix(intersectPanel[0].object.matrixWorld)
+                        normal = intersectPanel[0].face.normal.clone().applyMatrix3(objectMatrix).normalize()
+                        normal.negate();
+
+                        // define playerUpDirection
+                        playerUpDirection = new Vector3(0, -1, 0)
+                        //playerUpDirection.applyQuaternion(GLOBALS.MAIN_CAMERA.quaternion)
+
+                        var worldPos = new Vector3();
+                        intersectPanel[0].object.getWorldPosition(worldPos);
+
+                        point = worldPos;
+
+                        body = intersectPanel[0].object.body;
+
+                        console.log(point)
+                    }else{
+                        body = userData.body;
+                    }
+
                     if (button == 0) { // left click
 
                         //if (GLOBALS.PORTALS[1] === null)
@@ -224,7 +253,7 @@ function portalButton(button, auto, camera) {
                         if (GLOBALS.PORTALS[0] !== null)
                             deletePortal(0);
 
-                        newPortal(0, 1, point, normal, userData.body, playerUpDirection, portalPoints, userData.side)
+                        newPortal(0, 1, point, normal, body, playerUpDirection, portalPoints, userData.side)
 
                         GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(2.5, 0.7, 0.0);
 
@@ -236,12 +265,12 @@ function portalButton(button, auto, camera) {
 
                         GLOBALS.PORTALS[0].normal = normal;
 
-                        if(!auto){
+                        if (!auto) {
                             AUDIO.PORTAL_GUN_ORANGE.pause();
                             AUDIO.PORTAL_GUN_ORANGE.currentTime = 0;
                             play(AUDIO.PORTAL_GUN_ORANGE)
                         }
-                        
+
                     } else if (button == 2) { // left click
 
                         if (!auto) {
@@ -257,7 +286,7 @@ function portalButton(button, auto, camera) {
                         if (GLOBALS.PORTALS[1] !== null)
                             deletePortal(1);
 
-                        newPortal(1, 0, point, normal, userData.body, playerUpDirection, userData.rotation, userData.side)
+                        newPortal(1, 0, point, normal, body, playerUpDirection, userData.rotation, userData.side)
 
                         GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(0.0, 1.25, 2.5);
 
@@ -269,12 +298,12 @@ function portalButton(button, auto, camera) {
 
                         GLOBALS.PORTALS[1].normal = normal;
 
-                        if(!auto){
+                        if (!auto) {
                             AUDIO.PORTAL_GUN_BLUE.pause();
                             AUDIO.PORTAL_GUN_BLUE.currentTime = 0;
                             play(AUDIO.PORTAL_GUN_BLUE)
                         }
-                        
+
                     }
 
                     setTimeout(() => {
@@ -446,8 +475,8 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
     GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.quaternion.copy(GLOBALS.PORTALS[thisPortalIndex].mesh.quaternion);
     play(GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.audio)
 
-    if (AUDIO.PORTAL_GUN_LOOP.paused)
-        play(AUDIO.PORTAL_GUN_LOOP)
+    //if (AUDIO.PORTAL_GUN_LOOP.paused)
+    //    play(AUDIO.PORTAL_GUN_LOOP)
 }
 
 export {

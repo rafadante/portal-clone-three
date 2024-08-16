@@ -59,7 +59,6 @@ function viewFPS() {
 
         initPost();
         manageInstances();
-        addGel();
 
         addPositionalAudio('audio-door', GLOBALS.EXIT_DOOR, false, false, true, 8);
         addPositionalAudio('audio-door', GLOBALS.ENTER_DOOR, false, false, true, 8);
@@ -102,6 +101,7 @@ function viewFPS() {
         //----------------------------------------------
 
         setTimeout(() => {
+            addGel();
             GLOBALS.MAIN_CAMERA.lookAt(GLOBALS.ENTER_DOOR.position);
             GLOBALS.PAUSED = false;
             GLOBALS.CORRIDOR_ENTER.visible = true;

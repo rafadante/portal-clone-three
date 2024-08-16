@@ -41,7 +41,8 @@ $("body").on('click', '#rotate-item', function () {
     if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("door") ||
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("faith_plate") ||
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("portal_0") ||
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("portal_1")) {
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("portal_0") ||
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("angled_panel")) {
 
         var door = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName);
         door.rotation.y += Math.PI / 2;
@@ -593,3 +594,13 @@ if (localStorage.getItem("goo_reflections")) {
     GLOBALS.GOO_REFLECTIONS = localStorage.getItem("goo_reflections") == "true";
     $("#option-goo-reflections").prop('checked', GLOBALS.GOO_REFLECTIONS);
 }
+
+//
+
+$("body").on('click', '.angled_panel_option', function () {
+    $("#angled_panel_option").find(".title").text("Angle: " +  $(this).data("angle"));
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.angle = $(this).data("angle");
+
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.getObjectByName("pivot2").rotation.x = Math.PI/180 * $(this).data("real");
+    animate();
+})

@@ -18,6 +18,7 @@ import {
 } from './components/lasers/Laser.js';
 import { laserReceiverTrigger } from './components/events/events.js';
 import { applyCustomGravity } from './components/gels/Gels.js';
+import { updateGelBlob } from './components/gels/GelDispenser.js';
 
 // return the cannon world
 // Setup our world
@@ -82,6 +83,7 @@ var updateLasers = true;
 function updatePhysics() {
 
     applyCustomGravity();
+    updateGelBlob();
 
     if (GLOBALS.HOLDING_ITEM) {
         // Project the mouse onto the movement plane
@@ -143,11 +145,11 @@ function updatePhysics() {
             property == "pedestal_button" || property == "button_weight" || property == "button_box" ||
             property == "button_circle" || property == "dispenser" || property == "ramp" ||
             property == "ramp_half" || property == "ramp_half2" || property == "stairs" ||
-            property == "light_bridge" || property == "laser_emitter" ||
+            property == "light_bridge" || property == "laser_emitter" || property == "angled_panel" ||
             property == "door" || property == "light" || property == "stripe" || property == "gel_blue" ||
             property == "gel_orange" || property == "laser_field" || property == "fizzler" ||
-            property == "portal_0" || property == "portal_1"|| property == "pellet_launcher" ||
-            property == "pellet_catcher"||property == "faith_plate")
+            property == "portal_0" || property == "portal_1" || property == "pellet_launcher" ||
+            property == "pellet_catcher" || property == "faith_plate" || property == "gel_purple")
             continue;
 
         for (var i = 0; i < GLOBALS.DYMANIC_ITEMS[property].length; i++) {
@@ -161,11 +163,11 @@ function updatePhysics() {
                     }
                 }
 
-                if (property == "tractor_beam" || property == "laser_receiver"|| property == "laser_relay") {
+                if (property == "tractor_beam" || property == "laser_receiver" || property == "laser_relay") {
                     if (GLOBALS.DYMANIC_ITEMS[property][i].userData.state) {
                         if (property == "tractor_beam")
                             rotateInstanced(instanced, GLOBALS.DYMANIC_ITEMS[property][i], i, 0.05)
-                        else if (property == "laser_receiver"|| property == "laser_relay")
+                        else if (property == "laser_receiver" || property == "laser_relay")
                             rotateInstanced(instanced, GLOBALS.DYMANIC_ITEMS[property][i], i, -0.075)
                     }
                 } else {

@@ -31,7 +31,7 @@ import {
     laserEmitterRaycast,
     laserEmitterPosition
 } from '../lasers/Laser.js';
-import { 
+import {
     targetFaithPlateStart,
     targetFaithPlateEnd,
     targetFaithPlateUpdate
@@ -76,7 +76,7 @@ function addItem(found, loaded) {
             userData.hasItem = false; //delete here
         }
 
-        if ((!userData.hasItem &&!userData.continuousEnding) || loaded) {// 
+        if ((!userData.hasItem && !userData.continuousEnding) || loaded) {// 
 
             if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
                 const geometry = new BoxGeometry(2, 2, 2);
@@ -137,12 +137,9 @@ function addItem(found, loaded) {
                 item.getObjectByName("portal_door_right_04").scale.set(1, 1, 1);
                 item.getObjectByName("portal_door_left_06").scale.set(1, 1, 1);
                 //item.getObjectByName("warning").visible = false;
-            } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_blue2") {
-                GLOBALS.ITEM_HOLDED_NAME = "dispenser";
-                var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
-                var item = new Object3D();
-                //item.userData = instanced.userData;
-            } else {
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
+                var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
+            }else {
                 var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);
                 var item = new Object3D();
                 //item.userData = instanced.userData;
@@ -278,7 +275,7 @@ function addItem(found, loaded) {
             //LASER EMITTER
             if (GLOBALS.ITEM_HOLDED_NAME == "laser_emitter") {
                 laserEmitterRaycast(item, false, GLOBALS.LASER_EMITTER_RAYCASTER)
-            } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_receiver" || GLOBALS.ITEM_HOLDED_NAME == "laser_relay"|| GLOBALS.ITEM_HOLDED_NAME == "pellet_catcher") {
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_receiver" || GLOBALS.ITEM_HOLDED_NAME == "laser_relay" || GLOBALS.ITEM_HOLDED_NAME == "pellet_catcher") {
                 item.userData.connectedTo = [];
                 GLOBALS.LOADED_CONNECTIONS.push({
                     data: userDataLoadedItem,
@@ -289,11 +286,15 @@ function addItem(found, loaded) {
             item.initialPosition = item.position.clone();
             item.initialRotation = item.rotation.clone();
 
-            if(GLOBALS.ITEM_HOLDED_NAME == "faith_plate" && !loaded){
+            if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate" && !loaded) {
                 targetFaithPlateStart(item);
             }
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
+                GLOBALS.DYMANIC_ITEMS['angled_panel'].push(item)
+                GLOBALS.ITEMS_ADDED.add(item);
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
 
                 GLOBALS.ITEMS_ADDED.add(item);
                 item.translateY(1);
@@ -571,7 +572,7 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         item.userData.state = userDataLoadedItem.state;
         item.userData.triggers = userDataLoadedItem.triggers;
         laserEmitterPosition(item, item.userData.triggers, $("#laser_receiver-trigger"), "laser_receiver");
-    }else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
         item.userData.state = userDataLoadedItem.state;
         item.userData.target = userDataLoadedItem.target;
 

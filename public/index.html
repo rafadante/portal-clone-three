@@ -18,15 +18,6 @@
   <title>Portal Clone</title>
 </head>
 
-<script type="importmap">
-  {
-    "imports": {
-      "three": "./build/three.module.js",
-      "three/addons/": "./jsm/"
-    }
-  }
-</script>
-
 <body>
   <div id="root"></div>
 
@@ -81,13 +72,13 @@
           <img
             data-content="A dropper will come with it. If the player loses the cube the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
             data-title="CUBE 2" class="item" data-name="cube_2" src="../assets/ui/items/cube_blue.png"
-            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="false"
             data-instanced="true" id="cube_2" />
 
           <img
             data-content="A dropper will come with it. If the player loses the sphere the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
             data-title="SPHERE" class="item" data-name="sphere" src="../assets/ui/items/sphere.png"
-            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="false"
             data-instanced="true" id="sphere" />
 
           <img data-content="Purely cosmetic, it will play a radio music." data-title="RADIO" class="item"
@@ -110,7 +101,7 @@
             data-instanced="true" src="../assets/ui/items/laser_relays.png" id="laser_relay" />
 
           <img data-content="Reflects the laser." data-title="LASER CUBE" class="item" data-name="laser_cube"
-            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="false"
             data-instanced="true" src="../assets/ui/items/laser_cube.png" id="laser_cube" />
 
           <img data-content="Can be linked to an object to form a trigger. This button only accepts spheres."
@@ -181,30 +172,14 @@
             data-title="FIZZLER" class="item" data-name="fizzler" src="../assets/ui/items/fizzlers.png"
             data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" data-allowconnection="true"
             id="fizzler" />
-          <!--
-          
-
-          <img
-            data-content=" Any contact with the lasers will result in instant death. However, the Field allows objects to pass through without harm."
-            data-title="LASER FIELD" class="item" data-name="laser_field" src="../assets/ui/items/laser_field.png" />-->
 
           <!--<img
             data-content="Turrets will attack the player on sight if they run within their field of vision. You can adjust the field of vision by moving the cone when the object is selected."
             data-title="TURRETS" class="item" data-name="turrets" src="../assets/ui/items/turrets.png" />-->
 
-
-          <!--<img
-            data-content="The player can recharge the paint gun, you can choose between the blue, orange, white and puple gels. If a player go through fizzlers the gun will lose all the painting and the player will need to recharge again."
-            data-title="GEL GUN RECHARGER" class="item" data-name="gel_gun_blue"
-            src="../assets/ui/items/gel_gun_blue.png" />-->
-
           <!--<img data-content="You can choose if you want the panel to be automatically deployed or not."
             data-title="ANGLED GLASS PANEL" class="item" data-name="angled_panel1"
             src="../assets/ui/items/angled_panel1.png" />
-
-          <img data-content="You can choose if you want the panel to be automatically deployed or not."
-            data-title="ANGLED PORTAL PANEL" class="item" data-name="angled_panel2"
-            src="../assets/ui/items/angled_panel2.png" />
 
           <img
             data-content="Flip Panels must be connected to a trigger. Once you have activated the trigger the panel will flip around revealing a surface capable of allowing Portals."
@@ -236,15 +211,6 @@
             data-floor="false" data-ceiling="false" data-walls="true" data-instanced="false" id="camera" />
 
           <!--
-            
-            <img
-            data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
-            data-title="LIGHT STRIPS" class="item" data-name="stripe" src="../assets/ui/items/stripe.png" />
-
-            <img
-            data-content="Can either start enabled or disabled through the properties menu. When enabled the player can walk up and down them."
-            data-title="STAIRS" class="item" data-name="stairs" src="../assets/ui/items/stairs.png" />
-
             <img
             data-content="Piston Platforms will move up and down whenever the player stands on it. If it is connected to a trigger then the trigger must be activated before it will begin to move. You can adjust the height of the platform using the arrows that appear when the object is selected."
             data-title="PISTON PLATFORMS" class="item" data-name="piston_platforms"
@@ -254,28 +220,7 @@
             data-content="Track Platforms move on rails. You can adjust the pathing using the arrows that appear when the object is selected. The properties menu allow you to set the rail to oscillate and you can set the platform to start active or disabled."
             data-title="TRACK PLATFORMS" class="item" data-name="track_platforms"
             src="../assets/ui/items/track_platforms.png" />
-
             -->
-
-          <!--<img
-            data-content="You can place automatic portals on the scene, it can be static or activated by a trigger. You can choose which portal color on the level editor. If the player has a portal gun and shoots a portal with the same color as the automatic portal, the automatic portal will be destroyed and vice versa."
-            data-title="AUTOMATIC PORTAL" class="item" data-name="portal" src="../assets/ui/items/portal.png" />
-
-          <img
-            data-content="You can place the recall gun on the level editor, when the player touches, it will equipe. With the recall gun players can make objects go back in time."
-            data-title="RECALL GUN" class="item" data-name="recall2" src="../assets/ui/items/recall2.png" />
-
-          -->
-
-          <!---->
-
-          <!--<img
-            data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL CLEAR" class="item" data-name="ramp" src="../assets/ui/items/gel_new.png" />
-
-            <img
-            data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL CLEAR" class="item" data-name="ramp_half2" src="../assets/ui/items/gel_new.png" />-->
 
           <img data-content="" data-title="ENERGY PELLET LAUNCHER" class="item" data-name="pellet_launcher"
             data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
@@ -298,23 +243,40 @@
           <!--GELS-->
           <img
             data-content="Blue will cause the player to bounce. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL BLUE" class="item" data-name="gel_blue" src="../assets/ui/items/gel_blue.png" />
+            data-allowconnection="true" data-rotate="false" data-floor="false" data-ceiling="true" data-walls="false"
+            data-title="GEL BLUE" class="item" data-name="gel_blue" src="../assets/ui/items/gel_blue.png" id="gel_blue"
+            data-instanced="true" />
 
           <img
             data-content="Orange will give the player increased speed. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL ORANGE" class="item" data-name="gel_orange" src="../assets/ui/items/gel_orange.png" />
-
-          <img
-            data-content="White will allow the player to create a portal on any surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL WHITE" class="item" data-name="gel_white" src="../assets/ui/items/gel_white.png" />
+            data-allowconnection="true" data-rotate="false" data-floor="false" data-ceiling="true" data-walls="false"
+            data-title="GEL ORANGE" class="item" data-name="gel_orange" src="../assets/ui/items/gel_orange.png"
+            id="gel_orange" />
 
           <img
             data-content="Purple will allow players to walk on walls or ceilings. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
-            data-title="GEL PURPLE" class="item" data-name="gel_purple" src="../assets/ui/items/gel_purple.png" />
+            data-allowconnection="true" data-rotate="false" data-floor="false" data-ceiling="true" data-walls="false"
+            data-title="GEL PURPLE" class="item" data-name="gel_purple" src="../assets/ui/items/gel_purple.png"
+            id="gel_purple" />
+
+          <img
+            data-content="White will allow the player to create a portal on any surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
+            data-allowconnection="true" data-rotate="false" data-floor="false" data-ceiling="true" data-walls="false"
+            data-title="GEL WHITE" class="item" data-name="gel_white" src="../assets/ui/items/gel_white.png" />
 
           <img
             data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
+            data-allowconnection="true" data-rotate="false" data-floor="false" data-ceiling="true" data-walls="false"
             data-title="GEL CLEAR" class="item" data-name="gel_new" src="../assets/ui/items/gel_new.png" />
+
+          <img data-content="You can choose if you want the panel to be automatically deployed or not."
+            data-title="ANGLED PORTAL PANEL" class="item" data-name="angled_panel" data-allowconnection="true"
+            data-rotate="true" data-floor="true" data-ceiling="true" data-walls="true"
+            src="../assets/ui/items/angled_panel.png" id="angled_panel" data-instanced="false"/>
+
+          <img
+            data-content="Can either start enabled or disabled through the properties menu. When enabled the player can walk up and down them."
+            data-title="STAIRS" class="item" data-name="stairs" src="../assets/ui/items/stairs.png" />
         </div>
       </div>
     </div>
@@ -370,7 +332,6 @@
         <span class="menu-text">Delete</span>
       </a>
     </li>
-    <li class="menu-separator"></li>
 
     <li id="lines" class="menu-item hasItem buttons">
       <a href="#" class="menu-btn">
@@ -825,6 +786,40 @@
       </a>
     </li>
 
+    <!--ANGLED PANEL-->
+    <li class="menu-item menu-item-submenu angled_panel hasItem" id="angled_panel_option" data-angle="60">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-pallete"></i>
+        <span class="menu-text title">Angle: 60</span>
+      </button>
+      <ul class="menu">
+        <li data-angle="90" data-real="0" class="menu-item angled_panel_option">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-pallete"></i>
+            <span class="menu-text">90</span>
+          </button>
+        </li>
+        <li data-angle="60" data-real="30" class="menu-item angled_panel_option">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-pallete"></i>
+            <span class="menu-text">60</span>
+          </button>
+        </li>
+        <li data-angle="45" data-real="45" class="menu-item angled_panel_option">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-pallete"></i>
+            <span class="menu-text">45</span>
+          </button>
+        </li>
+        <li data-angle="30" data-real="60" class="menu-item angled_panel_option">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-pallete"></i>
+            <span class="menu-text">30</span>
+          </button>
+        </li>
+      </ul>
+    </li>
+
     <!--GELS-->
     <li class="menu-separator"></li>
     <li id="add-gel" class="menu-item gel">
@@ -863,109 +858,6 @@
         </li>
       </ul>
     </li>
-
-    <!--<li class="menu-item menu-item-submenu">
-      <button type="button" class="menu-btn">
-        <i class="fa fa-users"></i>
-        <span class="menu-text">Tile Portal</span>
-      </button>
-      <ul class="menu">
-        <li data-id="1" class="menu-item tile-portal">
-          <button type="button" class="menu-btn">
-            <i class="fa fa-comment"></i>
-            <span class="menu-text">Tile 1</span>
-          </button>
-        </li>
-        <li data-id="2" class="menu-item tile-portal">
-          <button type="button" class="menu-btn">
-            <i class="fa fa-comment"></i>
-            <span class="menu-text">Tile 2</span>
-          </button>
-        </li>
-        <li data-id="3" class="menu-item tile-portal">
-          <button type="button" class="menu-btn">
-            <i class="fa fa-comment"></i>
-            <span class="menu-text">Tile 3</span>
-          </button>
-        </li>
-      </ul>
-    </li>
-
-    <li class="menu-item menu-item-submenu">
-      <button type="button" class="menu-btn">
-        <i class="fa fa-users"></i>
-        <span class="menu-text">Tile Non Portal</span>
-      </button>
-      <ul class="menu">
-        <li data-id="1" class="menu-item tile-nonPortal">
-          <button type="button" class="menu-btn">
-            <i class="fa fa-comment"></i>
-            <span class="menu-text">Tile 1</span>
-          </button>
-        </li>
-        <li data-id="2" class="menu-item tile-nonPortal">
-          <button type="button" class="menu-btn">
-            <i class="fa fa-comment"></i>
-            <span class="menu-text">Tile 2</span>
-          </button>
-        </li>
-        <li data-id="3" class="menu-item tile-nonPortal">
-          <button type="button" class="menu-btn">
-            <i class="fa fa-comment"></i>
-            <span class="menu-text">Tile 3</span>
-          </button>
-        </li>
-      </ul>
-    </li>-->
-
-
-
-    <!--<li class="menu-item menu-item-submenu">
-      <button type="button" class="menu-btn">
-        <i class="fa fa-users"></i>
-        <span class="menu-text">State</span>
-      </button>
-      <ul class="menu">
-        <li data-id="1" class="menu-item dispenser-once">
-          <button type="button" class="menu-btn">
-            <i class="fa fa-comment"></i>
-            <span class="menu-text">Open Once</span>
-          </button>
-        </li>
-        <li data-id="2" class="menu-item dispenser-always">
-          <button type="button" class="menu-btn">
-            <i class="fa fa-comment"></i>
-            <span class="menu-text">Leave Opened</span>
-          </button>
-        </li>
-      </ul>
-    </li>
-
-    <li id="dispenser-state" class="menu-item hasItem">
-      <button type="button" class="menu-btn">
-        <i class="fa fa-plus"></i>
-        <span class="menu-text">Dispenser</span>
-      </button>
-    </li>
-
-    <li id="plus-portal" class="menu-item noItem">
-      <button type="button" class="menu-btn">
-        <i class="fa fa-plus"></i>
-        <span class="menu-text">Push Surface</span>
-      </button>
-    </li>
-    <li id="minus-portal" class="menu-item noItem">
-      <button type="button" class="menu-btn">
-        <i class="fa fa-minus"></i>
-        <span class="menu-text">Pull Surface</span>
-      </button>
-    </li>
-    <li id="rotate-item" class="menu-item noItem">
-      <button type="button" class="menu-btn">
-        <i class="fa fa-sync-alt"></i>
-        <span class="menu-text">Rotate Item</span>
-      </button>
-    </li>-->
   </ul>
 
   <div id="blocker">
@@ -1392,10 +1284,6 @@
   background: black;
   justify-content: center;
   align-items: center;"></span>
-
-  <!--<div id="placeholder">
-    <button id="start-place-holder">START</button>
-  </div>-->
 
   <div id="panel-top"></div>
 

@@ -62,7 +62,7 @@ function tractorStates(obj) {
 function dispenserSpawn(item) {
     item.body.position.set(item.dispenserPosition.x, item.dispenserPosition.y - 1, item.dispenserPosition.z);
     item.body.mass = item.body.initialMass;
-    //item.body.allowSleep = true;
+    item.body.allowSleep = true;
 
     // Velocity
     item.body.velocity.setZero();
@@ -85,6 +85,16 @@ function wakeUpAll() {
 
 function respawn(d) {
     if (d.name.includes("gel")) return;
+
+    // Velocity
+    d.velocity.setZero();
+    d.initVelocity.setZero();
+    d.angularVelocity.setZero();
+    d.initAngularVelocity.setZero();
+
+    // Force
+    d.force.setZero();
+    d.torque.setZero();
 
     d.repawning = true;
 

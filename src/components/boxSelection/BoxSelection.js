@@ -48,6 +48,7 @@ function raycastSelected(found, event, type) {
                 (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("door") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_0") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_1") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("angled_panel") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal_button"))) {
                 $("#rotate-item").css("display", "block");
             } else {
@@ -58,6 +59,7 @@ function raycastSelected(found, event, type) {
 
             if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem) {
                 $("#delete").css("display", "block");
+                $(".gel").css("display", "none");
 
                 if ((GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") ||
@@ -191,6 +193,12 @@ function raycastSelected(found, event, type) {
                     $("#plate-max-height-value").prop("min", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height - 2);
                     $("#plate-max-height-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height);
                 }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("angled_panel")) {
+                    $(".angled_panel").css("display", "block");
+                }
+            }else{
+                $(".gel").css("display", "block");
             }
 
             GLOBALS.SELECTED_ID.push(instanceId);
@@ -359,7 +367,8 @@ function raycastSelected(found, event, type) {
             currentID = instanceId;
 
             for (var i = 0; i < GLOBALS.SELECTED_ID_ORANGE.length; i++) {
-                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID_ORANGE[i].id_instanced, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID_ORANGE[i].id_instanced].planeColor);
+                if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID_ORANGE[i].id_instanced].planeColor)
+                    GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID_ORANGE[i].id_instanced, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID_ORANGE[i].id_instanced].planeColor);
             }
 
             GLOBALS.SELECTED_ID_ORANGE = [];
@@ -423,9 +432,12 @@ function raycastSelected(found, event, type) {
 function removeSelection() {
     for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
 
-        GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor);
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor) {
+            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor);
 
-        GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+        }
+
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].selected = false;
     }
 

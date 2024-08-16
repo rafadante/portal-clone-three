@@ -19,7 +19,7 @@ function loadMaterials() {
         'metal/floor.jpg',
         'metal/floor_normal.jpg',
         null,
-        'floor/nonPortalable/1/roughness.jpg',
+        null,//'floor/nonPortalable/1/roughness.jpg'
         null,
         null,
         1,

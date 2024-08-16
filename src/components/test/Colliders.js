@@ -68,6 +68,40 @@ function colliderItemManager() {
 
     addColliderDoorsDefault(GLOBALS.ENTER_DOOR);
     addColliderDoorsDefault(GLOBALS.EXIT_DOOR);
+
+    for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['angled_panel'].length; i++) {
+        if (GLOBALS.DYMANIC_ITEMS['angled_panel'][i].length != 0) {
+
+            const panel = GLOBALS.DYMANIC_ITEMS['angled_panel'][i].getObjectByName("panel");
+            GLOBALS.ANGLED_PANELS.push(panel);
+
+            const cube = GLOBALS.DYMANIC_ITEMS['angled_panel'][i].getObjectByName("Cube");
+
+            var shape = new CANNON.Box(new CANNON.Vec3(1, 1, 0.1));
+            var body = new CANNON.Body({
+                shape: shape,
+                mass: 0,
+                material: new CANNON.Material()
+            });
+
+            var worldPos = new Vector3();
+            cube.getWorldPosition(worldPos)
+            body.position.copy(worldPos);
+
+            var worldQua = new Quaternion();
+            cube.getWorldQuaternion(worldQua)
+            body.quaternion.copy(worldQua);
+
+            body.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
+            body.collisionFilterMask = GLOBALS.CGROUP_ALL;
+
+            GLOBALS.CANNON_BODIES.push(body);
+            GLOBALS.CANNON_WORLD.addBody(body);
+
+            console.log(body)
+            panel.body = body;
+        }
+    }
 }
 
 function addColliderDoorsDefault(obj) {
@@ -155,6 +189,8 @@ function addColliderItem(items, type, mass, offset) {
             let PHYSICS_MATERIAL = new CANNON.Material();
             PHYSICS_MATERIAL.friction = items[i].userData.friction; //0.01
             //PHYSICS_MATERIAL.restitution = 0; //0.1
+
+            console.log(items[i].userData.friction)
 
             var pos = items[i].position.clone();
             var rot = items[i].quaternion;
