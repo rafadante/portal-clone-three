@@ -134,8 +134,6 @@ function path2(dgraph, start, end, side,found,found2) {
 
         fromObj.node.hasLine = true;
 
-        console.log(fromObj)
-
         points.push(fromObj.position)
         rotPoints.push(fromObj.rotation)
 
@@ -147,8 +145,6 @@ function path2(dgraph, start, end, side,found,found2) {
 
     pathPoints.push(points[0])
     pathPointsRot.push(rotPoints[0])
-    //console.log(points)
-    //console.log(rotPoints)
 
     for (var j = 1; j < points.length; j++) {
 
@@ -218,9 +214,6 @@ function path2(dgraph, start, end, side,found,found2) {
         color: new Color(0, 0.7, 1.0),
         emissiveIntensity: 100
     });
-
-    console.log(pathPoints)
-    console.log(pathPointsRot)
 
     for (let i = 0; i < numberOfCircles; i++) {
         const targetDistance = (i / (numberOfCircles - 1)) * totalLength;

@@ -142,7 +142,6 @@ function teleportationState() {
 
         d.collisionFilterMask = GLOBALS.CGROUP_ALL;
         d.inArea = false;
-        d.collisionResponse = 1;
 
         if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null) continue;
 
@@ -171,9 +170,6 @@ function teleportationState() {
                 d.collisionFilterMask &=
                     ~GLOBALS.PORTALS[p].hostObjects.collisionFilterGroup;
                 d.inArea = true;
-                d.collisionResponse = 0;
-
-                console.log(d.collisionFilterMask)
 
                 if (dd == 0) {
                     inArea++;

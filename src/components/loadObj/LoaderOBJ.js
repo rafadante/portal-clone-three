@@ -288,8 +288,6 @@ function loadGunManager(scene) {
         scene.getObjectByName("Object_6").material.metalnessMap = null;
         scene.getObjectByName("Object_6").material.metalness = localStorage.getItem("portal_gun_metalness");
     }
-
-    console.log(scene.getObjectByName("Object_6").material)
         
     GLOBALS.GUN.name = "GUN";
     GLOBALS.SCENE.add(GLOBALS.GUN);
@@ -1146,7 +1144,6 @@ function loadAngledPanelManager(scene) {
             child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.2;
             child.material.roughness = 1;
-            console.log(child.material)
         }
 
         if(child.material){

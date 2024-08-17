@@ -23,7 +23,6 @@ import {
     hoverItem
 } from '../items/Items.js';
 import { addItem } from '../items/AddItem.js';
-import { manageRaycasterGlassPanel } from '../glassPanel/GlassPanel.js';
 import { updateMaterialRepeat } from '../materials/Materials.js';
 import { hex2rgb } from '../../Utils.js';
 
@@ -377,22 +376,7 @@ const mouse2 = new Vector2(1, 1);
 function raycastManager(event, type) {
     if (!GLOBALS.FPS_MODE && GLOBALS.PLANE_LEVEL_INSTANCED) {
 
-        if (GLOBALS.RESIZING_GLASS_PANEL) {
-            manageRaycasterGlassPanel(mouse2, type);
-            return;
-        }
-
         raycaster.setFromCamera(mouse2, GLOBALS.MAIN_CAMERA);
-        const intersectGlassPanels = raycaster.intersectObjects(GLOBALS.GLASS_PANELS);
-
-        if (intersectGlassPanels.length > 0) {
-            if (type == "down") {
-                GLOBALS.CONTROLS.enabled = false;
-                GLOBALS.RESIZING_GLASS_PANEL = true;
-                manageRaycasterGlassPanel(mouse2, type, intersectGlassPanels[0].object);
-                return;
-            }
-        }
 
         const intersection = raycaster.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
 

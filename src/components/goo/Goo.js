@@ -183,7 +183,6 @@ const AddGoo = function (found, loading) {
     //water.rotation.x = -Math.PI / 2;
     //water.position.set(0, -0.2, 0)
     water.material.transparent = true;
-    console.log(water)
 
     GOO.add(water);
     GOO.add(lava);
@@ -193,11 +192,6 @@ const AddGoo = function (found, loading) {
     bb.max.y += 0.2;
 
     GLOBALS.GOO_BOXES.push(bb);
-
-    console.log("000000000000000")
-    console.log(GLOBALS.GOO_BOXES);
-
-    
 };
 
 const randomizeMatrix = function () {

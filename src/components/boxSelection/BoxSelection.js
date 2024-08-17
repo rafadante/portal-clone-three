@@ -59,7 +59,11 @@ function raycastSelected(found, event, type) {
 
             if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem) {
                 $("#delete").css("display", "block");
-                $(".gel").css("display", "none");
+
+                if (!GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel"))
+                    $(".gel").css("display", "none");
+                else
+                    $(".gel").css("display", "block");
 
                 if ((GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") ||
@@ -197,7 +201,7 @@ function raycastSelected(found, event, type) {
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("angled_panel")) {
                     $(".angled_panel").css("display", "block");
                 }
-            }else{
+            } else {
                 $(".gel").css("display", "block");
             }
 

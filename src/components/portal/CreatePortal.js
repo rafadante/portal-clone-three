@@ -1,28 +1,10 @@
-import {
-    Vector3,
-    Raycaster,
-    Color,
-    Box3,
-    Matrix3
-} from 'three';
-import {
-    TWEEN
-} from '../../Tween.js';
-import {
-    createLightBridgesFromPortal
-} from '../continuous/Continuous.js';
-import {
-    cannonToThreeVector3,
-    tweenCamera
-} from '../../Utils.js';
-import {
-    Portal
-} from '../portal/Portal.js';
-import {
-    GLOBALS
-} from '../../Globals.js';
+import { Vector3, Raycaster, Color, Box3, Matrix3 } from 'three';
+import { TWEEN } from '../../Tween.js';
+import { createLightBridgesFromPortal } from '../continuous/Continuous.js';
+import { cannonToThreeVector3, tweenCamera } from '../../Utils.js';
+import { Portal } from '../portal/Portal.js';
+import { GLOBALS } from '../../Globals.js';
 import { AUDIO, play } from '../audio/Audio.js';
-import { globalEval } from 'jquery';
 
 var coords = new Vector3();
 var raycaster2 = new Raycaster();
@@ -59,7 +41,6 @@ function portalButton(button, auto, camera) {
         }
 
         var intersectPanel = raycaster2.intersectObjects(GLOBALS.ANGLED_PANELS);
-        console.log(intersectPanel)
 
         var intersectsGelWhite = raycaster2.intersectObject(GLOBALS.INSTANCED_WHITE_GEL);
 
@@ -136,7 +117,7 @@ function portalButton(button, auto, camera) {
 
             if (GLOBALS.GUN_MODE == 1) {
 
-                if (auto || (userData.portal) || intersectsGelWhite.length > 0|| intersectPanel.length > 0) {//!userData.hasItem || (userData.itemName.includes("camera"))
+                if (auto || (userData.portal) || intersectsGelWhite.length > 0 || intersectPanel.length > 0) {//!userData.hasItem || (userData.itemName.includes("camera"))
                     var point = new Vector3(x, y, z);
                     // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                     // define playerUpDirection
@@ -235,45 +216,18 @@ function portalButton(button, auto, camera) {
 
                         body = intersectPanel[0].object.body;
                     } else if (intersectsGelWhite.length > 0) {
-
-                        body = GLOBALS.INSTANCED_WHITE_GEL.array[intersectsGelWhite[0].instanceId];
-
-
-                        if (body.side == "front")
-                            normal = new Vector3(0, 0, 1)
-                        else if (body.side == "back")
-                            normal = new Vector3(0, 0, -1)
-                        else if (body.side == "right")
-                            normal = new Vector3(-1, 0, 0)
-                        else if (body.side == "left")
-                            normal = new Vector3(1, 0, 0)
-                        else if (body.side == "up") {
-                            playerUpDirection.applyQuaternion(GLOBALS.MAIN_CAMERA.quaternion)
-                            normal = new Vector3(0, -1, 0)
-                        } else if (body.side == "down") {
-                            playerUpDirection.applyQuaternion(GLOBALS.MAIN_CAMERA.quaternion)
-                            normal = new Vector3(0, 1, 0)
-                        }
-
-                        point = cannonToThreeVector3(body.position);
-
-                        console.log(GLOBALS.INSTANCED_WHITE_GEL)
-                        console.log(body)
-                        console.log(normal)
+                        point = cannonToThreeVector3(GLOBALS.INSTANCED_WHITE_GEL.array[intersectsGelWhite[0].instanceId].position);
+                        body = userData.body;
                     } else {
                         body = userData.body;
                     }
 
                     if (button == 0) { // left click
 
-                        //if (GLOBALS.PORTALS[1] === null)
                         if (!auto) {
                             document.getElementById("reticle-img").style.filter = "none";
                             document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
                         }
-
-                        //else
-                        //    document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
 
                         // delete the old portal this new one is replacing
                         if (GLOBALS.PORTALS[0] !== null)
@@ -303,10 +257,6 @@ function portalButton(button, auto, camera) {
                             document.getElementById("reticle-img").style.filter = "none";
                             document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
                         }
-                        //if (GLOBALS.PORTALS[0] === null)
-
-                        //
-                        //    document.getElementById("reticle-img").src = './assets/textures/crosshairBoth.png';
 
                         // delete the old portal this new one is replacing
                         if (GLOBALS.PORTALS[1] !== null)
@@ -329,18 +279,15 @@ function portalButton(button, auto, camera) {
                             AUDIO.PORTAL_GUN_BLUE.currentTime = 0;
                             play(AUDIO.PORTAL_GUN_BLUE)
                         }
-
                     }
 
                     setTimeout(() => {
                         if (button == 0) {
                             createLightBridgesFromPortal(1, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
                             createLightBridgesFromPortal(1, GLOBALS.TRACTOR_BEAM_RAYCASTER);
-                            //createLightBridgesFromPortal(1, GLOBALS.LASER_EMITTER_RAYCASTER);
                         } else if (button == 2) {
                             createLightBridgesFromPortal(0, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
                             createLightBridgesFromPortal(0, GLOBALS.TRACTOR_BEAM_RAYCASTER);
-                            //createLightBridgesFromPortal(0, GLOBALS.LASER_EMITTER_RAYCASTER);
                         }
                     }, 300);
                 } else {
@@ -401,6 +348,9 @@ function deletePortal(portalIndex) {
     if (GLOBALS.PORTALS[portalIndex] === null)
         return;
 
+    for (var i = 0; i < GLOBALS.PORTALS[portalIndex].gels.length; i++) {
+        GLOBALS.PORTALS[portalIndex].gels[i].collisionResponse = 1;
+    }
 
     //REMOVE FIELDS THAT ARE GOING THROUGH THIS PORTAL
     if (GLOBALS.PORTALS[portalIndex].field) {
@@ -499,10 +449,48 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
 
     GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.position.copy(GLOBALS.PORTALS[thisPortalIndex].mesh.position);
     GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.quaternion.copy(GLOBALS.PORTALS[thisPortalIndex].mesh.quaternion);
-    play(GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.audio)
+    play(GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.audio);
 
-    //if (AUDIO.PORTAL_GUN_LOOP.paused)
-    //    play(AUDIO.PORTAL_GUN_LOOP)
+    GLOBALS.PORTALS[thisPortalIndex].gels = [];
+
+    for (var i = 0; i < GLOBALS.GEL_TRIGGER.length; i++) {
+        for (var j = 0; j < 9; j++) {
+
+            const obj = GLOBALS.GEL_TRIGGER[i].clone();
+            GLOBALS.SCENE.add(obj)
+
+            if (j == 1)
+                obj.translateX(1);
+            else if (j == 2)
+                obj.translateX(-1);
+            else if (j == 3)
+                obj.translateY(1);
+            else if (j == 4)
+                obj.translateY(-1);
+            else if (j == 5) {
+                obj.translateX(1);
+                obj.translateY(1);
+            } else if (j == 6) {
+                obj.translateX(1);
+                obj.translateY(-1);
+            } else if (j == 7) {
+                obj.translateX(-1);
+                obj.translateY(1);
+            } else if (j == 8) {
+                obj.translateX(-1);
+                obj.translateY(-1);
+            }
+
+            GLOBALS.SCENE.remove(obj)
+
+            if (GLOBALS.PORTALS[thisPortalIndex].CDBB.containsPoint(obj.position)) {
+                GLOBALS.GEL_TRIGGER[i].gelBody.collisionResponse = 0;
+                GLOBALS.PORTALS[thisPortalIndex].gels.push(GLOBALS.GEL_TRIGGER[i].gelBody);
+                j = 10;
+            }
+        }
+    }
+
 }
 
 export {

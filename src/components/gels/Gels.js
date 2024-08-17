@@ -117,7 +117,7 @@ function spawnInstanced(item, color, gelType, side, dynamic, size) {
 }
 
 function gelCollider(dummy, type, side, size, instanced,color) {
-    var shape = new CANNON.Box(new CANNON.Vec3(size, size, 0.1));
+    var shape = new CANNON.Box(new CANNON.Vec3(size, size, 0.025));
     var gel = new CANNON.Body({
         shape: shape,
         mass: 0,
@@ -125,9 +125,7 @@ function gelCollider(dummy, type, side, size, instanced,color) {
     });
     gel.position.copy(dummy.position);
     gel.quaternion.copy(dummy.quaternion);
-
-    //if (type != "purple")
-        gel.collisionResponse = 0;
+    //gel.collisionResponse = 0;
 
     gel.name = "gel";
     gel.type = type;
@@ -135,6 +133,9 @@ function gelCollider(dummy, type, side, size, instanced,color) {
     gel.collisionFilterMask = GLOBALS.CGROUP_ALL;
     gel.side = side;
     gel.color = color;
+
+    dummy.gelBody = gel;
+    GLOBALS.GEL_TRIGGER.push(dummy);
 
     if (side == "front")
         gel.normal = new Vector3(0, 0, 1)
@@ -153,12 +154,14 @@ function gelCollider(dummy, type, side, size, instanced,color) {
     GLOBALS.CANNON_WORLD.addBody(gel);
 
     if (type == "white") {
-        console.log(instanced)
         instanced.array.push(gel);
     }
 }
 
 function gelTrigger(event) {
+
+    if(event.body.collisionResponse == 0)
+        return;
 
     if (event.body.type == "blue" && !event.target.gelJumping) {
 
@@ -230,7 +233,11 @@ function gelTrigger(event) {
         event.target.OrangeContact = true;
     } else if (event.body.type == "purple") {
 
+        if(event.body.side=="down")
+            return;
+
         clearTimeout(event.target.timeout);
+        event.target.gelPurple = event.body;
 
         const normalThree = cannonToThreeVector3(event.contact.ni).round().negate();
         const normalCannon = threeToCannonVector3(normalThree);
@@ -323,6 +330,7 @@ function applyCustomGravity() {
 //UI STUFF
 
 $("body").on('click', '#add-gel', function () {
+
     for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].hasItem = true;
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].itemName = "gel";
@@ -330,7 +338,11 @@ $("body").on('click', '#add-gel', function () {
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor = new Color($("#gel-type").data("color"));
         GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color($("#gel-type").data("color")));
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
-        GLOBALS.GELS.push(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
+
+        const index = GLOBALS.GELS.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
+        if (index <= -1) { // only splice array when item is found
+            GLOBALS.GELS.push(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
+        }
     }
 });
 

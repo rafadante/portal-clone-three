@@ -101,7 +101,6 @@ function colliderItemManager() {
             GLOBALS.CANNON_BODIES.push(body);
             GLOBALS.CANNON_WORLD.addBody(body);
 
-            console.log(body)
             panel.body = body;
         }
     }
@@ -192,8 +191,6 @@ function addColliderItem(items, type, mass, offset) {
             let PHYSICS_MATERIAL = new CANNON.Material();
             PHYSICS_MATERIAL.friction = items[i].userData.friction; //0.01
             //PHYSICS_MATERIAL.restitution = 0; //0.1
-
-            console.log(items[i].userData.friction)
 
             var pos = items[i].position.clone();
             var rot = items[i].quaternion;
@@ -377,11 +374,7 @@ function addColliderItem(items, type, mass, offset) {
                         }
                     }
 
-                    if (event.body.name == "gel") {
-                        gelTrigger(event)
-                    }
-
-                    if (event.body.type != "purple" && event.body.mass == 0) {
+                    if (event.body.type != "purple") {
                         if (event.target.customGravity) {
                             clearTimeout(event.target.timeout);
                             event.target.timeout = setTimeout(() => {
@@ -399,11 +392,22 @@ function addColliderItem(items, type, mass, offset) {
                                     // Force
                                     event.target.force.setZero();
                                     event.target.torque.setZero();
-
-                                    console.log(GLOBALS.CUSTOM_GRAVITY)
                                 }
                             }, 10);
                         }
+                    }
+
+                    /*if (event.body.type != "purple") {
+                        if (GLOBALS.PLAYER.customGravity) {
+                            clearTimeout(event.target.timeout);
+                            event.target.timeout = setTimeout(() => {
+                                playerExitPurpleGel();
+                            }, 1000);
+                        }
+                    }*/
+
+                    if (event.body.name == "gel") {
+                        gelTrigger(event)
                     }
 
                     if (event.body.name == "faith_plate") {
@@ -598,7 +602,7 @@ function corridorColliderNames(corridor, update) {
                 GLOBALS.SCENE_FPS.add(window.worlPos)
                 window.worlPos.position.y -= 4;
                 light.target = window.worlPos;
-            }else{
+            } else {
                 child.getWorldPosition(window.worlPos.position);
                 window.worlPos.position.y -= 4;
             }

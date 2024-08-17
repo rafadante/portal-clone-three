@@ -84,13 +84,10 @@ function addBody(obj, type, color, material) {
 
     gelBlob.addEventListener("collide", function (event) {
 
-        if(event.body.name == "gel")
-            return
+        if (gelBlob.inArea)
+            return;
 
         if (event.body.dynamic) {
-            console.log(event.body)
-            console.log(event.target)
-            console.log(gelBlob)
             const instanced = GLOBALS.ITEMS_ADDED.getObjectByName(event.body.item.userData.instancedName);
 
             if (gelBlob.typeGel == "clear")
@@ -100,8 +97,6 @@ function addBody(obj, type, color, material) {
 
             instanced.instanceColor.needsUpdate = true;
         }
-
-        console.log("repawns")
 
         gelBlob.sphereClone.visible = false;
         gelBlob.mass = 0;
@@ -128,8 +123,7 @@ function addBody(obj, type, color, material) {
         }, 2000);
 
         //
-        if (event.target.inArea)
-            return;
+        
 
         if (event.body.name != "wall" && event.body.name != "panel")
             return;

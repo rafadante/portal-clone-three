@@ -49,21 +49,13 @@ GLOBALS.PLAYER.upVector = new CANNON.Vec3(0, 1, 0);
 GLOBALS.PLAYER.upVectorThree = new Vector3(0, 1, 0);
 let contactNormal = new CANNON.Vec3(0, 0, 0);
 
-GLOBALS.PLAYER.addEventListener('beginContact', () => {
-    console.log('contact!!!')
-})
-
-GLOBALS.PLAYER.addEventListener('endContact', () => {
-    console.log('end contact!!!')
-})
-
 GLOBALS.PLAYER.addEventListener("collide", function (event) {
 
     if (event.body.name == "gel") {
         gelTrigger(event);
     }
 
-    if(GLOBALS.PLAYER.ROTATING)
+    if (GLOBALS.PLAYER.ROTATING)
         return;
 
     if (event.body.type == "orange") {
@@ -79,24 +71,13 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
         }
     }
 
-    if (event.body.type != "purple" && event.body.mass == 0) {
-
-        /*if (event.target.currentPurpleBody)
-            event.target.currentPurpleBody.collisionResponse = 0;*/
-
-        if (GLOBALS.PLAYER.customGravity && GLOBALS.PLAYER.PURPLE_CONTACT) {
+    if (event.body.type != "purple") {
+        if (GLOBALS.PLAYER.customGravity) {
             clearTimeout(event.target.timeout);
             event.target.timeout = setTimeout(() => {
                 playerExitPurpleGel();
             }, 10);
         }
-    } else {
-
-        /**if (event.target.currentPurpleBody)
-            event.target.currentPurpleBody.collisionResponse = 0;
-
-        event.target.currentPurpleBody = event.body;
-        event.body.collisionResponse = 1; */
     }
 
     if (event.body.type != "blue") {
@@ -196,7 +177,7 @@ for (let d of GLOBALS.DYNAMIC_OBJECTS) {
 }
 
 function playerExitPurpleGel() {
-    console.log("999999999999999")
+
     GLOBALS.HEAD_BOB_SPEED = 5;
     GLOBALS.PLAYER.PURPLE_CONTACT = false;
     GLOBALS.PLAYER.customGravity = null;

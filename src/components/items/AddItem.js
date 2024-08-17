@@ -584,10 +584,7 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
 
         targetFaithPlateUpdate(dummy)
         targetFaithPlateEnd(dummy, userDataLoadedItem.height);
-        console.log("loaded");
     }
-
-
 }
 
 function clickItem(elem) {

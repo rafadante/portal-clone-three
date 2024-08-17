@@ -199,8 +199,6 @@ const updatePlayer = function (deltaTime) {
                 jumpPressed = true;
                 GLOBALS.PLAYER.inJump = true;
 
-                console.log(GLOBALS.PLAYER.jumpVelocity)
-
                 if(GLOBALS.PLAYER.jumpVelocity){
                     GLOBALS.PLAYER.linearDamping = 0.01
                     const impulseStrength = -1 * GLOBALS.PLAYER.mass * GLOBALS.PLAYER.jumpVelocity;
@@ -209,7 +207,7 @@ const updatePlayer = function (deltaTime) {
                         impulseStrength * GLOBALS.PLAYER.upVectorThree.y,
                         impulseStrength * GLOBALS.PLAYER.upVectorThree.z
                     );
-                    console.log(impulse)
+
                     GLOBALS.PLAYER.applyImpulse(impulse, GLOBALS.PLAYER.position)
                     GLOBALS.PLAYER.jumpVelocity = null;
                 }else{
