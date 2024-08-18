@@ -228,8 +228,11 @@ const updatePlayer = function (deltaTime) {
 
     updateHeadBob(deltaTime);
 
-    if (GLOBALS.PLAYER_MOVING)
+    if (GLOBALS.PLAYER_MOVING){
         GLOBALS.GUN.children[0].position.x += Math.sin(INPUT.headBobTimer * GLOBALS.HEAD_BOB_SPEED) * headBobHeight;
+        GLOBALS.PAINT_GUN.children[0].position.x += Math.sin(INPUT.headBobTimer * GLOBALS.HEAD_BOB_SPEED) * headBobHeight * 700;
+    }
+        
 }
 
 var jumpPressed = false;
@@ -284,6 +287,7 @@ const updateCamera = function (deltaTime) {
 
     //GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.SMOOTHNESS);
     GLOBALS.GUN.quaternion.copy(GLOBALS.PIVOT.quaternion)
+    GLOBALS.PAINT_GUN.quaternion.copy(GLOBALS.PIVOT.quaternion)
 
     if (GLOBALS.MAIN_CAMERA.position.distanceTo(new Vector3(0, 0, 0)) > 100) {
         var obj = GLOBALS.ENTER_DOOR.clone();
@@ -439,7 +443,6 @@ function joystickAction(gamepad, index, gamepadButton, button) {
 
 function joystickGel(gamepad, index, gamepadButton, mode, value) {
     if (gamepad.buttons[index].value == 1 && !gamepadButton) {
-        GLOBALS.GUN_MODE = mode;
         gamepadButton = true;
     } else if (gamepad.buttons[index].value == 0) {
         gamepadButton = false;

@@ -231,6 +231,8 @@ var GLOBALS = {
         lightEmissive: [],
         stripe: [],
         gel_blue: [],
+        gel_recharger: [],
+        gel_reflection: [],
         gel_clear: [],
         gel_orange: [],
         gel_purple: [],
@@ -245,7 +247,8 @@ var GLOBALS = {
         trigger_area: [],
         pellet_launcher: [],
         pellet_catcher: [],
-        angled_panel: []
+        angled_panel: [],
+        paint_gun: []
     },
 
     INTERACTIVE: [],
@@ -267,7 +270,7 @@ var GLOBALS = {
     GUN: null,
     GUN_CLONE: null,
     GUN_CLONE2: null,
-    GUN_MODE: 1,
+    GUN_MODE: "portal",
 
     ENV_MAP: null,
     STATS: null,
@@ -516,6 +519,14 @@ var GLOBALS = {
             count: 0,
             max: 10
         },
+        gel_recharger: {
+            count: 0,
+            max: 10
+        },
+        gel_reflection: {
+            count: 0,
+            max: 10
+        },
         gel_clear: {
             count: 0,
             max: 10
@@ -566,7 +577,11 @@ var GLOBALS = {
         },
         portal_gun: {
             count: 0,
-            max: 2
+            max: 1
+        },
+        paint_gun: {
+            count: 0,
+            max: 1
         },
         trigger_area: {
             count: 0,
@@ -632,7 +647,10 @@ var GLOBALS = {
     HEAD_BOB_SPEED: 5,
     ANGLED_PANELS: [],
     INSTANCED_WHITE_GEL: [],
-    GEL_TRIGGER: []
+    GEL_TRIGGER: [],
+    PAINTING_GUN_MODE: [],
+    PAINT_GUN: null,
+    GUN_GROUP: new Group()
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
@@ -774,6 +792,14 @@ function reset() {
             count: 0,
             max: 10
         },
+        gel_recharger: {
+            count: 0,
+            max: 10
+        },
+        gel_reflection: {
+            count: 0,
+            max: 10
+        },
         gel_clear: {
             count: 0,
             max: 10
@@ -823,6 +849,10 @@ function reset() {
             max: 100
         },
         portal_gun: {
+            count: 0,
+            max: 2
+        },
+        paint_gun: {
             count: 0,
             max: 2
         },

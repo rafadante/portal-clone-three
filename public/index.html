@@ -141,10 +141,6 @@
             data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
             data-instanced="false" id="portal_1" />
 
-          <img data-content="Obtainable item: you can define how many portals it will have." data-title="PORTAL GUN"
-            class="item" data-name="portal_gun" src="../assets/ui/items/gun2.png" data-allowconnection="false"
-            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" id="portal_gun" />
-
           <img data-content="You can link a trigger to it to open the door." data-title="DOOR" class="item"
             data-name="door" src="../assets/ui/items/door.png" data-allowconnection="true" data-rotate="true"
             data-floor="true" data-ceiling="false" data-walls="false" data-instanced="false" id="door" />
@@ -262,21 +258,46 @@
           <img
             data-content="White will allow the player to create a portal on any surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
             data-allowconnection="true" data-rotate="false" data-floor="false" data-ceiling="true" data-walls="false"
-            data-title="GEL WHITE" class="item" data-name="gel_white" src="../assets/ui/items/gel_white.png" id="gel_white"/>
+            data-title="GEL WHITE" class="item" data-name="gel_white" src="../assets/ui/items/gel_white.png"
+            id="gel_white" />
 
           <img
             data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
             data-allowconnection="true" data-rotate="false" data-floor="false" data-ceiling="true" data-walls="false"
-            data-title="GEL CLEAR" class="item" data-name="gel_clear" src="../assets/ui/items/gel_new.png" id="gel_clear"/>
+            data-title="GEL CLEAR" class="item" data-name="gel_clear" src="../assets/ui/items/gel_new.png"
+            id="gel_clear" />
+
+          <img
+            data-content="Clear will remove any existing gels from a surface. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
+            data-allowconnection="true" data-rotate="false" data-floor="false" data-ceiling="true" data-walls="false"
+            data-title="GEL REFLECTION" class="item" data-name="gel_reflection"
+            src="../assets/ui/items/gel_reflection.png" id="gel_reflection" />
 
           <img data-content="You can choose if you want the panel to be automatically deployed or not."
             data-title="ANGLED PORTAL PANEL" class="item" data-name="angled_panel" data-allowconnection="true"
             data-rotate="true" data-floor="true" data-ceiling="true" data-walls="true"
-            src="../assets/ui/items/angled_panel.png" id="angled_panel" data-instanced="false"/>
+            src="../assets/ui/items/angled_panel.png" id="angled_panel" data-instanced="false" />
+
+          <img data-content="You can choose if you want the panel to be automatically deployed or not."
+            data-title="ANGLED PORTAL PANEL" class="item" data-name="angled_panel1" data-allowconnection="true"
+            data-rotate="true" data-floor="true" data-ceiling="true" data-walls="true"
+            src="../assets/ui/items/angled_panel1.png" id="angled_panel1" data-instanced="false" />
+
+          <img data-content="" data-title="PAINT GUN GEL RECHARGER" class="item" data-name="gel_recharger"
+            data-allowconnection="true" data-rotate="true" data-floor="true" data-ceiling="true" data-walls="true"
+            src="../assets/ui/items/gel_gun_blue.png" id="gel_recharger" data-instanced="false" id="gel_recharger" />
 
           <img
             data-content="Can either start enabled or disabled through the properties menu. When enabled the player can walk up and down them."
             data-title="STAIRS" class="item" data-name="stairs" src="../assets/ui/items/stairs.png" />
+
+          <img data-content="Obtainable item: you can define how many portals it will have." data-title="PORTAL GUN"
+            class="item" data-name="portal_gun" src="../assets/ui/items/gun2.png" data-allowconnection="false"
+            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" id="portal_gun" />
+
+          <img data-content="Obtainable item: you can define how many portals it will have." data-title="PAINT GUN"
+            class="item" data-name="paint_gun" src="../assets/ui/items/paint_gun.png" data-allowconnection="false"
+            data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" id="paint_gun" />
         </div>
       </div>
     </div>
@@ -854,6 +875,52 @@
           <button type="purple" class="menu-btn">
             <i class="fa fa-pallete"></i>
             <span class="menu-text">Purple</span>
+          </button>
+        </li>
+      </ul>
+    </li>
+
+    <!--RECHARGER-->
+    <li class="menu-item menu-item-submenu gel_recharger" id="gel_recharger-type" data-gel="blue">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-pallete"></i>
+        <span class="menu-text title">Gel Type: White</span>
+      </button>
+      <ul class="menu">
+        <li data-gel="white" class="menu-item gel_recharger-type">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-pallete"></i>
+            <span class="menu-text">White</span>
+          </button>
+        </li>
+        <li data-gel="blue" class="menu-item gel_recharger-type">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-pallete"></i>
+            <span class="menu-text">Blue</span>
+          </button>
+        </li>
+        <li data-gel="orange" class="menu-item gel_recharger-type">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-pallete"></i>
+            <span class="menu-text">Orange</span>
+          </button>
+        </li>
+        <li data-gel="purple" class="menu-item gel_recharger-type">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-pallete"></i>
+            <span class="menu-text">Purple</span>
+          </button>
+        </li>
+        <li data-gel="clear" class="menu-item gel_recharger-type">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-pallete"></i>
+            <span class="menu-text">Clear</span>
+          </button>
+        </li>
+        <li data-gel="reflection" class="menu-item gel_recharger-type">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-pallete"></i>
+            <span class="menu-text">Reflection</span>
           </button>
         </li>
       </ul>

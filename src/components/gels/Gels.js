@@ -5,6 +5,7 @@ import CANNON from 'cannon';
 import { cannonToThreeVector3, threeToCannonVector3, tweenCamera } from '../../Utils.js';
 import { AUDIO } from '../audio/Audio.js';
 import { addGelBlob } from './GelDispenser.js';
+import { animate } from '../../Main';
 
 //
 const geometryGel = new PlaneGeometry(2, 2);
@@ -55,6 +56,34 @@ for (var i = 0; i < 1000; i++) {
 instancedGelPlaneDynamic.instanceMatrix.needsUpdate = true;
 instancedGelPlaneDynamic.computeBoundingSphere();
 
+//REFLECTION INSTANCES
+const geometryGelDynamicReflection = new PlaneGeometry(2, 2);
+const materialGelDynamicReflection = new MeshStandardMaterial({
+    roughness: 0.2,
+    normalMap: new TextureLoader().load("./assets/textures/decal/decal-normal.jpg"),
+    map: new TextureLoader().load("./assets/textures/decal/decal-diffuse.png"),
+    transparent: true,
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: 1,
+    metalness: 1,
+    roughness: 0.25
+});
+
+const instancedGelPlaneDynamicReflection = new InstancedMesh(geometryGelDynamicReflection, materialGelDynamicReflection, 1000);
+instancedGelPlaneDynamicReflection.current = 0;
+instancedGelPlaneDynamicReflection.frustumCulled = true;
+
+var dummy = new Object3D();
+for (var i = 0; i < 1000; i++) {
+    dummy.position.set(100000, 100000, 100000);
+    dummy.updateMatrix();
+    instancedGelPlaneDynamicReflection.setMatrixAt(i, dummy.matrix);
+}
+
+instancedGelPlaneDynamicReflection.instanceMatrix.needsUpdate = true;
+instancedGelPlaneDynamicReflection.computeBoundingSphere();
+
 //WHITE GEL INSTANCES
 GLOBALS.INSTANCED_WHITE_GEL = new InstancedMesh(geometryGelDynamic, materialGelDynamic, 1000);
 GLOBALS.INSTANCED_WHITE_GEL.current = 0;
@@ -79,6 +108,9 @@ function addGel() {
     instancedGelPlaneDynamic.material.envMap = GLOBALS.ENV_MAP;
     GLOBALS.SCENE_FPS.add(instancedGelPlaneDynamic);
 
+    instancedGelPlaneDynamicReflection.material.envMap = GLOBALS.ENV_MAP;
+    GLOBALS.SCENE_FPS.add(instancedGelPlaneDynamicReflection);
+
     GLOBALS.INSTANCED_WHITE_GEL.material.envMap = GLOBALS.ENV_MAP;
     GLOBALS.SCENE_FPS.add(GLOBALS.INSTANCED_WHITE_GEL);
 
@@ -95,6 +127,8 @@ function spawnInstanced(item, color, gelType, side, dynamic, size) {
 
     if (gelType == "white")
         instanced = GLOBALS.INSTANCED_WHITE_GEL;
+    else if (gelType == "reflection")
+        instanced = instancedGelPlaneDynamicReflection;
     else if (dynamic)
         instanced = instancedGelPlaneDynamic;
     else
@@ -106,7 +140,7 @@ function spawnInstanced(item, color, gelType, side, dynamic, size) {
     dummy.updateMatrix();
 
     instanced.setMatrixAt(instanced.current, dummy.matrix);
-    instanced.setColorAt(instanced.current, color);
+    instanced.setColorAt(instanced.current, new Color(color));
 
     gelCollider(dummy, gelType, side, size, instanced, color);
 
@@ -116,7 +150,7 @@ function spawnInstanced(item, color, gelType, side, dynamic, size) {
     instanced.current += 1;
 }
 
-function gelCollider(dummy, type, side, size, instanced,color) {
+function gelCollider(dummy, type, side, size, instanced, color) {
     var shape = new CANNON.Box(new CANNON.Vec3(size, size, 0.025));
     var gel = new CANNON.Body({
         shape: shape,
@@ -160,7 +194,7 @@ function gelCollider(dummy, type, side, size, instanced,color) {
 
 function gelTrigger(event) {
 
-    if(event.body.collisionResponse == 0)
+    if (event.body.collisionResponse == 0)
         return;
 
     if (event.body.type == "blue" && !event.target.gelJumping) {
@@ -224,16 +258,16 @@ function gelTrigger(event) {
             event.target.applyImpulse(impulse, event.target.position);
         }
     } else if (event.body.type == "orange") {
-        if (!event.target.OrangeContact) {
+        /*if (!event.target.OrangeContact) {
             AUDIO.PROPULSION.currentTime = 0;
             AUDIO.PROPULSION.play();
             AUDIO.WALK.volume = 0;
-        }
+        }*/
 
         event.target.OrangeContact = true;
     } else if (event.body.type == "purple") {
 
-        if(event.body.side=="down")
+        if (event.body.side == "down")
             return;
 
         clearTimeout(event.target.timeout);
@@ -332,19 +366,38 @@ function applyCustomGravity() {
 $("body").on('click', '#add-gel', function () {
 
     for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].hasItem = true;
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].itemName = "gel";
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].gelType = $("#gel-type").data("gel");
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor = new Color($("#gel-type").data("color"));
-        GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color($("#gel-type").data("color")));
-        GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
-
-        const index = GLOBALS.GELS.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
-        if (index <= -1) { // only splice array when item is found
-            GLOBALS.GELS.push(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
-        }
+        addTileGel(
+            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]],
+            $("#gel-type").data("gel"),
+            $("#gel-type").data("color"),
+            GLOBALS.SELECTED_ID[i]
+        );
     }
+
+    animate();
 });
+
+function addTileGel(item, type, color, id) {
+
+    if (type == "blue")
+        color = "rgb(30,144,255)"
+    else if (type == "orange")
+        color = "rgb(255,140,0)"
+    else if (type == "purple")
+        color = "rgb(75,0,130)"
+
+    item.hasItem = true;
+    item.itemName = "gel";
+    item.gelType = type;
+    item.planeColor = color;
+    GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(id, new Color(color));
+    GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+
+    const index = GLOBALS.GELS.indexOf(item);
+    if (index <= -1) { // only splice array when item is found
+        GLOBALS.GELS.push(item);
+    }
+}
 
 $("body").on('click', '#remove-gel', function () {
     for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
@@ -355,12 +408,12 @@ $("body").on('click', '#remove-gel', function () {
 
             var color;
             if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal)
-                color = new Color(0xffffff);
+                color = 0xffffff;
             else
-                color = new Color(0x808080)
+                color = 0x808080;
 
             GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor = color;
-            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], color);
+            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(color));
             GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
             const index = GLOBALS.GELS.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
@@ -381,5 +434,6 @@ export {
     addGel,
     gelTrigger,
     applyCustomGravity,
-    spawnInstanced
+    spawnInstanced,
+    addTileGel
 }

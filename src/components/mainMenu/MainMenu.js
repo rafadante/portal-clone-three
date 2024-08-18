@@ -24,6 +24,7 @@ import '../shaders/MainMenuShader.js';
 import { init } from '../../Main.js';
 import { AUDIO, play } from '../audio/Audio.js';
 import { manageConnection } from '../boxSelection/Connection.js';
+import { addTileGel } from '../gels/Gels.js';
 
 var plane1;
 var plane2;
@@ -371,10 +372,10 @@ function loadLevel(data) {
 
             GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
-            var planeColor = new Color(0x808080);
+            var planeColor = 0x808080;
 
             if (data[i].portal) {
-                planeColor = new Color(0xffffff);
+                planeColor = 0xffffff;
             }
 
             data[i].planeColor = planeColor;
@@ -400,6 +401,9 @@ function loadLevel(data) {
 
             GLOBALS.OBSERVATION_ROOM_IMG.userData = data[i].item;
             data[i].item = GLOBALS.OBSERVATION_ROOM_IMG;
+        } else if (data[i].itemName == "gel") {
+            console.log("ttttttttttt")
+            addTileGel(data[i], data[i].gelType, data[i].planeColor, data[i].id_instanced);
         }
     }
 
@@ -407,7 +411,7 @@ function loadLevel(data) {
 
         if (data[i].exists) {
 
-            if (data[i].hasItem) {
+            if (data[i].hasItem && data[i].itemName != "gel") {
 
                 if (data[i].itemName.split('-')[0] != "exitDoor" &&
                     data[i].itemName.split('-')[0] != "enterDoor" &&

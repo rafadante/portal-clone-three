@@ -215,6 +215,8 @@ function viewFPS() {
         GLOBALS.PORTAL_GUN_BOX = holder;
         GLOBALS.FPS_MODE = true;
 
+        console.log(GLOBALS.PORTAL_GUN_BOX)
+
         //stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
         /*if (GLOBALS.EXIT_DOOR.userData.connections > 0)
             stateDoor(0, false, false, GLOBALS.EXIT_DOOR);

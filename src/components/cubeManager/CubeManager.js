@@ -142,7 +142,9 @@ function trasnlatePlane(id, val, portal) {
 
             var plane = GLOBALS.PLANE_USER_DATA[id];
 
-            if (GLOBALS.PLANE_USER_DATA[id].isInstanced) {
+            if (GLOBALS.PLANE_USER_DATA[id].itemName == "gel") {
+                
+            } else if (GLOBALS.PLANE_USER_DATA[id].isInstanced) {
                 plane.item.position.copy(plane.position);
                 var item = new Object3D();
                 item.position.copy(plane.position);
@@ -199,11 +201,11 @@ function checkSides(dummy, val, id, side, portal) {
 
         GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(idEmptyToFill, dummy.matrix);
 
-        var planeColor = new Color(0x808080);
+        var planeColor = 0x808080;
 
         if (portal) {
             GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(idEmptyToFill, new Color().setHex(0xffffff));
-            planeColor = new Color(0xffffff);
+            planeColor = 0xffffff;
         } else {
             GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(idEmptyToFill, new Color().setHex(0x808080));
         }
@@ -340,7 +342,7 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
             GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(a, clone.matrix);
 
             var portal;
-            var planeColor = new Color(0x808080);
+            var planeColor = 0x808080;
 
             if (clone.position.x <= 5 && clone.position.z >= 7 && clone.position.y <= 5) {
                 portal = false;
@@ -354,7 +356,7 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
             } else {
                 portal = true;
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(a, new Color().setHex(0xffffff));
-                planeColor = new Color(0xffffff);
+                planeColor = 0xffffff;
             }
 
             var hasItem = false;

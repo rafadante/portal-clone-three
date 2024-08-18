@@ -1,5 +1,5 @@
 
-import { Color, Euler, Mesh, MeshBasicMaterial, Object3D, SphereGeometry, Vector3 } from "three";
+import { Color, Euler, Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D, SphereGeometry, Vector3 } from "three";
 import { GLOBALS } from "../../Globals";
 import CANNON, { Quaternion } from "cannon";
 import { spawnInstanced } from "./Gels";
@@ -11,10 +11,13 @@ const materialOrange = new MeshBasicMaterial({ color: new Color('rgb(255,140,0)'
 const materialPurple = new MeshBasicMaterial({ color: new Color('rgb(75,0,130)') });
 const materialWhite = new MeshBasicMaterial({ color: new Color(0.8, 0.8, 0.8) });
 const materialClear = new MeshBasicMaterial({ color: new Color(0xa7dcdd), transparent: true, opacity: 0.5 });
+const materialReflection = new MeshStandardMaterial({ metalness: 1, roughness: 0.25});
 const sphere = new Mesh(geometry, materialBlue);
 var spheres = [];
 
 function addGelBlob() {
+
+    materialReflection.envMap = GLOBALS.ENV_MAP;
 
     for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['gel_blue'].length; i++) {
         if (GLOBALS.DYMANIC_ITEMS['gel_blue'][i].length != 0) {
@@ -43,6 +46,12 @@ function addGelBlob() {
     for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['gel_clear'].length; i++) {
         if (GLOBALS.DYMANIC_ITEMS['gel_clear'][i].length != 0) {
             addBody(GLOBALS.DYMANIC_ITEMS['gel_clear'][i], "clear", new Color(0xa7dcdd), materialClear);
+        }
+    }
+
+    for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['gel_reflection'].length; i++) {
+        if (GLOBALS.DYMANIC_ITEMS['gel_reflection'][i].length != 0) {
+            addBody(GLOBALS.DYMANIC_ITEMS['gel_reflection'][i], "reflection", new Color("rgb(128,128,128)"), materialReflection);
         }
     }
 }
@@ -120,7 +129,7 @@ function addBody(obj, type, color, material) {
             gelBlob.updateMassProperties();
             gelBlob.wakeUp();
             gelBlob.sphereClone.visible = true;
-        }, 2000);
+        }, 1000);
 
         //
         

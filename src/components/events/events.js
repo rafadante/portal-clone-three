@@ -52,18 +52,33 @@ function updateEvents() {
     if (d.name == "player") {
       for (var i = 0; i < GLOBALS.PORTAL_GUN_BOX.length; i++) {
         if (GLOBALS.PORTAL_GUN_BOX[i].containsPoint(pos) && GLOBALS.PORTAL_GUN_BOX[i].item.visible) {
+
           GLOBALS.PORTAL_GUN_BOX[i].item.visible = false;
-          GLOBALS.PORTAL_GUN_INITIATE = GLOBALS.PORTAL_GUN_BOX[i].item.userData.state;
 
-          //
-          GLOBALS.GUN.children[0].visible = true;
-          GLOBALS.GUN_CLONE.children[0].visible = true;
-          GLOBALS.GUN_CLONE2.children[0].visible = true;
-          //document.getElementById("reticle-img").style.display = "block";
+          if (GLOBALS.PORTAL_GUN_BOX[i].item.name.includes("portal_gun")) {
+
+            GLOBALS.PORTAL_GUN_INITIATE = GLOBALS.PORTAL_GUN_BOX[i].item.userData.state;
+
+            //
+            GLOBALS.GUN.children[0].visible = true;
+            GLOBALS.GUN_CLONE.children[0].visible = true;
+            GLOBALS.GUN_CLONE2.children[0].visible = true;
+            //document.getElementById("reticle-img").style.display = "block";
+
+            document.getElementById("reticle-img").style.filter = "none";
+            document.getElementById("reticle-img").src = './assets/textures/crosshairNone.png';
 
 
-          document.getElementById("reticle-img").style.filter = "none";
-          document.getElementById("reticle-img").src = './assets/textures/crosshairNone.png';
+            GLOBALS.GUN.visible = true;
+            GLOBALS.PAINT_GUN.visible = false;
+            GLOBALS.GUN_MODE = "portal";
+
+          } else if (GLOBALS.PORTAL_GUN_BOX[i].item.name.includes("paint_gun")) {
+            GLOBALS.GUN.visible = false;
+            GLOBALS.PAINT_GUN.visible = true;
+
+            GLOBALS.GUN_MODE = "paint";
+          }
         }
       }
     }

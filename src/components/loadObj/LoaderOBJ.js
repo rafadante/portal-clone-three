@@ -16,7 +16,8 @@ import {
     Object3D,
     AnimationMixer,
     DynamicDrawUsage,
-    InstancedMesh
+    InstancedMesh,
+    MeshStandardMaterial
 } from 'three';
 import {
     GLTFLoader
@@ -134,7 +135,12 @@ async function handleZip(path, obj) {
                     loadGelWhiteManager(result.scene)
                 else if (obj == "loadGelClear")
                     loadGelClearManager(result.scene)
-            
+                else if (obj == "loadGelReflection")
+                    loadGelReflectionManager(result.scene)
+                else if (obj == "loadGelRecharger")
+                    loadGelRechargerManager(result.scene)
+                else if (obj == "loadPaintGun")
+                    loadPaintGunManager(result.scene)
             });
         }
     });
@@ -253,6 +259,7 @@ function loadGunManager(scene) {
     GLOBALS.GUN_CLONE2 = GLOBALS.GUN_CLONE.clone();
 
     scene.traverse(child => {
+
         child.castShadow = true;
         child.layers.mask = 2;
         child.renderOrder = 100;
@@ -272,6 +279,13 @@ function loadGunManager(scene) {
             window.gun_holder = child;
         else if (child.name == "cube_5")
             GLOBALS.PORTAL_GUN_FLASH = child;
+        else if(child.name == "gel_left" || child.name == "gel_right"){
+            child.visible = false;
+            child.material = new MeshStandardMaterial();
+            child.material.roughness = 0;
+            child.material.envMap = GLOBALS.ENV_MAP;
+            child.material.envMapIntensity = 1;
+        }
     });
 
     //LOAD PRPERTIES
@@ -290,7 +304,7 @@ function loadGunManager(scene) {
     }
         
     GLOBALS.GUN.name = "GUN";
-    GLOBALS.SCENE.add(GLOBALS.GUN);
+    GLOBALS.GUN_GROUP.add(GLOBALS.GUN);
     scene.scale.set(0.001, 0.001, 0.001)
     scene.position.set(0.00009, -0.00013, -0.00012);
     //cene.scale.set(1, 1, 1)
@@ -666,34 +680,7 @@ function loadRadioManager(scene) {
     item.clone.children[0].material.envMapIntensity = 0.5;
     item.clone.children[0].material.roughness = 0.2;
 
-    loadGelRecharger();
-}
-
-function loadGelRecharger() {
-    loader.load('/3ds/glb/portal_gun_recharger.glb', (gltf) => {
-
-        gltf.scene.traverse(child => {
-            if (child.material)
-                child.material.roughness = 0;
-        })
-
-        var item = instancedTransform(gltf.scene, "gel_gun_blue", true, 0.1, 0.5)
-        item.userData.wall = false;
-        item.userData.ground = true;
-        item.userData.ceiling = false;
-
-        var item = instancedTransform(gltf.scene, "gel_gun_orange", true, 0.1, 0.5)
-        item.userData.wall = false;
-        item.userData.ground = true;
-        item.userData.ceiling = false;
-
-        var item = instancedTransform(gltf.scene, "gel_gun_white", true, 0.1, 0.5)
-        item.userData.wall = false;
-        item.userData.ground = true;
-        item.userData.ceiling = false;
-
-        loadStairs();
-    });
+    loadStairs();
 }
 
 function loadStairs() {
@@ -1124,13 +1111,40 @@ function loadGelClearManager(scene) {
     item.userData.ground = false;
     item.userData.ceiling = true;
 
+    loadGelReflection();
+}
+
+function loadGelReflection() {
+    handleZip('./assets/3ds/gel_reflection.zip', "loadGelReflection");
+}
+
+function loadGelReflectionManager(scene) {
+
+    var item = instancedTransform(scene, "gel_reflection", false, 0, 1)
+    item.userData.wall = false;
+    item.userData.ground = false;
+    item.userData.ceiling = true;
+
+    loadGelRecharger();
+}
+
+function loadGelRecharger() {
+    handleZip('./assets/3ds/gel_recharger.zip', "loadGelRecharger");
+}
+
+function loadGelRechargerManager(scene) {
+
+    var item = instancedTransform(scene, "gel_recharger", false, 0, 1)
+    item.userData.wall = true;
+    item.userData.ground = true;
+    item.userData.ceiling = true;
+
     loadAngledPanel();
 }
 
 function loadAngledPanel() {
     handleZip('./assets/3ds/angled_panel.zip', "loadAngledPanel");
 }
-
 
 function loadAngledPanelManager(scene) {
     scene.name = "angled_panel";
@@ -1151,6 +1165,49 @@ function loadAngledPanelManager(scene) {
             child.material.polygonOffsetFactor = 2;
         }
     });
+
+    loadPaintGun()
+}
+
+function loadPaintGun() {
+    handleZip('./assets/3ds/paint_gun.zip', "loadPaintGun");
+}
+
+function loadPaintGunManager(scene) {
+    scene.name = "paint_gun";
+    scene.userData.wall = true;
+    scene.userData.ground = true;
+    scene.userData.ceiling = true;
+    GLOBALS.ITEMS.add(scene);
+    scene.traverse(child => {
+        if (child.material) {
+            child.receiveShadow = true;
+            child.material.envMap = GLOBALS.ENV_MAP;
+            child.material.envMapIntensity = 0.5;
+        }
+
+        if(child.name == "opacity"){
+            child.material.transparent = true;
+            child.material.opacity = 0.2;
+        }else if(child.name == "left" || child.name == "right"){
+            child.material.roughness = 0;
+            child.material.color = new Color(0,0,0);
+        }
+    });
+
+    GLOBALS.PAINT_GUN = new Group();
+    const group = new Group()
+
+    GLOBALS.PAINT_GUN.add(group);
+    group.add(scene);
+    GLOBALS.GUN_GROUP.add(GLOBALS.PAINT_GUN);
+
+    //scene.scale.set(0.001, 0.001, 0.001)
+    scene.position.set(0.15, -0.17, -0.25);
+    GLOBALS.PAINT_GUN.visible = false;
+
+    console.log(GLOBALS.PAINT_GUN)
+    console.log(GLOBALS.GUN)
 
     if (GLOBALS.LOADED_LEVEL) {
         loadLevelJSON()

@@ -92,12 +92,17 @@ function addItem(found, loaded) {
                 var item = box;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
                 var item = GLOBALS.GUN_CLONE.clone();
+                item.name = "portal_gun";
                 const camera = GLOBALS.MAIN_CAMERA.clone();
                 camera.position.set(0, 0, 0)
                 camera.rotation.set(0, 0, 0)
                 item.add(camera);
                 item.camera = camera;
                 window.ttt = camera;
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "paint_gun") {
+                var item = GLOBALS.PAINT_GUN.clone();
+                item.name = "paint_gun";
+                item.visible = true;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
                 const box = new Object3D()
                 var item = box;
@@ -317,7 +322,12 @@ function addItem(found, loaded) {
                 item.position.y += 0.65;
                 GLOBALS.ITEMS_ADDED.add(item);
                 GLOBALS.PORTAL_GUN_BOX.push(item);
-            } else if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "paint_gun") {
+                item.scale.set(1, 1, 1);
+                item.position.y += 0.65;
+                GLOBALS.ITEMS_ADDED.add(item);
+                GLOBALS.PORTAL_GUN_BOX.push(item);
+            }else if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
                 GLOBALS.ITEMS_ADDED.add(item);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
 

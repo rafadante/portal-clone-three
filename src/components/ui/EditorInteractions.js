@@ -443,11 +443,11 @@ $("body").on('click', '#portalable', function () {
             GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].portal;
 
             if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal) {
-                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor = new Color(0xffffff);
+                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor = 0xffffff;
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(0xffffff));
             }
             else {
-                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor = new Color(0x808080);
+                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor = 0x808080;
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(0x808080));
             }
 

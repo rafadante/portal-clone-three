@@ -148,7 +148,9 @@ function updatePhysics() {
             property == "light_bridge" || property == "laser_emitter" || property == "angled_panel" ||
             property == "door" || property == "light" || property == "stripe" || property == "gel_blue" ||
             property == "gel_orange" || property == "laser_field" || property == "fizzler" ||
-            property == "portal_0" || property == "portal_1" || property == "pellet_launcher" || property == "gel_white" ||property == "gel_clear" ||
+            property == "portal_0" || property == "portal_1" || property == "pellet_launcher" ||
+            property == "gel_recharger" ||
+            property == "gel_white" || property == "gel_clear" || property == "gel_reflection" ||
             property == "pellet_catcher" || property == "faith_plate" || property == "gel_purple")
             continue;
 

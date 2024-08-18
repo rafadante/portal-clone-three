@@ -287,6 +287,7 @@ document.addEventListener('keyup', (event) => {
         //headBobActive = false;
 
         tweenCamera(300, GLOBALS.GUN.children[0].position, new Vector3(0, 0, 0))
+        tweenCamera(300, GLOBALS.PAINT_GUN.children[0].position, new Vector3(0, 0, 0))
 
         if (INPUT.crouched) {
             INPUT.crouched = false;

@@ -60,7 +60,7 @@ function raycastSelected(found, event, type) {
             if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem) {
                 $("#delete").css("display", "block");
 
-                if (!GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel"))
+                if (!GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel_recharger"))
                     $(".gel").css("display", "none");
                 else
                     $(".gel").css("display", "block");
@@ -200,6 +200,10 @@ function raycastSelected(found, event, type) {
 
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("angled_panel")) {
                     $(".angled_panel").css("display", "block");
+                }
+
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel_recharger")) {
+                    $(".gel_recharger").css("display", "block");
                 }
             } else {
                 $(".gel").css("display", "block");
@@ -372,7 +376,7 @@ function raycastSelected(found, event, type) {
 
             for (var i = 0; i < GLOBALS.SELECTED_ID_ORANGE.length; i++) {
                 if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID_ORANGE[i].id_instanced].planeColor)
-                    GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID_ORANGE[i].id_instanced, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID_ORANGE[i].id_instanced].planeColor);
+                    GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID_ORANGE[i].id_instanced, new Color(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID_ORANGE[i].id_instanced].planeColor));
             }
 
             GLOBALS.SELECTED_ID_ORANGE = [];
@@ -437,7 +441,7 @@ function removeSelection() {
     for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
 
         if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor) {
-            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor);
+            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor));
 
             GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
         }

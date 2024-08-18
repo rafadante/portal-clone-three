@@ -26,7 +26,7 @@ function initPost() {
     });
     GLOBALS.COMPOSER.addPass(new RenderPass(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA));
 
-    const renderPass = new RenderPass(GLOBALS.GUN, GLOBALS.PORTAL_GUN_CAMERA);
+    const renderPass = new RenderPass(GLOBALS.GUN_GROUP, GLOBALS.PORTAL_GUN_CAMERA);
     renderPass.clearColor = new Color(1, 1, 1);
     renderPass.clearAlpha = 0;
     renderPass.clearPass.enabled = true;
