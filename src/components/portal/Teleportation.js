@@ -227,6 +227,14 @@ function teleportationState() {
 
                     if (dd == 0) {
 
+                        if(GLOBALS.CURRENT_ITEM){
+                            GLOBALS.CURRENT_ITEM.body.collisionResponse = 0;
+                            setTimeout(() => {
+                                GLOBALS.CURRENT_ITEM.body.collisionResponse = 1;
+                            }, 100);
+                        }
+                        
+
                         //AUDIO.PORTAL_ENTER.pause();
                         AUDIO.PORTAL_ENTER.currentTime = 0;
                         play(AUDIO.PORTAL_ENTER)

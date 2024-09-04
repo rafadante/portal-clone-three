@@ -15,7 +15,7 @@ GLOBALS.UNIFORMS_TRACTOR_BEAM = {
     },
     iColor: {
         type: 'v3',
-        value: new Vector3(0.0, 3.5, 7.5)
+        value: new Vector3(0.02, 0.5, 0.95)
     },
 };
 
@@ -30,7 +30,7 @@ GLOBALS.UNIFORMS_TRACTOR_BEAM_ORANGE = {
     },
     iColor: {
         type: 'v3',
-        value: new Vector3(10.0, 5.0, 0.0)
+        value: new Vector3(0.95, 0.45, 0.02)
     }
 };
 

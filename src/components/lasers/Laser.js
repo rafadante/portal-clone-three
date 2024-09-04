@@ -58,7 +58,7 @@ function laserEmitterRaycast(object, update, rayItem, index) {
 
     const geometry = new CylinderGeometry(0.01, 0.01, 1, 8, 1, true);
     const laser = new Mesh(geometry, new MeshBasicMaterial({
-        color: new Color(10, 0, 0)
+        color: new Color(1, 0, 0)
     }));
     laser.translateY(0.5);
 
@@ -82,7 +82,7 @@ function laserEmitterRaycast(object, update, rayItem, index) {
 function addLaserToCube(cube) {
     const geometry = new CylinderGeometry(0.01, 0.01, 1, 8, 1, true);
     const laser = new Mesh(geometry, new MeshBasicMaterial({
-        color: new Color(10, 0, 0)
+        color: new Color(1, 0, 0)
     }));
     laser.translateY(0.5);
 

@@ -19,10 +19,10 @@ import {
 var visited = {};
 var shapes = [];
 var scene = new Group();
-var dgraph,lineFollow,count;
+var dgraph, lineFollow, count;
 var isDrawStart = false;
 
-function findPath(ini, target, found,found2) {
+function findPath(ini, target, found, found2) {
 
     scene = new Group();
     shapes = [];
@@ -106,7 +106,7 @@ function findPath(ini, target, found,found2) {
         scene.getObjectByName(target.x + '/' + target.y + '/' + target.z).id, side, found, found2)
 }
 
-function path2(dgraph, start, end, side,found,found2) {
+function path2(dgraph, start, end, side, found, found2) {
 
     var shortestpath = dgraph.findShortestPath(start, end);
 
@@ -209,10 +209,9 @@ function path2(dgraph, start, end, side,found,found2) {
     const numberOfCircles = totalLength * 4;
 
     // Create circles evenly spaced along the path
-    const circleGeometry = new SphereGeometry(0.04, 16,8);
+    const circleGeometry = new SphereGeometry(0.04, 16, 8);
     const circleMaterial = new MeshBasicMaterial({
         color: new Color(0, 0.7, 1.0),
-        emissiveIntensity: 100
     });
 
     for (let i = 0; i < numberOfCircles; i++) {
@@ -261,7 +260,9 @@ function path2(dgraph, start, end, side,found,found2) {
 
     var circlePAth = new Mesh(mergedGeometry, circleMaterial);
 
-    GLOBALS.SCENE_CHILDREN.add(circlePAth);
+    if (found2.instancedName != "trigger_area")
+        GLOBALS.SCENE_CHILDREN.add(circlePAth);
+
     //GLOBALS.SELECTED_FOR_CONNECTION.circle = circlePAth;
 
     GLOBALS.CONNECTIONS.push({
@@ -451,6 +452,6 @@ var Graph = (function (undefined) {
 
 })();
 
-export{
+export {
     findPath
 }

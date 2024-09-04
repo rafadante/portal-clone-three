@@ -58,6 +58,7 @@ import {
 } from './Globals.js';
 import { teleportationState } from './components/portal/Teleportation.js';
 import { hideMaterial } from "./Utils.js";
+//import { updatedGelGun } from "./components/portal/CreatePortal.js";
 
 //VARIABLES
 var angleHolder = 0;
@@ -214,6 +215,7 @@ function render(time) {
     updateEvents();
     TWEEN.update();
     animatePortal();
+    //updatedGelGun()
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {
         if (GLOBALS.CAMERAS[i].fixed) {
@@ -236,15 +238,15 @@ function render(time) {
     GLOBALS.RENDERER.localClippingEnabled = false;
     GLOBALS.RENDERER.clippingPlanes = [];
 
-    GLOBALS.COMPOSER.render();
+    //GLOBALS.COMPOSER.render();
     //GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
     //GLOBALS.COMPOSER2.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
-    /*GLOBALS.RENDERER.autoClear = false;
+    GLOBALS.RENDERER.autoClear = false;
     GLOBALS.RENDERER.clear();
     GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
     document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
     GLOBALS.RENDERER.clearDepth()
-    GLOBALS.RENDERER.render(GLOBALS.GUN, GLOBALS.PORTAL_GUN_CAMERA);*/
+    GLOBALS.RENDERER.render(GLOBALS.GUN_GROUP, GLOBALS.PORTAL_GUN_CAMERA);
 
     if (statsBegin)
         GLOBALS.STATS.end();

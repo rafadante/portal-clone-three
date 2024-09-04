@@ -62,7 +62,7 @@ GLOBALS.UNIFORMS_LASER_FIELD = {
     },
     iColor: {
         type: 'v3',
-        value: new Vector3(25.0, 0.0, 0.0)
+        value: new Vector3(1.0, 0.0, 0.0)
     },
 };
 

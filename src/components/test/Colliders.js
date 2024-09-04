@@ -141,7 +141,8 @@ function fizzlerTrigger(body) {
             deletePortal(0)
             deletePortal(1)
             GLOBALS.PORTAL_BOX = [];
-        } else if (e.body.name == "sphere" || e.body.name == "cube" || e.body.name == "radio" || e.body.name == "cube_2") {
+        } else if (e.body.name == "sphere" || e.body.name == "cube" ||
+            e.body.name == "radio" || e.body.name == "cube_2" || e.body.name == "laser_cube") {
             //CREATE A CLONE TO APPLY DISSOLVE SHADER
             const clone = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.name).scene.clone();
             clone.position.set(e.body.position.x, e.body.position.y, e.body.position.z);

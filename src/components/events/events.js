@@ -548,7 +548,6 @@ function laserReceiverTrigger(obj, state, catcher) {
       holder['to'].item.active = false;
     }
   }
-
 }
 
 export {

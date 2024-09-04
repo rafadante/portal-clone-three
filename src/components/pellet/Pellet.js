@@ -52,7 +52,7 @@ function addPelletBall(item) {
 
     //
     const light = new PointLight(color, 0.5, 3);
-    energyBall.add(light)
+    //energyBall.add(light)
 
     const energyBallClone = energyBall.clone();
     energyBallClone.visible = false;
@@ -83,7 +83,7 @@ function addPelletBall(item) {
 
     ball.addEventListener("collide", function (event) {
 
-        if (!event.target.pellet.active)
+        if (!event.target.pellet.active || event.body.name== "fizzler")
             return;
 
         play(event.target.sound.audio);
@@ -142,7 +142,7 @@ function addPelletBall(item) {
     pellets.push(energyBall);
 
     //
-    addPositionalAudio('pelletHit', ball, false, false, false, 20);
+    addPositionalAudio('pelletHit', ball, false, false, false, 10);
 }
 
 function addPelletCatcher(item) {

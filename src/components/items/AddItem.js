@@ -36,6 +36,7 @@ import {
     targetFaithPlateEnd,
     targetFaithPlateUpdate
 } from '../faithPlate/FaithPlate.js';
+import { gelRecharger } from '../gels/PaintingGun.js';
 
 var itemCount = 0;
 
@@ -594,6 +595,9 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
 
         targetFaithPlateUpdate(dummy)
         targetFaithPlateEnd(dummy, userDataLoadedItem.height);
+    }else if (GLOBALS.ITEM_HOLDED_NAME == "gel_recharger") {
+        item.userData.gel = userDataLoadedItem.gel;
+        gelRecharger(item.userData.gel, item)
     }
 }
 

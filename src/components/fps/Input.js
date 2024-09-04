@@ -253,7 +253,7 @@ function controlsLock() {
     GLOBALS.POINTER_CONTROLS.pointerSpeed = 0.5;
 
     GLOBALS.POINTER_CONTROLS.addEventListener('lock', function () {
-        //play(AUDIO.AMBIENT)
+        play(AUDIO.AMBIENT)
         document.getElementById('blocker').style.display = 'none';
         GLOBALS.PAUSED = false;
 

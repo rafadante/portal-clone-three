@@ -15,7 +15,7 @@ GLOBALS.UNIFORMS_LIGHT_BRIDGE = {
 }
 
 GLOBALS.MATERIAL_LIGHT_BRIDGERS = new MeshBasicMaterial({
-    color: new Color(0, 1.5, 2),//0, 0.75, 1
+    color: new Color(0, 0.75, 1),//0, 0.75, 1
     side: DoubleSide,
     transparent: true,
     blending: AdditiveBlending,
@@ -45,6 +45,9 @@ GLOBALS.MATERIAL_LIGHT_BRIDGERS = new MeshBasicMaterial({
           //a = max(a, scanLine);
           
           diffuseColor.a = a;
+
+            #include <tonemapping_fragment>
+            #include <colorspace_fragment>
           
           `
         );

@@ -56,8 +56,8 @@ jointBody = new CANNON.Body({
     mass: 0
 })
 jointBody.addShape(jointShape)
-jointBody.collisionFilterGroup = 0
-jointBody.collisionFilterMask = 0
+jointBody.collisionFilterGroup = 0;
+jointBody.collisionFilterMask = 0;
 world.addBody(jointBody)
 
 // Movement plane when dragging
@@ -106,6 +106,24 @@ function updatePhysics() {
         //TO AVOID THE HOLDING OBJECT TO GO OFF WALLS, DETECT IF THE CAMERA IS CLOSE TO A WALL
         //IF TRUE, PLACE THE HOLDING ITEM AT A FIXED POSITION
         var intersectWall = raycaster.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
+        if (intersectWall.length > 0) {//&& !GLOBALS.CURRENT_ITEM.body.teleportingHolding && !ff
+
+            if (intersectWall[0].distance < 1.25 && !portalInFront) {
+
+                var point = intersectWall[0].point;
+
+                var pLocal = new Vector3(0, 0, -1);
+                var pWorld = pLocal.applyMatrix4(GLOBALS.MAIN_CAMERA.matrixWorld);
+                var dir = pWorld.sub(GLOBALS.MAIN_CAMERA.position).normalize();
+
+                point.add(dir.clone().multiplyScalar(-GLOBALS.CURRENT_ITEM.body.offset));
+                hitPoint = point;
+
+                GLOBALS.CURRENT_ITEM.body.position.copy(point);
+            }
+        }
+
+        var intersectWall = raycaster.intersectObjects(window.glass);
         if (intersectWall.length > 0) {//&& !GLOBALS.CURRENT_ITEM.body.teleportingHolding && !ff
 
             if (intersectWall[0].distance < 1.25 && !portalInFront) {

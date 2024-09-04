@@ -63,17 +63,21 @@ function getGelColor(color) {
 }
 
 $("body").on('click', '.gel_recharger-type', function () {
-    $("#gel_recharger-type").find(".title").text("Gel type: " + $(this).data("gel"))
-    $("#gel-type").data("gel", $(this).data("gel"))
-
-    console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item)
-
-    const item = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item;
-    item.userData.gel = $(this).data("gel");
-
-    const instanced = GLOBALS.ITEMS_ADDED.getObjectByName("gel_recharger");
-    instanced.setColorAt(item.userData.idInstanced, getGelColor($(this).data("gel")));
-    instanced.instanceColor.needsUpdate = true;
+    gelRecharger( $(this).data("gel"),GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item)
 });
 
-export { shootGel, fillPaintingGun }
+function gelRecharger(gel, item){
+    $("#gel_recharger-type").find(".title").text("Gel type: " + gel)
+    $("#gel-type").data("gel", gel)
+
+    //console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item)
+
+    //const item = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item;
+    item.userData.gel = gel;
+
+    const instanced = GLOBALS.ITEMS_ADDED.getObjectByName("gel_recharger");
+    instanced.setColorAt(item.userData.idInstanced, getGelColor(gel));
+    instanced.instanceColor.needsUpdate = true;
+}
+
+export { shootGel, fillPaintingGun, gelRecharger }

@@ -32,6 +32,8 @@ import { getPlaneByName } from '../../Utils.js';
 import { updateMaterialRepeat } from '../materials/Materials.js';
 import { fizzlerTrigger } from '../test/Colliders.js';
 
+window.glass = [];
+
 function createLightBridges(item, rayItem, object, instanced, update, index) {
 
     var obj = new Object3D();
@@ -80,7 +82,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     if (item == "light_bridge") {
         var geometry = new BoxGeometry(0.9, intersects[0].distance, 0.025);
     } else if (item == "glass") {
-        var geometry = new PlaneGeometry(2, intersects[0].distance);
+        var geometry = new BoxGeometry(2, intersects[0].distance, 0.025);
     } else if (item == "laser_field" || item == "fizzler") {
         
 
@@ -194,6 +196,8 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
                 intersects[0].distance / 3
             )*/
         }
+
+        window.glass.push(plane)
     }
 
     if (!object.userData.state)
@@ -221,6 +225,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
                 }
             });
         } else if (item == "fizzler") {
+            box.name = "fizzler";
             fizzlerTrigger(box);
         }
     } else if (item == "tractor_beam") {

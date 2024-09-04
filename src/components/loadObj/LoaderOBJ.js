@@ -746,6 +746,7 @@ function loadLaserCubeManager(scene) {
     item.userData.wall = true;
     item.userData.ground = false;
     item.userData.ceiling = true;
+    item.scene = scene.children[0];
     item.clone = scene;
     item.clone.children[0].material.envMap = GLOBALS.ENV_MAP;
     item.clone.children[0].material.envMapIntensity = 0.5;

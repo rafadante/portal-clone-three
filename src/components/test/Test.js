@@ -57,7 +57,7 @@ function viewFPS() {
 
     setTimeout(() => {
 
-        initPost();
+        //initPost();
         manageInstances();
 
         addPositionalAudio('audio-door', GLOBALS.EXIT_DOOR, false, false, true, 8);
