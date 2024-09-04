@@ -42,6 +42,9 @@ function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, vo
 
     var audioClone = document.getElementById(path).cloneNode(true);
     audioClone.id = "";
+
+    document.body.appendChild(audioClone);
+
     sound.setMediaElementSource(audioClone);
     sound.setRefDistance(1);
     sound.setMaxDistance(maxDis);
@@ -81,6 +84,8 @@ function addAudio(obj, name) {
         }
     }
 }
+
+const radio = new Audio('audio/radio2.mp3');
 
 const ambient = new Audio('audio/ambient.mp3')
 ambient.volume = 0.15;
