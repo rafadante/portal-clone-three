@@ -37,6 +37,7 @@ function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, vo
         GLOBALS.GUN.add(listener);
 
         console.log(listener)
+        listener.context.resume();
     }
 
     // create the PositionalAudio object (passing in the listener)
