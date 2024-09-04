@@ -114,11 +114,30 @@ const AddGoo = function (found, loading) {
             new Vector3(7,0,7),
             new Vector3(7,0,3)]*/
     } else {
-        goo = found;
+
+        for (var i = 0; i < found.length; i++) {
+
+            var userData = found[i];
+
+            console.log(userData)
+
+            if (userData.side != "down") {
+                continue;
+            } else {
+
+                goo = [];
+
+                if (!userData.hasGoo)
+                    checkSides(userData)
+            }
+
+        }
     }
 
     const geometry = new PlaneGeometry(2, 2);
     const geometries = [];
+
+    console.log(goo)
 
     window.ooo = new Mesh(geometry, new MeshBasicMaterial())
     window.ooo.position.copy(goo[0])

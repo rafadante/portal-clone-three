@@ -641,7 +641,7 @@ var GLOBALS = {
     BLOCK_PLAYER_MOVE: false,
     FAITH_PLATE_TARGET: null,
     GROUP_LINE_TRAGECTORY: new Group(),
-    GOO_REFLECTIONS: true,
+    GOO_REFLECTIONS: false,
     CUSTOM_GRAVITY: [],
     SPEED: 1,
     HEAD_BOB_SPEED: 5,

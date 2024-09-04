@@ -405,6 +405,8 @@ function loadLevel(data) {
             console.log("ttttttttttt")
             addTileGel(data[i], data[i].gelType, data[i].planeColor, data[i].id_instanced);
         }
+
+        data[i].hasGoo = false;
     }
 
     for (var i = 0; i < data.length; i++) {
@@ -419,6 +421,8 @@ function loadLevel(data) {
                     data[i].itemName.split('-')[0] != "dispenser") {
 
                     const state = data[i].state;
+
+                    console.log(GLOBALS.PLANE_USER_DATA[i])
 
                     addItem(GLOBALS.PLANE_USER_DATA[i], true)
 

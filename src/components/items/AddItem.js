@@ -45,8 +45,25 @@ function addItem(found, loaded) {
     if (!GLOBALS.ITEM_CUBE.place && !loaded)
         return
 
-    if (GLOBALS.ITEM_HOLDED_NAME == "goo" && !loaded) {
-        AddGoo(found, false);
+    console.log(found)
+
+    if (GLOBALS.ITEM_HOLDED_NAME == "goo" || (loaded && found.itemName == "goo")) {
+
+        if (loaded)
+            userData = found;
+        else
+            userData = GLOBALS.PLANE_USER_DATA[found[0].instanceId];
+
+        userData.hasItem = true;
+        userData.itemName = "goo";
+
+
+        if (loaded) {
+            var ar = [found]
+            AddGoo(ar, true);
+        } else
+            AddGoo(found, false);
+
         return;
     }
 
@@ -145,7 +162,7 @@ function addItem(found, loaded) {
                 //item.getObjectByName("warning").visible = false;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
                 var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
-            }else {
+            } else {
                 var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);
                 var item = new Object3D();
                 //item.userData = instanced.userData;
@@ -328,7 +345,7 @@ function addItem(found, loaded) {
                 item.position.y += 0.65;
                 GLOBALS.ITEMS_ADDED.add(item);
                 GLOBALS.PORTAL_GUN_BOX.push(item);
-            }else if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "glass") {
                 GLOBALS.ITEMS_ADDED.add(item);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
 
@@ -595,7 +612,7 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
 
         targetFaithPlateUpdate(dummy)
         targetFaithPlateEnd(dummy, userDataLoadedItem.height);
-    }else if (GLOBALS.ITEM_HOLDED_NAME == "gel_recharger") {
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_recharger") {
         item.userData.gel = userDataLoadedItem.gel;
         gelRecharger(item.userData.gel, item)
     }
