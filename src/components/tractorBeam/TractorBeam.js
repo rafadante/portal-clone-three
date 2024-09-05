@@ -56,6 +56,7 @@ function tractorBeam() {
                         d.tractor = j;
                         d.tractorID = GLOBALS.TRACTOR_BEAM[j].id;
                         GLOBALS.TRACTOR_BEAM[j].inTractor = true;
+                        GLOBALS.TRACTOR_BEAM[j].body = d;
                         d.mass = 0;
 
                         // Velocity
@@ -109,6 +110,7 @@ function tractorBeam() {
 }
 
 function outOfTheTractor(d, j) {
+    
     if (d.name == "player") d.mass = 50;
     else d.mass = 5;
 
@@ -125,4 +127,4 @@ function outOfTheTractor(d, j) {
     }
 }
 
-export { tractorBeam }
+export { tractorBeam,outOfTheTractor }

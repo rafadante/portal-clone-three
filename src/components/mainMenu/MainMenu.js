@@ -89,7 +89,15 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
 
 var level;
 $("body").on('click', '#option-single-load', function () {
-    fetch("./levels/current.json")
+
+    if (!localStorage.getItem("level"))
+        window.currentLevel = 1;
+    else
+        window.currentLevel = parseInt(localStorage.getItem("level"));
+
+    console.log(window.currentLevel)
+
+    fetch("./levels/" + window.currentLevel + ".json")
         .then(response => response.json())
         .then(json => {
             level = json;
@@ -107,7 +115,46 @@ $("body").on('click', '#option-single-load', function () {
         });
 })
 
+
+if (localStorage.getItem("load") == "true") {
+
+    $("#loading-parent").css("opacity", "1");
+    $("#loading-parent").css("pointer-events", "all");
+
+    localStorage.setItem("load", "false");
+
+    setTimeout(() => {
+
+        window.currentLevel = parseInt(localStorage.getItem("level"));
+        console.log(window.currentLevel);
+
+        init();
+
+        fetch("./levels/" + window.currentLevel + ".json")
+            .then(response => response.json())
+            .then(json => {
+                level = json;
+                GLOBALS.LOADED_LEVEL = true;
+
+                startLevel();
+                /*setTimeout(() => {
+                    loadLevel(json[0]);
+    
+                    for (var i = 0; i < json[1].length; i++) {
+                        AddGoo(json[1][i], true);
+                    }
+                }, 3000);*/
+                //Do something with json variable
+            });
+    }, 1000);
+}
+
+
+//localStorage.setItem("level", 1);
+
 function loadLevelJSON() {
+
+    console.log(level)
 
     $("#portal-gun-select").val(level[0]).change();
     loadLevel(level[1])
@@ -119,6 +166,11 @@ function loadLevelJSON() {
     }*/
 
     viewFPS();
+
+    $("#option-single").css("display", "none");
+    $("#option-community").css("display", "none");
+    $("#option-about").css("display", "none");
+    $("#back-editor").css("display", "none");
 }
 
 $("body").on('click', '#option-community-build', function () {

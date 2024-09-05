@@ -160,6 +160,16 @@ function levelEnteredFunction() {
                     if (GLOBALS.BOX_BODY[i].item.userData.opened)
                         dispenserSpawn(GLOBALS.BOX_BODY[i].item);
                 }
+
+                if (GLOBALS.PORTAL_GUN_INITIATE == "none") {
+                    document.getElementById("warning-game").innerHTML = "Press E to interact with objects!";
+                    document.getElementById("warning-game").style.opacity = "1";
+
+                    setTimeout(() => {
+                        document.getElementById("warning-game").style.opacity = "0";
+                    }, 7000);
+                }
+
             }, 1000);
             stateDoor(1000, false, true, GLOBALS.ENTER_DOOR)
         }

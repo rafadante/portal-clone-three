@@ -73,6 +73,17 @@ function updateEvents() {
             GLOBALS.PAINT_GUN.visible = false;
             GLOBALS.GUN_MODE = "portal";
 
+            if (GLOBALS.PORTAL_GUN_INITIATE == "left")
+              document.getElementById("warning-game").innerHTML = "Press Mouse Left to create Orange Portals!";
+            else
+              document.getElementById("warning-game").innerHTML = "Press Mouse Right to create Blue Portals!";
+
+            document.getElementById("warning-game").style.opacity = "1";
+
+            setTimeout(() => {
+              document.getElementById("warning-game").style.opacity = "0";
+            }, 7000);
+
           } else if (GLOBALS.PORTAL_GUN_BOX[i].item.name.includes("paint_gun")) {
             GLOBALS.GUN.visible = false;
             GLOBALS.PAINT_GUN.visible = true;
@@ -137,11 +148,12 @@ function updateEvents() {
 
               //PLAY AUDIO POSITIVE
               if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area")) {
-                addPositionalAudio('audio-button-positive', GLOBALS.CONNECTIONS[i]['from'], true, false, true, 8);
-                var soundHolder = GLOBALS.CONNECTIONS[i]['from'];
-                setTimeout(() => {
-                  GLOBALS.SCENE_FPS.remove(soundHolder.sound);
-                }, 1500);
+                AUDIO.POSITIVE.play();
+              } else {
+                if (d.name == "player") {
+                  GLOBALS.PLAYER.spawnPosition = GLOBALS.CONNECTIONS[i]['from'].position;
+                  GLOBALS.PLAYER.spawnPosition.y += 0.5;
+                }
               }
 
               //Manage Door Trigger
@@ -266,6 +278,9 @@ function resetAll() {
 function interactWithItem() {
 
   raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
+
+  var intersectsWall = raycaster2.intersectObjects(window.glass);
+
   var intersects = raycaster2.intersectObjects(GLOBALS.INTERACTIVE);
 
   if (GLOBALS.HOLDING_ITEM) {
@@ -293,6 +308,15 @@ function interactWithItem() {
 
   } else if (intersects.length > 0) {
 
+    if (intersectsWall.length > 0) {
+      if (intersectsWall[0].distance < intersects[0].distance) {
+        AUDIO.PICK_FAIL.pause();
+        AUDIO.PICK_FAIL.currentTime = 0;
+        play(AUDIO.PICK_FAIL)
+        return;
+      }
+    }
+
     if (intersects[0].object.name == "pedestal_button") {
 
       if (intersects[0].distance < 1) {
@@ -317,11 +341,7 @@ function interactWithItem() {
               //GLOBALS.BATCHED_ORANGE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, true);
 
               //PLAY AUDIO POSITIVE
-              addPositionalAudio('audio-button-positive', GLOBALS.CONNECTIONS[i]['from'], true, false, true, 8);
-              var soundHolder = GLOBALS.CONNECTIONS[i]['from'];
-              setTimeout(() => {
-                GLOBALS.SCENE_FPS.remove(soundHolder.sound);
-              }, 1500);
+              AUDIO.POSITIVE.play();
 
               //Manage Door Trigger
               if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
@@ -473,11 +493,7 @@ function laserReceiverTrigger(obj, state, catcher) {
             GLOBALS.LASER_TRIGGERS.push(obj);
 
           //PLAY AUDIO POSITIVE
-          addPositionalAudio('audio-button-positive', GLOBALS.CONNECTIONS[i]['from'], true, false, true, 8);
-          var soundHolder = GLOBALS.CONNECTIONS[i]['from'];
-          setTimeout(() => {
-            GLOBALS.SCENE_FPS.remove(soundHolder.sound);
-          }, 1500);
+          AUDIO.POSITIVE.play();
 
           //Manage Door Trigger
           if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||

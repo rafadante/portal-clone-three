@@ -643,8 +643,24 @@ function addCollidersToCorridor(mesh) {
 
     if (mesh.name.includes("collider_door")) {
         GLOBALS.BODY_ELEVATOR = wall;
+
+        wall.addEventListener("collide", function (event) {
+            if (GLOBALS.LEVEL_ENTERED && !finished && GLOBALS.LOADED_LEVEL) {//
+                finished = true;
+                GLOBALS.POINTER_CONTROLS.unlock();
+                document.getElementById("next-map").style.display = "flex";
+
+                if(window.currentLevel == 8){
+                    document.getElementById("next-map-btn").style.display = "none";
+                    document.getElementById("congrats").style.display = "block";
+                    
+                }
+            }
+        })
     }
 }
+
+var finished = false;;
 
 export {
     colliderItemManager,

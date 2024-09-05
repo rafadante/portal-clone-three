@@ -237,12 +237,12 @@
             src="../assets/ui/items/faith_plate.png" />
 
           <!--GELS-->
-          <!--<img
+          <img
             data-content="Blue will cause the player to bounce. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
             data-allowconnection="true" data-rotate="false" data-floor="false" data-ceiling="true" data-walls="false"
             data-title="GEL BLUE" class="item" data-name="gel_blue" src="../assets/ui/items/gel_blue.png" id="gel_blue"
             data-instanced="true" />
-
+<!--
           <img
             data-content="Orange will give the player increased speed. Whenever Gel is placed a dropper will come with it which will steadily drop gel from its dispenser. The properties menu allows you to change the flow, and you can disable the dropper if you'd like."
             data-allowconnection="true" data-rotate="false" data-floor="false" data-ceiling="true" data-walls="false"
@@ -1386,10 +1386,6 @@
     <source src="./audio/tbeam_pos_lp_01.wav" type="audio/wav">
   </audio>
 
-  <audio id="audio-button-positive">
-    <source src="./audio/button_synth_positive_01.wav" type="audio/wav">
-  </audio>
-
   <audio id="audio-button-negative">
     <source src="./audio/button_synth_negative_01.wav" type="audio/wav">
   </audio>
@@ -1405,6 +1401,45 @@
   <audio id="pelletHit" preload="auto">
     <source src="./audio/pelletHit.wav" type="audio/wav">
   </audio>
+
+  <span id="warning-game" style="    position: absolute;
+  background: white;
+  color: black;
+  width: auto;
+  /* height: 50px; */
+  top: 10px;
+  left: 40%;
+  z-index: 1000;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50px;
+  filter: drop-shadow(2px 4px 6px black);
+  font-weight: bolder;
+  padding: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.5s;
+">Left Mouse Spawn Orange Portal</span>
+
+<div id="next-map" style="    width: 100%;
+height: 100%;
+background: #000000ad;
+position: absolute;
+z-index: 100000;
+top: 0px;
+display: none;
+justify-content: center;
+align-items: center;">
+  <button id="next-map-btn" style="width: 100px;
+  height: 40px;
+  font-size: 16px;
+  font-weight: bolder;
+  filter: drop-shadow(2px 4px 6px black);">NEXT</button>
+  <span id="congrats" style="display: none;font-size: 100px;
+    font-weight: bolder;">Thanks For Playing!</span>
+</div>
 
 </body>
 

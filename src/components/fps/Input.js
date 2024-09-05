@@ -140,6 +140,8 @@ if (GLOBALS.MOBILE) {
     controlsLock();
 }
 
+var holdDown = false;
+
 document.addEventListener('keydown', (event) => {
 
     //if (event.code == "ControlLeft" && !crouched)
@@ -153,8 +155,11 @@ document.addEventListener('keydown', (event) => {
         if (event.code == "ControlLeft" && !INPUT.crouched) {
             INPUT.crouched = true;
             Crouch(-0.25);
-        } else if (event.code == "KeyE")
+        } else if (event.code == "KeyE" && !holdDown){
+            holdDown = true;
             interactWithItem();
+        }
+            
     }
 });
 
@@ -276,6 +281,8 @@ function controlsLock() {
 }
 
 document.addEventListener('keyup', (event) => {
+
+    holdDown = false;
 
     if (GLOBALS.FPS_MODE && allowEnterFPS) {
 

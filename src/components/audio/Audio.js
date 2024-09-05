@@ -85,12 +85,14 @@ function addAudio(obj, name) {
     }
 }
 
+const positive = new Audio('audio/button_synth_positive_01.wav');
+
 const ambient = new Audio('audio/ambient.mp3')
 ambient.volume = 0.15;
 ambient.loop = true;
 
 const walk = new Audio('audio/tile1.wav')
-walk.volume = 0;//0.25
+walk.volume = 0.2;//0.25
 walk.loop = true;
 walk.pause();
 
@@ -106,7 +108,7 @@ walkLightBridde.playbackRate = 1.5;
 walkLightBridde.pause();
 
 const jump = new Audio('audio/p2_fs_jump_land_tile_01.wav')
-jump.volume = 0;//0.3
+jump.volume = 0.2;//0.3
 
 const playerInsideTractorBeam = new Audio('audio/player_enter_tbeam_lp_01.wav')
 playerInsideTractorBeam.volume = 0.5;
@@ -175,7 +177,8 @@ var AUDIO = {
     AERIAL: aerial,
     WALK_NORMAL: walk,
     WALK_PAINT: walkGel,
-    PROPULSION: propulsion
+    PROPULSION: propulsion,
+    POSITIVE: positive
 }
 
 export {

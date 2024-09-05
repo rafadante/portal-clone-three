@@ -242,7 +242,7 @@ function gelTrigger(event) {
         // Apply impulse only if the object is moving downwards
         if (event.target.impactVelocity < 0) {
             // The impulse should reverse the current downward velocity
-            const impulseStrength = -2 * event.target.mass * event.target.impactVelocity;
+            const impulseStrength = -2.1 * event.target.mass * event.target.impactVelocity;
 
             var impulse = new CANNON.Vec3(
                 impulseStrength * normalContact.x,

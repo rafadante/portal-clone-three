@@ -521,7 +521,7 @@ function manageItemVariables(item, userData, instanced) {
         item.userData.triggers = GLOBALS.LASER_EMITTER_TRIGGER;
         laserEmitterPosition(item, item.userData.triggers, $("#laser_emitter-trigger"), "laser_emitter");
     } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_receiver") {
-        item.userData.state = true;
+        item.userData.state = false;
         item.userData.triggers = GLOBALS.LASER_RECEIVER_TRIGGER;
         laserEmitterPosition(item, item.userData.triggers, $("#laser_receiver-trigger"), "laser_receiver");
     }
@@ -597,7 +597,7 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         item.userData.triggers = userDataLoadedItem.triggers;
         laserEmitterPosition(item, item.userData.triggers, $("#laser_emitter-trigger"), "laser_emitter");
     } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_receiver") {
-        item.userData.state = userDataLoadedItem.state;
+        item.userData.state = false;//userDataLoadedItem.state
         item.userData.triggers = userDataLoadedItem.triggers;
         laserEmitterPosition(item, item.userData.triggers, $("#laser_receiver-trigger"), "laser_receiver");
     } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {

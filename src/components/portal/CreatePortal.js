@@ -6,12 +6,16 @@ import { Portal } from '../portal/Portal.js';
 import { GLOBALS } from '../../Globals.js';
 import { AUDIO, play } from '../audio/Audio.js';
 import { fillPaintingGun, shootGel } from '../gels/PaintingGun.js';
+import { outOfTheTractor } from '../tractorBeam/TractorBeam.js';
 
 var coords = new Vector3();
 var raycaster2 = new Raycaster();
 var allowPortal = true;
 
 function portalButton(button, auto, camera) {
+
+    if(!GLOBALS.LEVEL_ENTERED)
+        return;
 
 
     if (!auto) {
@@ -404,6 +408,13 @@ function deletePortal(portalIndex) {
     if (GLOBALS.PORTALS[portalIndex].fieldTrigger) {
         const index = GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.indexOf(GLOBALS.PORTALS[portalIndex].fieldTrigger);
         if (index > -1) {
+
+            for (let d of GLOBALS.DYNAMIC_OBJECTS) {
+                if(d.inTractor && d.tractor == index){
+                    outOfTheTractor(d,index)
+                }
+            }
+
             GLOBALS.TRACTOR_BEAM.splice(index, 1);
             GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.splice(index, 1);
         }
