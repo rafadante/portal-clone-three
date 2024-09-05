@@ -424,8 +424,11 @@ function movePlayerTouch(direction, f, value) {
     GLOBALS.PLAYER_MOVING = true;
 }
 
+var pressed = [false,false,false,false,false,false,false,false,false,false]
+
 function joystickAction(gamepad, index, gamepadButton, button) {
-    if (gamepad.buttons[index].value == 1 && !gamepadButton) {
+    if (gamepad.buttons[index].value == 1 && !pressed[index]) {
+
         portalButton(button, null, GLOBALS.MAIN_CAMERA);
 
         /*gamepad.vibrationActuator.playEffect("dual-rumble", {
@@ -435,9 +438,9 @@ function joystickAction(gamepad, index, gamepadButton, button) {
             strongMagnitude: 1.0,
         });*/
 
-        gamepadButton = true;
+        pressed[index] = true;
     } else if (gamepad.buttons[index].value == 0) {
-        gamepadButton = false;
+        pressed[index] = false;
     }
 }
 
