@@ -1,7 +1,8 @@
 import {
   Vector3,
   Color,
-  Raycaster
+  Raycaster,
+  Clock
 } from "three";
 import { GLOBALS } from "../../Globals.js";
 import { stateDoor } from '../door/Door.js';
@@ -35,11 +36,24 @@ var itemHolder = null;
 var coords = new Vector3();
 var raycaster2 = new Raycaster();
 
+let clock = new Clock();
+let delta = 0;
+// 30 fps
+let interval = 1 / 60;
+
 function updateEvents() {
 
   levelEnteredFunction();
-  tractorBeam();
-  pelletUpdate();
+
+  delta += clock.getDelta();
+
+  if (delta > interval) {
+    // The draw or time dependent code are here
+    tractorBeam();
+    pelletUpdate();
+
+    delta = delta % interval;
+  }
 
   var id = 0;
 
