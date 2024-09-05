@@ -33,7 +33,7 @@ const updatePlayer = function (deltaTime) {
     var velocity = 1100;
 
     //ROTATE THE CAMERA WITH TOUCH ON MOBILE
-    if (GLOBALS.MOBILE) {
+    if (GLOBALS.MOBILE && controllerIndex == null) {
         velocity = 900;
         GLOBALS.MAIN_CAMERA.rotation.y += (GLOBALS.TARGET_ROTATION_X - GLOBALS.MAIN_CAMERA.rotation.y) * rotationMobile;
 
@@ -89,7 +89,69 @@ const updatePlayer = function (deltaTime) {
         GLOBALS.PLAYER.applyForce(forward.clone().multiplyScalar(f * 3), GLOBALS.PLAYER.position)
 
     if (!GLOBALS.STOP_TIME && !GLOBALS.GEL_ORANGE && !window.PLAYER_JUMPING_FROM_BLUE_GEL) {
-        if (GLOBALS.MOBILE) {
+
+        var gamepad;
+        if (controllerIndex !== null) {
+
+            gamepad = navigator.getGamepads()[controllerIndex];
+
+            joystickAction(gamepad, 5, gamepadButton5, 1);
+            joystickAction(gamepad, 6, gamepadButton6, 0);
+            joystickAction(gamepad, 7, gamepadButton7, 2);
+
+            if (gamepad.buttons[3].value == 1 && !gamepadButton3) {
+                INPUT.crouched = true;
+                Crouch(-0.25);
+                gamepadButton3 = true;
+                vv = true;
+            } else if (gamepad.buttons[3].value == 0) {
+                if (INPUT.crouched) {
+                    Crouch(0.25);
+                }
+                gamepadButton3 = false;
+                INPUT.crouched = false;
+                if (vv) {
+                    vv = false;
+                }
+            }
+
+            if (gamepad.buttons[1].value == 1 && !gamepadButton1) {
+                interactWithItem();
+                gamepadButton1 = true;
+            } else if (gamepad.buttons[1].value == 0)
+                gamepadButton1 = false;
+
+            joystickGel(gamepad, 12, gamepadButton12, 1, 0)
+            joystickGel(gamepad, 15, gamepadButton15, 2, 0.08)
+
+            // Ajuste esses valores conforme necessário para controlar a sensibilidade dos movimentos
+            const sensitivity = 0.04;  // Sensibilidade do controle
+
+            // Lê os estados dos controles do gamepad
+            const xAxis = gamepad.axes[2];  // Movimento horizontal
+            const yAxis = gamepad.axes[3];  // Movimento vertical
+
+            // Atualiza a orientação da câmera
+            GLOBALS.MAIN_CAMERA.rotation.y -= xAxis * 0.08;
+            GLOBALS.MAIN_CAMERA.rotation.x -= yAxis * 0.04;
+
+            // Limita o movimento vertical entre -PI/2 e PI/2 para evitar que a câmera dê uma volta completa
+            GLOBALS.MAIN_CAMERA.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, GLOBALS.MAIN_CAMERA.rotation.x));
+
+
+            var gamepadPressed = 0;
+
+            if (gamepad.axes[1] < -0.5)
+                movePlayerJoystick(forward, f, movementMultiplier, gamepadPressed)
+            if (gamepad.axes[1] > 0.5)
+                movePlayerJoystick(backward, f, movementMultiplier, gamepadPressed)
+            if (gamepad.axes[0] < -0.5)
+                movePlayerJoystick(left, f, movementMultiplier, gamepadPressed)
+            if (gamepad.axes[0] > 0.5)
+                movePlayerJoystick(right, f, movementMultiplier, gamepadPressed)
+        }
+
+        if (GLOBALS.MOBILE && controllerIndex == null) {
 
             if (INPUT.fwdValue > 0)
                 movePlayerTouch(forward, f, INPUT.fwdValue)
@@ -107,66 +169,6 @@ const updatePlayer = function (deltaTime) {
 
             INPUT.shouldJump = false;
         } else {
-            var gamepad;
-            if (controllerIndex !== null) {
-
-                gamepad = navigator.getGamepads()[controllerIndex];
-
-                joystickAction(gamepad, 5, gamepadButton5, 1);
-                joystickAction(gamepad, 6, gamepadButton6, 0);
-                joystickAction(gamepad, 7, gamepadButton7, 2);
-
-                if (gamepad.buttons[3].value == 1 && !gamepadButton3) {
-                    INPUT.crouched = true;
-                    Crouch(-0.25);
-                    gamepadButton3 = true;
-                    vv = true;
-                } else if (gamepad.buttons[3].value == 0) {
-                    if (INPUT.crouched) {
-                        Crouch(0.25);
-                    }
-                    gamepadButton3 = false;
-                    INPUT.crouched = false;
-                    if (vv) {
-                        vv = false;
-                    }
-                }
-
-                if (gamepad.buttons[1].value == 1 && !gamepadButton1) {
-                    interactWithItem();
-                    gamepadButton1 = true;
-                } else if (gamepad.buttons[1].value == 0)
-                    gamepadButton1 = false;
-
-                joystickGel(gamepad, 12, gamepadButton12, 1, 0)
-                joystickGel(gamepad, 15, gamepadButton15, 2, 0.08)
-
-                // Ajuste esses valores conforme necessário para controlar a sensibilidade dos movimentos
-                const sensitivity = 0.04;  // Sensibilidade do controle
-
-                // Lê os estados dos controles do gamepad
-                const xAxis = gamepad.axes[2];  // Movimento horizontal
-                const yAxis = gamepad.axes[3];  // Movimento vertical
-
-                // Atualiza a orientação da câmera
-                GLOBALS.MAIN_CAMERA.rotation.y -= xAxis * 0.08;
-                GLOBALS.MAIN_CAMERA.rotation.x -= yAxis * 0.04;
-
-                // Limita o movimento vertical entre -PI/2 e PI/2 para evitar que a câmera dê uma volta completa
-                GLOBALS.MAIN_CAMERA.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, GLOBALS.MAIN_CAMERA.rotation.x));
-
-
-                var gamepadPressed = 0;
-
-                if (gamepad.axes[1] < -0.5)
-                    movePlayerJoystick(forward, f, movementMultiplier, gamepadPressed)
-                if (gamepad.axes[1] > 0.5)
-                    movePlayerJoystick(backward, f, movementMultiplier, gamepadPressed)
-                if (gamepad.axes[0] < -0.5)
-                    movePlayerJoystick(left, f, movementMultiplier, gamepadPressed)
-                if (gamepad.axes[0] > 0.5)
-                    movePlayerJoystick(right, f, movementMultiplier, gamepadPressed)
-            }
 
             var posPlayer = new Vector3(GLOBALS.PLAYER.position.x, GLOBALS.PLAYER.position.y, GLOBALS.PLAYER.position.z)
 
@@ -199,7 +201,7 @@ const updatePlayer = function (deltaTime) {
                 jumpPressed = true;
                 GLOBALS.PLAYER.inJump = true;
 
-                if(GLOBALS.PLAYER.jumpVelocity){
+                if (GLOBALS.PLAYER.jumpVelocity) {
                     GLOBALS.PLAYER.linearDamping = 0.01
                     const impulseStrength = -1 * GLOBALS.PLAYER.mass * GLOBALS.PLAYER.jumpVelocity;
                     const impulse = new CANNON.Vec3(
@@ -210,10 +212,10 @@ const updatePlayer = function (deltaTime) {
 
                     GLOBALS.PLAYER.applyImpulse(impulse, GLOBALS.PLAYER.position)
                     GLOBALS.PLAYER.jumpVelocity = null;
-                }else{
+                } else {
                     GLOBALS.PLAYER.applyImpulse(GLOBALS.PLAYER.upVectorThree.clone().multiplyScalar(230), GLOBALS.PLAYER.position)
                 }
-                
+
 
                 blockJump = true;
                 setTimeout(() => {
@@ -228,11 +230,11 @@ const updatePlayer = function (deltaTime) {
 
     updateHeadBob(deltaTime);
 
-    if (GLOBALS.PLAYER_MOVING){
+    if (GLOBALS.PLAYER_MOVING) {
         GLOBALS.GUN.children[0].position.x += Math.sin(INPUT.headBobTimer * GLOBALS.HEAD_BOB_SPEED) * headBobHeight;
         GLOBALS.PAINT_GUN.children[0].position.x += Math.sin(INPUT.headBobTimer * GLOBALS.HEAD_BOB_SPEED) * headBobHeight * 700;
     }
-        
+
 }
 
 var jumpPressed = false;
@@ -424,7 +426,7 @@ function movePlayerTouch(direction, f, value) {
     GLOBALS.PLAYER_MOVING = true;
 }
 
-var pressed = [false,false,false,false,false,false,false,false,false,false]
+var pressed = [false, false, false, false, false, false, false, false, false, false]
 
 function joystickAction(gamepad, index, gamepadButton, button) {
     if (gamepad.buttons[index].value == 1 && !pressed[index]) {
