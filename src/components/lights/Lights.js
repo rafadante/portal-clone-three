@@ -46,7 +46,8 @@ const Lights = function () {
 
     GLOBALS.SPOTLIGHT = spotLight;
 
-    lightGroup.add(spotLight);
+    if (!GLOBALS.MOBILE)
+        lightGroup.add(spotLight);
 
     return lightGroup;
 };
@@ -108,7 +109,8 @@ function testLightsManager() {
                 spotLight.position.y + (dir.z * 10),
                 spotLight.position.z + (dir.y * 10));
 
-            GLOBALS.SCENE_FPS.add(spotLight);
+            if (!GLOBALS.MOBILE)
+                GLOBALS.SCENE_FPS.add(spotLight);
 
             spotLight.target.updateMatrixWorld();
         }
@@ -124,11 +126,15 @@ function testLightsManager() {
             cloneObsRoom.position.copy(GLOBALS.ITEMS_ADDED.children[i].position);
             cloneObsRoom.rotation.copy(GLOBALS.ITEMS_ADDED.children[i].rotation);
 
-            cloneObsRoom.getObjectByName("pointLight").color = new Color(GLOBALS.ITEMS_ADDED.children[i].userData.lightColor);
+            if (cloneObsRoom.getObjectByName("pointLight"))
+                cloneObsRoom.getObjectByName("pointLight").color = new Color(GLOBALS.ITEMS_ADDED.children[i].userData.lightColor);
+
             var light = GLOBALS.SPOTLIGHT.clone();
             cloneObsRoom.add(light);
 
-            light.color = cloneObsRoom.getObjectByName("pointLight").color;
+            if (cloneObsRoom.getObjectByName("pointLight"))
+                light.color = cloneObsRoom.getObjectByName("pointLight").color;
+
             light.intensity = 5;
             light.distance = 12;
             light.position.set(0, -1, -0.5);

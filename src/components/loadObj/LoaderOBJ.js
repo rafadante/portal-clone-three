@@ -211,7 +211,9 @@ function loadWindowManager(scene) {
             child.getWorldPosition(target);
             light.position.copy(target);
             light.translateY(-0.2);
-            scene.add(light);
+
+            if (!GLOBALS.MOBILE)
+                scene.add(light);
         }
 
         if (child.name.includes("image")) {
@@ -279,7 +281,7 @@ function loadGunManager(scene) {
             window.gun_holder = child;
         else if (child.name == "cube_5")
             GLOBALS.PORTAL_GUN_FLASH = child;
-        else if(child.name == "gel_left" || child.name == "gel_right"){
+        else if (child.name == "gel_left" || child.name == "gel_right") {
             child.visible = false;
             child.material = new MeshStandardMaterial();
             child.material.roughness = 0;
@@ -289,20 +291,20 @@ function loadGunManager(scene) {
     });
 
     //LOAD PRPERTIES
-    if(localStorage.getItem("portal_gun_color")){
+    if (localStorage.getItem("portal_gun_color")) {
         var color = hex2rgb(localStorage.getItem("portal_gun_color"));
-        scene.getObjectByName("Object_6").material.color = new Color(color.r/255, color.g/255, color.b/255);
+        scene.getObjectByName("Object_6").material.color = new Color(color.r / 255, color.g / 255, color.b / 255);
     }
 
-    if(localStorage.getItem("portal_gun_roughness")){
+    if (localStorage.getItem("portal_gun_roughness")) {
         scene.getObjectByName("Object_6").material.roughness = localStorage.getItem("portal_gun_roughness");
     }
 
-    if(localStorage.getItem("portal_gun_metalness")){
+    if (localStorage.getItem("portal_gun_metalness")) {
         scene.getObjectByName("Object_6").material.metalnessMap = null;
         scene.getObjectByName("Object_6").material.metalness = localStorage.getItem("portal_gun_metalness");
     }
-        
+
     GLOBALS.GUN.name = "GUN";
     GLOBALS.GUN_GROUP.add(GLOBALS.GUN);
     scene.scale.set(0.001, 0.001, 0.001)
@@ -538,7 +540,10 @@ function loadWindowHalfManager(scene) {
             var target = new Vector3(); // create once an reuse it
             child.getWorldPosition(target);
             light.position.copy(target);
-            scene.add(light);
+
+            if (!GLOBALS.MOBILE)
+                scene.add(light);
+
             light.position.set(0, -1, -0.8)
             light.shadow.bias = -0.1;
             light.castShadow = false;
@@ -1154,14 +1159,14 @@ function loadAngledPanelManager(scene) {
     scene.userData.ceiling = true;
     GLOBALS.ITEMS.add(scene);
     scene.traverse(child => {
-        if(child.name.includes("panel") && child.material){
+        if (child.name.includes("panel") && child.material) {
             child.material.side = 2;
             child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.2;
             child.material.roughness = 1;
         }
 
-        if(child.material){
+        if (child.material) {
             child.material.polygonOffset = true;
             child.material.polygonOffsetFactor = 2;
         }
@@ -1187,12 +1192,12 @@ function loadPaintGunManager(scene) {
             child.material.envMapIntensity = 0.5;
         }
 
-        if(child.name == "opacity"){
+        if (child.name == "opacity") {
             child.material.transparent = true;
             child.material.opacity = 0.2;
-        }else if(child.name == "left" || child.name == "right"){
+        } else if (child.name == "left" || child.name == "right") {
             child.material.roughness = 0;
-            child.material.color = new Color(0,0,0);
+            child.material.color = new Color(0, 0, 0);
         }
     });
 

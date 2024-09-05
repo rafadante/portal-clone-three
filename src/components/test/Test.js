@@ -225,6 +225,9 @@ function viewFPS() {
 
         animate()
 
+        if(GLOBALS.MOBILE)
+            GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;
+
     }, 500);
 };
 
