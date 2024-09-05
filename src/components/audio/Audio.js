@@ -36,7 +36,6 @@ function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, vo
         listener = new AudioListener();
         GLOBALS.GUN.add(listener);
 
-        console.log(listener)
         listener.context.resume();
     }
 

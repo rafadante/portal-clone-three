@@ -949,3 +949,7 @@ button:focus {outline:0;}
 	opacity: 0;
 	transition: all 0.25s;
 }
+
+.tut2{
+	font-size: 40px;
+}

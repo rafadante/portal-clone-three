@@ -647,13 +647,16 @@ function addCollidersToCorridor(mesh) {
         wall.addEventListener("collide", function (event) {
             if (GLOBALS.LEVEL_ENTERED && !finished && GLOBALS.LOADED_LEVEL) {//
                 finished = true;
-                GLOBALS.POINTER_CONTROLS.unlock();
+
+                if (!GLOBALS.MOBILE)
+                    GLOBALS.POINTER_CONTROLS.unlock();
+
                 document.getElementById("next-map").style.display = "flex";
 
-                if(window.currentLevel == 8){
+                if (window.currentLevel == 8) {
                     document.getElementById("next-map-btn").style.display = "none";
                     document.getElementById("congrats").style.display = "block";
-                    
+
                 }
             }
         })

@@ -1207,9 +1207,6 @@ function loadPaintGunManager(scene) {
     scene.position.set(0.15, -0.17, -0.25);
     GLOBALS.PAINT_GUN.visible = false;
 
-    console.log(GLOBALS.PAINT_GUN)
-    console.log(GLOBALS.GUN)
-
     if (GLOBALS.LOADED_LEVEL) {
         loadLevelJSON()
     } else {

@@ -328,7 +328,22 @@
     <section class="hero">
       <h1 style="font-size: 8vh;" class="main-title">LOADING <!--<span>TEST LEVEL</span>--></h1>
       <p class="introduction-text">
-        Get to the exit door to validate your level, you can place portals with the mouse LEFT and RIGHT buttons.
+        This demo is not optimized and may not run well on some devices.
+      </p>
+      <p class="introduction-text">
+        If you make graphical changes on the settings you may need to reload the page, there are some presets to choose from.
+      </p>
+      <p class="introduction-text">
+        There are a total of 8 chambers in this demo, your progress will be saved after completing each chamber.
+      </p>
+      <p class="introduction-text">
+        The mobile version works only on landscape mode, also, there is a camera bug if you cross a portal while rotating the camera. 
+      </p>
+      <p class="introduction-text">
+        Mouse left and right to create portals and E to interact with pedestal buttons and objects.
+      </p>
+      <p class="introduction-text">
+        Have fun and get your cake at the end!
       </p>
     </section>
     <div class="loading"></div>
@@ -951,6 +966,7 @@
           <!--<span class="option" id="option-single-continue">CONTINUE</span>
           <span class="option" id="option-single-continue">NEW GAME</span>-->
           <span class="option" id="option-single-load">PLAY</span>
+          <span class="option" id="option-single-reset">RESET PROGRESS</span>
         </div>
 
         <div id="options-community" class="option-main">
@@ -1133,10 +1149,10 @@
             <span class="option-name" id="">Quality</span>
             <div class="option-value">
               <select name="quality" id="quality-select">
+                <option value="low">Low</option>
                 <option value="epic">Epic</option>
                 <option value="high">High</option>
                 <option value="medium">Medium</option>
-                <option value="low">Low</option>
                 <option value="very_low">Very Low</option>
                 <option value="potato">Potato</option>
               </select>
@@ -1439,6 +1455,32 @@ align-items: center;">
   filter: drop-shadow(2px 4px 6px black);">NEXT</button>
   <span id="congrats" style="display: none;font-size: 100px;
     font-weight: bolder;">Thanks For Playing!</span>
+</div>
+
+<div id="tut" style="    background: black;
+width: 100%;
+height: 100%;
+display: none;
+z-index: 100000000;
+position: absolute;
+top: 0px;
+left: 0px;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+">
+  <span class="tut2">
+    1: This demo is not optimized and may not run well on some devices.
+  </span>
+  <span class="tut2">
+    2: if you make graphical changes on the settings you may need to reload the page, there are some presets to choose.
+  </span>
+  <span class="tut2">
+    3: There are a total of 8 chambers in this demo, your progress will be saved after completing each chamber.
+  </span>
+  <span class="tut2">
+    4: The mobile version works only on landscape mode, also, there is camera bug if you cross a portal while rotating the câmera. 
+  </span>
 </div>
 
 </body>

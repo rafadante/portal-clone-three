@@ -108,8 +108,6 @@ function manageInstances() {
         }
     }
 
-    console.log(roomBack)
-
     createRoomForPaint(roomBack, "x", "y")
     createRoomForPaint(roomFront, "x", "y")
     createRoomForPaint(roomDown, "x", "z")
@@ -300,8 +298,6 @@ function createRoomForPaint(room, valX, valY) {
     const geometry = new PlaneGeometry(2, 2);
     geometry.computeBoundsTree();
 
-    console.log(room.length)
-
     for (var i = 0; i < room.length; i++) {
         const clone = geometry.clone();
 
@@ -385,8 +381,6 @@ function createRoomForPaint(room, valX, valY) {
 
     const boundingBox = new Box3().setFromObject(unifiedMesh);
     const size = boundingBox.getSize(new Vector3());
-
-    console.log(size)
 
     const aspectRatio = size[valX] / size[valY];
 

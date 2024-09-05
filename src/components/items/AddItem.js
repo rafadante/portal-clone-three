@@ -45,8 +45,6 @@ function addItem(found, loaded) {
     if (!GLOBALS.ITEM_CUBE.place && !loaded)
         return
 
-    console.log(found)
-
     if (GLOBALS.ITEM_HOLDED_NAME == "goo" || (loaded && found.itemName == "goo")) {
 
         if (loaded)

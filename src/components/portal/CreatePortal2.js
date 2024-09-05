@@ -156,7 +156,7 @@ function portalButton(button, auto, camera) {
 
     channel = getGelColor(GLOBALS.PAINTING_GUN_MODE[button]);
 
-    console.log(colorGel)
+    //console.log(colorGel)
 
     updateGel = true;
 

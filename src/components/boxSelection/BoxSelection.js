@@ -42,7 +42,7 @@ function raycastSelected(found, event, type) {
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "enterDoor" &&
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "window") {
 
-            console.log(GLOBALS.PLANE_USER_DATA[instanceId])
+            //console.log(GLOBALS.PLANE_USER_DATA[instanceId])
 
             if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem &&
                 (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("door") ||

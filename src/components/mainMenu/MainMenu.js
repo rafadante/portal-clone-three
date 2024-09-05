@@ -95,8 +95,6 @@ $("body").on('click', '#option-single-load', function () {
     else
         window.currentLevel = parseInt(localStorage.getItem("level"));
 
-    console.log(window.currentLevel)
-
     fetch("./levels/" + window.currentLevel + ".json")
         .then(response => response.json())
         .then(json => {
@@ -126,7 +124,6 @@ if (localStorage.getItem("load") == "true") {
     setTimeout(() => {
 
         window.currentLevel = parseInt(localStorage.getItem("level"));
-        console.log(window.currentLevel);
 
         init();
 
@@ -150,11 +147,9 @@ if (localStorage.getItem("load") == "true") {
 }
 
 
-//localStorage.setItem("level", 1);
+//
 
 function loadLevelJSON() {
-
-    console.log(level)
 
     $("#portal-gun-select").val(level[0]).change();
     loadLevel(level[1])
@@ -175,6 +170,14 @@ function loadLevelJSON() {
 
 $("body").on('click', '#option-community-build', function () {
     startLevel()
+});
+
+
+$("body").on('click', '#option-single-reset', function () {
+    var check = window.confirm("Are you sure you want to reset your progress?");
+    if (check == true) {
+        localStorage.setItem("level", 1);
+    }
 });
 
 function startLevel() {
@@ -454,7 +457,6 @@ function loadLevel(data) {
             GLOBALS.OBSERVATION_ROOM_IMG.userData = data[i].item;
             data[i].item = GLOBALS.OBSERVATION_ROOM_IMG;
         } else if (data[i].itemName == "gel") {
-            console.log("ttttttttttt")
             addTileGel(data[i], data[i].gelType, data[i].planeColor, data[i].id_instanced);
         }
 
@@ -473,8 +475,6 @@ function loadLevel(data) {
                     data[i].itemName.split('-')[0] != "dispenser") {
 
                     const state = data[i].state;
-
-                    console.log(GLOBALS.PLANE_USER_DATA[i])
 
                     addItem(GLOBALS.PLANE_USER_DATA[i], true)
 

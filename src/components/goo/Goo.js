@@ -119,7 +119,7 @@ const AddGoo = function (found, loading) {
 
             var userData = found[i];
 
-            console.log(userData)
+            //console.log(userData)
 
             if (userData.side != "down") {
                 continue;
@@ -137,7 +137,7 @@ const AddGoo = function (found, loading) {
     const geometry = new PlaneGeometry(2, 2);
     const geometries = [];
 
-    console.log(goo)
+    //console.log(goo)
 
     window.ooo = new Mesh(geometry, new MeshBasicMaterial())
     window.ooo.position.copy(goo[0])
