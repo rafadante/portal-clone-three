@@ -156,7 +156,7 @@ function addBody(obj, type, color, material) {
             return;
         }
 
-        spawnInstanced(item, color, type, event.body.side, true, 1.5);
+        spawnInstanced(item, color, type, event.body.side, true, 1);
         gelBlob.spawnPositions.push(contactPosition);
     });
 }

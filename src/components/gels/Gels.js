@@ -31,7 +31,7 @@ instancedGelPlane.instanceMatrix.needsUpdate = true;
 instancedGelPlane.computeBoundingSphere();
 
 //
-const geometryGelDynamic = new PlaneGeometry(3, 3);
+const geometryGelDynamic = new PlaneGeometry(2, 2);
 const materialGelDynamic = new MeshStandardMaterial({
     roughness: 0.2,
     normalMap: new TextureLoader().load("./assets/textures/decal/decal-normal.jpg"),
