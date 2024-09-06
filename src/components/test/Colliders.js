@@ -653,7 +653,7 @@ function addCollidersToCorridor(mesh) {
 
                 document.getElementById("next-map").style.display = "flex";
 
-                if (window.currentLevel == 9) {
+                if (window.currentLevel == 8) {
                     document.getElementById("next-map-btn").style.display = "none";
                     document.getElementById("congrats").style.display = "block";
 
