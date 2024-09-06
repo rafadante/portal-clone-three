@@ -112,6 +112,18 @@ $("body").on('click', '#option-single-load', function () {
             //Do something with json variable
         });
 })
+window.isCustom = false;
+$("body").on('click', '.load-custom', function () {
+    window.isCustom = true;
+    init();
+    fetch("./levels/custom/" + $(this).data("id") + ".json")
+        .then(response => response.json())
+        .then(json => {
+            level = json;
+            GLOBALS.LOADED_LEVEL = true;
+            startLevel();
+        });
+})
 
 
 if (localStorage.getItem("load") == "true") {
@@ -232,6 +244,8 @@ $("body").on('click', '#option-single', function () {
 
 $("body").on('click', '#option-community', function () {
     optionMenu(GLOBALS.TEXTURE_MENU_GRID, "COMMUNITY CHAMBERS", "#options-community");
+    $(".main-option").css("display", "flex")
+    $(".sub-option").css("display", "none")
 });
 
 $("body").on('click', '#option-options', function () {
@@ -326,6 +340,11 @@ $("body").on('click', '#load-level', function () {
 
 $("body").on('click', '#close-load-level-panel', function () {
     $("#load-level-panel").css("display", "none")
+})
+
+$("body").on('click', '#option-community-play', function () {
+    $(".main-option").css("display", "none")
+    $(".sub-option").css("display", "flex")
 })
 
 $("#input-level").on('change', function (e) {

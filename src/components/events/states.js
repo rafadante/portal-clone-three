@@ -137,10 +137,10 @@ function respawn(d) {
         setTimeout(() => {
 
             if (d.name != "player") {
-                if (d.state == "once") {
-                    d.mass = 0;
-                } else {
+                if (d.item.userData.opened) {
                     d.mass = 5;
+                } else {
+                    d.mass = 0;
                 }
 
                 d.wakeUp()
