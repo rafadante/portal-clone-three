@@ -197,6 +197,11 @@ function fixedUpdate() { //60 fps always for physics
 var updatingShadowMap = false;
 var statsBegin = false;
 
+let clock = new Clock();
+let delta = 0;
+// 30 fps
+let interval = 1 / 30;
+
 function render(time) {
 
     //
@@ -214,7 +219,21 @@ function render(time) {
     teleportationState()
     updateEvents();
     TWEEN.update();
-    animatePortal();
+
+    if(GLOBALS.MOBILE){
+        delta += clock.getDelta();
+
+        if (delta > interval) {
+          // The draw or time dependent code are here
+          animatePortal();
+      
+          delta = delta % interval;
+        }
+    }else{
+        animatePortal();
+    }
+
+    
     //updatedGelGun()
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {

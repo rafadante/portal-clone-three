@@ -351,16 +351,36 @@ const updateCamera = function (deltaTime) {
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STATIONARY_RUNNING
             else if (INPUT.controller["KeyS"].pressed)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_BACKWARD_RUNNING
-        } else {
-            if (INPUT.controller["KeyW"].pressed)
-                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STATIONARY_RUNNING
-            if (INPUT.controller["KeyS"].pressed)
-                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_BACKWARD_RUNNING
-            if (INPUT.controller["KeyD"].pressed)
+        } 
+        
+        else if (INPUT.fwdValue > 0 && INPUT.rgtValue > 0 && INPUT.lftValue && INPUT.bkdValue > 0) {
+            action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
+        } else if (INPUT.fwdValue > 0 && INPUT.bkdValue > 0) {
+            action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
+            if (INPUT.rgtValue > 0)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_RIGHT_STRAFE
-            if (INPUT.controller["KeyA"].pressed)
+            else if (INPUT.lftValue)
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_LEFT_STRAFE
+        } else if (INPUT.lftValue && INPUT.rgtValue > 0) {
+            action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
+            if (INPUT.fwdValue > 0)
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STATIONARY_RUNNING
+            else if (INPUT.bkdValue > 0)
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_BACKWARD_RUNNING
+        }
+        
+        else {
+            if (INPUT.controller["KeyW"].pressed || INPUT.fwdValue > 0)
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STATIONARY_RUNNING
+            if (INPUT.controller["KeyS"].pressed || INPUT.bkdValue > 0)
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_BACKWARD_RUNNING
+            if (INPUT.controller["KeyD"].pressed || INPUT.rgtValue > 0)
+                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_RIGHT_STRAFE
+            if (INPUT.controller["KeyA"].pressed || INPUT.lftValue)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_LEFT_STRAFE
         }
+
+        
 
         setAction(action);
         const delta = clock.getDelta();
