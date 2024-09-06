@@ -25,7 +25,7 @@ var allowEnterFPS = true;
 if (GLOBALS.MOBILE) {
     //var controlsDevice = new DeviceOrientationControls(GLOBALS.MAIN_CAMERA);
     window.targetRotationOnMouseDownX = 0;
-    var targetRotationOnMouseDownY = 0;
+    window.targetRotationOnMouseDownY = 0;
     var mouseX = 0;
     var mouseXOnMouseDown = 0;
     var mouseY = 0;
@@ -53,7 +53,7 @@ if (GLOBALS.MOBILE) {
                 window.targetRotationOnMouseDownX = GLOBALS.TARGET_ROTATION_X;
 
                 mouseYOnMouseDown = event.touches[touches].pageY - windowHalfY;
-                targetRotationOnMouseDownY = GLOBALS.TARGET_ROTATION_Y;
+                window.targetRotationOnMouseDownY = GLOBALS.TARGET_ROTATION_Y;
             }
         }
     }
@@ -69,10 +69,10 @@ if (GLOBALS.MOBILE) {
 
             if (deltaX2 > 0) {
                 if (!INPUT.blocked_bottom)
-                    GLOBALS.TARGET_ROTATION_Y = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * (-0.01);
+                    GLOBALS.TARGET_ROTATION_Y = window.targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * (-0.01);
             } else {
                 if (!INPUT.blocked_top)
-                    GLOBALS.TARGET_ROTATION_Y = targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * (-0.01);
+                    GLOBALS.TARGET_ROTATION_Y = window.targetRotationOnMouseDownY + (mouseY - mouseYOnMouseDown) * (-0.01);
             }
         }
     }
