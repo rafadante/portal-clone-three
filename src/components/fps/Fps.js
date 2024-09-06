@@ -267,6 +267,9 @@ const updateCamera = function (deltaTime) {
         GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
         GLOBALS.PORTAL_GUN_CAMERA.position.copy(GLOBALS.MAIN_CAMERA.position);
         GLOBALS.PORTAL_GUN_CAMERA.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
+
+        GLOBALS.TARGET_ROTATION_X = GLOBALS.MAIN_CAMERA.rotation.y;
+        GLOBALS.TARGET_ROTATION_Y = GLOBALS.MAIN_CAMERA.rotation.x;
     }
 
     // always look where the camera points
