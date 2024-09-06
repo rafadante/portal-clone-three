@@ -24,7 +24,7 @@ var allowEnterFPS = true;
 
 if (GLOBALS.MOBILE) {
     //var controlsDevice = new DeviceOrientationControls(GLOBALS.MAIN_CAMERA);
-    var targetRotationOnMouseDownX = 0;
+    window.targetRotationOnMouseDownX = 0;
     var targetRotationOnMouseDownY = 0;
     var mouseX = 0;
     var mouseXOnMouseDown = 0;
@@ -50,7 +50,7 @@ if (GLOBALS.MOBILE) {
 
             if (touches == 0 || touches == 1) {
                 mouseXOnMouseDown = event.touches[touches].pageX - windowHalfX;
-                targetRotationOnMouseDownX = GLOBALS.TARGET_ROTATION_X;
+                window.targetRotationOnMouseDownX = GLOBALS.TARGET_ROTATION_X;
 
                 mouseYOnMouseDown = event.touches[touches].pageY - windowHalfY;
                 targetRotationOnMouseDownY = GLOBALS.TARGET_ROTATION_Y;
@@ -61,7 +61,7 @@ if (GLOBALS.MOBILE) {
     function onDocumentTouchMove(event) {
         if (event.touches.length > 0 && (touches == 0 || touches == 1)) {
             mouseX = event.touches[touches].pageX - windowHalfX;
-            GLOBALS.TARGET_ROTATION_X = targetRotationOnMouseDownX + (mouseX - mouseXOnMouseDown) * (-0.01); //camera speed
+            GLOBALS.TARGET_ROTATION_X = window.targetRotationOnMouseDownX + (mouseX - mouseXOnMouseDown) * (-0.01); //camera speed
 
             mouseY = event.touches[touches].pageY - windowHalfY;
             deltaX2 = event.touches[touches].pageY - touchX2;

@@ -270,6 +270,7 @@ const updateCamera = function (deltaTime) {
 
         GLOBALS.TARGET_ROTATION_X = GLOBALS.MAIN_CAMERA.rotation.y;
         GLOBALS.TARGET_ROTATION_Y = GLOBALS.MAIN_CAMERA.rotation.x;
+        window.targetRotationOnMouseDownX = GLOBALS.TARGET_ROTATION_X;
     }
 
     // always look where the camera points
