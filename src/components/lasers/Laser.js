@@ -20,6 +20,12 @@ import { animate } from '../../Main.js';
 import $ from 'jquery';
 import { laserReceiverTrigger } from '../events/events.js';
 
+var red = 1;
+
+if (localStorage.getItem("quality-select") == "epic") {
+    red = 10;
+}
+
 function laserEmitterRaycast(object, update, rayItem, index) {
 
     var obj = new Object3D();
@@ -58,7 +64,7 @@ function laserEmitterRaycast(object, update, rayItem, index) {
 
     const geometry = new CylinderGeometry(0.01, 0.01, 1, 8, 1, true);
     const laser = new Mesh(geometry, new MeshBasicMaterial({
-        color: new Color(1, 0, 0)
+        color: new Color(red, 0, 0)
     }));
     laser.translateY(0.5);
 
@@ -82,7 +88,7 @@ function laserEmitterRaycast(object, update, rayItem, index) {
 function addLaserToCube(cube) {
     const geometry = new CylinderGeometry(0.01, 0.01, 1, 8, 1, true);
     const laser = new Mesh(geometry, new MeshBasicMaterial({
-        color: new Color(1, 0, 0)
+        color: new Color(red, 0, 0)
     }));
     laser.translateY(0.5);
 

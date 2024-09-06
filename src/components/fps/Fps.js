@@ -33,24 +33,25 @@ const updatePlayer = function (deltaTime) {
     var velocity = 1100;
 
     //ROTATE THE CAMERA WITH TOUCH ON MOBILE
-    if (GLOBALS.MOBILE && controllerIndex == null) {
+    if (GLOBALS.MOBILE && controllerIndex == null && !GLOBALS.TELEPORTING_TARGET_QUATERNION) {
         velocity = 900;
         GLOBALS.MAIN_CAMERA.rotation.y += (GLOBALS.TARGET_ROTATION_X - GLOBALS.MAIN_CAMERA.rotation.y) * rotationMobile;
 
         //vertical rotation 
         finalRotationY = (GLOBALS.TARGET_ROTATION_Y - GLOBALS.MAIN_CAMERA.rotation.x);
-        if (GLOBALS.MAIN_CAMERA.rotation.x <= 1 && GLOBALS.MAIN_CAMERA.rotation.x >= -1)
+
+        if (GLOBALS.MAIN_CAMERA.rotation.x <= 1.5 && GLOBALS.MAIN_CAMERA.rotation.x >= -1.5)
             GLOBALS.MAIN_CAMERA.rotation.x += finalRotationY * rotationMobile;
 
-        if (GLOBALS.MAIN_CAMERA.rotation.x > 1) {
+        if (GLOBALS.MAIN_CAMERA.rotation.x > 1.5) {
             INPUT.blocked_top = true;
-            GLOBALS.MAIN_CAMERA.rotation.x = 1
+            GLOBALS.MAIN_CAMERA.rotation.x = 1.5
         } else
             INPUT.blocked_top = false;
 
-        if (GLOBALS.MAIN_CAMERA.rotation.x < -1) {
+        if (GLOBALS.MAIN_CAMERA.rotation.x < -1.5) {
             INPUT.blocked_bottom = true;
-            GLOBALS.MAIN_CAMERA.rotation.x = -1
+            GLOBALS.MAIN_CAMERA.rotation.x = -1.5
         } else
             INPUT.blocked_bottom = false;
     }

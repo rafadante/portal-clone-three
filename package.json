@@ -104,9 +104,6 @@
     "webpack-manifest-plugin": "^4.0.2",
     "workbox-webpack-plugin": "^6.4.1"
   },
-  "options": {
-    "allowedHosts": ["localhost", ".localhost"]
-  },
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",

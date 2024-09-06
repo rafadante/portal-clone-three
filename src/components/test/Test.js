@@ -57,7 +57,10 @@ function viewFPS() {
 
     setTimeout(() => {
 
-        //initPost();
+        if(localStorage.getItem("quality-select") == "epic"){
+            initPost();
+        }
+        //
         manageInstances();
 
         addPositionalAudio('audio-door', GLOBALS.EXIT_DOOR, false, false, true, 8);

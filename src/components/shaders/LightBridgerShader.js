@@ -14,8 +14,14 @@ GLOBALS.UNIFORMS_LIGHT_BRIDGE = {
     }
 }
 
+var color = new Color(0, 0.75, 1);
+
+if (localStorage.getItem("quality-select") == "epic") {
+    color = new Color(0, 1.5, 2);
+}
+
 GLOBALS.MATERIAL_LIGHT_BRIDGERS = new MeshBasicMaterial({
-    color: new Color(0, 0.75, 1),//0, 0.75, 1
+    color: color,//0, 0.75, 1
     side: DoubleSide,
     transparent: true,
     blending: AdditiveBlending,

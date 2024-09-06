@@ -82,7 +82,7 @@ renderer.shadowMap.enabled = shadowMap;
 renderer.shadowMap.type = PCFSoftShadowMap;
 renderer.shadowMap.needsUpdate = true;
 renderer.localClippingEnabled = true;
-//renderer.physicallyCorrectLights = true;
+renderer.physicallyCorrectLights = true;
 renderer.domElement.id = "viewer-3d";
 renderer.shadowMap.autoUpdate = true;
 

@@ -4,6 +4,14 @@ import {
 } from 'three';
 import { GLOBALS } from '../../Globals';
 
+var color1 = new Vector3(0.02, 0.5, 0.95)
+var color2 = new Vector3(0.95, 0.45, 0.02)
+
+if (localStorage.getItem("quality-select") == "epic") {
+    //color1 = new Vector3(1.02, 1.5, 1.95)
+    //color2 = new Vector3(1.95, 1.45, 1.02)
+}
+
 GLOBALS.UNIFORMS_TRACTOR_BEAM = {
     iTime: {
         type: 'f',
@@ -15,7 +23,7 @@ GLOBALS.UNIFORMS_TRACTOR_BEAM = {
     },
     iColor: {
         type: 'v3',
-        value: new Vector3(0.02, 0.5, 0.95)
+        value: color1
     },
 };
 
@@ -30,7 +38,7 @@ GLOBALS.UNIFORMS_TRACTOR_BEAM_ORANGE = {
     },
     iColor: {
         type: 'v3',
-        value: new Vector3(0.95, 0.45, 0.02)
+        value: color2
     }
 };
 

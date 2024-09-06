@@ -202,6 +202,7 @@ $("body").on('click', '#settings-close', function () {
 
         if (!GLOBALS.MOBILE) {
             document.body.requestPointerLock();
+            openFullscreen();
         } else {
             $("#blocker").css("display", "none");
             $("#mobile-controls").css("display", "block");

@@ -7,6 +7,12 @@ import {
 } from 'three';
 import { GLOBALS } from '../../Globals';
 
+var red = 1.0;
+
+if (localStorage.getItem("quality-select") == "epic") {
+    red = 30.0;
+}
+
 /*GLOBALS.UNIFORMS_LASER_FIELD = {
     time: {
         value: 0
@@ -62,7 +68,7 @@ GLOBALS.UNIFORMS_LASER_FIELD = {
     },
     iColor: {
         type: 'v3',
-        value: new Vector3(1.0, 0.0, 0.0)
+        value: new Vector3(red, 0.0, 0.0)
     },
 };
 
