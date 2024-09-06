@@ -220,18 +220,9 @@ function render(time) {
     updateEvents();
     TWEEN.update();
 
-    if(GLOBALS.MOBILE){
-        delta += clock.getDelta();
-
-        if (delta > interval) {
-          // The draw or time dependent code are here
-          animatePortal();
-      
-          delta = delta % interval;
-        }
-    }else{
+    
         animatePortal();
-    }
+    
 
     
     //updatedGelGun()
