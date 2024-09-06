@@ -219,12 +219,8 @@ function render(time) {
     teleportationState()
     updateEvents();
     TWEEN.update();
+    animatePortal();
 
-    
-        animatePortal();
-    
-
-    
     //updatedGelGun()
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {
@@ -304,8 +300,20 @@ function animatePortal() {
     //GLOBALS.RENDERER.autoClear = true;
 
     if (GLOBALS.PORTAL_RECURSION_LEVELS > 0) {
-        renderPortal2(0, 1)
-        renderPortal2(1, 0)
+        if (GLOBALS.MOBILE) {
+            delta += clock.getDelta();
+
+            if (delta > interval) {
+                // The draw or time dependent code are here
+                renderPortal2(0, 1)
+                renderPortal2(1, 0)
+
+                delta = delta % interval;
+            }
+        } else {
+            renderPortal2(0, 1)
+            renderPortal2(1, 0)
+        }
     } else {
         if (GLOBALS.PORTALS[0] && GLOBALS.PORTALS[1]) {
             if (GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value == 1) {
