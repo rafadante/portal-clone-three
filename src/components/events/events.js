@@ -88,9 +88,9 @@ function updateEvents() {
             GLOBALS.GUN_MODE = "portal";
 
             if (GLOBALS.PORTAL_GUN_INITIATE == "left")
-              document.getElementById("warning-game").innerHTML = "Press Mouse Left to create Orange Portals!";
+              document.getElementById("warning-game").innerHTML = "Press Mouse Left to create Blue Portals!";
             else
-              document.getElementById("warning-game").innerHTML = "Press Mouse Right to create Blue Portals!";
+              document.getElementById("warning-game").innerHTML = "Press Mouse Right to create Orange Portals!";
 
             document.getElementById("warning-game").style.opacity = "1";
 

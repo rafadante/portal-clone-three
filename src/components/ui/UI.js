@@ -233,3 +233,15 @@ $('#next-map-btn').on('click', function () {
 
     window.open("https://" + window.location.host, "_self");
 });
+
+$('#social-youtube').on('click', function () {
+    window.open("https://www.youtube.com/@Rafa_dante");
+});
+
+$('#social-twitter').on('click', function () {
+    window.open("https://x.com/RafaTecXR");
+});
+
+$('#social-discord').on('click', function () {
+    window.open("https://discord.com/invite/CsARjYrc");
+});

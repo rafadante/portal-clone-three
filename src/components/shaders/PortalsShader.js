@@ -117,7 +117,7 @@ const generateMeshPortalShader = () => {
                 value: new Vector2(width, height)
             },
             iPortal: {
-                value: 0
+                value: 1
             },
             iOpened:{
                 value: 0
@@ -149,7 +149,7 @@ const generateMeshPortalShader = () => {
                 value: new Vector2(width, height)
             },
             iPortal: {
-                value: 1
+                value: 0
             },
             iOpened:{
                 value: 0

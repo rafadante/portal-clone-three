@@ -953,3 +953,16 @@ button:focus {outline:0;}
 .tut2{
 	font-size: 40px;
 }
+
+.social-link{
+	display: block;
+	width: auto;
+	height: 30px;
+	margin: 20px;
+	transition: all 0.3s;
+	cursor: pointer;
+}
+
+.social-link:hover{
+	transform: scale(1.5);
+}

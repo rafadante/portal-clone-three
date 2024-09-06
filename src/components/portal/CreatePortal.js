@@ -263,7 +263,7 @@ function portalButton(button, auto, camera) {
 
                     newPortal(0, 1, point, normal, body, playerUpDirection, portalPoints, userData.side)
 
-                    GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(2.5, 0.7, 0.0);
+                    GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(0.0, 1.25, 2.5);
 
                     if (GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha.value == 0.0) {
                         new TWEEN.Tween(GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha).to({
@@ -299,7 +299,8 @@ function portalButton(button, auto, camera) {
 
                     newPortal(1, 0, point, normal, body, playerUpDirection, userData.rotation, userData.side)
 
-                    GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(0.0, 1.25, 2.5);
+                    
+                    GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(2.5, 0.7, 0.0);
 
                     if (GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha.value == 0.0) {
                         new TWEEN.Tween(GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha).to({
