@@ -54,7 +54,7 @@ $('#quality-select').on('change', function () {
         $("#shadows-resolution-select").val(512).change();
         localStorage.setItem("antialising", false);
     } else if ($(this).val() == "very_low") {
-        $("#recursive-select").val(3).change();
+        $("#recursive-select").val(2).change();
         $("#recursive-render-select").val(0).change();
         $("#resolution-select").val(0.5).change();
         $("#shadows-resolution-select").val(256).change();
@@ -78,7 +78,7 @@ $('#quality-select').on('change', function () {
         $("#shadows-resolution-select").val(2048).change();
         localStorage.setItem("antialising", true);
     } else if ($(this).val() == "epic") {
-        $("#recursive-select").val(7).change();
+        $("#recursive-select").val(3).change();
         $("#recursive-render-select").val(100).change();
         $("#resolution-select").val(1).change();
         $("#shadows-resolution-select").val(4096).change();
