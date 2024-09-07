@@ -970,3 +970,7 @@ button:focus {outline:0;}
 .sub-option{
 	display: none;
 }
+
+.production-disabled{
+	display: none !important;
+}
