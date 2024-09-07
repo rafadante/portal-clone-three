@@ -144,6 +144,9 @@ function onWindowResize() {
     GLOBALS.MAIN_CAMERA.aspect = window.innerWidth / window.innerHeight;
     GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
 
+    GLOBALS.PORTAL_GUN_CAMERA.aspect = window.innerWidth / window.innerHeight;
+    GLOBALS.PORTAL_GUN_CAMERA.updateProjectionMatrix();
+
     if (GLOBALS.COMPOSER)
         GLOBALS.COMPOSER.setSize(window.innerWidth, window.innerHeight);
 }
