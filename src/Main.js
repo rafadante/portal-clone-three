@@ -200,7 +200,17 @@ var statsBegin = false;
 let clock = new Clock();
 let delta = 0;
 // 30 fps
-let interval = 1 / 30;
+var interval = 1 / 30;
+
+if(localStorage.getItem("quality-select") != "very_low"){
+    interval = 1 / 30;
+}else if(localStorage.getItem("quality-select") != "low"){
+    interval = 1 / 40;
+}else if(localStorage.getItem("quality-select") != "medium"){
+    interval = 1 / 50;
+}else if(localStorage.getItem("quality-select") != "high"){
+    interval = 1 / 60;
+}
 
 function render(time) {
 
@@ -300,7 +310,7 @@ function animatePortal() {
     //GLOBALS.RENDERER.autoClear = true;
 
     if (GLOBALS.PORTAL_RECURSION_LEVELS > 0) {
-        if (GLOBALS.MOBILE) {
+        if (GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic")) {
             delta += clock.getDelta();
 
             if (delta > interval) {
