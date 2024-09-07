@@ -137,7 +137,7 @@ function respawn(d) {
         setTimeout(() => {
 
             if (d.name != "player") {
-                console.log(d)
+                
                 if (d.item.userData.connections == 0) {
                     d.mass = 5;
                 } else {
