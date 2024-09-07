@@ -254,7 +254,7 @@ function portalButton(button, auto, camera) {
 
                     if (!auto) {
                         document.getElementById("reticle-img").style.filter = "none";
-                        document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
+                        document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
                     }
 
                     // delete the old portal this new one is replacing
@@ -290,7 +290,7 @@ function portalButton(button, auto, camera) {
 
                     if (!auto) {
                         document.getElementById("reticle-img").style.filter = "none";
-                        document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
+                        document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
                     }
 
                     // delete the old portal this new one is replacing
