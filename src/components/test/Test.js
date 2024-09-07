@@ -228,7 +228,7 @@ function viewFPS() {
 
         animate()
 
-        if(GLOBALS.MOBILE)
+        if(GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic" && localStorage.getItem("quality-select") != "high"))
             GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;
 
     }, 500);

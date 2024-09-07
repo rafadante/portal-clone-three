@@ -254,7 +254,7 @@ function loadMaterial(material, base, normal, ao, rough, metal, alpha, roughValu
     material.envMap = GLOBALS.ENV_MAP;
     material.alphaTest = alphaTest;
 
-    if (GLOBALS.MOBILE)
+    if(GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic" && localStorage.getItem("quality-select") != "high"))
         material.envMapIntensity = 0.5;
     else
         material.envMapIntensity = envIntensity;

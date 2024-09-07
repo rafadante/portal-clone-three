@@ -212,7 +212,8 @@ function loadWindowManager(scene) {
             light.position.copy(target);
             light.translateY(-0.2);
 
-            if (!GLOBALS.MOBILE)
+
+            if (!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high"))
                 scene.add(light);
         }
 
@@ -541,7 +542,8 @@ function loadWindowHalfManager(scene) {
             child.getWorldPosition(target);
             light.position.copy(target);
 
-            if (!GLOBALS.MOBILE)
+
+            if (!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high"))
                 scene.add(light);
 
             light.position.set(0, -1, -0.8)

@@ -46,7 +46,7 @@ const Lights = function () {
 
     GLOBALS.SPOTLIGHT = spotLight;
 
-    if (!GLOBALS.MOBILE)
+    if (!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high"))
         lightGroup.add(spotLight);
 
     return lightGroup;
@@ -109,7 +109,8 @@ function testLightsManager() {
                 spotLight.position.y + (dir.z * 10),
                 spotLight.position.z + (dir.y * 10));
 
-            if (!GLOBALS.MOBILE)
+
+            if (!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high"))
                 GLOBALS.SCENE_FPS.add(spotLight);
 
             spotLight.target.updateMatrixWorld();
