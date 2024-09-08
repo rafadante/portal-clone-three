@@ -87,7 +87,7 @@ function addAudio(obj, name) {
 const positive = new Audio('audio/button_synth_positive_01.wav');
 
 const ambient = new Audio('audio/ambient.mp3')
-ambient.volume = 0.15;
+ambient.volume = 0.3;
 ambient.loop = true;
 
 const walk = new Audio('audio/tile1.wav')
