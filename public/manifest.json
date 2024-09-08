@@ -31,5 +31,8 @@
   "display": "fullscreen",
   "theme_color": "#000000",
   "background_color": "#ffffff",
-  "orientation": "landscape"
+  "orientation": "landscape",
+  "installs_allowed_from": [
+    "*"
+  ]
 }
