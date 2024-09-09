@@ -57,7 +57,7 @@ function viewFPS() {
 
     setTimeout(() => {
 
-        if(localStorage.getItem("quality-select") == "epic"){
+        if (localStorage.getItem("quality-select") == "epic") {
             initPost();
         }
         //
@@ -142,8 +142,11 @@ function viewFPS() {
         GLOBALS.OBSERVATION_ROOM.rotation.copy(GLOBALS.OBSERVATION_ROOM_IMG.rotation);
         //--------------------------------------------------------------------------
 
-        GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE);
-        GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE2);
+        if (!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high")) {
+            GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE);
+            GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE2);
+        }
+
 
         GLOBALS.GUN.children[0].children[0].add(GLOBALS.LIGHTNIN_STRIKE_1,
             GLOBALS.LIGHTNIN_STRIKE_2, GLOBALS.LIGHTNIN_STRIKE_3);
@@ -228,7 +231,7 @@ function viewFPS() {
 
         animate()
 
-        if(GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic" && localStorage.getItem("quality-select") != "high"))
+        if (GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic" && localStorage.getItem("quality-select") != "high"))
             GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;
 
     }, 500);

@@ -315,7 +315,10 @@ const updateCamera = function (deltaTime) {
 
         GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLAYER_MODEL_CLONE)
         GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
-        GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE);
+
+        if(!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high")){
+            GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE);
+        }
 
         GLOBALS.PLAYER_MODEL_CLONE.visible = false;
         GLOBALS.PLAYER_MODEL_CLONE.traverse(c => {
