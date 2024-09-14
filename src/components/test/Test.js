@@ -26,12 +26,32 @@ import { manageInstances } from './Instances.js';
 import './BackToEditor.js';
 import { stateDoor } from '../door/Door.js';
 import { addGel } from '../gels/Gels.js';
+import { findPath } from '../findPath/FindPath.js';
 
 $("body").on('click', '#view-fps', function () {
     viewFPS();
-})
+});
+
+var p = 0;
+
+function loadingTxt() {
+
+    p += 1;
+
+    $(".introduction-text").addClass("loading-disabled");
+    $("#p" + p).removeClass("loading-disabled");
+
+    if (p < 4) {
+        setTimeout(() => {
+            loadingTxt()
+        }, 3000);
+    }
+}
 
 function viewFPS() {
+
+    p = 0;
+    loadingTxt()
 
     AUDIO.EDITOR.pause();
 
@@ -65,7 +85,6 @@ function viewFPS() {
 
         addPositionalAudio('audio-door', GLOBALS.EXIT_DOOR, false, false, true, 8);
         addPositionalAudio('audio-door', GLOBALS.ENTER_DOOR, false, false, true, 8);
-
 
         GLOBALS.UNIFORMS_LASER_FIELD.fade = 1;
         GLOBALS.MATERIAL_TRACTOR_BEAM.depthWrite = false;
@@ -126,6 +145,7 @@ function viewFPS() {
 
             //GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
             //GLOBALS.RENDERER.dispose()
+            window.loaded = true;
         }, 5000);
 
         GLOBALS.CONTROLS.enabled = false;
@@ -234,6 +254,19 @@ function viewFPS() {
         if (GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic" && localStorage.getItem("quality-select") != "high"))
             GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;
 
+        console.log(GLOBALS.CONNECTIONS)
+
+        for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+            GLOBALS.CONNECTIONS[i]["line"].visible = false;
+            findPath(
+                GLOBALS.CONNECTIONS[i]["from"].position,
+                GLOBALS.CONNECTIONS[i]["to"].position,
+                GLOBALS.CONNECTIONS[i]["to"],
+                GLOBALS.CONNECTIONS[i]["from"],
+                GLOBALS.CONNECTIONS[i]
+            )
+        }
+
     }, 500);
 };
 
@@ -255,6 +288,13 @@ function blockPortal() {
             GLOBALS.BLOCK_PORTAL.push(GLOBALS.GLASS_RAYCASTER[i].item.continuous)
         }
 
+    }
+
+    console.log(GLOBALS.DOORS)
+
+    for (var i = 0; i < GLOBALS.DOORS.length; i++) {
+        GLOBALS.BLOCK_PORTAL.push(GLOBALS.DOORS[i].children[0].children[0])
+        GLOBALS.BLOCK_PORTAL.push(GLOBALS.DOORS[i].children[0].children[1])
     }
 }
 

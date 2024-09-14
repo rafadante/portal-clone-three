@@ -39,43 +39,52 @@ function manageConnection(instanceId, from) {
         if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere"))
             endPos = GLOBALS.PLANE_USER_DATA[instanceId].item.dispenserPosition
 
-        const points = [];
-        points.push(new Vector3(
-            from.position.x,
-            from.position.y,
-            from.position.z
-        ));
-        points.push(endPos);
+        const line = addLine(from.position, endPos);
 
-        const geometry = new MeshLineGeometry()
-        geometry.setPoints(points)
-        const material = new MeshLineMaterial({
-            color: 0xffa500,
-            side: 2,
-            depthTest: true,
-            transparent: true
-        })
-        material.uniforms.alphaTest.value = 0;
-        material.uniforms.dashArray.value = 0.01;
-        material.uniforms.lineWidth.value = 0.1;
-        material.uniforms.useDash.value = 1;
-        const line = new Mesh(geometry, material)
-
-        /*GLOBALS.SCENE_CHILDREN.add(line);
+        GLOBALS.SCENE_CHILDREN.add(line);
 
         GLOBALS.CONNECTIONS.push({
             line: line,
             from: from,
+            line2: null,
             to:  GLOBALS.PLANE_USER_DATA[instanceId]
-        });*/
+        });
 
         from.item.userData.connectedTo.push(instanceId);
 
-        findPath(from.position, GLOBALS.PLANE_USER_DATA[instanceId].position, GLOBALS.PLANE_USER_DATA[instanceId], from)
+        //findPath(from.position, GLOBALS.PLANE_USER_DATA[instanceId].position, GLOBALS.PLANE_USER_DATA[instanceId], from)
+
+        //console.log(GLOBALS.CONNECTIONS)
     }
 
     GLOBALS.ITEM_CUBE.visible = false;
     GLOBALS.CURRENT_LINE = null;
+}
+
+function addLine(position, endPos){
+
+    const points = [];
+    points.push(new Vector3(
+        position.x,
+        position.y,
+        position.z
+    ));
+    points.push(endPos);
+
+    const geometry = new MeshLineGeometry()
+    geometry.setPoints(points)
+    const material = new MeshLineMaterial({
+        color: 0xffa500,
+        side: 2,
+        depthTest: true,
+        transparent: true
+    })
+    material.uniforms.alphaTest.value = 0;
+    material.uniforms.dashArray.value = 0.01;
+    material.uniforms.lineWidth.value = 0.1;
+    material.uniforms.useDash.value = 1;
+
+    return new Mesh(geometry, material);
 }
 
 $("body").on('click', '.removeConnection', function () {
@@ -120,5 +129,6 @@ $("body").on('mouseleave', '.removeConnection', function () {
 });
 
 export {
-    manageConnection
+    manageConnection,
+    addLine
 }

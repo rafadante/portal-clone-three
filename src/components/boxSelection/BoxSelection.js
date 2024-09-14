@@ -17,7 +17,7 @@ import {
     getPlaneByName,
     warning
 } from '../../Utils.js';
-import { clickItem } from '../items/AddItem.js';
+import { clickItem, updateLines } from '../items/AddItem.js';
 import { manageConnection } from './Connection.js';
 
 const orange = new Color("rgb(255, 165, 0)");
@@ -34,6 +34,18 @@ function raycastSelected(found, event, type) {
     if (GLOBALS.CONNECTING) {
         manageConnection(instanceId, GLOBALS.SELECTED_FOR_CONNECTION)
         return;
+    }
+
+    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName) {
+        $("#sample-audio").prop("value", "");
+        if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area")) {
+            $("#sample-audio").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.speech);
+            $("#audio-trigger").css("display", "flex");
+        } else {
+            $("#audio-trigger").css("display", "none");
+        }
+    } else {
+        $("#audio-trigger").css("display", "none");
     }
 
     if (event.button == 2) {
@@ -205,6 +217,7 @@ function raycastSelected(found, event, type) {
                 if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel_recharger")) {
                     $(".gel_recharger").css("display", "block");
                 }
+
             } else {
                 $(".gel").css("display", "block");
             }
@@ -354,6 +367,10 @@ function raycastSelected(found, event, type) {
                             );
                             //UPDATE PARAMETERS OF THE OLD PLACEMENT
                             planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false, false);
+
+                            window.changingPosition = true;
+                            window.changingPositionPlane = planeInstanceOld;
+                            updateLines(planeInstanceNew, false)
                         }
 
                         removeSelection();
@@ -459,6 +476,10 @@ function showMenu(x, y) {
     menu.style.top = y + 'px';
     menu.classList.add('menu-show');
 }
+
+$('#sample-audio').on('input', function () {
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.speech = $("#sample-audio").prop("value");
+});
 
 export {
     raycastSelected,

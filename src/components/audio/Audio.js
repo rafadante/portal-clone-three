@@ -6,6 +6,48 @@ import {
 var listernAdded = false;
 var listener;
 
+var opt, voices, utterance;
+
+if (window.hasOwnProperty("speechSynthesis")) {
+
+}
+
+const speechSynth = window.speechSynthesis,
+    form = document.querySelector("form"),
+    init = () => {
+        if (!voices) { // fixes triple trigger weirdness
+            voices = speechSynth.getVoices();
+            voices.forEach((v) => {
+                opt = document.createElement("option");
+                opt.textContent = v.name;
+                if (v.name === "Google US English") {
+                    opt.selected = true;
+                    form.rate.value = 65;
+                }
+                form.voice.appendChild(opt);
+            });
+        }
+    };
+if (speechSynth.onvoiceschanged !== undefined) {
+    // Only Chrome and Edge at time of posting
+    speechSynth.onvoiceschanged = init;
+} else {
+    init();
+}
+
+function playVoice(txt) {
+    if (speechSynth.speaking) {
+        speechSynth.cancel();
+        // doesn't work as expected with default voice on Chrome on Windows
+    }
+    utterance = new SpeechSynthesisUtterance(txt);
+    utterance.voice = voices[form.voice.selectedIndex];
+    utterance.volume = form.volume.valueAsNumber * 0.01;
+    utterance.pitch = 100 * 0.01;
+    utterance.rate = 100 * 0.01;
+    speechSynth.speak(utterance);
+}
+
 function play(elem) {
     //return
     var isPlaying = elem.currentTime > 0 && !elem.paused && !elem.ended
@@ -87,7 +129,7 @@ function addAudio(obj, name) {
 const positive = new Audio('audio/button_synth_positive_01.wav');
 
 const ambient = new Audio('audio/ambient.mp3')
-ambient.volume = 0.3;
+ambient.volume = 0.15;
 ambient.loop = true;
 
 const walk = new Audio('audio/tile1.wav')
@@ -186,5 +228,6 @@ export {
     volume,
     play,
     addAudio,
-    fadeAudio
+    fadeAudio,
+    playVoice
 }

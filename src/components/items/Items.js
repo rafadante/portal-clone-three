@@ -212,8 +212,13 @@ function deleteItemInstanced(item, moving) {
 
     GLOBALS.DYMANIC_ITEMS[item.instancedName][item.item.userData.idInstanced] = [];
 
-    if (moving)
+    if (moving){
+        window.changingPosition = true;
+        window.changingPositionPlane = item;
         clickItem($("#" + item.instancedName));
+    }
+        
+    $("#" + item.instancedName).parent().children("span").text(GLOBALS.ITEMS_COUNT[item.instancedName]["max"] - GLOBALS.ITEMS_COUNT[item.instancedName]["count"]);
 }
 
 export {

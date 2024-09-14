@@ -60,15 +60,20 @@
       max-height: 60%;
       overflow-y: scroll;
 
-      #options-settings, #options-single, #options-community, #options-about, #options-patreon {
+      #options-settings,
+      #options-single,
+      #options-community,
+      #options-about,
+      #options-patreon {
         width: 100%;
         display: none;
       }
 
-      #options-about, #options-patreon{
+      #options-about,
+      #options-patreon {
         pointer-events: none;
 
-        span{
+        span {
           display: block;
           width: 95%;
           text-align: justify;
@@ -80,7 +85,9 @@
         display: none;
       }
 
-      #options-video, #options-controls, #options-audio {
+      #options-video,
+      #options-controls,
+      #options-audio {
         width: 100%;
         display: none;
 
@@ -146,15 +153,15 @@
         color: black;
       }
 
-      .sub-option{
+      .sub-option {
         display: none;
       }
     }
 
-    #settings-menu{
+    #settings-menu {
       display: flex;
 
-      button{
+      button {
         width: 12vh;
         height: 4vh;
         border: none;
@@ -167,13 +174,13 @@
         display: none;
       }
 
-      button:hover{
+      button:hover {
         background: #d1bb53;
         filter: drop-shadow(1 2px 3px black);
         color: black;
       }
 
-      #done{
+      #done {
         margin-left: 3vh;
       }
     }
@@ -205,14 +212,17 @@ select {
   border-radius: 0.25em;
   box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
   cursor: pointer;
+
   /* Remove IE arrow */
   &::-ms-expand {
     display: none;
   }
+
   /* Remove focus outline */
   &:focus {
     outline: none;
   }
+
   /* <option> colors */
   option {
     color: inherit;
@@ -224,7 +234,7 @@ select {
 /* Firefox */
 * {
   scrollbar-width: auto;
-  scrollbar-color:  rgba(255, 255, 255, 0.4);
+  scrollbar-color: rgba(255, 255, 255, 0.4);
 }
 
 /* Chrome, Edge, and Safari */
@@ -243,7 +253,7 @@ select {
 
 /*-------------------------------------------------------------*/
 
-#load-level-panel{
+#load-level-panel {
   position: absolute;
   top: 0px;
   left: 0px;
@@ -255,7 +265,7 @@ select {
   justify-content: center;
   align-items: center;
 
-  #close-load-level-panel{
+  #close-load-level-panel {
     position: absolute;
     top: 10px;
     left: 10px;
@@ -274,34 +284,34 @@ select {
     transition: 0.3s;
   }
 
-  #close-load-level-panel:hover{
+  #close-load-level-panel:hover {
     background-color: black;
     color: white;
   }
 
-  #input-level{
-
-  }
+  #input-level {}
 }
 
-#viewer-3d{
+#viewer-3d {
   transition: all 0.5s;
+  width: 100% !important;
+  height: 100% !important;
 }
 
-#rotate-item{
+#rotate-item {
   display: none;
 }
 
-#settings{
-	display: none;
+#settings {
+  display: none;
   flex-direction: column;
   padding: 20px;
 
-  .options-row{
+  .options-row {
     color: black;
     display: flex;
 
-    span{
+    span {
       width: 50%;
       display: flex;
       align-items: center;
@@ -310,20 +320,44 @@ select {
       pointer-events: none;
     }
 
-    .option-value{
+    .option-value {
       width: 50%;
     }
 
-    select{
+    select {
       color: black;
       width: 100%;
       font-size: 16px;
       font-weight: bold;
     }
 
-    option{
+    option {
       font-size: 16px;
     }
   }
 
+}
+
+#items {
+
+  div {
+    position: relative;
+
+    span {
+      background-color: rgba(0, 0, 0, 0.4);
+      width: 20px;
+      height: 20px;
+      display: flex;
+      border-radius: 20px;
+      justify-content: center;
+      align-items: center;
+      font-weight: bolder;
+      position: absolute;
+      bottom: 5px;
+      right: 10px;
+      filter: drop-shadow(2px 4px 6px black);
+      pointer-events: none;
+      font-size: 12px;
+    }
+  }
 }

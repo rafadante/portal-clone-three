@@ -14,7 +14,8 @@ import {
 import {
   AUDIO,
   play,
-  addPositionalAudio
+  addPositionalAudio,
+  playVoice
 } from "../audio/Audio.js";
 import {
   removeJointConstraint
@@ -156,7 +157,7 @@ function updateEvents() {
               GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
               GLOBALS.CONNECTIONS[i]['line'].idConnection = id;
               GLOBALS.CONNECTIONS[i]['line'].active = true;
-              GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(2, 1.3, 0);
+              GLOBALS.CONNECTIONS[i]['line2'].material.color = new Color(2, 1.3, 0);
               //GLOBALS.BATCHED_BLUE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, false);
               //GLOBALS.BATCHED_ORANGE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, true);
 
@@ -167,6 +168,10 @@ function updateEvents() {
                 if (d.name == "player") {
                   GLOBALS.PLAYER.spawnPosition = GLOBALS.CONNECTIONS[i]['from'].position;
                   GLOBALS.PLAYER.spawnPosition.y += 0.5;
+
+                  console.log(GLOBALS.CONNECTIONS[i]['from'])
+
+                  playVoice(GLOBALS.CONNECTIONS[i]['from'].item.userData.speech)
                 }
               }
 
@@ -220,7 +225,7 @@ function updateEvents() {
               GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons -= 1;
               GLOBALS.CONNECTIONS[i]['line'].idConnection = null;
               GLOBALS.CONNECTIONS[i]['line'].active = false;
-              GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0, 2.0, 5.0);
+              GLOBALS.CONNECTIONS[i]['line2'].material.color = new Color(0, 2.0, 5.0);
               //GLOBALS.BATCHED_BLUE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, true);
               //GLOBALS.BATCHED_ORANGE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, false);
 
@@ -261,7 +266,7 @@ function resetAll() {
       GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons -= 1;
       GLOBALS.CONNECTIONS[i]['line'].idConnection = null;
       GLOBALS.CONNECTIONS[i]['line'].active = false;
-      GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(0, 2.0, 5.0);
+      GLOBALS.CONNECTIONS[i]['line2'].material.color = new Color(0, 2.0, 5.0);
 
       if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
         GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
@@ -350,7 +355,7 @@ function interactWithItem() {
               GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
               //GLOBALS.CONNECTIONS[i]['line'].idConnection = id;
               GLOBALS.CONNECTIONS[i]['line'].active = true;
-              GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(2, 1.3, 0);
+              GLOBALS.CONNECTIONS[i]['line2'].material.color = new Color(2, 1.3, 0);
               //GLOBALS.BATCHED_BLUE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, false);
               //GLOBALS.BATCHED_ORANGE.setVisibleAt(GLOBALS.CONNECTIONS[i]['line'].lineInstancedId, true);
 
@@ -397,13 +402,26 @@ function interactWithItem() {
     } else {
       if (intersects[0].distance < 1.5) {
 
+        var instancedId = intersects[0].instanceId;
+        var name = intersects[0].object.name;
+        var test;
+
+        if (intersects[0].object.name != "camera") {
+          test = GLOBALS.DYMANIC_ITEMS[name][instancedId];
+        } else {
+          test = intersects[0].object;
+        }
+
+        console.log(test)
+
+        if (test.body.mass == 0) {
+          return;
+        }
+
         GLOBALS.HOLDING_ITEM = true;
         tweenCamera(250, GLOBALS.GUN.children[0].children[0].position, new Vector3(0.00009, -0.00013, -0.00001))
 
         if (intersects[0].object.name != "camera") {
-          var instancedId = intersects[0].instanceId;
-          var name = intersects[0].object.name;
-
           GLOBALS.CURRENT_ITEM = GLOBALS.DYMANIC_ITEMS[name][instancedId];
           GLOBALS.CURRENT_INSTANCED = GLOBALS.ITEMS_ADDED.getObjectByName(name);
           GLOBALS.CURRENT_ITEM_ID = instancedId;
@@ -458,7 +476,7 @@ function pedestalTimer(holder) {
 
   holder['line'].active = false;
   holder['to'].item.userData.buttons -= 1;
-  holder['line'].material.color = new Color(0, 2.0, 5.0);
+  holder['line2'].material.color = new Color(0, 2.0, 5.0);
   //GLOBALS.BATCHED_BLUE.setVisibleAt(holder['line'].lineInstancedId, true);
   //GLOBALS.BATCHED_ORANGE.setVisibleAt(holder['line'].lineInstancedId, false);
 
@@ -501,7 +519,7 @@ function laserReceiverTrigger(obj, state, catcher) {
           GLOBALS.CONNECTIONS[i]['from'].item.userData.state = true;
           GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
           GLOBALS.CONNECTIONS[i]['line'].active = true;
-          GLOBALS.CONNECTIONS[i]['line'].material.color = new Color(2, 1.3, 0);
+          GLOBALS.CONNECTIONS[i]['line2'].material.color = new Color(2, 1.3, 0);
 
           if (!catcher)
             GLOBALS.LASER_TRIGGERS.push(obj);
@@ -556,7 +574,7 @@ function laserReceiverTrigger(obj, state, catcher) {
 
     holder['line'].active = false;
     holder['to'].item.userData.buttons -= 1;
-    holder['line'].material.color = new Color(0, 2.0, 5.0);
+    holder['line2'].material.color = new Color(0, 2.0, 5.0);
     holder['from'].item.userData.state = false;
     //GLOBALS.BATCHED_BLUE.setVisibleAt(holder['line'].lineInstancedId, true);
     //GLOBALS.BATCHED_ORANGE.setVisibleAt(holder['line'].lineInstancedId, false);

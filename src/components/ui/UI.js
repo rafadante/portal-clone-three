@@ -6,7 +6,7 @@ import "./Custom.js";
 if (!GLOBALS.MOBILE)
     $(".mobile").css("display", "none");
 
-$("body").on('click', '#settings-audio', function () {
+$("body").on('click', '.settings-audio', function () {
     $("#options-audio").css("display", "block");
     $("#options-settings").css("display", "none");
     $(".settings-menu").css("width", "50%");
@@ -14,7 +14,7 @@ $("body").on('click', '#settings-audio', function () {
     $("#done").css("display", "block");
 });
 
-$("body").on('click', '#settings-video', function () {
+$("body").on('click', '.settings-video', function () {
     $("#options-video").css("display", "block");
     $("#options-settings").css("display", "none");
     $(".settings-menu").css("width", "50%");
@@ -23,7 +23,7 @@ $("body").on('click', '#settings-video', function () {
     alert("The option changes will be saved to local storage while there is no server to allocate player data.");
 });
 
-$("body").on('click', '#settings-controls', function () {
+$("body").on('click', '.settings-controls', function () {
     $("#options-controls").css("display", "block");
     $("#options-settings").css("display", "none");
     $(".settings-menu").css("width", "50%");
@@ -83,6 +83,12 @@ $('#quality-select').on('change', function () {
         $("#resolution-select").val(1).change();
         $("#shadows-resolution-select").val(4096).change();
         localStorage.setItem("antialising", true);
+    }
+
+    if (window.loaded) {
+        // reload the current page
+        alert("The page needs to be reloaded!")
+        window.location.reload();
     }
 
     update();
@@ -245,3 +251,19 @@ $('#social-twitter').on('click', function () {
 $('#social-discord').on('click', function () {
     window.open("https://discord.com/invite/CsARjYrc");
 });
+
+window.addEventListener("orientationchange", (event) => {
+    if (GLOBALS.MOBILE)
+        checkOrientation()
+});
+
+checkOrientation()
+
+function checkOrientation() {
+    if (Math.abs(window.orientation) == 0) {
+        $("#mobile-warning").css("display", "flex")
+        console.log("vertical");
+    } else {
+        $("#mobile-warning").css("display", "none")
+    }
+}

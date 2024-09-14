@@ -37,8 +37,42 @@ import {
     targetFaithPlateUpdate
 } from '../faithPlate/FaithPlate.js';
 import { gelRecharger } from '../gels/PaintingGun.js';
+import { addLine } from '../boxSelection/Connection.js';
 
 var itemCount = 0;
+
+for (const property in GLOBALS.ITEMS_COUNT) {
+    $("#" + property).parent().children("span").text(GLOBALS.ITEMS_COUNT[property]["max"])
+}
+
+function updateLines(userData, instanced) {
+    if (window.changingPosition) {
+        for (var j = 0; j < GLOBALS.CONNECTIONS.length; j++) {
+            if (GLOBALS.CONNECTIONS[j]["from"] == window.changingPositionPlane) {
+
+                GLOBALS.CONNECTIONS[j]["from"] = userData;
+                GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[j]["line"]);
+                const line = addLine(GLOBALS.CONNECTIONS[j]["from"].position, GLOBALS.CONNECTIONS[j]["to"].position);
+                GLOBALS.SCENE_CHILDREN.add(line);
+                GLOBALS.CONNECTIONS[j]["line"] = line;
+
+            } else if (GLOBALS.CONNECTIONS[j]["to"] == window.changingPositionPlane) {
+
+                GLOBALS.CONNECTIONS[j]["to"] = userData;
+                GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[j]["line"]);
+                const line = addLine(GLOBALS.CONNECTIONS[j]["from"].position, GLOBALS.CONNECTIONS[j]["to"].position);
+                GLOBALS.SCENE_CHILDREN.add(line);
+                GLOBALS.CONNECTIONS[j]["line"] = line;
+
+                if (instanced)
+                    GLOBALS.CONNECTIONS[j]["to"].item.userData.connections += 1;
+
+                console.log(GLOBALS.CONNECTIONS[j]["to"])
+
+            }
+        }
+    }
+}
 
 function addItem(found, loaded) {
 
@@ -168,6 +202,7 @@ function addItem(found, loaded) {
 
             if (GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["count"] < GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["max"]) {
                 GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["count"] += 1;
+                $("#" + GLOBALS.ITEM_HOLDED_NAME).parent().children("span").text(GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["max"] - GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["count"])
             } else {
                 alert("Max Number of this item on the scene reached!");
                 return;
@@ -190,6 +225,11 @@ function addItem(found, loaded) {
                 false
             );
 
+            //PORTALS CAN NOT SPAWN ON ITEM POSITION
+            GLOBALS.PLANE_USER_DATA[userData.id_instanced].portal = false;
+            GLOBALS.PLANE_USER_DATA[userData.id_instanced].planeColor = 0x808080;
+            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(userData.id_instanced, new Color(0x808080));
+            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
                 var target = new Vector3(); // create once an reuse it
@@ -277,11 +317,11 @@ function addItem(found, loaded) {
                 bb.setFromObject(cube);
 
                 if (userData.instancedName == "button_box") {
-                    bb.accept = "cube";
+                    bb.accept = "cube-cube_2-laser_cube";
                 } else if (userData.instancedName == "button_circle") {
                     bb.accept = "sphere";
                 } else if (userData.instancedName == "button_weight") {
-                    bb.accept = "sphere-cube-player";
+                    bb.accept = "sphere-cube-player-laser_cube-cube_2";
                 }
 
                 userData.box3 = bb;
@@ -459,6 +499,9 @@ function addItem(found, loaded) {
                 manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData);
             else
                 manageItemVariables(item, userData, instanced);
+
+            //Update Connection Lines
+            updateLines(userData, true);
         }
     }
 
@@ -466,6 +509,8 @@ function addItem(found, loaded) {
         GLOBALS.ITEM_HOLDED_NAME = null;
         $("#follow").css("display", "none");
     }
+
+    window.changingPosition = false;
 }
 
 function manageItemVariables(item, userData, instanced) {
@@ -624,5 +669,6 @@ function clickItem(elem) {
 
 export {
     addItem,
-    clickItem
+    clickItem,
+    updateLines
 }

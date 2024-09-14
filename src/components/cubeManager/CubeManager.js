@@ -3,12 +3,18 @@ import {
     Color,
     Vector3,
     PlaneGeometry,
-    InstancedMesh
+    InstancedMesh,
+    BoxGeometry,
+    MeshBasicMaterial,
+    Mesh,
+    Box3
 } from 'three';
 import { GLOBALS } from '../../Globals.js';
 import { getPlaneByName, warning } from '../../Utils.js';
 import { checkToUpdateContinuous } from './UpdateRaycast.js';
 import { removeSelection } from '../boxSelection/BoxSelection.js';
+import { updateLines } from '../items/AddItem.js';
+import { addLine } from '../boxSelection/Connection.js';
 
 var IndexArray = [];
 var remove;
@@ -20,7 +26,7 @@ function cubeState(button) {
     if (button == "plus") {
         //
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
-            trasnlatePlane(GLOBALS.SELECTED_ID[i], 1, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal);
+            trasnlatePlane(GLOBALS.SELECTED_ID[i], 1, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
         }
     } else if (button == "minus") {
         //
@@ -40,7 +46,7 @@ function cubeState(button) {
                 return;
             }
 
-            trasnlatePlane(GLOBALS.SELECTED_ID[i], -1, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal);
+            trasnlatePlane(GLOBALS.SELECTED_ID[i], -1, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
         }
     }
 
@@ -67,7 +73,7 @@ function cubeState(button) {
     }
 }
 
-function trasnlatePlane(id, val, portal) {
+function trasnlatePlane(id, val, portal, old) {
 
     var dummy = new Object3D();
     dummy.position.copy(GLOBALS.PLANE_USER_DATA[id].position);
@@ -142,8 +148,51 @@ function trasnlatePlane(id, val, portal) {
 
             var plane = GLOBALS.PLANE_USER_DATA[id];
 
+            console.log(old)
+            console.log(plane);
+
+
+            for (var j = 0; j < GLOBALS.CONNECTIONS.length; j++) {
+                if (GLOBALS.CONNECTIONS[j]["from"] == plane) {
+
+                    GLOBALS.CONNECTIONS[j]["from"] = plane;
+                    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[j]["line"]);
+                    const line = addLine(GLOBALS.CONNECTIONS[j]["from"].position, GLOBALS.CONNECTIONS[j]["to"].position);
+                    GLOBALS.SCENE_CHILDREN.add(line);
+                    GLOBALS.CONNECTIONS[j]["line"] = line;
+
+                    //UPDATE BOX3 TRIGGER
+                    const geometryBox3 = new BoxGeometry(1, 0.5, 1);
+                    const materialBox3 = new MeshBasicMaterial();
+                    const cube = new Mesh(geometryBox3, materialBox3);
+                    cube.position.copy(plane.position);
+                    cube.rotation.copy(plane.rotation);
+
+                    var bb = new Box3(); // for re-use
+                    bb.setFromObject(cube);
+
+                    if (plane.instancedName == "button_box") {
+                        bb.accept = "cube-cube_2-laser_cube";
+                    } else if (plane.instancedName == "button_circle") {
+                        bb.accept = "sphere";
+                    } else if (plane.instancedName == "button_weight") {
+                        bb.accept = "sphere-cube-player-laser_cube-cube_2";
+                    }
+
+                    plane.box3 = bb;
+
+                } else if (GLOBALS.CONNECTIONS[j]["to"] == plane) {
+
+                    GLOBALS.CONNECTIONS[j]["to"] = plane;
+                    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[j]["line"]);
+                    const line = addLine(GLOBALS.CONNECTIONS[j]["from"].position, GLOBALS.CONNECTIONS[j]["to"].position);
+                    GLOBALS.SCENE_CHILDREN.add(line);
+                    GLOBALS.CONNECTIONS[j]["line"] = line;
+                }
+            }
+
             if (GLOBALS.PLANE_USER_DATA[id].itemName == "gel") {
-                
+
             } else if (GLOBALS.PLANE_USER_DATA[id].isInstanced) {
                 plane.item.position.copy(plane.position);
                 var item = new Object3D();
@@ -264,7 +313,6 @@ function checkSides(dummy, val, id, side, portal) {
         };
 
         GLOBALS.BUDGET -= 1;
-
     } else { //if there is a face delete it
         IndexArray.push(sideExists[0].id_instanced);
     }

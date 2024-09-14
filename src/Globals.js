@@ -67,6 +67,17 @@ cubeHolder.name = "cubeHolder";
 window.cubeHolder = cubeHolder;
 camera.add(cubeHolder);
 
+const maxWidth = 1920;  // Set your maximum width resolution
+const maxHeight = 1080; // Set your maximum height resolution
+
+// Get the actual window dimensions
+window.canvasWidth = window.innerWidth;
+window.canvasHeight = window.innerHeight;
+
+// Cap the width and height to your maximum values
+window.canvasWidth = Math.min(window.canvasWidth, maxWidth);
+window.canvasHeight = Math.min(window.canvasHeight, maxHeight);
+
 //RENDERER
 const renderer = new WebGLRenderer({
     alpha: true,
@@ -74,7 +85,7 @@ const renderer = new WebGLRenderer({
     antialias: antialias
 });
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setSize(window.canvasWidth, window.canvasHeight);
 renderer.outputColorSpace = SRGBColorSpace;
 renderer.toneMapping = ACESFilmicToneMapping;;
 renderer.toneMappingExposure = 1;
@@ -405,11 +416,11 @@ var GLOBALS = {
         },
         door: {
             count: 0,
-            max: 10
+            max: 5
         },
         sphere: {
             count: 0,
-            max: 15
+            max: 10
         },
         gel_gun_blue: {
             count: 0,
@@ -429,7 +440,7 @@ var GLOBALS = {
         },
         radio: {
             count: 0,
-            max: 10
+            max: 1
         },
         button_weight: {
             count: 0,
@@ -501,7 +512,7 @@ var GLOBALS = {
         },
         door: {
             count: 0,
-            max: 10
+            max: 5
         },
         light: {
             count: 0,
@@ -549,7 +560,7 @@ var GLOBALS = {
         },
         camera: {
             count: 0,
-            max: 10
+            max: 5
         },
         portal_0: {
             count: 0,
@@ -561,11 +572,11 @@ var GLOBALS = {
         },
         laser_field: {
             count: 0,
-            max: 10
+            max: 20
         },
         fizzler: {
             count: 0,
-            max: 10
+            max: 20
         },
         observation_room: {
             count: 0,
@@ -573,7 +584,7 @@ var GLOBALS = {
         },
         glass: {
             count: 0,
-            max: 100
+            max: 20
         },
         portal_gun: {
             count: 0,
@@ -590,7 +601,7 @@ var GLOBALS = {
         portal: {
             count: 0,
             max: 10
-        },
+        }
     },
     SCENE_FPS: null,
     LISTENER: new AudioListener(),

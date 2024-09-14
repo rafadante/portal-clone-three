@@ -8,7 +8,8 @@ import {
     Mesh,
     Box3,
     PlaneGeometry,
-    MeshStandardMaterial
+    MeshStandardMaterial,
+    Color
 } from 'three';
 import * as CANNON from 'cannon';
 import {
@@ -84,7 +85,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     } else if (item == "glass") {
         var geometry = new BoxGeometry(2, intersects[0].distance, 0.025);
     } else if (item == "laser_field" || item == "fizzler") {
-        
+
 
         if (item == "laser_field") {
             var geometry = new PlaneGeometry(2, intersects[0].distance);
@@ -176,6 +177,16 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     var otherSide = getPlaneByName(cloneLaserField.position.x + "/" + cloneLaserField.position.y + "/" + cloneLaserField.position.z);
     raycaster.distance = intersects[0].distance;
 
+    if (item != "tractor_beam" && item != "light_bridge") {
+        console.log(otherSide)
+        //PORTALS CAN NOT SPAWN ON ITEM POSITION
+        GLOBALS.PLANE_USER_DATA[otherSide[0].id_instanced].portal = false;
+        GLOBALS.PLANE_USER_DATA[otherSide[0].id_instanced].planeColor = 0x808080;
+        GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(otherSide[0].id_instanced, new Color(0x808080));
+        GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+    }
+
+
     if (otherSide.length > 0 && item != "tractor_beam") {
         otherSide[0].continuousEnding = true;
         plane.otherSide = otherSide[0];
@@ -201,7 +212,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     }
 
     if (!object.userData.state)
-       plane.visible = false;
+        plane.visible = false;
 
     if (item == "light_bridge" || item == "glass") {
         box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT

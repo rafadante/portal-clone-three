@@ -4,7 +4,8 @@ import {
     Color,
     Clock,
     Object3D,
-    InstancedMesh
+    InstancedMesh,
+    Vector2
 } from 'three';
 import $ from 'jquery';
 import {
@@ -42,9 +43,26 @@ $("#loading-parent").css("pointer-events", "none");
 $("body").on('click', '#option-community-build, #option-single-load', function () { //
     setTimeout(() => {
         //play(AUDIO.EDITOR);
+
         init();
     }, 2000);
 });
+
+var p = 0;
+
+function loadingTxt(){
+
+    p+=1;
+
+    $(".introduction-text").addClass("loading-disabled");
+    $("#p" + p).removeClass("loading-disabled");
+
+    if(p < 4){
+        setTimeout(() => {
+            loadingTxt()
+        }, 5000);
+    }
+}
 
 if (!stopMenuLoop) {
     setTimeout(() => {
@@ -60,7 +78,7 @@ if (!stopMenuLoop) {
         planeFitPerspectiveCamera(plane1, GLOBALS.MAIN_CAMERA)
 
         animate();
-        //window.addEventListener('resize', onWindowResize);
+        window.addEventListener('resize', onWindowResize);
 
         setTimeout(() => {
             getMonitorFPS = false;
@@ -73,6 +91,10 @@ function onWindowResize() {
 
     GLOBALS.MAIN_CAMERA.aspect = window.innerWidth / window.innerHeight;
     GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
+
+    GLOBALS.MATERIAL_MAIN_MENU.uniforms.resolution.value = new Vector2(window.innerWidth, window.innerHeight);
+    GLOBALS.MATERIAL_SUB_MENU.uniforms.resolution.value = new Vector2(window.innerWidth, window.innerHeight);
+
     planeFitPerspectiveCamera(plane1, GLOBALS.MAIN_CAMERA)
 }
 
@@ -85,6 +107,8 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
 
     plane.scale.set(scaleX, scaleY, 1);
     plane2.scale.set(scaleX, scaleY, 1);
+
+    console.log(camera.fov)
 }
 
 var level;

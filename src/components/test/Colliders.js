@@ -260,14 +260,16 @@ function addColliderItem(items, type, mass, offset) {
                     objHolder.translateZ(a1)
                 } else if (offset == 2) {
                     var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.14, 0.1));
-                    objHolder.translateZ(-a2)
+                    objHolder.translateY(0.14)
+                    objHolder.translateZ(-a1)
                 } else if (offset == 3) {
                     var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.14, 0.5));
-                    objHolder.translateZ(a1)
+                    objHolder.translateY(0.14)
                     objHolder.translateX(a1)
                 } else if (offset == 4) {
                     var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.14, 0.5));
-                    objHolder.translateX(-a2)
+                    objHolder.translateY(0.14)
+                    objHolder.translateX(-a1)
                 }
             } else if (type == "dispenser") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.7));

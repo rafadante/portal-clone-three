@@ -15,6 +15,7 @@ import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
 import {
     GLOBALS
 } from '../../Globals.js';
+import { getPlaneMiddleEdges } from '../../Utils.js';
 
 var visited = {};
 var shapes = [];
@@ -22,7 +23,7 @@ var scene = new Group();
 var dgraph, lineFollow, count;
 var isDrawStart = false;
 
-function findPath(ini, target, found, found2) {
+function findPath(ini, target, found, found2, line2) {
 
     scene = new Group();
     shapes = [];
@@ -68,7 +69,7 @@ function findPath(ini, target, found, found2) {
     //GLOBALS.SELECTED_FOR_CONNECTION.check = plane;
 
     for (var j = 0; j < GLOBALS.PLANE_USER_DATA.length; j++) {
-        if (GLOBALS.PLANE_USER_DATA[j].exists && !GLOBALS.PLANE_USER_DATA[j].hasItem) {
+        if (GLOBALS.PLANE_USER_DATA[j].exists) {//&& !GLOBALS.PLANE_USER_DATA[j].hasItem
             nodes.push(GLOBALS.PLANE_USER_DATA[j]);
         }
     }
@@ -103,10 +104,10 @@ function findPath(ini, target, found, found2) {
 
     path2(dgraph,
         scene.getObjectByName(ini.x + '/' + ini.y + '/' + ini.z).id,
-        scene.getObjectByName(target.x + '/' + target.y + '/' + target.z).id, side, found, found2)
+        scene.getObjectByName(target.x + '/' + target.y + '/' + target.z).id, side, found, found2, line2)
 }
 
-function path2(dgraph, start, end, side, found, found2) {
+function path2(dgraph, start, end, side, found, found2, line2) {
 
     var shortestpath = dgraph.findShortestPath(start, end);
 
@@ -150,33 +151,15 @@ function path2(dgraph, start, end, side, found, found2) {
 
         if (points[j - 1].distanceTo(points[j]) != 2) {
 
-            /*var dir = new Vector3(); // create once an reuse it
-            dir.subVectors(points[j], points[j - 1]).normalize();
+            var array = getPlaneMiddleEdges(points[j - 1], rotPoints[j - 1]);
 
-            if (direction.z != 0) {
-                if (dir.round().z == 0) {
-                    direction.x = direction.z;
-                    direction.z = 0;
+            for (var w = 0; w < array.length; w++) {
+                if (array[w].distanceTo(points[j]) <= 1) {
+                    pathPointsRot.push(rotPoints[j - 1])
+                    pathPoints.push(array[w])
+                    break;
                 }
             }
-
-            var val = points[j - 1].clone();
-            val.x -= direction.round().x;
-            val.y -= direction.round().y;
-            val.z -= direction.round().z;*/
-
-            //pathPoints.push(val)
-
-            const holderObj = new Object3D();
-            holderObj.position.copy(points[j - 1])
-            holderObj.rotation.copy(rotPoints[j - 1])
-            GLOBALS.SCENE.add(holderObj)
-            holderObj.translateY(1);
-
-            pathPointsRot.push(holderObj.rotation)
-            pathPoints.push(holderObj.position)
-            GLOBALS.SCENE.remove(holderObj)
-
 
             pathPointsRot.push(rotPoints[j])
             pathPoints.push(points[j])
@@ -189,7 +172,6 @@ function path2(dgraph, start, end, side, found, found2) {
         direction.subVectors(pathPoints[j - 1], points[j]).normalize();
     }
 
-    //
     var dir = new Vector3(); // create once an reuse it
     dir.subVectors(pathPoints[pathPoints.length - 2], pathPoints[pathPoints.length - 1]).normalize();
 
@@ -211,7 +193,7 @@ function path2(dgraph, start, end, side, found, found2) {
     // Create circles evenly spaced along the path
     const circleGeometry = new SphereGeometry(0.04, 16, 8);
     const circleMaterial = new MeshBasicMaterial({
-        color: new Color(0, 0.7, 1.0),
+        color: new Color(0, 2.0, 5.0),
     });
 
     for (let i = 0; i < numberOfCircles; i++) {
@@ -261,15 +243,9 @@ function path2(dgraph, start, end, side, found, found2) {
     var circlePAth = new Mesh(mergedGeometry, circleMaterial);
 
     if (found2.instancedName != "trigger_area")
-        GLOBALS.SCENE_CHILDREN.add(circlePAth);
+        GLOBALS.SCENE_FPS.add(circlePAth);//
 
-    //GLOBALS.SELECTED_FOR_CONNECTION.circle = circlePAth;
-
-    GLOBALS.CONNECTIONS.push({
-        line: circlePAth,
-        from: found2,
-        to: found
-    });
+    line2['line2'] = circlePAth;
 }
 
 function dist(t0, t1) {

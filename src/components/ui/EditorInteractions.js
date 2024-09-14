@@ -72,6 +72,25 @@ $("body").on('click', '#rotate-item', function () {
 
 $("body").on('click', '#delete', function () {
 
+    var indexesToDelete = [];
+
+    for (var j = 0; j < GLOBALS.CONNECTIONS.length; j++) {
+        if (GLOBALS.CONNECTIONS[j]["from"] == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]]) {
+            indexesToDelete.push(j);
+        } else if (GLOBALS.CONNECTIONS[j]["to"] == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]]) {
+            indexesToDelete.push(j);
+        }
+    }
+
+    console.log(indexesToDelete)
+
+    for (var j = 0; j < indexesToDelete.length; j++) {
+        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[indexesToDelete[j]]["line"]);
+        GLOBALS.CONNECTIONS.splice(indexesToDelete[j], 1);
+    }
+
+    console.log(GLOBALS.CONNECTIONS);
+
     if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].isInstanced) {
 
         if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous) {
@@ -133,12 +152,14 @@ $("body").on('click', '#delete', function () {
 
         GLOBALS.ITEMS_COUNT[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName]["count"] -= 1;
         GLOBALS.ITEMS_ADDED.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item);
+
+        $("#" + GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName).parent().children("span").text(GLOBALS.ITEMS_COUNT[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName]["max"] - GLOBALS.ITEMS_COUNT[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName]["count"])
     }
 
     planeInstanceReset(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false, null, null, null, null, null, null, null, false, null, false, false);
     $(".menu").removeClass("menu-show");
 
-    animate()
+    animate();
 });
 
 $("body").on('input', '#state-dispenser', function () {
@@ -582,9 +603,9 @@ if (localStorage.getItem("goo_reflections")) {
 //
 
 $("body").on('click', '.angled_panel_option', function () {
-    $("#angled_panel_option").find(".title").text("Angle: " +  $(this).data("angle"));
+    $("#angled_panel_option").find(".title").text("Angle: " + $(this).data("angle"));
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.angle = $(this).data("angle");
 
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.getObjectByName("pivot2").rotation.x = Math.PI/180 * $(this).data("real");
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.getObjectByName("pivot2").rotation.x = Math.PI / 180 * $(this).data("real");
     animate();
 })

@@ -1,5 +1,8 @@
 import {
+    Mesh,
+    MeshBasicMaterial,
     Object3D,
+    PlaneGeometry,
     Vector3,
     Vector4
 } from 'three';
@@ -135,6 +138,55 @@ function tweenBack(duration, ini, final) {
         .start();
 }
 
+function getPlaneMiddleEdges(pos, rot) {
+
+    console.log("------------------------------")
+    console.log(pos)
+    console.log(rot)
+
+    const geometry = new PlaneGeometry(2, 2);
+    const material = new MeshBasicMaterial();
+    const plane = new Mesh(geometry, material);
+    plane.position.copy(pos);
+    plane.rotation.copy(rot);
+    plane.updateMatrixWorld(true);
+    GLOBALS.SCENE.add(plane)
+
+    // Get the dimensions of the plane (assuming the plane is not scaled)
+    const width = geometry.parameters.width;
+    const height = geometry.parameters.height;
+
+    // Find half dimensions
+    const halfWidth = width / 2;
+    const halfHeight = height / 2;
+
+    // Get the plane's transformation matrix
+    const matrix = plane.matrixWorld;
+
+    // Define the midpoints in local space
+    const localTopMiddle = new Vector3(0, halfHeight, 0);
+    const localBottomMiddle = new Vector3(0, -halfHeight, 0);
+    const localLeftMiddle = new Vector3(-halfWidth, 0, 0);
+    const localRightMiddle = new Vector3(halfWidth, 0, 0);
+
+    // Apply the matrix to transform them to world space
+    localTopMiddle.applyMatrix4(matrix);
+    localBottomMiddle.applyMatrix4(matrix);
+    localLeftMiddle.applyMatrix4(matrix);
+    localRightMiddle.applyMatrix4(matrix);
+
+    GLOBALS.SCENE.remove(plane)
+
+    var array = [
+        localTopMiddle.round(),
+        localBottomMiddle.round(),
+        localLeftMiddle.round(),
+        localRightMiddle.round()
+    ]
+
+    return array;
+}
+
 export {
     getPlaneByName,
     warning,
@@ -147,5 +199,6 @@ export {
     threeToFour,
     fourToThree,
     hex2rgb,
-    tweenBack
+    tweenBack,
+    getPlaneMiddleEdges
 }

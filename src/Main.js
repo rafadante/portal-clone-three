@@ -142,16 +142,16 @@ function init() {
 }
 
 function onWindowResize() {
-    GLOBALS.RENDERER.setSize(window.innerWidth, window.innerHeight);
+    GLOBALS.RENDERER.setSize(window.canvasWidth, window.canvasHeight);
 
-    GLOBALS.MAIN_CAMERA.aspect = window.innerWidth / window.innerHeight;
+    GLOBALS.MAIN_CAMERA.aspect = window.canvasWidth / window.canvasHeight;
     GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
 
-    GLOBALS.PORTAL_GUN_CAMERA.aspect = window.innerWidth / window.innerHeight;
+    GLOBALS.PORTAL_GUN_CAMERA.aspect = window.canvasWidth / window.canvasHeight;
     GLOBALS.PORTAL_GUN_CAMERA.updateProjectionMatrix();
 
     if (GLOBALS.COMPOSER)
-        GLOBALS.COMPOSER.setSize(window.innerWidth, window.innerHeight);
+        GLOBALS.COMPOSER.setSize(window.canvasWidth, window.canvasHeight);
 }
 
 GLOBALS.RENDERER.info.autoReset = true;
@@ -260,7 +260,7 @@ function render(time) {
     GLOBALS.RENDERER.localClippingEnabled = false;
     GLOBALS.RENDERER.clippingPlanes = [];
 
-    if (localStorage.getItem("quality-select") == "epic") {
+    if (localStorage.getItem("quality-select") == "epic" && GLOBALS.COMPOSER) {
         GLOBALS.COMPOSER.render();
         GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
     } else {
