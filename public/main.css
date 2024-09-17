@@ -978,3 +978,7 @@ button:focus {outline:0;}
 .loading-disabled{
 	display: none;
 }
+
+.gel{
+	display: none !important;
+}

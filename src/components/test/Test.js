@@ -162,7 +162,8 @@ function viewFPS() {
         GLOBALS.OBSERVATION_ROOM.rotation.copy(GLOBALS.OBSERVATION_ROOM_IMG.rotation);
         //--------------------------------------------------------------------------
 
-        if (!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high")) {
+        if ((!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high"))
+        || (window.playerState)) {
             GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE);
             GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE2);
         }
@@ -289,8 +290,6 @@ function blockPortal() {
         }
 
     }
-
-    console.log(GLOBALS.DOORS)
 
     for (var i = 0; i < GLOBALS.DOORS.length; i++) {
         GLOBALS.BLOCK_PORTAL.push(GLOBALS.DOORS[i].children[0].children[0])

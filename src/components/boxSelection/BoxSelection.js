@@ -23,6 +23,7 @@ import { manageConnection } from './Connection.js';
 const orange = new Color("rgb(255, 165, 0)");
 var initialPosition = null;
 var currentID = null;
+var firstSelected;
 
 function raycastSelected(found, event, type) {
 
@@ -54,8 +55,6 @@ function raycastSelected(found, event, type) {
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "enterDoor" &&
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "window") {
 
-            //console.log(GLOBALS.PLANE_USER_DATA[instanceId])
-
             if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem &&
                 (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("door") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_0") ||
@@ -69,157 +68,159 @@ function raycastSelected(found, event, type) {
 
             $(".hasItem").css("display", "none");
 
-            if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem) {
-                $("#delete").css("display", "block");
+            if (GLOBALS.SELECTED_ID.length == 1) {
+                if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem) {
+                    $("#delete").css("display", "block");
 
-                if (!GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel_recharger"))
-                    $(".gel").css("display", "none");
-                else
-                    $(".gel").css("display", "block");
+                    if (!GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel_recharger"))
+                        $(".gel").css("display", "none");
+                    else
+                        $(".gel").css("display", "block");
 
-                if ((GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere") ||
-                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") ||
-                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_cube"))) {
-                    $(".dispenser").css("display", "block");
-                    $("#state-dispenser").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.hasDispenser);
-                    $("#dispenser-opened").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.opened);
-                } else {
-                    $(".dispenser").css("display", "none");
-                }
+                    if ((GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere") ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_cube"))) {
+                        $(".dispenser").css("display", "block");
+                        $("#state-dispenser").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.hasDispenser);
+                        $("#dispenser-opened").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.opened);
+                    } else {
+                        $(".dispenser").css("display", "none");
+                    }
 
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_receiver") ||
-                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_relay") ||
-                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_catcher")) {
-                    $(".buttons").css("display", "block");
-                    $("#connections").empty();
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_receiver") ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_relay") ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_catcher")) {
+                        $(".buttons").css("display", "block");
+                        $("#connections").empty();
 
-                    for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+                        for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
 
-                        if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[instanceId].itemName) {
-                            var elem = '<li data-id="' + i + '" class="menu-item removeConnection">' +
-                                '<button type="button" class="menu-btn">' +
-                                '<i class="fas fa-times"></i>' +
-                                '<span class="menu-text">' + GLOBALS.CONNECTIONS[i]["to"].itemName + '</span>' +
-                                '</button>' +
-                                '</li>';
+                            if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[instanceId].itemName) {
+                                var elem = '<li data-id="' + i + '" class="menu-item removeConnection">' +
+                                    '<button type="button" class="menu-btn">' +
+                                    '<i class="fas fa-times"></i>' +
+                                    '<span class="menu-text">' + GLOBALS.CONNECTIONS[i]["to"].itemName + '</span>' +
+                                    '</button>' +
+                                    '</li>';
 
-                            $("#connections").append(elem);
+                                $("#connections").append(elem);
 
-                            $("#state-lines").prop("checked", GLOBALS.CONNECTIONS[i]['line'].visible);
+                                $("#state-lines").prop("checked", GLOBALS.CONNECTIONS[i]['line'].visible);
+                            }
+                        }
+
+                    } else {
+                        $(".buttons").css("display", "none");
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal")) {
+
+                        $(".pedestal").css("display", "block");
+                        $("#state-pedetsal-infinity").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalInfinity);
+                        $("#pedestal-timer-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalValue);
+
+                        if (GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalInfinity) {
+                            $("#pedestal-timer").addClass("disabled");
+                        } else {
+                            $("#pedestal-timer").removeClass("disabled");
                         }
                     }
 
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("tractor")) {
+                        $(".tractor").css("display", "block");
+
+                        $("#tractor-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state)
+                        $("#tractor-direction-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.reversed)
+                        $("#tractor-trigger").find(".title").text("Triggers: " + GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light_bridge")) {
+                        $(".light-bridge").css("display", "block");
+
+                        $("#light-bridge-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state);
+                        $("#light-bridge-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_field")) {
+                        $(".laser-field").css("display", "block");
+
+                        $("#laser-field-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state);
+                        $("#laser-field-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("fizzler")) {
+                        $(".fizzler").css("display", "block");
+
+                        $("#fizzler-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state);
+                        $("#fizzler-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("observation_room") ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light")) {
+                        $(".light-color").css("display", "block");
+
+                        $("#ligh-color-input").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.lightColor)
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere")) {
+                        $(".physics").css("display", "block");
+
+                        $("#restitution").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.restitution)
+                        $("#friction").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.friction)
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("glass")) {
+                        $(".glass").css("display", "block");
+
+                        $("#glass-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
+                        $("#grid-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.grid);
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_gun")) {
+                        $(".portal_gun").css("display", "block");
+                        $("#portal_gun-state").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state + " Portals");
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_emitter")) {
+                        $(".laser_emitter").css("display", "block");
+                        $("#laser_emitter-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_receiver")) {
+                        $(".laser_receiver").css("display", "block");
+                        $("#laser_receiver-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_launcher")) {
+                        $(".pellet").css("display", "block");
+                        $("#state-pellet-infinity").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalInfinity);
+                        $("#pellet-timer-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalValue);
+
+                        if (GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalInfinity) {
+                            $("#pellet-timer").addClass("disabled");
+                        } else {
+                            $("#pellet-timer").removeClass("disabled");
+                        }
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("faith_plate")) {
+                        $(".faith_plate").css("display", "block");
+                        $("#plate-max-height-value").prop("min", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height - 2);
+                        $("#plate-max-height-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height);
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("angled_panel")) {
+                        $(".angled_panel").css("display", "block");
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel_recharger")) {
+                        $(".gel_recharger").css("display", "block");
+                    }
+
                 } else {
-                    $(".buttons").css("display", "none");
+                    $(".gel").css("display", "block");
                 }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal")) {
-
-                    $(".pedestal").css("display", "block");
-                    $("#state-pedetsal-infinity").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalInfinity);
-                    $("#pedestal-timer-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalValue);
-
-                    if (GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalInfinity) {
-                        $("#pedestal-timer").addClass("disabled");
-                    } else {
-                        $("#pedestal-timer").removeClass("disabled");
-                    }
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("tractor")) {
-                    $(".tractor").css("display", "block");
-
-                    $("#tractor-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state)
-                    $("#tractor-direction-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.reversed)
-                    $("#tractor-trigger").find(".title").text("Triggers: " + GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light_bridge")) {
-                    $(".light-bridge").css("display", "block");
-
-                    $("#light-bridge-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state);
-                    $("#light-bridge-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_field")) {
-                    $(".laser-field").css("display", "block");
-
-                    $("#laser-field-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state);
-                    $("#laser-field-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("fizzler")) {
-                    $(".fizzler").css("display", "block");
-
-                    $("#fizzler-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state);
-                    $("#fizzler-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("observation_room") ||
-                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light")) {
-                    $(".light-color").css("display", "block");
-
-                    $("#ligh-color-input").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.lightColor)
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") ||
-                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere")) {
-                    $(".physics").css("display", "block");
-
-                    $("#restitution").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.restitution)
-                    $("#friction").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.friction)
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("glass")) {
-                    $(".glass").css("display", "block");
-
-                    $("#glass-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
-                    $("#grid-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.grid);
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_gun")) {
-                    $(".portal_gun").css("display", "block");
-                    $("#portal_gun-state").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state + " Portals");
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_emitter")) {
-                    $(".laser_emitter").css("display", "block");
-                    $("#laser_emitter-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_receiver")) {
-                    $(".laser_receiver").css("display", "block");
-                    $("#laser_receiver-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_launcher")) {
-                    $(".pellet").css("display", "block");
-                    $("#state-pellet-infinity").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalInfinity);
-                    $("#pellet-timer-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalValue);
-
-                    if (GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalInfinity) {
-                        $("#pellet-timer").addClass("disabled");
-                    } else {
-                        $("#pellet-timer").removeClass("disabled");
-                    }
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("faith_plate")) {
-                    $(".faith_plate").css("display", "block");
-                    $("#plate-max-height-value").prop("min", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height - 2);
-                    $("#plate-max-height-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height);
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("angled_panel")) {
-                    $(".angled_panel").css("display", "block");
-                }
-
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel_recharger")) {
-                    $(".gel_recharger").css("display", "block");
-                }
-
-            } else {
-                $(".gel").css("display", "block");
             }
 
             GLOBALS.SELECTED_ID.push(instanceId);
@@ -402,6 +403,7 @@ function raycastSelected(found, event, type) {
                 initialPosition = GLOBALS.PLANE_USER_DATA[instanceId].position;
                 GLOBALS.SELECTED_ID.push(instanceId);
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.PLANE_USER_DATA[instanceId].id_instanced, orange);
+                firstSelected = instanceId;
             } else {
 
                 GLOBALS.SELECTED_ID = [];
@@ -439,10 +441,15 @@ function raycastSelected(found, event, type) {
 
                             var plane = getPlaneByName((vec1.x + (i * xDir)) + "/" + (vec1.y + (j * yDir)) + "/" + (vec1.z + (k * zDir)));
 
-                            if (plane[0]) {
-                                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(plane[0].id_instanced, orange);
-                                GLOBALS.SELECTED_ID_ORANGE.push(plane[0]);
-                                GLOBALS.SELECTED_ID.push(plane[0].id_instanced);
+                            if (!plane[0])
+                                continue;
+
+                            if (plane[0].side == GLOBALS.PLANE_USER_DATA[firstSelected].side) {
+                                if (plane[0]) {
+                                    GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(plane[0].id_instanced, orange);
+                                    GLOBALS.SELECTED_ID_ORANGE.push(plane[0]);
+                                    GLOBALS.SELECTED_ID.push(plane[0].id_instanced);
+                                }
                             }
                         }
                     }
@@ -455,6 +462,7 @@ function raycastSelected(found, event, type) {
 }
 
 function removeSelection() {
+    firstSelected = null;
     for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
 
         if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor) {

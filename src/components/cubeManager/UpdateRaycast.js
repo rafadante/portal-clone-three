@@ -3,7 +3,6 @@ import { createLightBridges } from '../continuous/Continuous.js';
 import { ContinuousTrigger } from '../continuous/Continuous.js';
 import $ from 'jquery';
 import { laserEmitterRaycast } from '../lasers/Laser.js';
-import { updateLines } from '../items/AddItem.js';
 
 function checkToUpdateContinuous() {
 

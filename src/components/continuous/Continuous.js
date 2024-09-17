@@ -8,7 +8,6 @@ import {
     Mesh,
     Box3,
     PlaneGeometry,
-    MeshStandardMaterial,
     Color
 } from 'three';
 import * as CANNON from 'cannon';
@@ -23,12 +22,6 @@ import { respawn } from '../events/states.js';
 import {
     animate
 } from '../../Main.js';
-import {
-    tweenCamera,
-} from '../../Utils.js';
-import { interactWithItem } from '../events/events.js';
-import { deletePortal } from '../portal/CreatePortal.js';
-import { addPositionalAudio } from '../audio/Audio.js';
 import { getPlaneByName } from '../../Utils.js';
 import { updateMaterialRepeat } from '../materials/Materials.js';
 import { fizzlerTrigger } from '../test/Colliders.js';
@@ -111,9 +104,8 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
         var vertices = geometry.attributes.position.array;
         var heights = new Float32Array(vertices.length / 3);  // Assuming height for each vertex
 
-        for (var i = 0; i < heights.length; i++) {
+        for (var i = 0; i < heights.length; i++)
             heights[i] = intersects[0].distance / 5;
-        }
 
         geometry.setAttribute('height', new BufferAttribute(heights, 1));
 
@@ -125,11 +117,10 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
 
     raycaster.name = item;
 
-    if (update) {
+    if (update)
         rayItem = raycaster;
-    } else {
+    else
         rayItem.push(raycaster);
-    }
 
     const plane = new Mesh(geometry, material);
 
@@ -139,7 +130,6 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     window.uuuu = plane;
 
     if (item == "tractor_beam") {
-        //plane.rotation.x = Math.PI / 2;
         plane.updateMatrix();
         plane.geometry.applyMatrix4(plane.matrix);
     }
@@ -150,9 +140,8 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     plane.distance = intersects[0].distance / 2;
     plane.renderOrder = -1;
 
-    if (item == "laser_field" || item == "fizzler") {
+    if (item == "laser_field" || item == "fizzler")
         plane.rotateX(Math.PI)
-    }
 
     const result = threeToCannon(plane, {
         type: ShapeType.BOX
@@ -186,7 +175,6 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
     }
 
-
     if (otherSide.length > 0 && item != "tractor_beam") {
         otherSide[0].continuousEnding = true;
         plane.otherSide = otherSide[0];
@@ -201,11 +189,6 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
             )
         } else {
             plane.material = GLOBALS.MATERIAL_GLASS;
-            /*updateMaterialRepeat(
-                plane,
-                GLOBALS.MATERIAL_GLASS,
-                intersects[0].distance / 3
-            )*/
         }
 
         window.glass.push(plane)
@@ -320,8 +303,6 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 }
             }
 
-            //---------------------------------------------------------------------
-
             var material = GLOBALS.MATERIAL_LIGHT_BRIDGERS;
 
             if (rayItem[g].name == "light_bridge") {
@@ -343,7 +324,6 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
             const plane = new Mesh(geometry, material);
             GLOBALS.SCENE_CHILDREN.add(plane);
-            //GLOBALS.SELECTED_FOR_BLOOM.add(plane)
 
             if (rayItem[g].name == "tractor_beam") {
                 plane.rotation.x = Math.PI / 2;
@@ -403,8 +383,6 @@ function createLightBridgesFromPortal(portal, rayItem) {
             box.position.copy(plane.position);
             box.quaternion.copy(plane.quaternion);
 
-            //obj.continuous = plane;
-
             plane.visible = rayItem[g].item.continuous.visible;
             plane.material = rayItem[g].item.continuous.material;
             plane.item = rayItem[g].item;
@@ -431,7 +409,6 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 bb.setFromObject(plane);
                 bb.side = 1;
 
-                //rayItem[g].userData.opened = true;
                 plane.inTractor = false;
                 plane.dir = dir;
 
@@ -477,9 +454,8 @@ function ContinuousTrigger(item, trigger, elem, name) {
 
     var valOffset = 0.8;
 
-    if (name == "glass") {
+    if (name == "glass")
         valOffset = 0.99;
-    }
 
     if (trigger == "Middle Vertical") {
         dummy.rotateY(Math.PI / 2);
@@ -513,7 +489,6 @@ function ContinuousTrigger(item, trigger, elem, name) {
     dummy.updateMatrix();
     var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(name);
     instanced.setMatrixAt(item.userData.idInstanced, dummy.matrix);
-
 
     if (name == "laser_field" || name == "fizzler") {
         item.bodyLaserField.position.copy(item.continuous.position)

@@ -118,10 +118,9 @@
           </div>
 
           <div>
-            <img alt="image" data-content="Reflects the laser." data-title="LASER CUBE" class="item"
-              data-name="laser_cube" data-allowconnection="true" data-rotate="false" data-floor="true"
-              data-ceiling="true" data-walls="false" data-instanced="true" src="../assets/ui/items/laser_cube.png"
-              id="laser_cube" />
+            <img alt="image" data-content="Purely cosmetic, it will play a radio music." data-title="RADIO" class="item"
+              data-name="radio" src="../assets/ui/items/radio.png" data-allowconnection="false" data-rotate="false"
+              data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="radio" />
             <span>10</span>
           </div>
 
@@ -151,11 +150,10 @@
           </div>
 
           <div>
-            <img alt="image"
-              data-content="An area that triggers once the players walks into it, you can link to items just like buttons. You can choose between a one time trigger or a multiple one."
-              data-title="TRIGGER" class="item" data-name="trigger_area" src="../assets/ui/items/trigger.jpg"
-              data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-              id="trigger_area" />
+            <img alt="image" data-content="Reflects the laser." data-title="LASER CUBE" class="item"
+              data-name="laser_cube" data-allowconnection="true" data-rotate="false" data-floor="true"
+              data-ceiling="true" data-walls="false" data-instanced="true" src="../assets/ui/items/laser_cube.png"
+              id="laser_cube" />
             <span>10</span>
           </div>
 
@@ -307,13 +305,6 @@
             <span>10</span>
           </div>
 
-          <div>
-            <img alt="image" data-content="Purely cosmetic, it will play a radio music." data-title="RADIO" class="item"
-              data-name="radio" src="../assets/ui/items/radio.png" data-allowconnection="false" data-rotate="false"
-              data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="radio" />
-            <span>10</span>
-          </div>
-
           <!--
             <img alt="image"
             data-content="Piston Platforms will move up and down whenever the player stands on it. If it is connected to a trigger then the trigger must be activated before it will begin to move. You can adjust the height of the platform using the arrows that appear when the object is selected."
@@ -334,7 +325,7 @@
             data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
             data-instanced="true" src="../assets/ui/items/pellet_catcher.png" id="pellet_catcher" />-->
 
-          <div class="production-disabled">
+          <div class="">
             <img alt="image" data-content="If the player steps in Deadly Goo they will be instantly killed."
               data-title="DEADLY GOO" data-allowconnection="false" data-rotate="false" data-floor="true"
               data-ceiling="false" data-walls="false" data-instanced="false" class="item"
@@ -415,6 +406,42 @@
               data-title="PORTAL GUN" class="item" data-name="portal_gun"
               src="../assets/ui/items/gun2.png" data-allowconnection="false" data-rotate="false" data-floor="true"
               data-ceiling="false" data-walls="false" id="portal_gun" />
+            <span>10</span>
+          </div>
+
+          <div>
+            <img alt="image"
+              data-content="An area that triggers once the players walks into it, you can link to items just like buttons. You can choose between a one time trigger or a multiple one."
+              data-title="TRIGGER ENTER" class="item" data-name="trigger_area" src="../assets/ui/items/trigger.jpg"
+              data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+              id="trigger_area" />
+            <span>10</span>
+          </div>
+
+          <div>
+            <img alt="image"
+              data-content="An area that triggers once the players walks into it, you can link to items just like buttons. You can choose between a one time trigger or a multiple one."
+              data-title="TRIGGER MULTIPLE" class="item" data-name="trigger_area" src="../assets/ui/items/trigger.jpg"
+              data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+              id="trigger_area" />
+            <span>10</span>
+          </div>
+
+          <div>
+            <img alt="image"
+              data-content="An area that triggers once the players walks into it, you can link to items just like buttons. You can choose between a one time trigger or a multiple one."
+              data-title="TRIGGER SAVE" class="item" data-name="trigger_area" src="../assets/ui/items/trigger.jpg"
+              data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+              id="trigger_area" />
+            <span>10</span>
+          </div>
+
+          <div>
+            <img alt="image"
+              data-content="An area that triggers once the players walks into it, you can link to items just like buttons. You can choose between a one time trigger or a multiple one."
+              data-title="TRIGGER VOICE" class="item" data-name="trigger_area" src="../assets/ui/items/trigger.jpg"
+              data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+              id="trigger_area" />
             <span>10</span>
           </div>
         </div>
@@ -1301,8 +1328,8 @@
             <span class="option-name" id="">Recursive Portals</span>
             <div class="option-value">
               <select name="recursive" id="recursive-select">
-                <option value="0">0</option>
-                <option value="1">1</option>
+                <!--<option value="0">0</option>
+                <option value="1">1</option>-->
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
@@ -1353,6 +1380,13 @@
                 <option value="2048">2048</option>
                 <option value="4096">4096</option>
               </select>
+            </div>
+          </div>
+          <!--PLAYER-->
+          <div class="options-row">
+            <span class="option-name" id="">Player</span>
+            <div class="option-value">
+              <input id="option-player" type="checkbox" />
             </div>
           </div>
           <!--STATS-->

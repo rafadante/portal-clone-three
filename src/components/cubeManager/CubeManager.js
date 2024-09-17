@@ -15,21 +15,41 @@ import { checkToUpdateContinuous } from './UpdateRaycast.js';
 import { removeSelection } from '../boxSelection/BoxSelection.js';
 import { updateLines } from '../items/AddItem.js';
 import { addLine } from '../boxSelection/Connection.js';
+import { func } from 'three/examples/jsm/nodes/Nodes.js';
 
 var IndexArray = [];
 var remove;
+var sides = ["left", "right", "up", "down", "front", "back"];
 
 function cubeState(button) {
 
     remove = false;
 
     if (button == "plus") {
-        //
+        
+        for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
+            for (var j = 0; j < 6; j++) {
+                if (GLOBALS.PLANE_USER_DATA[i].side != sides[j]) {
+                    var exists = checkSidesWithItems(i, 1, sides[j])
+                    if (exists) return;
+                }
+            }
+        }
+
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
             trasnlatePlane(GLOBALS.SELECTED_ID[i], 1, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
         }
     } else if (button == "minus") {
-        //
+
+        for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
+            for (var j = 0; j < 6; j++) {
+                if (GLOBALS.PLANE_USER_DATA[i].side != sides[j]) {
+                    var exists = checkSidesWithItems(i, -1, sides[j])
+                    if (exists) return;
+                }
+            }
+        }
+
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
 
             if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == 20 ||
@@ -71,6 +91,66 @@ function cubeState(button) {
     if (remove) {
         removeSelection();
     }
+}
+
+function checkSidesWithItems(i, t, side) {
+
+    var sideOther;
+
+    var dummy = new Object3D();
+    dummy.position.set(
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.x,
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y,
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.z
+    );
+    dummy.rotation.set(
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].rotation.x,
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].rotation.y,
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].rotation.z
+    );
+
+    dummy.translateZ(t);
+
+    if (side == "left")
+        dummy.rotation.set(0, Math.PI / 2, 0)
+    else if (side == "right")
+        dummy.rotation.set(0, -Math.PI / 2, 0)
+    else if (side == "up")
+        dummy.rotation.set(Math.PI / 2, 0, 0)
+    else if (side == "down")
+        dummy.rotation.set(-Math.PI / 2, 0, 0)
+    else if (side == "front")
+        dummy.rotation.set(0, 0, 0)
+    else if (side == "back")
+        dummy.rotation.set(0, Math.PI, 0)
+
+    if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].side == "left")
+        sideOther = "right"
+    else if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].side == "right")
+        sideOther = "left"
+    else if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].side == "up")
+        sideOther = "down"
+    else if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].side == "down")
+        sideOther = "up"
+    else if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].side == "front")
+        sideOther = "back"
+    else if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].side == "back")
+        sideOther = "front"
+
+    dummy.translateZ(t);
+    dummy.position.copy(dummy.position.round());
+
+    var sideExists = getPlaneByName(dummy.position.x + "/" + dummy.position.y + "/" + dummy.position.z);
+
+    if (sideExists.length > 0) {
+        if ((sideExists[0].hasItem && GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].side != sideExists[0].side) ||
+            (sideExists[0].side == sideOther)) {//GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].hasItem
+            warning("Conflict!");
+            return true;
+        }
+    }
+
+    return false
 }
 
 function trasnlatePlane(id, val, portal, old) {
@@ -147,10 +227,6 @@ function trasnlatePlane(id, val, portal, old) {
         if (GLOBALS.PLANE_USER_DATA[id].hasItem) {
 
             var plane = GLOBALS.PLANE_USER_DATA[id];
-
-            console.log(old)
-            console.log(plane);
-
 
             for (var j = 0; j < GLOBALS.CONNECTIONS.length; j++) {
                 if (GLOBALS.CONNECTIONS[j]["from"] == plane) {

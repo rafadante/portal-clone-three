@@ -82,14 +82,10 @@ $("body").on('click', '#delete', function () {
         }
     }
 
-    console.log(indexesToDelete)
-
     for (var j = 0; j < indexesToDelete.length; j++) {
         GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[indexesToDelete[j]]["line"]);
         GLOBALS.CONNECTIONS.splice(indexesToDelete[j], 1);
     }
-
-    console.log(GLOBALS.CONNECTIONS);
 
     if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].isInstanced) {
 
@@ -138,8 +134,36 @@ $("body").on('click', '#delete', function () {
             }
         }
 
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "fizzler") {
+            const index = GLOBALS.FIZZLER_RAYCASTER.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.raycaster);
+            if (index > -1) { // only splice array when item is found
+                GLOBALS.FIZZLER_RAYCASTER.splice(index, 1); // 2nd parameter means remove one item only
+            }
+        }
+
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "laser_field") {
+            const index = GLOBALS.LASER_FIELD_RAYCASTER.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.raycaster);
+            if (index > -1) { // only splice array when item is found
+                GLOBALS.LASER_FIELD_RAYCASTER.splice(index, 1); // 2nd parameter means remove one item only
+            }
+        }
+
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "light_bridge") {
+            const index = GLOBALS.LIGHT_BRIDGE_RAYCASTER.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.raycaster);
+            if (index > -1) { // only splice array when item is found
+                GLOBALS.LIGHT_BRIDGE_RAYCASTER.splice(index, 1); // 2nd parameter means remove one item only
+            }
+        }
+
         deleteItemInstanced(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false);
     } else {
+
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "glass") {
+            const index = GLOBALS.GLASS_RAYCASTER.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.raycaster);
+            if (index > -1) { // only splice array when item is found
+                GLOBALS.GLASS_RAYCASTER.splice(index, 1); // 2nd parameter means remove one item only
+            }
+        }
 
         if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous) {
             GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide.hasItem = false;

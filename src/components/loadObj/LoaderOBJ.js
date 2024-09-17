@@ -889,11 +889,12 @@ function loadAvatar() {
         GLOBALS.PLAYER_MODEL.position.y = 100000;
         GLOBALS.PLAYER_MODEL_CLONE.position.y = 100000;
 
-        if(!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high")){
+        if ((!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high"))
+            || (window.playerState)) {
             GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL);
             GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE);
         }
-        
+
         GLOBALS.PLAYER_MODEL.animationActions = {};
         GLOBALS.PLAYER_MODEL.modelReady = true;
     }).then(() => {

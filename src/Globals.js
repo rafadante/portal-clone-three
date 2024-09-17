@@ -456,7 +456,7 @@ var GLOBALS = {
         },
         dispenser: {
             count: 0,
-            max: 10
+            max: 50
         },
         ramp: {
             count: 0,
@@ -729,7 +729,7 @@ function reset() {
         },
         dispenser: {
             count: 0,
-            max: 10
+            max: 50
         },
         ramp: {
             count: 0,

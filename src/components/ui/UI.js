@@ -48,7 +48,7 @@ $('#quality-select').on('change', function () {
     localStorage.setItem("quality-select", $(this).val());
 
     if ($(this).val() == "potato") {
-        $("#recursive-select").val(0).change();
+        $("#recursive-select").val(2).change();
         $("#recursive-render-select").val(0).change();
         $("#resolution-select").val(0.5).change();
         $("#shadows-resolution-select").val(512).change();
@@ -266,4 +266,30 @@ function checkOrientation() {
     } else {
         $("#mobile-warning").css("display", "none")
     }
+}
+
+//PLAYER
+$("body").on('input', '#option-player', function () {
+    localStorage.setItem("option-player", this.checked);
+    if (this.checked) {
+        window.playerState = true;
+        GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL);
+        GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE);
+        GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE2);
+    } else {
+        window.playerState = false;
+        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLAYER_MODEL);
+        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLAYER_MODEL_CLONE);
+        GLOBALS.SCENE_FPS.remove(GLOBALS.GUN_CLONE);
+        GLOBALS.SCENE_FPS.remove(GLOBALS.GUN_CLONE2);
+    }
+
+    update()
+});
+
+console.log(localStorage.getItem("option-player"))
+
+if (localStorage.getItem("option-player") == "true") {
+    $("#option-player").prop('checked', true);
+    window.playerState = true;
 }

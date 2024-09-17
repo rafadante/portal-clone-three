@@ -38,7 +38,14 @@ function colliderItemManager() {
     //CORRIDOR ENTER COLLIDERS
     corridorColliderNames(GLOBALS.CORRIDOR_ENTER, false);
 
+    console.log(GLOBALS.DYMANIC_ITEMS['dispenser'])
+
     //
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['dispenser'], "dispenser", 0, 1)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['dispenser'], "dispenser", 0, 2)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['dispenser'], "dispenser", 0, 3)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['dispenser'], "dispenser", 0, 4)
+
     addColliderItem(GLOBALS.DYMANIC_ITEMS['cube'], "cube", 5)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['cube_2'], "cube_2", 5)
     addColliderItem(GLOBALS.DYMANIC_ITEMS["sphere"], "sphere", 5)
@@ -272,8 +279,27 @@ function addColliderItem(items, type, mass, offset) {
                     objHolder.translateX(-a1)
                 }
             } else if (type == "dispenser") {
-                var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.7));
-                objHolder.translateY(0.77)
+                //var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.7));
+                
+
+                if (offset == 1) {
+                    var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.01));
+                    objHolder.translateZ(0.7)
+                } else if (offset == 2) {
+                    var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.01));
+                    objHolder.translateZ(-0.7)
+                } else if (offset == 3) {
+                    var shape = new CANNON.Box(new CANNON.Vec3(0.01, 0.77, 0.7));
+                    objHolder.translateX(0.7)
+                } else if (offset == 4) {
+                    var shape = new CANNON.Box(new CANNON.Vec3(0.01, 0.77, 0.7));
+                    objHolder.translateX(-0.7)
+                }
+
+                objHolder.translateY(-0.2)
+
+                console.log(offset)
+                console.log(objHolder.position)
             } else if (type == "ramp" || type == "ramp_half" || type == "ramp_half2" || type == "stairs") {
                 const result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), {
                     type: ShapeType.HULL

@@ -316,7 +316,8 @@ const updateCamera = function (deltaTime) {
         GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLAYER_MODEL_CLONE)
         GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
 
-        if(!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high")){
+        if ((!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high")) ||
+            (window.playerState)) {
             GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE);
         }
 
@@ -354,8 +355,8 @@ const updateCamera = function (deltaTime) {
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STATIONARY_RUNNING
             else if (INPUT.controller["KeyS"].pressed)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_BACKWARD_RUNNING
-        } 
-        
+        }
+
         else if (INPUT.fwdValue > 0 && INPUT.rgtValue > 0 && INPUT.lftValue && INPUT.bkdValue > 0) {
             action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
         } else if (INPUT.fwdValue > 0 && INPUT.bkdValue > 0) {
@@ -371,7 +372,7 @@ const updateCamera = function (deltaTime) {
             else if (INPUT.bkdValue > 0)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_BACKWARD_RUNNING
         }
-        
+
         else {
             if (INPUT.controller["KeyW"].pressed || INPUT.fwdValue > 0)
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STATIONARY_RUNNING
@@ -383,7 +384,7 @@ const updateCamera = function (deltaTime) {
                 action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_LEFT_STRAFE
         }
 
-        
+
 
         setAction(action);
         const delta = clock.getDelta();
