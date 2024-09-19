@@ -165,10 +165,10 @@ function targetFaithPlateEnd(item, h) {
     }
   }
 
-
-  GLOBALS.FAITH_PLATE_TARGET.userData.height = height;
+  GLOBALS.FAITH_PLATE_TARGET.userData.height = 2;
   GLOBALS.FAITH_PLATE_TARGET.userData.targetPos = clone.position;
   GLOBALS.FAITH_PLATE_TARGET.userData.targetRot = clone.rotation;
+  GLOBALS.FAITH_PLATE_TARGET.userData.target = clone;
 
   createCurve(GLOBALS.FAITH_PLATE_TARGET.position, clone.position, height, clone)
 
@@ -205,7 +205,7 @@ $('#plate-max-height-value').on('change', function () {
   createCurve(
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.position,
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.target.position,
-    parseInt(this.value),
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.position.y + parseInt(this.value),
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.target
   )
 
@@ -214,6 +214,13 @@ $('#plate-max-height-value').on('change', function () {
 
 $('#faith-plate-line').on('change', function () {
   GLOBALS.GROUP_LINE_TRAGECTORY.visible = this.checked;
+});
+
+//RESET Target
+$('#plate-change-target').on('click', function () {
+  GLOBALS.SCENE.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target);
+  GLOBALS.GROUP_LINE_TRAGECTORY.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target.line);
+  targetFaithPlateStart(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item);
 });
 
 export {

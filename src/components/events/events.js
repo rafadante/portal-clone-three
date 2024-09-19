@@ -44,7 +44,8 @@ let interval = 1 / 60;
 
 function updateEvents() {
 
-  levelEnteredFunction();
+  if (!GLOBALS.ITEMS_ADDED.getObjectByName("spawn"))
+    levelEnteredFunction(false);
 
   delta += clock.getDelta();
 
@@ -168,8 +169,6 @@ function updateEvents() {
                 if (d.name == "player") {
                   GLOBALS.PLAYER.spawnPosition = GLOBALS.CONNECTIONS[i]['from'].position;
                   GLOBALS.PLAYER.spawnPosition.y += 0.5;
-
-                  console.log(GLOBALS.CONNECTIONS[i]['from'])
 
                   playVoice(GLOBALS.CONNECTIONS[i]['from'].item.userData.speech)
                 }
@@ -411,8 +410,6 @@ function interactWithItem() {
         } else {
           test = intersects[0].object;
         }
-
-        console.log(test)
 
         if (test.body.mass == 0) {
           return;

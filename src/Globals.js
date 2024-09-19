@@ -18,7 +18,6 @@ import {
     OrbitControls
 } from 'three/addons/controls/OrbitControls.js';
 import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh';
-import { groupByPercentage } from './Utils.js';
 
 // Add the extension functions
 BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
@@ -259,7 +258,8 @@ var GLOBALS = {
         pellet_launcher: [],
         pellet_catcher: [],
         angled_panel: [],
-        paint_gun: []
+        paint_gun: [],
+        spawn: []
     },
 
     INTERACTIVE: [],
@@ -601,6 +601,10 @@ var GLOBALS = {
         portal: {
             count: 0,
             max: 10
+        },
+        spawn: {
+            count: 0,
+            max: 1
         }
     },
     SCENE_FPS: null,

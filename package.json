@@ -2,6 +2,8 @@
   "name": "portal-react",
   "version": "0.1.0",
   "private": true,
+  "main": "public/electron.js",
+  "homepage": "./",
   "dependencies": {
     "@babel/core": "^7.16.0",
     "@codedread/bitjs": "^1.2.3",
@@ -30,6 +32,7 @@
     "cannon-es": "^0.20.0",
     "cannon-es-debugger": "^1.0.0",
     "case-sensitive-paths-webpack-plugin": "^2.4.0",
+    "cross-env": "^7.0.3",
     "css-loader": "^6.5.1",
     "css-minimizer-webpack-plugin": "^3.2.0",
     "dotenv": "^10.0.0",
@@ -105,7 +108,19 @@
     "start": "node scripts/start.js",
     "electron": "electron .",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "electron-dev": "cross-env ELECTRON_START_URL=http://localhost:3000 electron .",
+    "electron-pack": "electron-builder"
+  },
+  "build": {
+    "appId": "com.yourapp.id",
+    "files": [
+      "build/**/*",
+      "public/electron.js"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
   },
   "eslintConfig": {
     "extends": [
@@ -182,6 +197,7 @@
     ]
   },
   "devDependencies": {
-    "electron": "^32.0.2"
+    "electron": "^32.0.2",
+    "electron-builder": "^25.0.5"
   }
 }

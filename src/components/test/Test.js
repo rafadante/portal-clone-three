@@ -27,6 +27,7 @@ import './BackToEditor.js';
 import { stateDoor } from '../door/Door.js';
 import { addGel } from '../gels/Gels.js';
 import { findPath } from '../findPath/FindPath.js';
+import { levelEnteredFunction } from '../events/states.js';
 
 $("body").on('click', '#view-fps', function () {
     viewFPS();
@@ -163,7 +164,7 @@ function viewFPS() {
         //--------------------------------------------------------------------------
 
         if ((!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high"))
-        || (window.playerState)) {
+            || (window.playerState)) {
             GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE);
             GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE2);
         }
@@ -255,8 +256,6 @@ function viewFPS() {
         if (GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic" && localStorage.getItem("quality-select") != "high"))
             GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;
 
-        console.log(GLOBALS.CONNECTIONS)
-
         for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
             GLOBALS.CONNECTIONS[i]["line"].visible = false;
             findPath(
@@ -268,6 +267,17 @@ function viewFPS() {
             )
         }
 
+        if (GLOBALS.ITEMS_ADDED.getObjectByName("spawn")) {
+            GLOBALS.CORRIDOR_ENTER.visible = false;
+            GLOBALS.ITEMS_ADDED.getObjectByName("spawn").visible = false;
+            GLOBALS.PLAYER.spawnPosition = GLOBALS.ITEMS_ADDED.getObjectByName("spawn").position.clone();
+            GLOBALS.ENTER_DOOR.visible = false;
+            GLOBALS.PLAYER.position.copy(GLOBALS.PLAYER.spawnPosition);
+
+            setTimeout(() => {
+                levelEnteredFunction(true);
+            }, 5000);
+        }
     }, 500);
 };
 

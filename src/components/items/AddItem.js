@@ -11,6 +11,7 @@ import {
     MeshStandardMaterial,
     Object3D,
     Box3,
+    ConeGeometry,
 } from 'three';
 import {
     AddGoo
@@ -66,9 +67,6 @@ function updateLines(userData, instanced) {
 
                 if (instanced)
                     GLOBALS.CONNECTIONS[j]["to"].item.userData.connections += 1;
-
-                console.log(GLOBALS.CONNECTIONS[j]["to"])
-
             }
         }
     }
@@ -128,7 +126,12 @@ function addItem(found, loaded) {
 
         if ((!userData.hasItem && !userData.continuousEnding) || loaded) {// 
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "spawn") {
+                const geometry = new ConeGeometry(0.75, 2, 8);
+                const material = new MeshBasicMaterial({ color: 0xff0000 });
+                const cone = new Mesh(geometry, material);
+                var item = cone;
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
                 const geometry = new BoxGeometry(2, 2, 2);
 
                 var material = GLOBALS.MATERIAL_TRIGGER_ONCE;
@@ -225,12 +228,6 @@ function addItem(found, loaded) {
                 false
             );
 
-            //PORTALS CAN NOT SPAWN ON ITEM POSITION
-            GLOBALS.PLANE_USER_DATA[userData.id_instanced].portal = false;
-            GLOBALS.PLANE_USER_DATA[userData.id_instanced].planeColor = 0x808080;
-            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(userData.id_instanced, new Color(0x808080));
-            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
-
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
                 var target = new Vector3(); // create once an reuse it
 
@@ -240,8 +237,15 @@ function addItem(found, loaded) {
                     found[i].object.getWorldPosition(target);
 
                 item.position.copy(target);
-            } else
+            } else {
                 item.position.copy(userData.position);
+
+                //PORTALS CAN NOT SPAWN ON ITEM POSITION
+                GLOBALS.PLANE_USER_DATA[userData.id_instanced].portal = false;
+                GLOBALS.PLANE_USER_DATA[userData.id_instanced].planeColor = 0x808080;
+                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(userData.id_instanced, new Color(0x808080));
+                GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+            }
 
             item.position.copy(userData.position);
             item.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
@@ -351,8 +355,12 @@ function addItem(found, loaded) {
                 targetFaithPlateStart(item);
             }
 
-
-            if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "spawn") {
+                GLOBALS.ITEMS_ADDED.add(item);
+                item.translateY(1);
+                item.rotation.x = -Math.PI;
+                item.name = "spawn";
+            }else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
                 GLOBALS.DYMANIC_ITEMS['angled_panel'].push(item)
                 GLOBALS.ITEMS_ADDED.add(item);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {

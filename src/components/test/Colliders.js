@@ -38,9 +38,6 @@ function colliderItemManager() {
     //CORRIDOR ENTER COLLIDERS
     corridorColliderNames(GLOBALS.CORRIDOR_ENTER, false);
 
-    console.log(GLOBALS.DYMANIC_ITEMS['dispenser'])
-
-    //
     addColliderItem(GLOBALS.DYMANIC_ITEMS['dispenser'], "dispenser", 0, 1)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['dispenser'], "dispenser", 0, 2)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['dispenser'], "dispenser", 0, 3)
@@ -298,8 +295,6 @@ function addColliderItem(items, type, mass, offset) {
 
                 objHolder.translateY(-0.2)
 
-                console.log(offset)
-                console.log(objHolder.position)
             } else if (type == "ramp" || type == "ramp_half" || type == "ramp_half2" || type == "stairs") {
                 const result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), {
                     type: ShapeType.HULL

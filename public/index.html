@@ -418,19 +418,19 @@
             <span>10</span>
           </div>
 
-          <div>
+          <!--<div>
             <img alt="image"
               data-content="An area that triggers once the players walks into it, you can link to items just like buttons. You can choose between a one time trigger or a multiple one."
               data-title="TRIGGER MULTIPLE" class="item" data-name="trigger_area" src="../assets/ui/items/trigger.jpg"
               data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
               id="trigger_area" />
             <span>10</span>
-          </div>
+          </div>-->
 
           <div>
             <img alt="image"
               data-content="An area that triggers once the players walks into it, you can link to items just like buttons. You can choose between a one time trigger or a multiple one."
-              data-title="TRIGGER SAVE" class="item" data-name="trigger_area" src="../assets/ui/items/trigger.jpg"
+              data-title="TRIGGER SAVE" class="item" data-name="trigger_area" src="../assets/ui/items/save.jpg"
               data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
               id="trigger_area" />
             <span>10</span>
@@ -439,9 +439,18 @@
           <div>
             <img alt="image"
               data-content="An area that triggers once the players walks into it, you can link to items just like buttons. You can choose between a one time trigger or a multiple one."
-              data-title="TRIGGER VOICE" class="item" data-name="trigger_area" src="../assets/ui/items/trigger.jpg"
+              data-title="TRIGGER VOICE" class="item" data-name="trigger_area" src="../assets/ui/items/voice.jpg"
               data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
               id="trigger_area" />
+            <span>10</span>
+          </div>
+
+          <div>
+            <img alt="image"
+              data-content=""
+              data-title="Spawn Point" class="item" data-name="spawn" src="../assets/ui/items/spawn.png"
+              data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
+              id="spawn" />
             <span>10</span>
           </div>
         </div>
@@ -510,12 +519,12 @@
       </a>
     </li>
 
-    <li id="lines" class="menu-item hasItem buttons">
+    <!--<li id="lines" class="menu-item hasItem buttons" style="display: none !important;">
       <a href="#" class="menu-btn">
         <input type="checkbox" checked id="state-lines" />
         <span class="menu-text">Show Lines</span>
       </a>
-    </li>
+    </li>-->
 
     <li id="dispenser" class="menu-item hasItem dispenser">
       <a href="#" class="menu-btn">
@@ -956,9 +965,15 @@
     </li>
 
     <!--FAITH PLATE-->
+    <li id="plate-change-target" class="menu-item hasItem faith_plate">
+      <a href="#" class="menu-btn">
+        <i class="fa fa-sync"></i>
+        <span class="menu-text">Update Target</span>
+      </a>
+    </li>
     <li id="plate-max-height" class="menu-item hasItem faith_plate">
       <a href="#" class="menu-btn">
-        <input type="number" style="width: 50px;" max="100" min="0" value="3" id="plate-max-height-value" step="1" />
+        <input type="number" style="width: 50px;" max="100" min="0" value="2" id="plate-max-height-value" step="1" />
         <span class="menu-text">Max Height</span>
       </a>
     </li>
@@ -1119,6 +1134,7 @@
           <span class="option" id="option-community">COMMUNITY CHAMBERS</span>
           <!--<span class="option" id="option-options">OPTIONS</span>-->
           <!--<span class="option" id="option-patreon">PATREON</span>-->
+          <span class="option" id="option-download">DOWNLOAD</span>
           <span class="option" id="option-about">ABOUT</span>
         </div>
 
@@ -1314,12 +1330,12 @@
             <span class="option-name" id="">Quality</span>
             <div class="option-value">
               <select name="quality" id="quality-select">
-                <option value="low">Low</option>
-                <option value="epic">Epic</option>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="very_low">Very Low</option>
                 <option value="potato">Potato</option>
+                <option value="very_low">Very Low</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="epic">Epic</option>
               </select>
             </div>
           </div>
@@ -1571,7 +1587,7 @@
   </audio>
 
   <audio id="audio-tractor-beam">
-    <source src="./audio/tbeam_pos_lp_01.wav" type="audio/wav">
+    <source src="./audio/tbeam_pos_lp_01.ogg" type="audio/ogg">
   </audio>
 
   <audio id="audio-button-negative">
@@ -1583,7 +1599,7 @@
   </audio>
 
   <audio id="faith_plate_loop" preload="auto">
-    <source src="./audio/aerial.mp3" type="audio/mp3">
+    <source src="./audio/aerial.ogg" type="audio/ogg">
   </audio>
 
   <audio id="pelletHit" preload="auto">

@@ -206,7 +206,7 @@ function raycastSelected(found, event, type) {
 
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("faith_plate")) {
                         $(".faith_plate").css("display", "block");
-                        $("#plate-max-height-value").prop("min", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height - 2);
+                        //$("#plate-max-height-value").prop("min", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height - 2);
                         $("#plate-max-height-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height);
                     }
 
@@ -348,17 +348,28 @@ function raycastSelected(found, event, type) {
 
                             if (planeInstanceOld.item.name.includes("camera"))
                                 planeInstanceOld.item.translateY(0.3)
+                            else if (planeInstanceOld.item.name.includes("spawn"))
+                                planeInstanceOld.item.translateY(-1)
                             else if (planeInstanceOld.item.name.includes("portal_gun"))
                                 planeInstanceOld.item.translateY(0.65)
                             else if (planeInstanceOld.item.name.includes("trigger_area"))
                                 planeInstanceOld.item.translateZ(1)
+                            else if (planeInstanceOld.item.name.includes("faith_plate")) {
+                                window.faithPlateMoved = planeInstanceNew;
+                                planeInstanceOld.item.translateY(0.025);
+                                GLOBALS.SCENE.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target);
+                                GLOBALS.GROUP_LINE_TRAGECTORY.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target.line);
+                            }
 
                             if (planeInstanceOld.item.name.includes("camera") ||
                                 planeInstanceOld.item.name.includes("observation") ||
-                                planeInstanceOld.item.name.includes("portal_"))
+                                planeInstanceOld.item.name.includes("portal_")) {
                                 planeInstanceOld.item.rotation.set(planeInstanceNew.normal.x, planeInstanceNew.normal.y, planeInstanceNew.normal.z)
-                            else if (!planeInstanceOld.item.name.includes("door-"))
+                            } else if (!planeInstanceOld.item.name.includes("door-") &&
+                                !planeInstanceOld.item.name.includes("faith_plate") &&
+                                !planeInstanceOld.item.name.includes("spawn")) {
                                 planeInstanceOld.item.rotation.copy(planeInstanceNew.rotation);
+                            }
 
                             //UPDATE PARAMETERS OF THE NEW PLACEMENT
                             planeInstanceReset(planeInstanceNew, true, planeInstanceOld.item.name, planeInstanceOld.item,

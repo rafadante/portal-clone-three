@@ -167,7 +167,6 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
     raycaster.distance = intersects[0].distance;
 
     if (item != "tractor_beam" && item != "light_bridge") {
-        console.log(otherSide)
         //PORTALS CAN NOT SPAWN ON ITEM POSITION
         GLOBALS.PLANE_USER_DATA[otherSide[0].id_instanced].portal = false;
         GLOBALS.PLANE_USER_DATA[otherSide[0].id_instanced].planeColor = 0x808080;

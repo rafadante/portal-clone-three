@@ -20,7 +20,7 @@ $("body").on('click', '.settings-video', function () {
     $(".settings-menu").css("width", "50%");
     $("#settings-menu-title").text("GRAPHICS");
     $("#done").css("display", "block");
-    alert("The option changes will be saved to local storage while there is no server to allocate player data.");
+    //alert("The option changes will be saved to local storage while there is no server to allocate player data.");
 });
 
 $("body").on('click', '.settings-controls', function () {
@@ -29,7 +29,7 @@ $("body").on('click', '.settings-controls', function () {
     $(".settings-menu").css("width", "50%");
     $("#settings-menu-title").text("CONTROLS");
     $("#done").css("display", "block");
-    alert("The option changes will be saved to local storage while there is no server to allocate player data.");
+    //alert("The option changes will be saved to local storage while there is no server to allocate player data.");
 });
 
 $("body").on('click', '#done', function () {
@@ -46,6 +46,7 @@ $("body").on('click', '#done', function () {
 $('#quality-select').on('change', function () {
 
     localStorage.setItem("quality-select", $(this).val());
+    GLOBALS.RENDERER.shadowMap.enabled = false;
 
     if ($(this).val() == "potato") {
         $("#recursive-select").val(2).change();
@@ -72,24 +73,28 @@ $('#quality-select').on('change', function () {
         $("#shadows-resolution-select").val(1024).change();
         localStorage.setItem("antialising", true);
     } else if ($(this).val() == "high") {
+        GLOBALS.RENDERER.shadowMap.enabled = true;
         $("#recursive-select").val(3).change();
         $("#recursive-render-select").val(100).change();
         $("#resolution-select").val(1).change();
         $("#shadows-resolution-select").val(2048).change();
         localStorage.setItem("antialising", true);
+        GLOBALS.RENDERER.shadowMap.autoUpdate = true;
     } else if ($(this).val() == "epic") {
+        GLOBALS.RENDERER.shadowMap.enabled = true;
         $("#recursive-select").val(3).change();
         $("#recursive-render-select").val(100).change();
         $("#resolution-select").val(1).change();
         $("#shadows-resolution-select").val(4096).change();
         localStorage.setItem("antialising", true);
+        GLOBALS.RENDERER.shadowMap.autoUpdate = true;
     }
 
-    if (window.loaded) {
+    /*if (window.loaded) {
         // reload the current page
         alert("The page needs to be reloaded!")
         window.location.reload();
-    }
+    }*/
 
     update();
 });
@@ -124,8 +129,10 @@ $('#shadows-resolution-select').on('change', function () {
         GLOBALS.SPOTLIGHT.shadow.mapSize.height = $(this).val();
     }
 
-    //GLOBALS.RENDERER.shadowMap.autoUpdate = true;
-    //GLOBALS.RENDERER.shadowMap.autoUpdate = false;
+    //if (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high") {
+        GLOBALS.RENDERER.shadowMap.autoUpdate = true;
+        GLOBALS.RENDERER.shadowMap.autoUpdate = false;
+    //}
 
     update()
 });
@@ -252,6 +259,10 @@ $('#social-discord').on('click', function () {
     window.open("https://discord.com/invite/CsARjYrc");
 });
 
+$('#option-download').on('click', function () {
+    window.open("https://drive.google.com/drive/folders/1V4JBopiETzoDdxIogca9_7XqLjbSaHTd?usp=sharing", "_blank");
+});
+
 window.addEventListener("orientationchange", (event) => {
     if (GLOBALS.MOBILE)
         checkOrientation()
@@ -262,7 +273,6 @@ checkOrientation()
 function checkOrientation() {
     if (Math.abs(window.orientation) == 0) {
         $("#mobile-warning").css("display", "flex")
-        console.log("vertical");
     } else {
         $("#mobile-warning").css("display", "none")
     }
@@ -286,8 +296,6 @@ $("body").on('input', '#option-player', function () {
 
     update()
 });
-
-console.log(localStorage.getItem("option-player"))
 
 if (localStorage.getItem("option-player") == "true") {
     $("#option-player").prop('checked', true);

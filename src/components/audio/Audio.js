@@ -151,7 +151,7 @@ walkLightBridde.pause();
 const jump = new Audio('audio/p2_fs_jump_land_tile_01.wav')
 jump.volume = 0.2;//0.3
 
-const playerInsideTractorBeam = new Audio('audio/player_enter_tbeam_lp_01.wav')
+const playerInsideTractorBeam = new Audio('audio/player_enter_tbeam_lp_01.ogg')
 playerInsideTractorBeam.volume = 0.5;
 playerInsideTractorBeam.loop = true;
 
@@ -175,7 +175,7 @@ const aerial = document.getElementById("faith_plate_loop");
 aerial.volume = 1;
 aerial.loop = false;
 
-const propulsion = new Audio('audio/propulsion.mp3');
+const propulsion = new Audio('audio/propulsion.ogg');
 propulsion.volume = 1;
 propulsion.loop = true;
 

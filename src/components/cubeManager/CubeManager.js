@@ -26,13 +26,13 @@ function cubeState(button) {
     remove = false;
 
     if (button == "plus") {
-        
+
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
             for (var j = 0; j < 6; j++) {
-                if (GLOBALS.PLANE_USER_DATA[i].side != sides[j]) {
-                    var exists = checkSidesWithItems(i, 1, sides[j])
-                    if (exists) return;
-                }
+                //if (GLOBALS.PLANE_USER_DATA[i].side != sides[j]) {
+                var exists = checkSidesWithItems(i, 1, sides[j])
+                if (exists) return;
+                //}
             }
         }
 
@@ -43,10 +43,10 @@ function cubeState(button) {
 
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
             for (var j = 0; j < 6; j++) {
-                if (GLOBALS.PLANE_USER_DATA[i].side != sides[j]) {
-                    var exists = checkSidesWithItems(i, -1, sides[j])
-                    if (exists) return;
-                }
+                //if (GLOBALS.PLANE_USER_DATA[i].side != sides[j]) {
+                var exists = checkSidesWithItems(i, -1, sides[j])
+                if (exists) return;
+                //}
             }
         }
 
@@ -144,7 +144,7 @@ function checkSidesWithItems(i, t, side) {
 
     if (sideExists.length > 0) {
         if ((sideExists[0].hasItem && GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].side != sideExists[0].side) ||
-            (sideExists[0].side == sideOther)) {//GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].hasItem
+            (sideExists[0].side == sideOther && GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].hasItem)) {//GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].hasItem
             warning("Conflict!");
             return true;
         }

@@ -152,9 +152,9 @@ function respawn(d) {
     }, time2);
 }
 
-function levelEnteredFunction() {
+function levelEnteredFunction(trigger) {
     if (!GLOBALS.LEVEL_ENTERED) {
-        if (GLOBALS.ENTER_DOOR.box3.containsPoint(GLOBALS.PLAYER.position)) {
+        if (GLOBALS.ENTER_DOOR.box3.containsPoint(GLOBALS.PLAYER.position) || trigger) {
             GLOBALS.LEVEL_ENTERED = true;
             setTimeout(() => {
                 for (var i = 0; i < GLOBALS.BOX_BODY.length; i++) {

@@ -40,11 +40,16 @@ function manageInstances() {
     var sideRight = [];
     var sideLeft = [];
 
+    var enterDoor = "enterDoor";
+    if(GLOBALS.ITEMS_ADDED.getObjectByName("spawn")){
+        enterDoor = ".."
+    }
+
     //SEPARETE MESHS FOR INSTANCING
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
 
         if (GLOBALS.PLANE_USER_DATA[i].exists) {
-            if (GLOBALS.PLANE_USER_DATA[i].itemName != "enterDoor" &&
+            if (GLOBALS.PLANE_USER_DATA[i].itemName != enterDoor &&
                 GLOBALS.PLANE_USER_DATA[i].itemName != "exitDoor") {
 
                 GLOBALS.PLANE_USER_DATA[i].checked = false;

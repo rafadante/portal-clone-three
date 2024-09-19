@@ -25,6 +25,7 @@ import {
 import { addItem } from '../items/AddItem.js';
 import { updateMaterialRepeat } from '../materials/Materials.js';
 import { hex2rgb } from '../../Utils.js';
+import { targetFaithPlateEnd, targetFaithPlateStart } from '../faithPlate/FaithPlate';
 
 window.addEventListener("contextmenu", e => e.preventDefault());
 
@@ -157,6 +158,11 @@ $("body").on('click', '#delete', function () {
 
         deleteItemInstanced(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false);
     } else {
+
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "faith_plate") {
+            GLOBALS.SCENE.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target);
+            GLOBALS.GROUP_LINE_TRAGECTORY.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target.line);
+        }
 
         if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "glass") {
             const index = GLOBALS.GLASS_RAYCASTER.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.raycaster);
@@ -386,13 +392,23 @@ function onDocumentMouseMove(event) {
 
 function onDocumentMouseUp(event) {
     if (!GLOBALS.FPS_MODE) {
+
+        if (window.faithPlateMoved) {
+            //PORTALS CAN NOT SPAWN ON ITEM POSITION
+            window.faithPlateMoved.portal = false;
+            window.faithPlateMoved.planeColor = 0x808080;
+            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(window.faithPlateMoved.id_instanced, new Color(0x808080));
+            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+            targetFaithPlateStart(window.faithPlateMoved.item);
+        }
+
         GLOBALS.RESIZING_GLASS_PANEL = false;
         GLOBALS.SELECTED_SIDE = null;
         GLOBALS.SELECTING = false;
         GLOBALS.CONTROLS.enabled = true;
         GLOBALS.CONTROLS.update();
 
-        if (GLOBALS.ITEM_HOLDED_NAME || GLOBALS.CONNECTING) {
+        if ((GLOBALS.ITEM_HOLDED_NAME || GLOBALS.CONNECTING) && !window.faithPlateMoved) {
             raycastManager(event, "up");
         }
 
@@ -413,6 +429,7 @@ function onDocumentMouseUp(event) {
         }
 
         animate();
+        window.faithPlateMoved = null;
     }
 }
 

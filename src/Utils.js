@@ -140,10 +140,6 @@ function tweenBack(duration, ini, final) {
 
 function getPlaneMiddleEdges(pos, rot) {
 
-    console.log("------------------------------")
-    console.log(pos)
-    console.log(rot)
-
     const geometry = new PlaneGeometry(2, 2);
     const material = new MeshBasicMaterial();
     const plane = new Mesh(geometry, material);

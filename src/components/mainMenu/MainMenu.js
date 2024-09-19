@@ -107,8 +107,6 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
 
     plane.scale.set(scaleX, scaleY, 1);
     plane2.scale.set(scaleX, scaleY, 1);
-
-    console.log(camera.fov)
 }
 
 var level;
