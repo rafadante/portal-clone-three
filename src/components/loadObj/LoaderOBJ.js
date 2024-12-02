@@ -43,13 +43,11 @@ import {
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { hex2rgb } from '../../Utils.js';
 
+var draco = new DRACOLoader();
+draco.setDecoderPath("draco/");
+draco.preload();
+
 async function handleZip(path, obj) {
-
-    var draco = new DRACOLoader();
-    draco.setDecoderPath("draco/");
-    draco.preload();
-
-    console.log(path)
 
     const loader = new GLTFLoader();
     loader.setDRACOLoader(draco);
@@ -825,6 +823,7 @@ function loadLightStripeManager(scene) {
 }
 
 const gltfLoader = new GLTFLoader();
+gltfLoader.setDRACOLoader(draco);
 
 function loadAvatar() {
 

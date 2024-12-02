@@ -159,12 +159,12 @@ function loadMaterials() {
     
     loadMaterial(
         GLOBALS.MATERIAL_GRID,
-        "wall/grid/Metal_Grill_024_basecolor.jpg",
-        "wall/grid/Metal_Grill_024_normal.jpg",
+        "wall/grid/Metal_Grill_024_basecolor.webp",
+        "wall/grid/Metal_Grill_024_normal.webp",
         null,
         null,
-        "wall/grid/Metal_Grill_024_metallic.jpg",
-        "wall/grid/Metal_Grill_024_opacity.jpg",
+        "wall/grid/Metal_Grill_024_metallic.webp",
+        "wall/grid/Metal_Grill_024_opacity.webp",
         0.5,
         1,
         0.5,
