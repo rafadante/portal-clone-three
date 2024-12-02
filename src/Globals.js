@@ -408,7 +408,7 @@ var GLOBALS = {
     ITEMS_COUNT: {
         cube: {
             count: 0,
-            max: 10
+            max: 100
         },
         cube_2: {
             count: 0,
@@ -420,7 +420,7 @@ var GLOBALS = {
         },
         sphere: {
             count: 0,
-            max: 10
+            max: 100
         },
         gel_gun_blue: {
             count: 0,
@@ -685,7 +685,7 @@ function reset() {
     GLOBALS.ITEMS_COUNT = {
         cube: {
             count: 0,
-            max: 10
+            max: 100
         },
         cube_2: {
             count: 0,
@@ -697,7 +697,7 @@ function reset() {
         },
         sphere: {
             count: 0,
-            max: 15
+            max: 100
         },
         gel_gun_blue: {
             count: 0,

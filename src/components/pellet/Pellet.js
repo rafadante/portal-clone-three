@@ -262,7 +262,7 @@ $("body").on('input', '#pellet-timer-value', function () {
 });
 
 const geometryHit = new BoxGeometry(0.6, 0.01, 0.6);
-const map = new TextureLoader().load('./assets/textures/burn01a.png');
+const map = new TextureLoader().load('./assets/textures/burn01a.webp');
 const instancePelletHit = new InstancedMesh(geometryHit, new MeshBasicMaterial({
     side: 0,
     map: map,

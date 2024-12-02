@@ -1,9 +1,9 @@
 import { Vector3, ShaderMaterial, TextureLoader, RepeatWrapping, SRGBColorSpace } from 'three'
 import { GLOBALS } from '../../Globals';
 
-var noise = new TextureLoader().load('./assets/textures/noise.jpg');
+var noise = new TextureLoader().load('./assets/textures/noise.webp');
 noise.wrapS = noise.wrapT = RepeatWrapping
-var matcap = new TextureLoader().load('./assets/textures/matcap.png');
+var matcap = new TextureLoader().load('./assets/textures/matcap.webp');
 matcap.colorSpace = SRGBColorSpace;
 
 //setTimeout(() => {

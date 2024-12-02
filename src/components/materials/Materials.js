@@ -269,7 +269,7 @@ const textureLoader = new TextureLoader();
 const map = textureLoader.load('./assets/textures/decal/base2.png');
 //decalDiffuse.colorSpace = SRGBColorSpace;
 map.colorSpace = SRGBColorSpace;
-var normal = textureLoader.load('./assets/textures/decal/normal.jpg');
+var normal = textureLoader.load('./assets/textures/decal/normal.webp');
 
 GLOBALS.INK_MATERIAL = new MeshStandardMaterial({
     //map: map,

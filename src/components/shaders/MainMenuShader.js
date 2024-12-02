@@ -132,8 +132,8 @@ void main()
 }
 `;
 
-var background = new TextureLoader().load('./assets/loading/3.jpg');
-GLOBALS.TEXTURE_MENU_GRID = new TextureLoader().load('./assets/ui/grid.jpg');
+var background = new TextureLoader().load('./assets/loading/3.webp');
+GLOBALS.TEXTURE_MENU_GRID = new TextureLoader().load('./assets/ui/grid.webp');
 
 GLOBALS.MATERIAL_MAIN_MENU = new ShaderMaterial({
     uniforms: {

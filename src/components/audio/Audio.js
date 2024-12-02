@@ -126,7 +126,7 @@ function addAudio(obj, name) {
     }
 }
 
-const positive = new Audio('audio/button_synth_positive_01.wav');
+/*const positive = new Audio('audio/button_synth_positive_01.wav');
 
 const ambient = new Audio('audio/ambient.mp3')
 ambient.volume = 0.15;
@@ -177,7 +177,11 @@ aerial.loop = false;
 
 const propulsion = new Audio('audio/propulsion.ogg');
 propulsion.volume = 1;
-propulsion.loop = true;
+propulsion.loop = true;*/
+
+function loadAudio(src, volume, loop, playbackRate){
+
+}
 
 function volume(val) {
 }
@@ -197,7 +201,7 @@ function fadeAudio(audio) {
     }
 }
 
-var AUDIO = {
+/*var AUDIO = {
     AMBIENT: ambient,
     EDITOR: editor,
     PORTAL_GUN_BLUE: new Audio('audio/portalgun_shoot_blue1.wav'),
@@ -220,6 +224,31 @@ var AUDIO = {
     WALK_PAINT: walkGel,
     PROPULSION: propulsion,
     POSITIVE: positive
+}*/
+
+var AUDIO = {
+    AMBIENT: null,
+    EDITOR: null,
+    PORTAL_GUN_BLUE: null,
+    PORTAL_GUN_ORANGE: null,
+    PORTAL_ENTER: null,
+    PORTAL_EXIT: null,
+    PORTAL_GUN_LOOP: null,
+    PORTAL_INVALID: null,
+    FALLING: null,
+    PICK_FAIL: null,
+    PICK_SUCESS: null,
+    HOLD: null,
+    PLAYER_INSIDE_TRACTOR_BEAM: null,
+    DEATH: null,
+    WALK: null,
+    JUMP: null,
+    WALK_LIGHT_BRIDGE: null,
+    AERIAL: null,
+    WALK_NORMAL: null,
+    WALK_PAINT: null,
+    PROPULSION: null,
+    POSITIVE: null
 }
 
 export {

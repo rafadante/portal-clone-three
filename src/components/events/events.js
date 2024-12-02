@@ -82,7 +82,7 @@ function updateEvents() {
             //document.getElementById("reticle-img").style.display = "block";
 
             document.getElementById("reticle-img").style.filter = "none";
-            document.getElementById("reticle-img").src = './assets/textures/crosshairNone.png';
+            document.getElementById("reticle-img").src = './assets/textures/crosshairNone.webp';
 
 
             GLOBALS.GUN.visible = true;

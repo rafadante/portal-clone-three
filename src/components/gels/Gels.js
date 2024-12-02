@@ -11,7 +11,7 @@ import { animate } from '../../Main';
 const geometryGel = new PlaneGeometry(2, 2);
 const materialGel = new MeshStandardMaterial({
     roughness: 0.2,
-    normalMap: new TextureLoader().load("./assets/textures/decal/normal.jpg"),
+    normalMap: new TextureLoader().load("./assets/textures/decal/normal.webp"),
     polygonOffset: true,
     polygonOffsetFactor: 1
 });
@@ -34,8 +34,8 @@ instancedGelPlane.computeBoundingSphere();
 const geometryGelDynamic = new PlaneGeometry(2, 2);
 const materialGelDynamic = new MeshStandardMaterial({
     roughness: 0.2,
-    normalMap: new TextureLoader().load("./assets/textures/decal/decal-normal.jpg"),
-    map: new TextureLoader().load("./assets/textures/decal/decal-diffuse.png"),
+    normalMap: new TextureLoader().load("./assets/textures/decal/decal-normal.webp"),
+    map: new TextureLoader().load("./assets/textures/decal/decal-diffuse.webp"),
     transparent: true,
     depthWrite: false,
     polygonOffset: true,
@@ -60,8 +60,8 @@ instancedGelPlaneDynamic.computeBoundingSphere();
 const geometryGelDynamicReflection = new PlaneGeometry(2, 2);
 const materialGelDynamicReflection = new MeshStandardMaterial({
     roughness: 0.2,
-    normalMap: new TextureLoader().load("./assets/textures/decal/decal-normal.jpg"),
-    map: new TextureLoader().load("./assets/textures/decal/decal-diffuse.png"),
+    normalMap: new TextureLoader().load("./assets/textures/decal/decal-normal.webp"),
+    map: new TextureLoader().load("./assets/textures/decal/decal-diffuse.webp"),
     transparent: true,
     depthWrite: false,
     polygonOffset: true,
