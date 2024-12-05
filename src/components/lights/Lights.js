@@ -54,7 +54,8 @@ const Lights = function () {
 
 function testLightsManager() {
     var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("lightEmissive");
-    instanced.material.color = new Color(2, 2, 2);
+    if (instanced)
+        instanced.material.color = new Color(2, 2, 2);
     //instanced.material.emissive = new Color(0xffffff)
     //instanced.material.emissiveIntensity = 100
 

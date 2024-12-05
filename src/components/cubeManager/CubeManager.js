@@ -249,7 +249,7 @@ function trasnlatePlane(id, val, portal, old) {
 
                     if (plane.instancedName == "button_box") {
                         bb.accept = "cube-cube_2-laser_cube";
-                    } else if (plane.instancedName == "button_circle") {
+                    } else if (plane.instancedName == "button_sphere") {
                         bb.accept = "sphere";
                     } else if (plane.instancedName == "button_weight") {
                         bb.accept = "sphere-cube-player-laser_cube-cube_2";
@@ -498,12 +498,16 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
                 walls = true;
                 item = GLOBALS.ENTER_DOOR;
                 allowconnection = true;
+
+                console.log(item)
             } else if (clone.position.equals(new Vector3(13, 1, 0))) {
                 hasItem = true;
                 itemName = "exitDoor";
                 walls = true;
                 item = GLOBALS.EXIT_DOOR;
                 allowconnection = true;
+
+                console.log(item)
             } else if (clone.position.equals(new Vector3(16, 7, 7))) {
                 hasItem = true;
                 itemName = "window";

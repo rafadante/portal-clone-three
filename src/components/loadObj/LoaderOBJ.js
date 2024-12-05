@@ -26,11 +26,7 @@ import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import {
     buildIniCubes
 } from '../cubeManager/CubeManager.js';
-import $ from 'jquery';
-/*import JSZipUtils from 'jszip-utils';
-import {
-    unzipSync
-} from 'three/addons/libs/fflate.module.js';*/
+import $, { globalEval } from 'jquery';
 import {
     animate
 } from '../../Main.js';
@@ -42,112 +38,14 @@ import {
 } from '../../Globals.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { hex2rgb } from '../../Utils.js';
+import { viewFPS } from '../test/Test.js';
+import { addItem } from '../items/AddItem.js';
 
-var draco = new DRACOLoader();
-draco.setDecoderPath("draco/");
-draco.preload();
+var defaultLoaded = false;
+var fpsDefaultLoads = 3;
+var fpsDefaultLoaded = 0;
 
-async function handleZip(path, obj) {
-
-    const loader = new GLTFLoader();
-    loader.setDRACOLoader(draco);
-    loader.load(path, async function (glb) {
-
-        const result = glb;
-
-        result.scene.traverse(child => {
-            child.frustumCulled = true;
-        })
-
-        if (obj == "loadButtonCube")
-            loadButtonCubeManager(result.scene)
-        else if (obj == "loadButtonSphere")
-            loadButtonSphereManager(result.scene)
-        else if (obj == "loadButtonWeight")
-            loadButtonWeightManager(result.scene)
-        else if (obj == "loadPedestalButton")
-            loadPedestalButtonManager(result.scene)
-        else if (obj == "loadCamera")
-            loadCameraManager(result.scene)
-        else if (obj == "loadRadio")
-            loadRadioManager(result.scene)
-        else if (obj == "loadCorridor")
-            loadCorridorEnter(result.scene)
-        else if (obj == "loadEnterDoor")
-            loadEnterDoor(result.scene)
-        else if (obj == "loadDispenser")
-            loadDispenserManager(result.scene)
-        else if (obj == "loadGun")
-            loadGunManager(result.scene)
-        else if (obj == "loadPortalCube")
-            loadPortalCubeManager(result.scene)
-        else if (obj == "loadPortalSphere")
-            loadPortalSphereManager(result.scene)
-        else if (obj == "loadWindow")
-            loadWindowManager(result.scene)
-        else if (obj == "loadWindowHalf")
-            loadWindowHalfManager(result.scene)
-        else if (obj == "loadStairs")
-            loadStairsManager(result.scene)
-        else if (obj == "loadLightBridge")
-            loadLightBridgeManager(result.scene)
-        else if (obj == "loadTractorBeam")
-            loadTractorBeamManager(result.scene)
-        else if (obj == "loadLaserEmitter")
-            loadLaserEmitterManager(result.scene)
-        else if (obj == "loadLaserCube")
-            loadLaserCubeManager(result.scene)
-        else if (obj == "loadFaithPlate")
-            loadFaithPlateManager(result.scene)
-        else if (obj == "loadLight")
-            loadLightManager(result.scene)
-        else if (obj == "loadLightEmissive")
-            loadLightEmissiveManager(result.scene)
-        else if (obj == "loadLightStripe")
-            loadLightStripeManager(result.scene)
-        else if (obj == "loadLaserField")
-            loadLaserFieldManager(result.scene)
-        else if (obj == "loadFizzler")
-            loadFizzlerManager(result.scene)
-        else if (obj == "loadPortalCube2")
-            loadPortalCubeManager2(result.scene)
-        else if (obj == "loadAutoPortal")
-            loadAutoPortalManager(result.scene)
-        else if (obj == "loadAutoPortal1")
-            loadAutoPortalManager1(result.scene)
-        else if (obj == "loadLaserReceiver")
-            loadLaserReceiverManager(result.scene)
-        else if (obj == "loadLaserRelay")
-            loadLaserRelayManager(result.scene)
-        else if (obj == "loadPelletLauncher")
-            loadPelletLauncherManager(result.scene)
-        else if (obj == "loadPelletCatcher")
-            loadPelletCatcherManager(result.scene)
-        else if (obj == "loadGelBlue")
-            loadGelBlueManager(result.scene)
-        else if (obj == "loadGelOrange")
-            loadGelOrangeManager(result.scene)
-        else if (obj == "loadGelPurple")
-            loadGelPurpleManager(result.scene)
-        else if (obj == "loadAngledPanel")
-            loadAngledPanelManager(result.scene)
-        else if (obj == "loadGelWhite")
-            loadGelWhiteManager(result.scene)
-        else if (obj == "loadGelClear")
-            loadGelClearManager(result.scene)
-        else if (obj == "loadGelReflection")
-            loadGelReflectionManager(result.scene)
-        else if (obj == "loadGelRecharger")
-            loadGelRechargerManager(result.scene)
-        else if (obj == "loadPaintGun")
-            loadPaintGunManager(result.scene)
-    });
-}
-
-const manager = new LoadingManager();
-const loader = new GLTFLoader(manager).setPath('./assets');
-
-function loadCube() {
+function loadDefault() {
 
     var bb = new Box3()
     bb.setFromObject(GLOBALS.CUBES);
@@ -157,7 +55,155 @@ function loadCube() {
     GLOBALS.MAIN_CAMERA.position.set(-12.2, 17.4, 26.3)
     GLOBALS.CONTROLS.update();
 
-    loadWindowIMG()
+    load3D("/3ds/open.glb", "door", false);
+    loadWindowIMG();
+}
+
+var draco = new DRACOLoader();
+draco.setDecoderPath("draco/");
+draco.preload();
+
+const loader = new GLTFLoader().setPath('./assets');
+loader.setDRACOLoader(draco);
+
+function load3D(path, name, instanced, interactive, roughness, envIntensity, wall, ground, ceiling, trigger, found, loaded, elem) {
+
+    const manager = new LoadingManager();
+    const loader2 = new GLTFLoader(manager).setPath('./assets');
+    loader2.setDRACOLoader(draco);
+
+    manager.onStart = function (url, itemsLoaded, itemsTotal) {
+        $("#loading-parent").css("opacity", 1);
+        $("#loading-parent").css("pointer-events", "all");
+    };
+
+    manager.onLoad = function () {
+        animate();
+
+        if (!defaultLoaded) {
+
+            defaultLoaded = true;
+
+            if (GLOBALS.LOADED_LEVEL) {
+                loadLevelJSON();
+            } else {
+                $("#loading-parent").css("opacity", 0);
+                $("#loading-parent").css("pointer-events", "none");
+            }
+
+            buildIniCubes();
+        } else if (window.ttt) {
+
+            fpsDefaultLoaded++;
+
+            console.log(fpsDefaultLoaded)
+
+            if (fpsDefaultLoaded == 3) {
+                viewFPS();
+            }
+        } else {
+
+            if (found) {
+                GLOBALS.ITEM_HOLDED_NAME = name;
+                GLOBALS.DRAGGED_ITEM_ELEMENT = elem;
+                addItem(found, loaded);
+            }
+
+            $("#loading-parent").css("opacity", 0);
+            $("#loading-parent").css("pointer-events", "none");
+        }
+    };
+
+    manager.onProgress = function (url, itemsLoaded, itemsTotal) {
+
+    };
+
+    loader2.load(path, async function (glb) {
+
+        const scene = glb.scene;
+        scene.instanced = instanced;
+
+        scene.traverse(child => {
+            child.frustumCulled = true;
+        });
+
+        if (instanced) {
+            var item = instancedTransform(scene, name, interactive, roughness, envIntensity)
+            item.userData.wall = wall;
+            item.userData.ground = ground;
+            item.userData.ceiling = ceiling;
+            item.userData.trigger = trigger;
+
+            if (interactive) {
+                item.scene = scene.children[0];
+                item.clone = scene;
+                /*item.clone.children[0].material.envMap = GLOBALS.ENV_MAP;
+                item.clone.children[0].material.envMapIntensity = 0.5;
+                item.clone.children[0].material.roughness = 0.2;*/
+            }
+        } else {
+            if (name == "door") {
+                loadEnterDoor(scene);
+            } else if (name == "gun") {
+                loadGunManager(scene);
+            } else if (name == "window") {
+                loadWindowManager(scene);
+            } else if (name == "corridor") {
+                loadCorridorEnter(scene);
+            }
+        }
+    });
+}
+
+function manageFirstLoadFPS() {
+
+}
+
+function instancedTransform(scene, name, interactive, roughness, envIntensity) {
+    var geometry = scene.children[0].geometry.clone();
+    geometry.computeVertexNormals();
+    geometry.computeBoundsTree();
+
+    var item = new InstancedMesh(geometry, scene.children[0].material.clone(), 200);
+    item.instanceMatrix.setUsage(DynamicDrawUsage); // will be updated every frame
+
+    var clone = new Object3D();
+
+    for (var i = 0; i < 200; i++) {
+        clone.scale.set(0, 0, 0);
+        clone.position.set(100000, 100000, 100000);
+        clone.updateMatrix();
+        item.setMatrixAt(i, clone.matrix);
+    }
+
+    item.instanceMatrix.needsUpdate = true;
+    item.computeBoundingSphere();
+
+    item.name = name;
+    item.receiveShadow = true;
+    item.castShadow = true;
+    item.material.envMap = GLOBALS.ENV_MAP;
+    item.material.envMapIntensity = envIntensity;
+    item.material.roughness = roughness;
+    item.frustumCulled = true;
+
+    if (interactive)
+        GLOBALS.INTERACTIVE.push(item);
+
+    if (name == "laser_cube") {
+        GLOBALS.LASER_CUBE = item;
+        item.material.transparent = true;
+        item.material.opacity = 0.9;
+        item.material.roughness = 0;
+    }
+
+    for (var i = 0; i < 200; i++)
+        GLOBALS.DYMANIC_ITEMS[name].push([])
+
+    GLOBALS.ITEMS_ADDED.add(item);
+    //GLOBALS.ITEMS_ADDED.visible = false;
+
+    return item;
 }
 
 function loadWindowIMG() {
@@ -185,12 +231,77 @@ function loadWindowIMG() {
         gltf.scene.name = "window";
         GLOBALS.SCENE_CHILDREN.add(gltf.scene);
         GLOBALS.OBSERVATION_ROOM_IMG = gltf.scene;
-        loadWindow();
     });
 }
 
-function loadWindow() {
-    handleZip('./assets/3ds/window.glb', "loadWindow");
+function loadEnterDoor(scene) {
+
+    var door = scene;
+    door.userData.connections = 0;
+
+    //ENTER DOOR
+    door.name = "enterDoor";
+    door.rotation.y = Math.PI;
+    door.position.set(3, 1, 12);
+
+    door.namePosition = door.position.x + "/" + door.position.y + "/" + door.position.z;
+    GLOBALS.ENTER_DOOR = door;
+    GLOBALS.SCENE_CHILDREN.add(door);
+
+    //
+    const geometry = new PlaneGeometry(2, 2);
+    const material = new MeshBasicMaterial({
+        color: 0xffff00,
+        side: 2,
+        visible: false
+    });
+    const plane = new Mesh(geometry, material);
+    door.add(plane);
+
+    const geometry3 = new BoxGeometry(2, 2, 0.1);
+    const material3 = new MeshBasicMaterial({ color: 0x00ff00 });
+    const cube = new Mesh(geometry3, material3);
+    cube.visible = false;
+    door.add(cube);
+    door.cube = cube;
+    cube.translateZ(0.3);
+
+    door.traverse(child => {
+
+        child.userData.wall = true;
+        child.userData.ground = false;
+        child.userData.ceiling = false;
+
+        if (child.material) {
+            child.material.envMap = GLOBALS.ENV_MAP;
+            child.material.envMapIntensity = 0.5;
+
+            if (child.name.includes("dif")) {
+                child.material = new MeshBasicMaterial();
+                child.material.color = new Color(0x000000);
+            }
+        }
+
+    })
+    //
+    GLOBALS.EXIT_DOOR = SkeletonUtils.clone(GLOBALS.ENTER_DOOR);
+    GLOBALS.EXIT_DOOR.position.set(13, 1, 0);
+    GLOBALS.EXIT_DOOR.userData.buttons = 0;
+    GLOBALS.EXIT_DOOR.userData.connections = 0;
+    GLOBALS.EXIT_DOOR.name = "exitDoor";
+    GLOBALS.EXIT_DOOR.rotation.y += Math.PI;
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.EXIT_DOOR);
+    GLOBALS.EXIT_DOOR.namePosition = GLOBALS.EXIT_DOOR.position.x + "/" + GLOBALS.EXIT_DOOR.position.y + "/" + GLOBALS.EXIT_DOOR.position.z;
+    //
+    var map = new TextureLoader().load('./assets/exit.jpg');
+    map.colorSpace = SRGBColorSpace;
+
+    const geometryExitDoor = new PlaneGeometry(1, 1);
+    const materialExitDoor = new MeshBasicMaterial({ map: map });
+    const planeExitDoor = new Mesh(geometryExitDoor, materialExitDoor);
+    planeExitDoor.position.set(0, 1.3, 0.01)
+    planeExitDoor.scale.set(1, 0.5, 1)
+    GLOBALS.EXIT_DOOR.add(planeExitDoor);
 }
 
 function loadWindowManager(scene) {
@@ -234,11 +345,6 @@ function loadWindowManager(scene) {
     GLOBALS.SPOTLIGHT.target = scene.getObjectByName("lightTarget");
     GLOBALS.OBSERVATION_ROOM = scene;
     GLOBALS.OBSERVATION_ROOM.add(GLOBALS.LIGHT_GROUP);
-    loadGun();
-}
-
-function loadGun() {
-    handleZip('./assets/3ds/hd_portal_gun3.glb', "loadGun");
 }
 
 function loadGunManager(scene) {
@@ -311,87 +417,9 @@ function loadGunManager(scene) {
     //cene.scale.set(1, 1, 1)
     //scene.position.set(0.12, -0.16, -0.14);
     //scene.visible = false;
-    loadDoor()
-}
 
-function loadDoor() {
-    handleZip('./assets/3ds/open.glb', "loadEnterDoor");
-}
-
-function loadEnterDoor(scene) {
-
-    var door = scene;
-    door.userData.connections = 0;
-
-    //ENTER DOOR
-    door.name = "enterDoor";
-    door.rotation.y = Math.PI;
-    door.position.set(3, 1, 12);
-
-    door.namePosition = door.position.x + "/" + door.position.y + "/" + door.position.z;
-    GLOBALS.ENTER_DOOR = door;
-    GLOBALS.SCENE_CHILDREN.add(door);
-
-    //
-    const geometry = new PlaneGeometry(2, 2);
-    const material = new MeshBasicMaterial({
-        color: 0xffff00,
-        side: 2,
-        visible: false
-    });
-    const plane = new Mesh(geometry, material);
-    door.add(plane);
-
-    const geometry3 = new BoxGeometry(2, 2, 0.1);
-    const material3 = new MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new Mesh(geometry3, material3);
-    cube.visible = false;
-    door.add(cube);
-    door.cube = cube;
-    cube.translateZ(0.3);
-
-    door.traverse(child => {
-
-        child.userData.wall = true;
-        child.userData.ground = false;
-        child.userData.ceiling = false;
-
-        if (child.material) {
-            child.material.envMap = GLOBALS.ENV_MAP;
-            child.material.envMapIntensity = 0.5;
-
-            if (child.name.includes("dif")) {
-                child.material = new MeshBasicMaterial();
-                child.material.color = new Color(0x000000);
-            }
-        }
-
-    })
-    //
-    GLOBALS.EXIT_DOOR = SkeletonUtils.clone(GLOBALS.ENTER_DOOR);
-    GLOBALS.EXIT_DOOR.position.set(13, 1, 0);
-    GLOBALS.EXIT_DOOR.userData.buttons = 0;
-    GLOBALS.EXIT_DOOR.userData.connections = 0;
-    GLOBALS.EXIT_DOOR.name = "exitDoor";
-    GLOBALS.EXIT_DOOR.rotation.y += Math.PI;
-    GLOBALS.SCENE_CHILDREN.add(GLOBALS.EXIT_DOOR);
-    GLOBALS.EXIT_DOOR.namePosition = GLOBALS.EXIT_DOOR.position.x + "/" + GLOBALS.EXIT_DOOR.position.y + "/" + GLOBALS.EXIT_DOOR.position.z;
-    //
-    var map = new TextureLoader().load('./assets/exit.jpg');
-    map.colorSpace = SRGBColorSpace;
-
-    const geometryExitDoor = new PlaneGeometry(1, 1);
-    const materialExitDoor = new MeshBasicMaterial({ map: map });
-    const planeExitDoor = new Mesh(geometryExitDoor, materialExitDoor);
-    planeExitDoor.position.set(0, 1.3, 0.01)
-    planeExitDoor.scale.set(1, 0.5, 1)
-    GLOBALS.EXIT_DOOR.add(planeExitDoor);
-
-    loadCorridor()
-}
-
-function loadCorridor() {
-    handleZip('./assets/3ds/corridor.glb', "loadCorridor");
+    GLOBALS.GUN_CLONE.scale.setScalar(0.7);
+    GLOBALS.GUN_CLONE2.scale.setScalar(0.7);
 }
 
 function loadCorridorEnter(scene) {
@@ -414,92 +442,104 @@ function loadCorridorEnter(scene) {
     GLOBALS.CORRIDOR_ENTER = corridor;
     GLOBALS.CORRIDOR_ENTER.name = "corridorEnter";
     GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
-    loadPortalCube();
 }
 
-function loadPortalCube() {
-    handleZip('./assets/3ds/portal_cube.glb', "loadPortalCube");
-}
+function loadAvatar() {
 
-function loadPortalCubeManager(scene) {
+    const playerModel = loader.loadAsync('/avatar/chell.glb');
 
-    var item = instancedTransform(scene, "cube", true, 0.2, 0.5)
-    item.userData.wall = false;
-    item.userData.ground = true;
-    item.userData.ceiling = false;
-    item.scene = scene.children[0];
-    item.clone = scene;
-    item.clone.children[0].material.envMap = GLOBALS.ENV_MAP;
-    item.clone.children[0].material.envMapIntensity = 0.5;
-    item.clone.children[0].material.roughness = 0.2;
-    loadPortalSphere();
-    buildIniCubes();
-}
+    load3D("/3ds/hd_portal_gun3.glb", "gun", false);
+    load3D("/3ds/window.glb", "window", false);
+    load3D("/3ds/corridor.glb", "corridor", false);
 
-function instancedTransform(scene, name, interactive, roughness, envIntensity) {
-    var geometry = scene.children[0].geometry.clone();
-    geometry.computeVertexNormals();
-    geometry.computeBoundsTree();
-
-    var item = new InstancedMesh(geometry, scene.children[0].material.clone(), 200);
-    item.instanceMatrix.setUsage(DynamicDrawUsage); // will be updated every frame
-
-    var clone = new Object3D();
-
-    for (var i = 0; i < 200; i++) {
-        clone.scale.set(0, 0, 0);
-        clone.position.set(100000, 100000, 100000);
-        clone.updateMatrix();
-        item.setMatrixAt(i, clone.matrix);
+    GLOBALS.PLAYER_ANIMATIONS = {
+        //WITH PORTAL GUN
+        ANIM_STANDING_IDLE: loader.loadAsync('/avatar/StandingIdle.glb'),
+        ANIM_JUMP: loader.loadAsync('/avatar/Jump.glb'),
+        ANIM_STATIONARY_RUNNING: loader.loadAsync('/avatar/StationaryRunning.glb'),
+        ANIM_BACKWARD_RUNNING: loader.loadAsync('/avatar/RunningBackward.glb'),
+        ANIM_RIGHT_STRAFE: loader.loadAsync('/avatar/RightStrafe.glb'),
+        ANIM_LEFT_STRAFE: loader.loadAsync('/avatar/LeftStrafe.glb'),
+        ANIM_FALLING_IDLE: loader.loadAsync('/avatar/FallingIdle.glb'),
+        //NO PORTAL GUN
+        /*ANIM_STANDING_IDLE_NO_GUN: loader.loadAsync('./assets/avatar/noGun/StandingIdle.glb'),
+        ANIM_JUMP_NO_GUN: loader.loadAsync('./assets/avatar/noGun/Jump.glb'),
+        ANIM_STATIONARY_RUNNING_NO_GUN: loader.loadAsync('./assets/avatar/noGun/StationaryRunning.glb'),
+        ANIM_BACKWARD_RUNNING_NO_GUN: loader.loadAsync('./assets/avatar/noGun/RunningBackward.glb'),
+        ANIM_RIGHT_STRAFE_NO_GUN: loader.loadAsync('./assets/avatar/noGun/RightStrafe.glb'),
+        ANIM_LEFT_STRAFE_NO_GUN: loader.loadAsync('./assets/avatar/noGun/LeftStrafe.glb'),*/
     }
 
-    item.instanceMatrix.needsUpdate = true;
-    item.computeBoundingSphere();
+    playerModel.then((glb) => {
 
-    item.name = name;
-    item.receiveShadow = true;
-    item.castShadow = true;
-    item.material.envMap = GLOBALS.ENV_MAP;
-    item.material.envMapIntensity = envIntensity;
-    item.material.roughness = roughness;
-    item.frustumCulled = true;
+        const fbx = glb.scene;
 
-    if (interactive)
-        GLOBALS.INTERACTIVE.push(item);
+        fbx.scale.setScalar(0.015);
+        GLOBALS.MIXERS = new AnimationMixer(fbx)
 
-    if (name == "laser_cube") {
-        GLOBALS.LASER_CUBE = item;
-        item.material.transparent = true;
-        item.material.opacity = 0.9;
-        item.material.roughness = 0;
-    }
+        fbx.traverse(c => {
+            c.castShadow = true;
 
-    for (var i = 0; i < 200; i++)
-        GLOBALS.DYMANIC_ITEMS[name].push([])
+            if (c.material) {
 
-    GLOBALS.ITEMS_ADDED.add(item);
-    //GLOBALS.ITEMS_ADDED.visible = false;
+                c.material.envMap = GLOBALS.ENV_MAP;
+                c.material.envMapIntensity = 0.5;
+                c.material.transparent = true;
+                c.material.opacity = 0;
+                c.material.colorWrite = false;
+                c.material.depthWrite = false;
+                c.material.side = 0;
+            }
 
-    return item;
+            if (c.isBone) {
+                if (c.name == "wrist_R") {
+                    window.hand = c;
+                } else if (c.name == "elbow_L") {
+                    window.handLeft = c;
+                } else if (c.name == "neck1") {
+                    window.neck = c;
+                }
+            }
+        })
+
+        GLOBALS.PLAYER_MODEL = fbx;
+        GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
+
+        GLOBALS.PLAYER_MODEL.position.y = 100000;
+        GLOBALS.PLAYER_MODEL_CLONE.position.y = 100000;
+
+        if ((!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high"))
+            || (window.playerState)) {
+            GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL);
+            GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE);
+        }
+
+        GLOBALS.PLAYER_MODEL.animationActions = {};
+        GLOBALS.PLAYER_MODEL.modelReady = true;
+    }).then(() => {
+        let animationPromises = []
+        for (let index in GLOBALS.PLAYER_ANIMATIONS) {
+            const anim = GLOBALS.PLAYER_ANIMATIONS[index]
+
+            anim.then((anim) => {
+                const animationAction = GLOBALS.MIXERS.clipAction(anim.animations[0])
+                GLOBALS.PLAYER_MODEL.animationActions[index] = animationAction
+            })
+            animationPromises.push(anim)
+        }
+        Promise.all(animationPromises).then(() => GLOBALS.PLAYER_MODEL.modelReady = true)
+    });
+
+    // modify bone update function to also update its world matrix
+    // possibly do this only to skeletons you need it for, not for all bones
+    var update = Bone.prototype.update;
+    Bone.prototype.update = function (parentSkinMatrix, forceUpdate) {
+        update.call(this, parentSkinMatrix, forceUpdate);
+        this.updateMatrixWorld(true);
+    };
 }
 
-function loadPortalSphere() {
-    handleZip('./assets/3ds/portal_sphere.glb', "loadPortalSphere");
-}
-
-function loadPortalSphereManager(scene) {
-    var item = instancedTransform(scene, "sphere", true, 0.2, 0.5)
-    item.userData.wall = false;
-    item.userData.ground = true;
-    item.userData.ceiling = false;
-    item.scene = scene.children[0];
-    item.clone = scene.children[0];
-    item.clone.material.envMap = GLOBALS.ENV_MAP;
-    item.clone.material.envMapIntensity = 0.5;
-    item.clone.material.roughness = 0.2;
-
-    loadHalfWindow()
-}
+//
 
 function loadHalfWindow() {
     //HALF WINDOW IMG
@@ -510,9 +550,8 @@ function loadHalfWindow() {
         gltf.scene.userData.ceiling = false;
         GLOBALS.ITEMS.add(gltf.scene);
         //HALF WINDOW
-        handleZip('./assets/3ds/window_half.glb', "loadWindowHalf");
+        //handleZip('./assets/3ds/window_half.glb', "loadWindowHalf");
     })
-    loadDispenser()
 }
 
 function loadWindowHalfManager(scene) {
@@ -564,86 +603,6 @@ function loadWindowHalfManager(scene) {
     GLOBALS.OBSERVATION_ROOM_HALF = scene;
 }
 
-function loadDispenser() {
-    handleZip('./assets/3ds/cube_dispenser.glb', "loadDispenser");
-}
-
-function loadDispenserManager(scene) {
-
-    var item = instancedTransform(scene, "dispenser", false, 0.2, 0.5)
-
-    item.userData.wall = false;
-    item.userData.ground = true;
-    item.userData.ceiling = false;
-
-    loadPedestalButton()
-}
-
-function loadPedestalButton() {
-    handleZip('./assets/3ds/pedestal_button.glb', "loadPedestalButton");
-}
-
-function loadPedestalButtonManager(scene) {
-
-    var item = instancedTransform(scene, "pedestal_button", true, 0.2, 0.5)
-
-    item.userData.wall = false;
-    item.userData.ground = true;
-    item.userData.ceiling = false;
-    item.userData.trigger = true;
-
-    loadButtonSphere()
-}
-
-function loadButtonSphere() {
-    handleZip('./assets/3ds/button_sphere.glb', "loadButtonSphere");
-}
-
-function loadButtonSphereManager(scene) {
-
-    var item = instancedTransform(scene, "button_circle", false, 0.2, 0.5)
-    item.userData.wall = false;
-    item.userData.ground = true;
-    item.userData.ceiling = false;
-    item.userData.trigger = true;
-
-    loadButtonCube()
-}
-
-function loadButtonCube() {
-    handleZip('./assets/3ds/button_cube.glb', "loadButtonCube");
-}
-
-function loadButtonCubeManager(scene) {
-
-    var item = instancedTransform(scene, "button_box", false, 0.2, 0.5)
-    item.userData.wall = false;
-    item.userData.ground = true;
-    item.userData.ceiling = false;
-    item.userData.trigger = true;
-
-    loadButtonWeight()
-}
-
-function loadButtonWeight() {
-    handleZip('./assets/3ds/button_weight.glb', "loadButtonWeight", 0.2, 0.5);
-}
-
-function loadButtonWeightManager(scene) {
-
-    var item = instancedTransform(scene, "button_weight", false, 0.2, 0.5)
-    item.userData.wall = false;
-    item.userData.ground = true;
-    item.userData.ceiling = false;
-    item.userData.trigger = true;
-
-    loadCamera();
-}
-
-function loadCamera() {
-    handleZip('./assets/3ds/camera.glb', "loadCamera");
-}
-
 function loadCameraManager(scene) {
     scene.name = "camera";
     scene.userData.wall = true;
@@ -665,103 +624,6 @@ function loadCameraManager(scene) {
             }
         }
     });
-
-    loadRadio();
-}
-
-function loadRadio() {
-    handleZip('./assets/3ds/radio.glb', "loadRadio");
-}
-
-function loadRadioManager(scene) {
-
-    var item = instancedTransform(scene, "radio", true, 0.2, 0.5)
-    item.userData.wall = false;
-    item.userData.ground = true;
-    item.userData.ceiling = false;
-    item.scene = scene.children[0];
-    item.clone = scene;
-    item.clone.children[0].material.envMap = GLOBALS.ENV_MAP;
-    item.clone.children[0].material.envMapIntensity = 0.5;
-    item.clone.children[0].material.roughness = 0.2;
-
-    loadStairs();
-}
-
-function loadStairs() {
-    handleZip('./assets/3ds/stairs.glb', "loadStairs");
-}
-
-function loadStairsManager(scene) {
-    var item = instancedTransform(scene, "stairs", false, 0.2, 0.5)
-    item.userData.wall = false;
-    item.userData.ground = true;
-    item.userData.ceiling = false;
-    loadLightBridge()
-}
-
-function loadLightBridge() {
-    handleZip('./assets/3ds/light_bridge.glb', "loadLightBridge");
-}
-
-function loadLightBridgeManager(scene) {
-    var item = instancedTransform(scene, "light_bridge", false, 0.2, 0.5)
-    item.userData.wall = true;
-    item.userData.ground = false;
-    item.userData.ceiling = false;
-
-    loadTractorBeam()
-}
-
-function loadTractorBeam() {
-    handleZip('./assets/3ds/tractor_beam.glb', "loadTractorBeam");
-}
-
-function loadTractorBeamManager(scene) {
-
-    var item = instancedTransform(scene, "tractor_beam", false, 0.2, 0.5)
-    item.userData.wall = true;
-    item.userData.ground = false;
-    item.userData.ceiling = true;
-
-    loadLaserEmitter()
-}
-
-function loadLaserEmitter() {
-    handleZip('./assets/3ds/laser_emitter.glb', "loadLaserEmitter");
-}
-
-function loadLaserEmitterManager(scene) {
-
-    var item = instancedTransform(scene, "laser_emitter", false, 0.2, 0.5)
-    item.userData.wall = true;
-    item.userData.ground = false;
-    item.userData.ceiling = true;
-
-    loadLaserCube()
-}
-
-function loadLaserCube() {
-    handleZip('./assets/3ds/laser_cube.glb', "loadLaserCube");
-}
-
-function loadLaserCubeManager(scene) {
-
-    var item = instancedTransform(scene, "laser_cube", true, 0.0, 0.5)
-    item.userData.wall = true;
-    item.userData.ground = false;
-    item.userData.ceiling = true;
-    item.scene = scene.children[0];
-    item.clone = scene;
-    item.clone.children[0].material.envMap = GLOBALS.ENV_MAP;
-    item.clone.children[0].material.envMapIntensity = 0.5;
-    item.clone.children[0].material.roughness = 0.2;
-
-    loadFaithPlate()
-}
-
-function loadFaithPlate() {
-    handleZip('./assets/3ds/faith_plate.glb', "loadFaithPlate");
 }
 
 function loadFaithPlateManager(scene) {
@@ -779,461 +641,16 @@ function loadFaithPlateManager(scene) {
             child.material.roughness = 0.2;
         }
     })
-
-    loadLight()
 }
 
-function loadLight() {
-    handleZip('./assets/3ds/light.glb', "loadLight");
-}
-
-function loadLightManager(scene) {
-    var item = instancedTransform(scene, "light", false, 0, 1)
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
-    loadLightEmissive()
-}
-
-function loadLightEmissive() {
-    handleZip('./assets/3ds/lightEmissive.glb', "loadLightEmissive");
-}
-
-function loadLightEmissiveManager(scene) {
-    var item = instancedTransform(scene, "lightEmissive", false, 0, 1)
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
-    loadLightStripe()
-}
-
-function loadLightStripe() {
-    handleZip('./assets/3ds/stripe.glb', "loadLightStripe");
-}
-
-function loadLightStripeManager(scene) {
-    var item = instancedTransform(scene, "stripe", false, 0, 1)
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
-    loadAvatar();
-}
-
-const gltfLoader = new GLTFLoader();
-gltfLoader.setDRACOLoader(draco);
-
-function loadAvatar() {
-
-    const playerModel = gltfLoader.loadAsync('./assets/avatar/chell.glb');
-
-    GLOBALS.PLAYER_ANIMATIONS = {
-        //WITH PORTAL GUN
-        ANIM_STANDING_IDLE: gltfLoader.loadAsync('./assets/avatar/StandingIdle.glb'),
-        ANIM_JUMP: gltfLoader.loadAsync('./assets/avatar/Jump.glb'),
-        ANIM_STATIONARY_RUNNING: gltfLoader.loadAsync('./assets/avatar/StationaryRunning.glb'),
-        ANIM_BACKWARD_RUNNING: gltfLoader.loadAsync('./assets/avatar/RunningBackward.glb'),
-        ANIM_RIGHT_STRAFE: gltfLoader.loadAsync('./assets/avatar/RightStrafe.glb'),
-        ANIM_LEFT_STRAFE: gltfLoader.loadAsync('./assets/avatar/LeftStrafe.glb'),
-        ANIM_FALLING_IDLE: gltfLoader.loadAsync('./assets/avatar/FallingIdle.glb'),
-        //NO PORTAL GUN
-        /*ANIM_STANDING_IDLE_NO_GUN: gltfLoader.loadAsync('./assets/avatar/noGun/StandingIdle.glb'),
-        ANIM_JUMP_NO_GUN: gltfLoader.loadAsync('./assets/avatar/noGun/Jump.glb'),
-        ANIM_STATIONARY_RUNNING_NO_GUN: gltfLoader.loadAsync('./assets/avatar/noGun/StationaryRunning.glb'),
-        ANIM_BACKWARD_RUNNING_NO_GUN: gltfLoader.loadAsync('./assets/avatar/noGun/RunningBackward.glb'),
-        ANIM_RIGHT_STRAFE_NO_GUN: gltfLoader.loadAsync('./assets/avatar/noGun/RightStrafe.glb'),
-        ANIM_LEFT_STRAFE_NO_GUN: gltfLoader.loadAsync('./assets/avatar/noGun/LeftStrafe.glb'),*/
-    }
-
-    playerModel.then((glb) => {
-
-        const fbx = glb.scene;
-
-        fbx.scale.setScalar(0.015);
-        GLOBALS.MIXERS = new AnimationMixer(fbx)
-
-        fbx.traverse(c => {
-            c.castShadow = true;
-
-            if (c.material) {
-
-                c.material.envMap = GLOBALS.ENV_MAP;
-                c.material.envMapIntensity = 0.5;
-                c.material.transparent = true;
-                c.material.opacity = 0;
-                c.material.colorWrite = false;
-                c.material.depthWrite = false;
-                c.material.side = 0;
-            }
-
-            if (c.isBone) {
-                if (c.name == "wrist_R") {
-                    window.hand = c;
-                } else if (c.name == "elbow_L") {
-                    window.handLeft = c;
-                } else if (c.name == "neck1") {
-                    window.neck = c;
-                }
-            }
-        })
-
-        GLOBALS.GUN_CLONE.scale.setScalar(0.7);
-        GLOBALS.GUN_CLONE2.scale.setScalar(0.7);
-
-        GLOBALS.PLAYER_MODEL = fbx;
-        GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
-
-        GLOBALS.PLAYER_MODEL.position.y = 100000;
-        GLOBALS.PLAYER_MODEL_CLONE.position.y = 100000;
-
-        if ((!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high"))
-            || (window.playerState)) {
-            GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL);
-            GLOBALS.SCENE_CHILDREN.add(GLOBALS.PLAYER_MODEL_CLONE);
-        }
-
-        GLOBALS.PLAYER_MODEL.animationActions = {};
-        GLOBALS.PLAYER_MODEL.modelReady = true;
-    }).then(() => {
-        let animationPromises = []
-        for (let index in GLOBALS.PLAYER_ANIMATIONS) {
-            const anim = GLOBALS.PLAYER_ANIMATIONS[index]
-
-            anim.then((anim) => {
-                const animationAction = GLOBALS.MIXERS.clipAction(anim.animations[0])
-                GLOBALS.PLAYER_MODEL.animationActions[index] = animationAction
-            })
-            animationPromises.push(anim)
-        }
-        Promise.all(animationPromises).then(() => GLOBALS.PLAYER_MODEL.modelReady = true)
-    });
-
-    // modify bone update function to also update its world matrix
-    // possibly do this only to skeletons you need it for, not for all bones
-    var update = Bone.prototype.update;
-    Bone.prototype.update = function (parentSkinMatrix, forceUpdate) {
-        update.call(this, parentSkinMatrix, forceUpdate);
-        this.updateMatrixWorld(true);
-    };
-
-    loadLaserField();
-}
-
-function loadLaserField() {
-    handleZip('./assets/3ds/laser_field.glb', "loadLaserField");
-}
-
-function loadLaserFieldManager(scene) {
-
-    var item = instancedTransform(scene, "laser_field", false, 0.1, 1)
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
-    loadFizzler()
-}
-
-function loadFizzler() {
-    handleZip('./assets/3ds/fizzler.glb', "loadFizzler");
-}
-
-function loadFizzlerManager(scene) {
-
-    var item = instancedTransform(scene, "fizzler", false, 0.1, 1)
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
-    loadPortalCube2();
-}
-
-function loadPortalCube2() {
-    handleZip('./assets/3ds/cube_2.glb', "loadPortalCube2");
-}
-
-function loadPortalCubeManager2(scene) {
-
-    var item = instancedTransform(scene, "cube_2", true, 0.2, 0.5)
-    item.userData.wall = false;
-    item.userData.ground = true;
-    item.userData.ceiling = false;
-    item.scene = scene.children[0];
-    item.clone = scene;
-    item.clone.children[0].material.envMap = GLOBALS.ENV_MAP;
-    item.clone.children[0].material.envMapIntensity = 0.5;
-    item.clone.children[0].material.roughness = 0.2;
-
-    loadAutoPortal()
-}
-
-function loadAutoPortal() {
-    handleZip('./assets/3ds/portal_0.glb', "loadAutoPortal");
-}
-
-function loadAutoPortalManager(scene) {
-
-    var item = instancedTransform(scene, "portal_0", false, 0.1, 1)
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
-    loadAutoPortal1()
-}
-
-function loadAutoPortal1() {
-    handleZip('./assets/3ds/portal_1.glb', "loadAutoPortal1");
-}
-
-function loadAutoPortalManager1(scene) {
-
-    var item = instancedTransform(scene, "portal_1", false, 0.1, 1)
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
-    loadLaserReceiver()
-}
-
-function loadLaserReceiver() {
-    handleZip('./assets/3ds/laser_receiver.glb', "loadLaserReceiver");
-}
-
-function loadLaserReceiverManager(scene) {
-
-    var item = instancedTransform(scene, "laser_receiver", false, 0.1, 1)
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
-    loadLaserRelay()
-}
-
-function loadLaserRelay() {
-    handleZip('./assets/3ds/laser_relay.glb', "loadLaserRelay");
-}
-
-function loadLaserRelayManager(scene) {
-
-    var item = instancedTransform(scene, "laser_relay", false, 0, 1)
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
-    loadPelletLauncher();
-}
-
-function loadPelletLauncher() {
-    handleZip('./assets/3ds/pellet_launcher.glb', "loadPelletLauncher");
-}
-
-function loadPelletLauncherManager(scene) {
-
-    var item = instancedTransform(scene, "pellet_launcher", false, 0, 1)
-    item.material.polygonOffset = true;
-    item.material.polygonOffsetFactor = -10;
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
-    loadPelletCatcher();
-}
-
-function loadPelletCatcher() {
-    handleZip('./assets/3ds/pellet_catcher.glb', "loadPelletCatcher");
-}
-
-function loadPelletCatcherManager(scene) {
-
-    var item = instancedTransform(scene, "pellet_catcher", false, 0, 1)
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
-    loadGelBlue();
-}
-
-function loadGelBlue() {
-    handleZip('./assets/3ds/gel_blue.glb', "loadGelBlue");
-}
-
-function loadGelBlueManager(scene) {
-
-    var item = instancedTransform(scene, "gel_blue", false, 0, 1)
-    item.userData.wall = false;
-    item.userData.ground = false;
-    item.userData.ceiling = true;
-
-    loadGelOrange()
-}
-
-function loadGelOrange() {
-    handleZip('./assets/3ds/gel_orange.glb', "loadGelOrange");
-}
-
-function loadGelOrangeManager(scene) {
-
-    var item = instancedTransform(scene, "gel_orange", false, 0, 1)
-    item.userData.wall = false;
-    item.userData.ground = false;
-    item.userData.ceiling = true;
-
-    loadGelPurple()
-}
-
-function loadGelPurple() {
-    handleZip('./assets/3ds/gel_purple.glb', "loadGelPurple");
-}
-
-function loadGelPurpleManager(scene) {
-
-    var item = instancedTransform(scene, "gel_purple", false, 0, 1)
-    item.userData.wall = false;
-    item.userData.ground = false;
-    item.userData.ceiling = true;
-
-    loadGelWhite();
-}
-
-function loadGelWhite() {
-    handleZip('./assets/3ds/gel_white.glb', "loadGelWhite");
-}
-
-function loadGelWhiteManager(scene) {
-
-    var item = instancedTransform(scene, "gel_white", false, 0, 1)
-    item.userData.wall = false;
-    item.userData.ground = false;
-    item.userData.ceiling = true;
-
-    loadGelClear();
-}
-
-function loadGelClear() {
-    handleZip('./assets/3ds/gel_clear.glb', "loadGelClear");
-}
-
-function loadGelClearManager(scene) {
-
-    var item = instancedTransform(scene, "gel_clear", false, 0, 1)
-    item.userData.wall = false;
-    item.userData.ground = false;
-    item.userData.ceiling = true;
-
-    loadGelReflection();
-}
-
-function loadGelReflection() {
-    handleZip('./assets/3ds/gel_reflection.glb', "loadGelReflection");
-}
-
-function loadGelReflectionManager(scene) {
-
-    var item = instancedTransform(scene, "gel_reflection", false, 0, 1)
-    item.userData.wall = false;
-    item.userData.ground = false;
-    item.userData.ceiling = true;
-
-    loadGelRecharger();
-}
-
-function loadGelRecharger() {
-    handleZip('./assets/3ds/gel_recharger.glb', "loadGelRecharger");
-}
-
-function loadGelRechargerManager(scene) {
-
-    var item = instancedTransform(scene, "gel_recharger", false, 0, 1)
-    item.userData.wall = true;
-    item.userData.ground = true;
-    item.userData.ceiling = true;
-
-    loadAngledPanel();
-}
-
-function loadAngledPanel() {
-    handleZip('./assets/3ds/angled_panel.glb', "loadAngledPanel");
-}
-
-function loadAngledPanelManager(scene) {
-    scene.name = "angled_panel";
-    scene.userData.wall = true;
-    scene.userData.ground = true;
-    scene.userData.ceiling = true;
-    GLOBALS.ITEMS.add(scene);
-    scene.traverse(child => {
-        if (child.name.includes("panel") && child.material) {
-            child.material.side = 2;
-            child.material.envMap = GLOBALS.ENV_MAP;
-            child.material.envMapIntensity = 0.2;
-            child.material.roughness = 1;
-        }
-
-        if (child.material) {
-            child.material.polygonOffset = true;
-            child.material.polygonOffsetFactor = 2;
-        }
-    });
-
-    loadPaintGun()
-}
-
-function loadPaintGun() {
-    handleZip('./assets/3ds/paint_gun.glb', "loadPaintGun");
-}
-
-function loadPaintGunManager(scene) {
-    scene.name = "paint_gun";
-    scene.userData.wall = true;
-    scene.userData.ground = true;
-    scene.userData.ceiling = true;
-    GLOBALS.ITEMS.add(scene);
-    scene.traverse(child => {
-        if (child.material) {
-            child.receiveShadow = true;
-            child.material.envMap = GLOBALS.ENV_MAP;
-            child.material.envMapIntensity = 0.5;
-        }
-
-        if (child.name == "opacity") {
-            child.material.transparent = true;
-            child.material.opacity = 0.2;
-        } else if (child.name == "left" || child.name == "right") {
-            child.material.roughness = 0;
-            child.material.color = new Color(0, 0, 0);
-        }
-    });
-
-    GLOBALS.PAINT_GUN = new Group();
-    const group = new Group()
-
-    GLOBALS.PAINT_GUN.add(group);
-    group.add(scene);
-    GLOBALS.GUN_GROUP.add(GLOBALS.PAINT_GUN);
-
-    //scene.scale.set(0.001, 0.001, 0.001)
-    scene.position.set(0.15, -0.17, -0.25);
-    GLOBALS.PAINT_GUN.visible = false;
-
-    if (GLOBALS.LOADED_LEVEL) {
-        loadLevelJSON()
-    } else {
-        $("#loading-parent").css("opacity", 0);
-        $("#loading-parent").css("pointer-events", "none");
-    }
-    animate();
-}
-
-
-GLOBALS.LIGHT_PORTAL_0 = new PointLight(new Color(1, 0.25, 0), 3, 2);
-GLOBALS.LIGHT_PORTAL_1 = new PointLight(new Color(0, 0.3, 1), 3, 2);
+GLOBALS.LIGHT_PORTAL_1 = new PointLight(new Color(1, 0.25, 0), 3, 2);
+GLOBALS.LIGHT_PORTAL_0 = new PointLight(new Color(0, 0.3, 1), 3, 2);
 GLOBALS.FLASH = new PointLight(0xff0000, 10);
 
 if (localStorage.getItem("quality-select") == "epic") {
-    //GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
-    //GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
-    //GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
 }
 
 setTimeout(() => {
@@ -1243,5 +660,7 @@ setTimeout(() => {
 }, 3000);
 
 export {
-    loadCube
+    loadDefault,
+    load3D,
+    loadAvatar
 };

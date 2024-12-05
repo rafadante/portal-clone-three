@@ -56,10 +56,10 @@ function colliderItemManager() {
     addColliderItem(GLOBALS.DYMANIC_ITEMS['button_box'], "button_box", 0, 2)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['button_box'], "button_box", 0, 3)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['button_box'], "button_box", 0, 4)
-    addColliderItem(GLOBALS.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 1)
-    addColliderItem(GLOBALS.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 2)
-    addColliderItem(GLOBALS.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 3)
-    addColliderItem(GLOBALS.DYMANIC_ITEMS['button_circle'], "button_circle", 0, 4)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['button_sphere'], "button_sphere", 0, 1)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['button_sphere'], "button_sphere", 0, 2)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['button_sphere'], "button_sphere", 0, 3)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['button_sphere'], "button_sphere", 0, 4)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['ramp'], "ramp", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['ramp_half'], "ramp_half", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['ramp_half2'], "ramp_half2", 0)
@@ -246,14 +246,14 @@ function addColliderItem(items, type, mass, offset) {
             } else if (type == "button_weight") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.117, 0.5));
                 objHolder.translateY(0.117)
-            } else if (type == "button_box" || type == "button_circle") {
+            } else if (type == "button_box" || type == "button_sphere") {
 
                 var a1, a2;
 
                 if (type == "button_box") {
                     a1 = 0.45;
                     a2 = 0.9;
-                } else if (type == "button_circle") {
+                } else if (type == "button_sphere") {
                     a1 = 0.4;
                     a2 = 0.8;
                 }

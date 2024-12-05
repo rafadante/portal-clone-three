@@ -106,7 +106,7 @@ function teleportationState() {
         GLOBALS.PIVOT.position.y += 0.3;
 
     GLOBALS.GUN.position.copy(GLOBALS.PIVOT.position);
-    GLOBALS.PAINT_GUN.position.copy(GLOBALS.PIVOT.position);
+    //GLOBALS.PAINT_GUN.position.copy(GLOBALS.PIVOT.position);
 
     GLOBALS.PORTAL_GUN_CAMERA.position.copy(GLOBALS.PIVOT.position)
     GLOBALS.PORTAL_GUN_CAMERA.quaternion.copy(GLOBALS.PIVOT.quaternion)

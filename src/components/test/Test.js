@@ -28,9 +28,19 @@ import { stateDoor } from '../door/Door.js';
 import { addGel } from '../gels/Gels.js';
 import { findPath } from '../findPath/FindPath.js';
 import { levelEnteredFunction } from '../events/states.js';
+import { loadAvatar } from '../loadObj/LoaderOBJ.js';
 
 $("body").on('click', '#view-fps', function () {
-    viewFPS();
+    //
+    $("#loading-parent").css("opacity", 1)
+    $("#loading-parent").css("pointer-events", "all")
+    window.ttt = true;
+
+    if(GLOBALS.GUN){
+        viewFPS();
+    }else{
+        loadAvatar();
+    }
 });
 
 var p = 0;
@@ -66,8 +76,7 @@ function viewFPS() {
     obj.translateZ(1);
     GLOBALS.PLAYER.spawnPosition = obj.position.clone();
 
-    $("#loading-parent").css("opacity", 1)
-    $("#loading-parent").css("pointer-events", "all")
+    
     $("#container").css("filter", "blur(3px)")
     $(".img").addClass("image");
     GLOBALS.FLASH.visible = true;
@@ -147,7 +156,7 @@ function viewFPS() {
             //GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
             //GLOBALS.RENDERER.dispose()
             window.loaded = true;
-        }, 5000);
+        }, 500);
 
         GLOBALS.CONTROLS.enabled = false;
         GLOBALS.ROOM.visible = false;

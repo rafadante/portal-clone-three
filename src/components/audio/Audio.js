@@ -49,6 +49,7 @@ function playVoice(txt) {
 }
 
 function play(elem) {
+
     //return
     var isPlaying = elem.currentTime > 0 && !elem.paused && !elem.ended
         && elem.readyState > elem.HAVE_CURRENT_DATA;
@@ -179,7 +180,7 @@ const propulsion = new Audio('audio/propulsion.ogg');
 propulsion.volume = 1;
 propulsion.loop = true;*/
 
-function loadAudio(src, volume, loop, playbackRate){
+function loadAudio(src, volume, loop, playbackRate) {
 
 }
 
@@ -202,8 +203,6 @@ function fadeAudio(audio) {
 }
 
 /*var AUDIO = {
-    AMBIENT: ambient,
-    EDITOR: editor,
     PORTAL_GUN_BLUE: new Audio('audio/portalgun_shoot_blue1.wav'),
     PORTAL_GUN_ORANGE: new Audio('audio/portalgun_shoot_red1.wav'),
     PORTAL_ENTER: new Audio('audio/portal_enter2.wav'),
@@ -216,8 +215,6 @@ function fadeAudio(audio) {
     HOLD: hold,
     PLAYER_INSIDE_TRACTOR_BEAM: playerInsideTractorBeam,
     DEATH: deathAudio,
-    WALK: walk,
-    JUMP: jump,
     WALK_LIGHT_BRIDGE: walkLightBridde,
     AERIAL: aerial,
     WALK_NORMAL: walk,
@@ -226,29 +223,27 @@ function fadeAudio(audio) {
     POSITIVE: positive
 }*/
 
+console.log(document.getElementById("AUDIO-AMBIENT"))
+
 var AUDIO = {
-    AMBIENT: null,
-    EDITOR: null,
-    PORTAL_GUN_BLUE: null,
-    PORTAL_GUN_ORANGE: null,
-    PORTAL_ENTER: null,
-    PORTAL_EXIT: null,
-    PORTAL_GUN_LOOP: null,
-    PORTAL_INVALID: null,
-    FALLING: null,
-    PICK_FAIL: null,
-    PICK_SUCESS: null,
-    HOLD: null,
-    PLAYER_INSIDE_TRACTOR_BEAM: null,
-    DEATH: null,
-    WALK: null,
-    JUMP: null,
-    WALK_LIGHT_BRIDGE: null,
-    AERIAL: null,
-    WALK_NORMAL: null,
-    WALK_PAINT: null,
-    PROPULSION: null,
-    POSITIVE: null
+    AMBIENT: document.getElementById("AUDIO-AMBIENT"),
+    EDITOR: document.getElementById("AUDIO-EDITOR"),
+    PORTAL_GUN_BLUE: document.getElementById("AUDIO-PORTAL_GUN_BLUE"),
+    PORTAL_GUN_ORANGE: document.getElementById("AUDIO-PORTAL_GUN_ORANGE"),
+    PORTAL_ENTER: document.getElementById("AUDIO-PORTAL_ENTER"),
+    PORTAL_EXIT: document.getElementById("AUDIO-PORTAL_EXIT"),
+    PORTAL_GUN_LOOP: document.getElementById("AUDIO-PORTAL_GUN_LOOP"),
+    PORTAL_INVALID: document.getElementById("AUDIO-PORTAL_INVALID"),
+    FALLING: document.getElementById("AUDIO-FALLING"),
+    PICK_FAIL: document.getElementById("AUDIO-PICK_FAIL"),
+    PICK_SUCESS: document.getElementById("AUDIO-PICK_SUCESS"),
+    HOLD: document.getElementById("AUDIO-HOLD"),
+    PLAYER_INSIDE_TRACTOR_BEAM: document.getElementById("AUDIO-PLAYER_INSIDE_TRACTOR_BEAM"),
+    DEATH: document.getElementById("AUDIO-DEATH"),
+    WALK: document.getElementById("AUDIO-WALK"),
+    JUMP: document.getElementById("AUDIO-JUMP"),
+    AERIAL: document.getElementById("AUDIO-AERIAL"),
+    POSITIVE: document.getElementById("AUDIO-POSITIVE")
 }
 
 export {

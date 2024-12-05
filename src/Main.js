@@ -31,7 +31,7 @@ import {
     updateCamera
 } from './components/fps/Fps.js';
 import {
-    loadCube
+    loadDefault
 } from './components/loadObj/LoaderOBJ.js';
 import {
     updateRay,
@@ -133,7 +133,7 @@ function init() {
     envMap.dispose();
     pmremGenerator.dispose();
     //
-    loadCube();
+    loadDefault();
     loadMaterials();
     //initGels();
     //LISTENER

@@ -160,7 +160,7 @@
           <div>
             <img alt="image"
               data-content="Can be linked to an object to form a trigger. This button only accepts spheres."
-              data-title="BUTTON SPHERE" class="item" data-name="button_circle" id="button_circle"
+              data-title="BUTTON SPHERE" class="item" data-name="button_sphere" id="button_sphere"
               data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
               data-instanced="true" src="../assets/ui/items/button_sphere.webp" />
             <span>10</span>
@@ -1561,53 +1561,155 @@
 
   <div id="panel-top"></div>
 
-  <!--<audio id="audio-door" preload="auto" style="display: none">
-    <source src="./audio/doormove2.wav" type="audio/wav">
+  <!--AUDIOS-->
+
+  <audio id="AUDIO-AMBIENT" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/ambient.mp3" type="audio/mp3">
+  </audio>
+  ]
+  <audio id="AUDIO-EDITOR" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/editor.mp3" type="audio/mp3">
   </audio>
 
-  <audio id="audio-radio">
-    <source src="audio/radio2.mp3" type="audio/mp3">
+  <audio id="AUDIO-PORTAL_GUN_BLUE" preload="none" style="display: none" volume="1">
+    <source src="./audio/portalgun_shoot_blue1.wav" type="audio/wav">
   </audio>
 
-  <audio id="audio-impact">
-    <source src="./audio/physics_cube_impact_hard_01.wav" type="audio/wav">
+  <audio id="AUDIO-PORTAL_GUN_ORANGE" preload="none" style="display: none" volume="1">
+    <source src="./audio/portalgun_shoot_red1.wav" type="audio/wav">
   </audio>
 
-  <audio id="audio-portal-ambient">
-    <source src="./audio/portal_ambient_loop1.wav" type="audio/wav">
+  <audio id="AUDIO-PORTAL_INVALID" preload="none" style="display: none" volume="1">
+    <source src="./audio/portal_invalid_surface_03.wav" type="audio/wav">
   </audio>
 
-  <audio id="audio-dissolve">
-    <source src="./audio/material_emancipation_01.wav" type="audio/wav">
+  <audio id="AUDIO-PORTAL_GUN_LOOP" preload="none" style="display: none" volume="0.2" loop>
+    <source src="./audio/wpn_portal_ambient_lp_01.wav" type="audio/wav">
   </audio>
 
-  <audio id="audio-fizzler">
-    <source src="./audio/fizzler_lp_01.wav" type="audio/wav">
+  <audio id="AUDIO-PORTAL_ENTER" preload="none" style="display: none" volume="1">
+    <source src="./audio/portal_enter2.wav" type="audio/wav">
   </audio>
 
-  <audio id="audio-laser-beam">
-    <source src="./audio/laser_beam_lp_01.wav" type="audio/wav">
+  <audio id="AUDIO-PORTAL_EXIT" preload="none" style="display: none" volume="1">
+    <source src="./audio/portal_exit2.wav" type="audio/wav">
   </audio>
 
-  <audio id="audio-tractor-beam">
-    <source src="./audio/tbeam_pos_lp_01.ogg" type="audio/ogg">
+  <audio id="AUDIO-FALLING" preload="none" style="display: none" volume="1" loop>
+    <source src="./audio/player_fall_whoosh_lp_01.wav" type="audio/wav">
   </audio>
 
-  <audio id="audio-button-negative">
-    <source src="./audio/button_synth_negative_01.wav" type="audio/wav">
+  <audio id="AUDIO-PICK_FAIL" preload="none" style="display: none" volume="1">
+    <source src="./audio/object_use_failure_01.wav" type="audio/wav">
   </audio>
 
-  <audio id="faith_plate_hit">
-    <source src="./audio/faith_plate_hit.wav" type="audio/wav">
+  <audio id="AUDIO-PICK_SUCESS" preload="none" style="display: none" volume="1">
+    <source src="./audio/object_use_01.wav" type="audio/wav">
   </audio>
 
-  <audio id="faith_plate_loop" preload="auto">
+  <audio id="AUDIO-HOLD" preload="none" style="display: none" volume="1">
+    <source src="./audio/hold_loop.wav" type="audio/wav">
+  </audio>
+
+  <audio id="AUDIO-PLAYER_INSIDE_TRACTOR_BEAM" preload="none" style="display: none" volume="0.5" loop>
+    <source src="./audio/player_enter_tbeam_lp_01.ogg" type="audio/ogg">
+  </audio>
+
+  <audio id="AUDIO-DEATH" preload="none" style="display: none" volume="0.5">
+    <source src="./audio/body_medium_impact_hard1.wav" type="audio/wav">
+  </audio>
+
+  <audio id="AUDIO-WALK" preload="none" style="display: none" volume="0.2">
+    <source src="./audio/tile1.wav" type="audio/wav">
+  </audio>
+
+  <audio id="AUDIO-JUMP" preload="none" style="display: none" volume="0.2">
+    <source src="./audio/p2_fs_jump_land_tile_01.wav" type="audio/wav">
+  </audio>
+
+  <audio id="AUDIO-AERIAL" preload="none" style="display: none" volume="0.5" loop>
     <source src="./audio/aerial.ogg" type="audio/ogg">
   </audio>
 
-  <audio id="pelletHit" preload="auto">
+  <audio id="AUDIO-POSITIVE" preload="none" style="display: none" volume="0.5">
+    <source src="./audio/button_synth_positive_01.wav" type="audio/wav">
+  </audio>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <audio id="audio-door" preload="none" style="display: none">
+    <source src="./audio/doormove2.wav" type="audio/wav">
+  </audio>
+
+  <audio id="audio-radio" preload="none">
+    <source src="audio/radio2.mp3" type="audio/mp3">
+  </audio>
+
+  <audio id="audio-impact" preload="none">
+    <source src="./audio/physics_cube_impact_hard_01.wav" type="audio/wav">
+  </audio>
+
+  <audio id="audio-portal-ambient" preload="none">
+    <source src="./audio/portal_ambient_loop1.wav" type="audio/wav">
+  </audio>
+
+  <audio id="audio-dissolve" preload="none">
+    <source src="./audio/material_emancipation_01.wav" type="audio/wav">
+  </audio>
+
+  <audio id="audio-fizzler" preload="none">
+    <source src="./audio/fizzler_lp_01.wav" type="audio/wav">
+  </audio>
+
+  <audio id="audio-laser-beam" preload="none">
+    <source src="./audio/laser_beam_lp_01.wav" type="audio/wav">
+  </audio>
+
+  <audio id="audio-tractor-beam" preload="none">
+    <source src="./audio/tbeam_pos_lp_01.ogg" type="audio/ogg">
+  </audio>
+
+  <audio id="audio-button-negative" preload="none">
+    <source src="./audio/button_synth_negative_01.wav" type="audio/wav">
+  </audio>
+
+  <audio id="faith_plate_hit" preload="none">
+    <source src="./audio/faith_plate_hit.wav" type="audio/wav">
+  </audio>
+
+  <audio id="faith_plate_loop" preload="none">
+    <source src="./audio/aerial.ogg" type="audio/ogg">
+  </audio>
+
+  <audio id="pelletHit" preload="none">
     <source src="./audio/pelletHit.wav" type="audio/wav">
-  </audio>-->
+  </audio>
 
   <span id="warning-game" style="    position: absolute;
   background: white;

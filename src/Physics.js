@@ -161,7 +161,7 @@ function updatePhysics() {
 
         if (property == "gel_gun_blue" || property == "gel_gun_orange" || property == "gel_gun_white" ||
             property == "pedestal_button" || property == "button_weight" || property == "button_box" ||
-            property == "button_circle" || property == "dispenser" || property == "ramp" ||
+            property == "button_sphere" || property == "dispenser" || property == "ramp" ||
             property == "ramp_half" || property == "ramp_half2" || property == "stairs" ||
             property == "light_bridge" || property == "laser_emitter" || property == "angled_panel" ||
             property == "door" || property == "light" || property == "stripe" || property == "gel_blue" ||

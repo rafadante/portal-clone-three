@@ -47,12 +47,12 @@ function portalButton(button, auto, camera) {
             }
         }
 
-        var intersectsGelRecharger = raycaster2.intersectObject(GLOBALS.ITEMS_ADDED.getObjectByName("gel_recharger"));
+        /*var intersectsGelRecharger = raycaster2.intersectObject(GLOBALS.ITEMS_ADDED.getObjectByName("gel_recharger"));
 
         if (intersectsGelRecharger.length > 0 && GLOBALS.GUN_MODE == "paint") {
             fillPaintingGun(button, intersectsGelRecharger[0])
             return;
-        }
+        }*/
 
         var intersectPanel = raycaster2.intersectObjects(GLOBALS.ANGLED_PANELS);
 
@@ -84,9 +84,9 @@ function portalButton(button, auto, camera) {
 
             //PORTAL GUN FLASH
             if (!auto) {
-                if (button == 0) // left click
+                if (button == 2) // left click
                     GLOBALS.FLASH.color = new Color(1, 0.25, 0);
-                else if (button == 2) // left click
+                else if (button == 0) // left click
                     GLOBALS.FLASH.color = new Color(0, 0.3, 1);
 
                 var positionGun = new Vector3();

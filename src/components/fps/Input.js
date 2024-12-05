@@ -259,7 +259,9 @@ function controlsLock() {
     GLOBALS.POINTER_CONTROLS.pointerSpeed = 0.5;
 
     GLOBALS.POINTER_CONTROLS.addEventListener('lock', function () {
-        play(AUDIO.AMBIENT)
+
+        play(AUDIO.AMBIENT);
+        
         document.getElementById('blocker').style.display = 'none';
         GLOBALS.PAUSED = false;
 
@@ -283,6 +285,9 @@ function controlsLock() {
 
 document.addEventListener('keyup', (event) => {
 
+    if(!GLOBALS.FPS_MODE)
+        return;
+
     holdDown = false;
 
     if (GLOBALS.FPS_MODE && allowEnterFPS) {
@@ -295,7 +300,7 @@ document.addEventListener('keyup', (event) => {
         //headBobActive = false;
 
         tweenCamera(300, GLOBALS.GUN.children[0].position, new Vector3(0, 0, 0))
-        tweenCamera(300, GLOBALS.PAINT_GUN.children[0].position, new Vector3(0, 0, 0))
+        //tweenCamera(300, GLOBALS.PAINT_GUN.children[0].position, new Vector3(0, 0, 0))
 
         if (INPUT.crouched) {
             INPUT.crouched = false;
@@ -304,7 +309,6 @@ document.addEventListener('keyup', (event) => {
     }
 
     AUDIO.WALK.pause();
-    AUDIO.WALK_LIGHT_BRIDGE.pause();
 });
 
 $("body").on('pointerdown', '#crouch', function () {

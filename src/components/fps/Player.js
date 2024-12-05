@@ -124,7 +124,6 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
     }
 
     if (GLOBALS.PLAYER.inJump) {
-        AUDIO.JUMP.currentTime = 0;
         play(AUDIO.JUMP)
     }
 })

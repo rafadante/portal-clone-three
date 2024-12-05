@@ -4,6 +4,7 @@ import {
     WebGLRenderer,
     SRGBColorSpace,
     ACESFilmicToneMapping,
+    NeutralToneMapping,
     PCFSoftShadowMap,
     Group,
     Scene,
@@ -18,6 +19,7 @@ import {
     OrbitControls
 } from 'three/addons/controls/OrbitControls.js';
 import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh';
+import { metalness } from 'three/examples/jsm/nodes/Nodes.js';
 
 // Add the extension functions
 BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
@@ -86,7 +88,7 @@ const renderer = new WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.canvasWidth, window.canvasHeight);
 renderer.outputColorSpace = SRGBColorSpace;
-renderer.toneMapping = ACESFilmicToneMapping;;
+renderer.toneMapping = NeutralToneMapping;;
 renderer.toneMappingExposure = 1;
 renderer.shadowMap.enabled = shadowMap;
 renderer.shadowMap.type = PCFSoftShadowMap;
@@ -95,6 +97,8 @@ renderer.localClippingEnabled = true;
 renderer.physicallyCorrectLights = true;
 renderer.domElement.id = "viewer-3d";
 renderer.shadowMap.autoUpdate = true;
+
+console.log(renderer)
 
 //CONTROLS
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -207,7 +211,7 @@ var GLOBALS = {
     TRIGGER: {
         button_weight: [],
         button_box: [],
-        button_circle: [],
+        button_sphere: [],
         pedestal_button: [],
     },
 
@@ -223,7 +227,7 @@ var GLOBALS = {
         radio: [],
         button_weight: [],
         button_box: [],
-        button_circle: [],
+        button_sphere: [],
         dispenser: [],
         ramp: [],
         ramp_half: [],
@@ -450,9 +454,17 @@ var GLOBALS = {
             count: 0,
             max: 10
         },
-        button_circle: {
+        button_sphere: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: true
         },
         dispenser: {
             count: 0,
@@ -490,15 +502,15 @@ var GLOBALS = {
             count: 0,
             max: 10
         },
-        laser_relay :{
+        laser_relay: {
             count: 0,
             max: 10
         },
-        pellet_launcher :{
+        pellet_launcher: {
             count: 0,
             max: 10
         },
-        pellet_catcher :{
+        pellet_catcher: {
             count: 0,
             max: 10
         },
@@ -727,7 +739,7 @@ function reset() {
             count: 0,
             max: 10
         },
-        button_circle: {
+        button_sphere: {
             count: 0,
             max: 10
         },
@@ -767,11 +779,11 @@ function reset() {
             count: 0,
             max: 10
         },
-        pellet_launcher :{
+        pellet_launcher: {
             count: 0,
             max: 10
         },
-        pellet_catcher :{
+        pellet_catcher: {
             count: 0,
             max: 10
         },
@@ -879,7 +891,7 @@ function reset() {
     GLOBALS.CONNECTIONS = [];
     GLOBALS.GLASS_PANELS = [];
     GLOBALS.LOADED_CONNECTIONS = [];
-    GLOBALS.PORTAL_GUN_BOX= []
+    GLOBALS.PORTAL_GUN_BOX = []
 }
 
 export {

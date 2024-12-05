@@ -39,6 +39,7 @@ import {
 } from '../faithPlate/FaithPlate.js';
 import { gelRecharger } from '../gels/PaintingGun.js';
 import { addLine } from '../boxSelection/Connection.js';
+import { load3D } from '../loadObj/LoaderOBJ.js';
 
 var itemCount = 0;
 
@@ -73,6 +74,25 @@ function updateLines(userData, instanced) {
 }
 
 function addItem(found, loaded) {
+
+    if (!GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME)) {
+
+        $("#follow").css("display", "none");
+
+        load3D(
+            "/3ds/" + GLOBALS.ITEM_HOLDED_NAME + ".glb",
+            GLOBALS.ITEM_HOLDED_NAME,
+            GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["instanced"],
+            GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["interactive"],
+            GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["roughness"],
+            GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["envIntensity"],
+            GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["wall"],
+            GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["ground"],
+            GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["ceiling"],
+            GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["trigger"],
+            found, loaded, GLOBALS.DRAGGED_ITEM_ELEMENT);
+        return;
+    }
 
     if (!GLOBALS.ITEM_CUBE.place && !loaded)
         return
@@ -322,7 +342,7 @@ function addItem(found, loaded) {
 
                 if (userData.instancedName == "button_box") {
                     bb.accept = "cube-cube_2-laser_cube";
-                } else if (userData.instancedName == "button_circle") {
+                } else if (userData.instancedName == "button_sphere") {
                     bb.accept = "sphere";
                 } else if (userData.instancedName == "button_weight") {
                     bb.accept = "sphere-cube-player-laser_cube-cube_2";
@@ -360,7 +380,7 @@ function addItem(found, loaded) {
                 item.translateY(1);
                 item.rotation.x = -Math.PI;
                 item.name = "spawn";
-            }else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
                 GLOBALS.DYMANIC_ITEMS['angled_panel'].push(item)
                 GLOBALS.ITEMS_ADDED.add(item);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
@@ -513,10 +533,10 @@ function addItem(found, loaded) {
         }
     }
 
-    if (loaded) {
-        GLOBALS.ITEM_HOLDED_NAME = null;
-        $("#follow").css("display", "none");
-    }
+    //if (loaded) {
+    GLOBALS.ITEM_HOLDED_NAME = null;
+    $("#follow").css("display", "none");
+    //}
 
     window.changingPosition = false;
 }

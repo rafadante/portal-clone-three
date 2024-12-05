@@ -198,7 +198,6 @@ const updatePlayer = function (deltaTime) {
 
             if (INPUT.shouldJump && !GLOBALS.PLAYER.inJump && !jumpPressed && !blockJump) {
                 AUDIO.WALK.pause();
-                AUDIO.WALK_LIGHT_BRIDGE.pause();
                 jumpPressed = true;
                 GLOBALS.PLAYER.inJump = true;
 
@@ -233,7 +232,7 @@ const updatePlayer = function (deltaTime) {
 
     if (GLOBALS.PLAYER_MOVING) {
         GLOBALS.GUN.children[0].position.x += Math.sin(INPUT.headBobTimer * GLOBALS.HEAD_BOB_SPEED) * headBobHeight;
-        GLOBALS.PAINT_GUN.children[0].position.x += Math.sin(INPUT.headBobTimer * GLOBALS.HEAD_BOB_SPEED) * headBobHeight * 700;
+        //GLOBALS.PAINT_GUN.children[0].position.x += Math.sin(INPUT.headBobTimer * GLOBALS.HEAD_BOB_SPEED) * headBobHeight * 700;
     }
 
 }
@@ -295,7 +294,7 @@ const updateCamera = function (deltaTime) {
 
     //GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.SMOOTHNESS);
     GLOBALS.GUN.quaternion.copy(GLOBALS.PIVOT.quaternion)
-    GLOBALS.PAINT_GUN.quaternion.copy(GLOBALS.PIVOT.quaternion)
+    //GLOBALS.PAINT_GUN.quaternion.copy(GLOBALS.PIVOT.quaternion)
 
     if (GLOBALS.MAIN_CAMERA.position.distanceTo(new Vector3(0, 0, 0)) > 100) {
         var obj = GLOBALS.ENTER_DOOR.clone();
@@ -413,19 +412,12 @@ function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
         return;
 
     if (AUDIO.WALK.paused && !GLOBALS.PLAYER.inJump && !GLOBALS.PLAYER.lightBridge) {
-
-        if (!AUDIO.WALK_LIGHT_BRIDGE.paused)
-            AUDIO.WALK_LIGHT_BRIDGE.pause()
-
         AUDIO.WALK.currentTime = 0;
         play(AUDIO.WALK)
-    } else if (AUDIO.WALK_LIGHT_BRIDGE.paused && !GLOBALS.PLAYER.inJump && GLOBALS.PLAYER.lightBridge) {
+    } else if (!GLOBALS.PLAYER.inJump && GLOBALS.PLAYER.lightBridge) {
 
         if (!AUDIO.WALK.paused)
             AUDIO.WALK.pause()
-
-        AUDIO.WALK_LIGHT_BRIDGE.currentTime = 0;
-        play(AUDIO.WALK_LIGHT_BRIDGE)
     }
 
     GLOBALS.PLAYER_MOVING = true;

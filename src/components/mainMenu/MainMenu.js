@@ -42,8 +42,7 @@ $("#loading-parent").css("pointer-events", "none");
 
 $("body").on('click', '#option-community-build, #option-single-load', function () { //
     setTimeout(() => {
-        //play(AUDIO.EDITOR);
-
+        play(AUDIO.EDITOR);
         init();
     }, 2000);
 });

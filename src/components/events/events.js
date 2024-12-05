@@ -86,7 +86,7 @@ function updateEvents() {
 
 
             GLOBALS.GUN.visible = true;
-            GLOBALS.PAINT_GUN.visible = false;
+            //GLOBALS.PAINT_GUN.visible = false;
             GLOBALS.GUN_MODE = "portal";
 
             if (GLOBALS.PORTAL_GUN_INITIATE == "left")
@@ -102,7 +102,7 @@ function updateEvents() {
 
           } else if (GLOBALS.PORTAL_GUN_BOX[i].item.name.includes("paint_gun")) {
             GLOBALS.GUN.visible = false;
-            GLOBALS.PAINT_GUN.visible = true;
+            //GLOBALS.PAINT_GUN.visible = true;
 
             GLOBALS.GUN_MODE = "paint";
           }
