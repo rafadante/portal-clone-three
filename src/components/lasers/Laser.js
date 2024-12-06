@@ -136,7 +136,7 @@ function updateLaserCubeRaycaster(item, laser) {
     laser.rotateX(-Math.PI / 2)
     laser.scale.y = laserCubeRayIntersects[0].distance;
 
-    var array = [
+    var unfiltered = [
         GLOBALS.ITEMS_ADDED.getObjectByName("laser_cube"),
         GLOBALS.ITEMS_ADDED.getObjectByName("cube"),
         GLOBALS.ITEMS_ADDED.getObjectByName("sphere"),
@@ -144,6 +144,10 @@ function updateLaserCubeRaycaster(item, laser) {
         GLOBALS.ITEMS_ADDED.getObjectByName("laser_receiver"),
         GLOBALS.ITEMS_ADDED.getObjectByName("laser_relay"),
     ]
+
+    var array = unfiltered.filter(function (el) {
+        return el != null;
+    });
 
     var laserCubeRayIntersects = raycasterLaserCube.intersectObjects(array);
 
@@ -153,11 +157,11 @@ function updateLaserCubeRaycaster(item, laser) {
             if (laserCubeRayIntersects[i].object.name == "laser_receiver") {
                 GLOBALS.DYMANIC_ITEMS['laser_receiver'][laserCubeRayIntersects[i].instanceId].emitterState = true;
                 GLOBALS.DYMANIC_ITEMS['laser_receiver'][laserCubeRayIntersects[i].instanceId].fromLaserCube = true;
-                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_receiver'][laserCubeRayIntersects[i].instanceId], true,false);
+                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_receiver'][laserCubeRayIntersects[i].instanceId], true, false);
             } else if (laserCubeRayIntersects[i].object.name == "laser_relay") {
                 GLOBALS.DYMANIC_ITEMS['laser_relay'][laserCubeRayIntersects[i].instanceId].emitterState = true;
                 GLOBALS.DYMANIC_ITEMS['laser_relay'][laserCubeRayIntersects[i].instanceId].fromLaserCube = true;
-                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_relay'][laserCubeRayIntersects[i].instanceId], true,false);
+                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_relay'][laserCubeRayIntersects[i].instanceId], true, false);
             }
 
             if (laserCubeRayIntersects[i].object.name == "laser_cube") {
@@ -172,7 +176,7 @@ function updateLaserCubeRaycaster(item, laser) {
                 }
             }
 
-            if (laserCubeRayIntersects[i].object.name != "laser_relay"){
+            if (laserCubeRayIntersects[i].object.name != "laser_relay") {
                 laser.scale.y = laserCubeRayIntersects[i].distance;
                 return;
             }
@@ -258,17 +262,17 @@ function updateLaserCubeRaycaster(item, laser) {
         }
 
         var intersectsInstanceOtherPortalObj = raycasterLaserOtherPortal.intersectObjects(array);
-        
+
         for (var j = 0; j < intersectsInstanceOtherPortalObj.length; j++) {
 
             if (intersectsInstanceOtherPortalObj[j].object.name == "laser_receiver") {
                 GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId].emitterState = true;
                 GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId].fromLaserCube = true;
-                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId], true,false);
+                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId], true, false);
             } else if (intersectsInstanceOtherPortalObj[j].object.name == "laser_relay") {
                 GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId].emitterState = true;
                 GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId].fromLaserCube = true;
-                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId], true,false);
+                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId], true, false);
             }
 
             if (intersectsInstanceOtherPortalObj[j].object.name == "laser_cube") {
@@ -284,7 +288,7 @@ function updateLaserCubeRaycaster(item, laser) {
 
             laser.clone.visible = true;
 
-            if (intersectsInstanceOtherPortalObj[j].object.name != "laser_relay"){
+            if (intersectsInstanceOtherPortalObj[j].object.name != "laser_relay") {
                 laser.clone.scale.y = intersectsInstanceOtherPortalObj[j].distance;
                 break;
             }
@@ -317,7 +321,7 @@ function updateLaserEmitterRaycaster() {
             GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.scale.y = intersectsWall[0].distance;
         }
 
-        var array = [
+        var unfiltered = [
             GLOBALS.ITEMS_ADDED.getObjectByName("laser_cube"),
             GLOBALS.ITEMS_ADDED.getObjectByName("cube"),
             GLOBALS.ITEMS_ADDED.getObjectByName("sphere"),
@@ -325,6 +329,10 @@ function updateLaserEmitterRaycaster() {
             GLOBALS.ITEMS_ADDED.getObjectByName("laser_receiver"),
             GLOBALS.ITEMS_ADDED.getObjectByName("laser_relay"),
         ]
+
+        var array = unfiltered.filter(function (el) {
+            return el != null;
+        });
 
         //CHECK FOR LASER CUBE INTERSECTION
         var intersectsLaserCube = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObjects(array);
@@ -334,11 +342,11 @@ function updateLaserEmitterRaycaster() {
             if (intersectsLaserCube[j].object.name == "laser_receiver") {
                 GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsLaserCube[j].instanceId].emitterState = true;
                 GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsLaserCube[j].instanceId].fromLaserCube = false;
-                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsLaserCube[j].instanceId], true,false);
+                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsLaserCube[j].instanceId], true, false);
             } else if (intersectsLaserCube[j].object.name == "laser_relay") {
                 GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsLaserCube[j].instanceId].emitterState = true;
                 GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsLaserCube[j].instanceId].fromLaserCube = false;
-                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsLaserCube[j].instanceId], true,false);
+                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsLaserCube[j].instanceId], true, false);
             }
 
             if (intersectsLaserCube[j].object.name == "laser_cube") {
@@ -393,11 +401,11 @@ function updateLaserEmitterRaycaster() {
                 if (intersectsInstanceOtherPortalObj[j].object.name == "laser_receiver") {
                     GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId].fromLaserCube = false;
                     GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId].emitterState = true;
-                    laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId], true,false);
+                    laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId], true, false);
                 } else if (intersectsInstanceOtherPortalObj[j].object.name == "laser_relay") {
                     GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId].fromLaserCube = false;
                     GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId].emitterState = true;
-                    laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId], true,false);
+                    laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId], true, false);
                 }
 
                 if (intersectsInstanceOtherPortalObj[j].object.name == "laser_cube") {
@@ -424,7 +432,7 @@ function updateLaserEmitterRaycaster() {
 
     for (var i = 0; i < GLOBALS.LASER_TRIGGERS.length; i++) {
         if (!GLOBALS.LASER_TRIGGERS[i].emitterState && !GLOBALS.LASER_TRIGGERS[i].fromLaserCube) {
-            laserReceiverTrigger(GLOBALS.LASER_TRIGGERS[i], false,false);
+            laserReceiverTrigger(GLOBALS.LASER_TRIGGERS[i], false, false);
         }
     }
 }

@@ -41,7 +41,7 @@ import { hex2rgb } from '../../Utils.js';
 import { viewFPS } from '../test/Test.js';
 import { addItem } from '../items/AddItem.js';
 
-var defaultLoaded = false;
+var defaultLoaded = 0;
 var fpsDefaultLoads = 3;
 var fpsDefaultLoaded = 0;
 
@@ -56,6 +56,7 @@ function loadDefault() {
     GLOBALS.CONTROLS.update();
 
     load3D("/3ds/open.glb", "door", false);
+    load3D("/3ds/cube_dispenser.glb", "dispenser", true, false, 0.2, 0.5, false, false, true, false, null, null, null, 100);
     loadWindowIMG();
 }
 
@@ -66,7 +67,7 @@ draco.preload();
 const loader = new GLTFLoader().setPath('./assets');
 loader.setDRACOLoader(draco);
 
-function load3D(path, name, instanced, interactive, roughness, envIntensity, wall, ground, ceiling, trigger, found, loaded, elem) {
+function load3D(path, name, instanced, interactive, roughness, envIntensity, wall, ground, ceiling, trigger, found, loaded, elem, max) {
 
     const manager = new LoadingManager();
     const loader2 = new GLTFLoader(manager).setPath('./assets');
@@ -80,23 +81,23 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
     manager.onLoad = function () {
         animate();
 
-        if (!defaultLoaded) {
+        if (defaultLoaded < 2) {
 
-            defaultLoaded = true;
+            defaultLoaded++;
 
-            if (GLOBALS.LOADED_LEVEL) {
-                loadLevelJSON();
-            } else {
-                $("#loading-parent").css("opacity", 0);
-                $("#loading-parent").css("pointer-events", "none");
+            if (defaultLoaded == 2) {
+                if (GLOBALS.LOADED_LEVEL) {
+                    loadLevelJSON();
+                } else {
+                    $("#loading-parent").css("opacity", 0);
+                    $("#loading-parent").css("pointer-events", "none");
+                }
+
+                buildIniCubes();
             }
-
-            buildIniCubes();
         } else if (window.ttt) {
 
             fpsDefaultLoaded++;
-
-            console.log(fpsDefaultLoaded)
 
             if (fpsDefaultLoaded == 3) {
                 viewFPS();
@@ -118,6 +119,8 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
 
     };
 
+    console.log(path)
+
     loader2.load(path, async function (glb) {
 
         const scene = glb.scene;
@@ -128,7 +131,7 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
         });
 
         if (instanced) {
-            var item = instancedTransform(scene, name, interactive, roughness, envIntensity)
+            var item = instancedTransform(scene, name, interactive, roughness, envIntensity, max)
             item.userData.wall = wall;
             item.userData.ground = ground;
             item.userData.ceiling = ceiling;
@@ -137,9 +140,9 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
             if (interactive) {
                 item.scene = scene.children[0];
                 item.clone = scene;
-                /*item.clone.children[0].material.envMap = GLOBALS.ENV_MAP;
+                item.clone.children[0].material.envMap = GLOBALS.ENV_MAP;
                 item.clone.children[0].material.envMapIntensity = 0.5;
-                item.clone.children[0].material.roughness = 0.2;*/
+                item.clone.children[0].material.roughness = 0.2;
             }
         } else {
             if (name == "door") {
@@ -150,6 +153,8 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
                 loadWindowManager(scene);
             } else if (name == "corridor") {
                 loadCorridorEnter(scene);
+            } else if(name == "faith_plate"){
+                loadFaithPlateManager(scene);
             }
         }
     });
@@ -159,17 +164,19 @@ function manageFirstLoadFPS() {
 
 }
 
-function instancedTransform(scene, name, interactive, roughness, envIntensity) {
+function instancedTransform(scene, name, interactive, roughness, envIntensity, max) {
     var geometry = scene.children[0].geometry.clone();
     geometry.computeVertexNormals();
     geometry.computeBoundsTree();
 
-    var item = new InstancedMesh(geometry, scene.children[0].material.clone(), 200);
+    console.log(scene)
+
+    var item = new InstancedMesh(geometry, scene.children[0].material.clone(), max);
     item.instanceMatrix.setUsage(DynamicDrawUsage); // will be updated every frame
 
     var clone = new Object3D();
 
-    for (var i = 0; i < 200; i++) {
+    for (var i = 0; i < max; i++) {
         clone.scale.set(0, 0, 0);
         clone.position.set(100000, 100000, 100000);
         clone.updateMatrix();
@@ -197,7 +204,7 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity) {
         item.material.roughness = 0;
     }
 
-    for (var i = 0; i < 200; i++)
+    for (var i = 0; i < max; i++)
         GLOBALS.DYMANIC_ITEMS[name].push([])
 
     GLOBALS.ITEMS_ADDED.add(item);
@@ -631,7 +638,8 @@ function loadFaithPlateManager(scene) {
     scene.userData.wall = false;
     scene.userData.ground = true;
     scene.userData.ceiling = true;
-    GLOBALS.ITEMS.add(scene);
+    scene.visible = false;
+    GLOBALS.ITEMS_ADDED.add(scene);
     scene.traverse(child => {
         child.receiveShadow = true;
         child.castShadow = true;

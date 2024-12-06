@@ -75,9 +75,15 @@ function updateLines(userData, instanced) {
 
 function addItem(found, loaded) {
 
-    if (!GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME)) {
+    if (!GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME)
+        && GLOBALS.ITEM_HOLDED_NAME != "glass"
+        && GLOBALS.ITEM_HOLDED_NAME != "trigger_area"
+        && GLOBALS.ITEM_HOLDED_NAME != "spawn"
+        && GLOBALS.ITEM_HOLDED_NAME != "goo") {
 
         $("#follow").css("display", "none");
+
+        console.log(GLOBALS.ITEM_HOLDED_NAME)
 
         load3D(
             "/3ds/" + GLOBALS.ITEM_HOLDED_NAME + ".glb",
@@ -90,7 +96,8 @@ function addItem(found, loaded) {
             GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["ground"],
             GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["ceiling"],
             GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["trigger"],
-            found, loaded, GLOBALS.DRAGGED_ITEM_ELEMENT);
+            found, loaded, GLOBALS.DRAGGED_ITEM_ELEMENT, GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["max"]
+        );
         return;
     }
 
@@ -180,7 +187,7 @@ function addItem(found, loaded) {
                 const box = new Object3D()
                 var item = box;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
-                var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
+                var item = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
 
                 item.traverse(child => {
                     if (child.name == "horizontal")
@@ -189,9 +196,10 @@ function addItem(found, loaded) {
                         GLOBALS.CAMERA_OBJ_VERTICAL.push(child)
                 })
             } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
-                var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
+                var item = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
+                item.visible = true;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "observation_room") {
-                var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
+                var item = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
             } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
 
                 var item = new Group();
@@ -216,7 +224,7 @@ function addItem(found, loaded) {
                 item.getObjectByName("portal_door_left_06").scale.set(1, 1, 1);
                 //item.getObjectByName("warning").visible = false;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
-                var item = GLOBALS.ITEMS.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
+                var item = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
             } else {
                 var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);
                 var item = new Object3D();
