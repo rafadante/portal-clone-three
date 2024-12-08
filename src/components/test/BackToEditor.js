@@ -12,7 +12,7 @@ import { Vector3 } from 'three';
 //BACK FROM EDITOR
 $("body").on('click', '#back-editor', function () {
 
-    GLOBALS.STATS.container.style.display = "none";
+    GLOBALS.STATS.dom.style.display = "none";
     GLOBALS.ROOM.visible = true;
     GLOBALS.CONTROLS.enabled = true;
     GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;

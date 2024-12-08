@@ -200,7 +200,8 @@ function deleteItemInstanced(item, moving) {
     instanced.setMatrixAt(item.item.userData.idInstanced, dummy.matrix);
     instanced.instanceMatrix.needsUpdate = true;
 
-    if (item.instancedName == "cube" || item.instancedName == "sphere") {
+    if (item.instancedName == "cube" || item.instancedName == "sphere"
+        || item.instancedName == "cube_2" || item.instancedName == "laser_cube") {
         var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
         var dummy = new Object3D();
         dummy.scale.set(0, 0, 0);

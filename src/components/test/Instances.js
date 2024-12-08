@@ -20,7 +20,6 @@ import {
     MeshLineGeometry,
     MeshLineMaterial
 } from 'meshline';
-import { func } from 'three/examples/jsm/nodes/Nodes.js';
 
 var id = 0;
 

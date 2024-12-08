@@ -198,7 +198,7 @@
               data-content="You can link a trigger to it to activate this portal without the need of the portal gun."
               data-title="PORTAL LEFT" class="item" data-name="portal_0" src="../assets/ui/items/portalBlue.webp"
               data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-              data-instanced="false" id="portal_0" />
+              data-instanced="true" id="portal_0" />
             <span>10</span>
           </div>
 
@@ -207,7 +207,7 @@
               data-content="You can link a trigger to it to activate this portal without the need of the portal gun."
               data-title="PORTAL RIGHT" class="item" data-name="portal_1" src="../assets/ui/items/portalOrange.webp"
               data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-              data-instanced="false" id="portal_1" />
+              data-instanced="true" id="portal_1" />
             <span>10</span>
           </div>
 
@@ -412,6 +412,14 @@
             <span>10</span>
           </div>
 
+          <img alt="image" data-content="" data-title="ENERGY PELLET LAUNCHER" class="item" data-name="pellet_launcher"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="true" src="../assets/ui/items/pellet_launcher.webp" id="pellet_launcher" />
+
+          <img alt="image" data-content="" data-title="ENERGY PELLET CATCHER" class="item" data-name="pellet_catcher"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+            data-instanced="true" src="../assets/ui/items/pellet_catcher.webp" id="pellet_catcher" />
+
           <!--
           <img alt="image"
             data-content="Piston Platforms will move up and down whenever the player stands on it. If it is connected to a trigger then the trigger must be activated before it will begin to move. You can adjust the height of the platform using the arrows that appear when the object is selected."
@@ -423,14 +431,6 @@
             data-title="TRACK PLATFORMS" class="item" data-name="track_platforms"
             src="../assets/ui/items/track_platforms.webp" />
 
-
-          <img alt="image" data-content="" data-title="ENERGY PELLET LAUNCHER" class="item" data-name="pellet_launcher"
-            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-            data-instanced="true" src="../assets/ui/items/pellet_launcher.webp" id="pellet_launcher" />
-
-          <img alt="image" data-content="" data-title="ENERGY PELLET CATCHER" class="item" data-name="pellet_catcher"
-            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-            data-instanced="true" src="../assets/ui/items/pellet_catcher.webp" id="pellet_catcher" />
 
           <img alt="image"
             data-content="Can either start enabled or disabled through the properties menu. When enabled the player can walk up and down them."
@@ -1277,8 +1277,8 @@
           <span class="option selected settings-controls" id="settings-controls">CONTROLS</span>
           <span class="option settings-video" id="settings-video">GRAPHICS</span>
           <span class="option settings-audio" id="settings-audio">AUDIO</span>
-          <!--<span class="option" id="settings-language">Language</span>
-          <span class="option" id="back-editor">BACK TO EDITOR</span>-->
+          <span class="option" id="settings-language">LANGUAGE</span>
+          <span class="option" id="back-editor">BACK TO EDITOR</span>
         </div>
 
         <div id="options-audio">

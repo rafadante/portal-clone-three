@@ -15,7 +15,6 @@ import { checkToUpdateContinuous } from './UpdateRaycast.js';
 import { removeSelection } from '../boxSelection/BoxSelection.js';
 import { updateLines } from '../items/AddItem.js';
 import { addLine } from '../boxSelection/Connection.js';
-import { func } from 'three/examples/jsm/nodes/Nodes.js';
 
 var IndexArray = [];
 var remove;
@@ -275,8 +274,18 @@ function trasnlatePlane(id, val, portal, old) {
                 item.position.copy(plane.position);
                 item.rotation.copy(plane.item.rotation);
 
-                if (plane.instancedName == "cube" || plane.instancedName == "sphere") {
+                if (plane.instancedName == "cube" || plane.instancedName == "sphere" 
+                    || plane.instancedName == "cube_2" || plane.instancedName == "laser_cube") {
                     item.translateY(1);
+
+                    //UPDATE DISPENSER
+                    var item2 = new Object3D();
+                    item2.position.copy(plane.position);
+                    item2.updateMatrix();
+                    GLOBALS.ITEMS_ADDED.getObjectByName("dispenser").setMatrixAt(plane.item.dispenserID, item2.matrix);
+                    GLOBALS.ITEMS_ADDED.getObjectByName("dispenser").instanceMatrix.needsUpdate = true;
+
+                    plane.item.dispenserPosition = item2.position.clone();
                 }
 
                 item.updateMatrix();

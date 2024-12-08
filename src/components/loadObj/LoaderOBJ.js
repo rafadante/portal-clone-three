@@ -42,8 +42,8 @@ import { viewFPS } from '../test/Test.js';
 import { addItem } from '../items/AddItem.js';
 
 var defaultLoaded = 0;
-var fpsDefaultLoads = 3;
 var fpsDefaultLoaded = 0;
+var fpsPropsLoading = false;
 
 function loadDefault() {
 
@@ -55,8 +55,9 @@ function loadDefault() {
     GLOBALS.MAIN_CAMERA.position.set(-12.2, 17.4, 26.3)
     GLOBALS.CONTROLS.update();
 
-    load3D("/3ds/open.glb", "door", false);
-    load3D("/3ds/cube_dispenser.glb", "dispenser", true, false, 0.2, 0.5, false, false, true, false, null, null, null, 100);
+    load3D("/items/open.glb", "door", false);
+    load3D("/items/hd_portal_gun3.glb", "gun", false);
+    load3D("/items/cube_dispenser.glb", "dispenser", true, false, 0.2, 0.5, false, false, true, false, null, null, null, 100);
     loadWindowIMG();
 }
 
@@ -64,13 +65,13 @@ var draco = new DRACOLoader();
 draco.setDecoderPath("draco/");
 draco.preload();
 
-const loader = new GLTFLoader().setPath('./assets');
+const loader = new GLTFLoader().setPath('./assets/3ds/');
 loader.setDRACOLoader(draco);
 
 function load3D(path, name, instanced, interactive, roughness, envIntensity, wall, ground, ceiling, trigger, found, loaded, elem, max) {
 
     const manager = new LoadingManager();
-    const loader2 = new GLTFLoader(manager).setPath('./assets');
+    const loader2 = new GLTFLoader(manager).setPath('./assets/3ds/medium');
     loader2.setDRACOLoader(draco);
 
     manager.onStart = function (url, itemsLoaded, itemsTotal) {
@@ -81,11 +82,11 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
     manager.onLoad = function () {
         animate();
 
-        if (defaultLoaded < 2) {
+        if (defaultLoaded < 3) {
 
             defaultLoaded++;
 
-            if (defaultLoaded == 2) {
+            if (defaultLoaded == 3) {
                 if (GLOBALS.LOADED_LEVEL) {
                     loadLevelJSON();
                 } else {
@@ -95,11 +96,12 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
 
                 buildIniCubes();
             }
-        } else if (window.ttt) {
+        } else if (fpsPropsLoading) {
 
             fpsDefaultLoaded++;
 
-            if (fpsDefaultLoaded == 3) {
+            if (fpsDefaultLoaded == 2) {
+                fpsPropsLoading = false;
                 viewFPS();
             }
         } else {
@@ -115,9 +117,7 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
         }
     };
 
-    manager.onProgress = function (url, itemsLoaded, itemsTotal) {
-
-    };
+    manager.onProgress = function (url, itemsLoaded, itemsTotal) { };
 
     console.log(path)
 
@@ -145,23 +145,20 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
                 item.clone.children[0].material.roughness = 0.2;
             }
         } else {
-            if (name == "door") {
+            if (name == "door")
                 loadEnterDoor(scene);
-            } else if (name == "gun") {
+            else if (name == "gun")
                 loadGunManager(scene);
-            } else if (name == "window") {
+            else if (name == "window")
                 loadWindowManager(scene);
-            } else if (name == "corridor") {
+            else if (name == "corridor")
                 loadCorridorEnter(scene);
-            } else if(name == "faith_plate"){
+            else if (name == "faith_plate")
                 loadFaithPlateManager(scene);
-            }
+            else if (name == "camera")
+                loadCameraManager(scene);
         }
     });
-}
-
-function manageFirstLoadFPS() {
-
 }
 
 function instancedTransform(scene, name, interactive, roughness, envIntensity, max) {
@@ -214,7 +211,7 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity, m
 }
 
 function loadWindowIMG() {
-    loader.load('/3ds/WINDOW_IMG.glb', (gltf) => {
+    loader.load('/medium/items/WINDOW_IMG.glb', (gltf) => {
 
         gltf.scene.traverse(child => {
 
@@ -328,7 +325,6 @@ function loadWindowManager(scene) {
             light.position.copy(target);
             light.translateY(-0.2);
 
-
             if (!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high"))
                 scene.add(light);
         }
@@ -339,9 +335,6 @@ function loadWindowManager(scene) {
             child.material.envMapIntensity = 0.5;
             child.material.roughness = 0.3;
         }
-
-        //if (child.name.includes("vidro") || child.name.includes("Cube005"))
-        //    child.visible = false;
     })
 
     scene.rotation.y = -Math.PI / 2;
@@ -421,9 +414,6 @@ function loadGunManager(scene) {
     GLOBALS.GUN_GROUP.add(GLOBALS.GUN);
     scene.scale.set(0.001, 0.001, 0.001)
     scene.position.set(0.00009, -0.00013, -0.00012);
-    //cene.scale.set(1, 1, 1)
-    //scene.position.set(0.12, -0.16, -0.14);
-    //scene.visible = false;
 
     GLOBALS.GUN_CLONE.scale.setScalar(0.7);
     GLOBALS.GUN_CLONE2.scale.setScalar(0.7);
@@ -453,11 +443,12 @@ function loadCorridorEnter(scene) {
 
 function loadAvatar() {
 
-    const playerModel = loader.loadAsync('/avatar/chell.glb');
+    fpsPropsLoading = true;
 
-    load3D("/3ds/hd_portal_gun3.glb", "gun", false);
-    load3D("/3ds/window.glb", "window", false);
-    load3D("/3ds/corridor.glb", "corridor", false);
+    const playerModel = loader.loadAsync('/avatar/medium/chell.glb');
+
+    load3D("/items/window.glb", "window", false);
+    load3D("/items/corridor.glb", "corridor", false);
 
     GLOBALS.PLAYER_ANIMATIONS = {
         //WITH PORTAL GUN
@@ -546,8 +537,6 @@ function loadAvatar() {
     };
 }
 
-//
-
 function loadHalfWindow() {
     //HALF WINDOW IMG
     loader.load('/3ds/WINDOW_HALF_IMG.glb', (gltf) => {
@@ -612,10 +601,11 @@ function loadWindowHalfManager(scene) {
 
 function loadCameraManager(scene) {
     scene.name = "camera";
+    scene.visible = false;
     scene.userData.wall = true;
     scene.userData.ground = false;
     scene.userData.ceiling = false;
-    GLOBALS.ITEMS.add(scene);
+    GLOBALS.ITEMS_ADDED.add(scene);
     scene.traverse(child => {
         child.receiveShadow = true;
         child.castShadow = true;

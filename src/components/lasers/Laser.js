@@ -15,7 +15,6 @@ import {
 import {
     GLOBALS
 } from '../../Globals.js';
-import { func, roughness } from 'three/examples/jsm/nodes/Nodes.js';
 import { animate } from '../../Main.js';
 import $ from 'jquery';
 import { laserReceiverTrigger } from '../events/events.js';

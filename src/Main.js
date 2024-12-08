@@ -2,72 +2,32 @@ import "./components/materials/Materials.js";
 import "./components/ui/UI.js";
 import "./components/ui/EditorInteractions.js";
 import "./Utils.js";
+import { updatePhysics } from './Physics.js';
 import {
-    updatePhysics
-} from './Physics.js';
-import {
-    BoxGeometry,
-    MeshBasicMaterial,
-    Mesh,
-    PMREMGenerator,
-    Clock,
-    Matrix4,
-    Frustum,
-    Vector3,
-    GridHelper,
-    Quaternion
+    BoxGeometry, MeshBasicMaterial, Mesh, PMREMGenerator, Clock, Matrix4, Frustum, Vector3, Quaternion
 } from 'three';
-import {
-    TWEEN
-} from './Tween.js';
-import {
-    Lights
-} from './components/lights/Lights.js';
-import {
-    animateShader
-} from "./components/shaders/AnimateShaders.js"
-import {
-    updatePlayer,
-    updateCamera
-} from './components/fps/Fps.js';
-import {
-    loadDefault
-} from './components/loadObj/LoaderOBJ.js';
-import {
-    updateRay,
-    recreateRay
-} from './components/ray/Ray.js';
+import { TWEEN } from './Tween.js';
+import { Lights } from './components/lights/Lights.js';
+import { animateShader } from "./components/shaders/AnimateShaders.js"
+import { updatePlayer, updateCamera } from './components/fps/Fps.js';
+import { loadDefault } from './components/loadObj/LoaderOBJ.js';
+import { updateRay, recreateRay } from './components/ray/Ray.js';
 import './components/test/Test.js';
 import Stats from "stats-gl";
 import "./components/mainMenu/MainMenu.js";
-import {
-    renderGoo
-} from './components/goo/Goo.js';
-import {
-    updateEvents
-} from './components/events/events.js';
-import {
-    loadMaterials
-} from "./components/materials/Materials.js";
-import {
-    RoomEnvironment
-} from 'three/addons/environments/RoomEnvironment.js';
+import { renderGoo } from './components/goo/Goo.js';
+import { updateEvents } from './components/events/events.js';
+import { loadMaterials } from "./components/materials/Materials.js";
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import './components/gels/Gels.js';
-import {
-    GLOBALS
-} from './Globals.js';
+import { GLOBALS } from './Globals.js';
 import { teleportationState } from './components/portal/Teleportation.js';
 import { hideMaterial } from "./Utils.js";
-//import { updatedGelGun } from "./components/portal/CreatePortal.js";
-
-
-
 
 //VARIABLES
 var angleHolder = 0;
 let pmremGenerator, currentRenderTarget;
 let timeTarget = 0;
-//SCENE FPS
 let clock2 = new Clock();
 let clockPortal = new Clock();
 let deltaPortal = 0;
@@ -82,17 +42,21 @@ mainContainer.id = 'main-container';
 document.body.appendChild(mainContainer);
 
 GLOBALS.STATS = new Stats({
-    logsPerSecond: 20,
-    samplesLog: 100,
+    trackGPU: true,
+    trackHz: true,
+    trackCPT: true,
+    logsPerSecond: 4,
+    graphsPerSecond: 30,
+    samplesLog: 40,
     samplesGraph: 10,
     precision: 2,
     horizontal: true,
     minimal: false,
     mode: 0
 });
-mainContainer.appendChild(GLOBALS.STATS.container);
-GLOBALS.STATS.init(GLOBALS.RENDERER.domElement);
-GLOBALS.STATS.container.style.display = "none";
+mainContainer.appendChild(GLOBALS.STATS.dom);
+GLOBALS.STATS.init(GLOBALS.RENDERER);
+GLOBALS.STATS.dom.style.display = "none";
 //
 const geometry = new BoxGeometry(2, 2, 2);
 const material = new MeshBasicMaterial({
@@ -125,23 +89,29 @@ function init() {
     //HDR
     pmremGenerator = new PMREMGenerator(GLOBALS.RENDERER);
     const environment = new RoomEnvironment(GLOBALS.RENDERER);
-
     var envMap = pmremGenerator.fromScene(environment).texture;
     GLOBALS.SCENE.environment = envMap
     GLOBALS.ENV_MAP = envMap;
 
     envMap.dispose();
     pmremGenerator.dispose();
-    //
+    
     loadDefault();
     loadMaterials();
-    //initGels();
-    //LISTENER
+
     window.addEventListener('resize', onWindowResize);
     recreateRay();
 }
 
 function onWindowResize() {
+
+    const maxWidth = 1920;  // Set your maximum width resolution
+    const maxHeight = 1080; // Set your maximum height resolution
+
+    // Cap the width and height to your maximum values
+    window.canvasWidth = Math.min(window.innerWidth, maxWidth);
+    window.canvasHeight = Math.min(window.innerHeight, maxHeight);
+
     GLOBALS.RENDERER.setSize(window.canvasWidth, window.canvasHeight);
 
     GLOBALS.MAIN_CAMERA.aspect = window.canvasWidth / window.canvasHeight;
@@ -158,18 +128,16 @@ GLOBALS.RENDERER.info.autoReset = true;
 
 function animate(time) {
 
-    if (GLOBALS.FPS_MODE) {
+    if (GLOBALS.FPS_MODE)
         requestAnimationFrame(animate);
-    }
 
     if (!GLOBALS.FPS_MODE) {
         //GLOBALS.COMPOSER.render();
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         TWEEN.update();
         document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
-    } else if (!GLOBALS.PAUSED) {
+    } else if (!GLOBALS.PAUSED)
         render(time);
-    }
 }
 
 function fixedUpdate() { //60 fps always for physics
@@ -194,38 +162,32 @@ function fixedUpdate() { //60 fps always for physics
         const timeStep = (1 / 60);
         GLOBALS.CANNON_WORLD.step(timeStep)
         timeTarget += 1000 / GLOBALS.PHYSICS_UPDATEPERSEC_LIMIT
-        if (Date.now() >= timeTarget) {
+        if (Date.now() >= timeTarget)
             timeTarget = Date.now()
-        }
     }
 }
 
-var updatingShadowMap = false;
 var statsBegin = false;
-
 let clock = new Clock();
 let delta = 0;
 // 30 fps
 var interval = 1 / 30;
 
-if(localStorage.getItem("quality-select") != "very_low"){
+if (localStorage.getItem("quality-select") != "very_low")
     interval = 1 / 30;
-}else if(localStorage.getItem("quality-select") != "low"){
+else if (localStorage.getItem("quality-select") != "low")
     interval = 1 / 40;
-}else if(localStorage.getItem("quality-select") != "medium"){
+else if (localStorage.getItem("quality-select") != "medium")
     interval = 1 / 50;
-}else if(localStorage.getItem("quality-select") != "high"){
+else if (localStorage.getItem("quality-select") != "high")
     interval = 1 / 60;
-}
 
 function render(time) {
 
-    //
     if (GLOBALS.LEVEL_ENTERED) {
-        GLOBALS.STATS.begin();
+        GLOBALS.STATS.update();
         statsBegin = true;
     }
-
 
     fixedUpdate();
     animateShader();
@@ -236,8 +198,6 @@ function render(time) {
     updateEvents();
     TWEEN.update();
     animatePortal();
-
-    //updatedGelGun()
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {
         if (GLOBALS.CAMERAS[i].fixed) {
@@ -271,9 +231,6 @@ function render(time) {
         GLOBALS.RENDERER.clearDepth()
         GLOBALS.RENDERER.render(GLOBALS.GUN_GROUP, GLOBALS.PORTAL_GUN_CAMERA);
     }
-
-    if (statsBegin)
-        GLOBALS.STATS.end();
 }
 
 function animatePortal() {
@@ -304,9 +261,8 @@ function animatePortal() {
     if (angle > -20 && angle < 30) {
         window.neck.rotation.y = -GLOBALS.MAIN_CAMERA.rotation.x;
         angleHolder = GLOBALS.MAIN_CAMERA.rotation.x;
-    } else {
+    } else
         window.neck.rotation.y = -angleHolder;
-    }
 
     deltaPortal += clockPortal.getDelta();
 
@@ -372,7 +328,6 @@ function animatePortal() {
     GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
 }
 
-// Render loop
 function renderPortal2(thisIndex, pairIndex) {
 
     if (GLOBALS.PORTALS[thisIndex] === null || GLOBALS.PORTALS[pairIndex] === null)

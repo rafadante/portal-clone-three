@@ -408,6 +408,8 @@ function setAction(action) {
 
 function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
 
+    GLOBALS.PLAYER.centering = false;
+
     if (GLOBALS.BLOCK_PLAYER_MOVE)
         return;
 

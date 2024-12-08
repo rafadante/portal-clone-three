@@ -79,14 +79,16 @@ function addItem(found, loaded) {
         && GLOBALS.ITEM_HOLDED_NAME != "glass"
         && GLOBALS.ITEM_HOLDED_NAME != "trigger_area"
         && GLOBALS.ITEM_HOLDED_NAME != "spawn"
-        && GLOBALS.ITEM_HOLDED_NAME != "goo") {
+        && GLOBALS.ITEM_HOLDED_NAME != "goo"
+        && GLOBALS.ITEM_HOLDED_NAME != "door"
+        && GLOBALS.ITEM_HOLDED_NAME != "portal_gun") {
 
         $("#follow").css("display", "none");
 
         console.log(GLOBALS.ITEM_HOLDED_NAME)
 
         load3D(
-            "/3ds/" + GLOBALS.ITEM_HOLDED_NAME + ".glb",
+            "/items/" + GLOBALS.ITEM_HOLDED_NAME + ".glb",
             GLOBALS.ITEM_HOLDED_NAME,
             GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["instanced"],
             GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["interactive"],
@@ -188,7 +190,7 @@ function addItem(found, loaded) {
                 var item = box;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
                 var item = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
-
+                item.visible = true;
                 item.traverse(child => {
                     if (child.name == "horizontal")
                         GLOBALS.CAMERA_OBJ_HORIZONTAL.push(child)

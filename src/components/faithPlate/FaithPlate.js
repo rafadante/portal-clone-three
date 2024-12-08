@@ -14,7 +14,6 @@ import { tweenCamera } from "../../Utils.js";
 import { GLOBALS } from "../../Globals.js";
 import { AUDIO, fadeAudio, play } from "../audio/Audio.js";
 import * as CANNON from 'cannon';
-import { vec3 } from "three/examples/jsm/nodes/Nodes.js";
 import $ from 'jquery';
 import { animate } from "../../Main.js";
 

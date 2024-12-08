@@ -1,21 +1,16 @@
 import {
     Matrix4,
     Quaternion,
-    Group,
-    Vector3,
-    Object3D
+    Vector3
 } from 'three';
 import * as CANNON from "cannon";
 import { AUDIO, play } from '../audio/Audio.js';
 import { removeJointConstraint } from "../../Physics.js";
-import { cannonToThreeVector3, threeToFour, fourToThree } from '../../Utils.js';
-import {
-    GLOBALS
-} from '../../Globals.js';
+import { cannonToThreeVector3, threeToFour, fourToThree, tweenCamera } from '../../Utils.js';
+import { GLOBALS } from '../../Globals.js';
 import { resetBall } from '../pellet/Pellet.js';
 
 var teleported = false;
-var cameraRotatingTimeout;
 
 // teleport a 3D object directly, returns nothing
 // Object3D includes camera, meshes
@@ -43,16 +38,31 @@ function teleportPhysicalObject(object, portal) {
 
     let velocity = cannonToThreeVector3(object.velocity);
 
-    /*if (GLOBALS.PORTALS[0].normal.y != GLOBALS.PORTALS[1].normal.y) {
-        if (object.looping == true) {
-            const heightDifference = getHeightDifference(portal.portalShader.position, portal.output.portalShader.position);
+    //CORRECT VELOCITY WHEN LOPING VERTICALLY TO AVOID INFINITY VELOCITY
+    if (GLOBALS.PORTALS[0].normal.y != GLOBALS.PORTALS[1].normal.y) {
+
+        const heightDifference = getHeightDifference(portal.portalShader.position, portal.output.portalShader.position);
+
+        if (object.heightDifference && object.looping2) {
+            if (object.heightDifference != heightDifference) {
+                console.log("changed")
+                object.looping2 = false;
+                object.looping = false;
+                object.centered = false;
+                object.centering = false;
+            }
+        }
+
+        if (object.looping2) {
+            velocity.y = -calculateVelocity(Math.abs(object.heightDifference), 9.8);
+        } else if (object.looping == true) {
+            object.looping2 = true;
             velocity.y = -calculateVelocity(Math.abs(heightDifference), 9.8);
-            velocity.x *= 0.2;
-            velocity.z *= 0.2;
+            object.heightDifference = heightDifference;
         } else {
             object.looping = true;
         }
-    }*/
+    }
 
     let force = cannonToThreeVector3(object.force);
 
@@ -60,16 +70,36 @@ function teleportPhysicalObject(object, portal) {
     let mquat = new Quaternion().setFromRotationMatrix(m)
     orientation.premultiply(mquat)
 
-    position = getTeleportedPositionalVector(position, portal)
+
     previousPosition = getTeleportedPositionalVector(previousPosition, portal)
     velocity = getTeleportedDirectionalVector(velocity, portal)
     force = getTeleportedDirectionalVector(force, portal)
 
     object.previousPosition.copy(previousPosition)
-    object.position.copy(position)
     object.velocity.copy(velocity)
     object.force.copy(force)
     object.quaternion.copy(orientation)
+
+    //APPLY PORTAL FUNNELLING
+    if (GLOBALS.PORTALS[0].normal.y != GLOBALS.PORTALS[1].normal.y && object.looping2 == true) {
+        if (!object.centering) {
+
+            object.centering = true;
+
+            position = getTeleportedPositionalVector(position, portal)
+            object.position.copy(position)
+
+            const newPosition = getTeleportedPositionalVector(portal.portalShader.position, portal);
+            object.newPosition = newPosition;
+            //tweenCamera(100, object.position, newPosition);
+        } else {
+            position = getTeleportedPositionalVector(portal.portalShader.position, portal);
+            object.position.copy(position)
+        }
+    } else {
+        position = getTeleportedPositionalVector(position, portal)
+        object.position.copy(position)
+    }
 }
 
 // apply teleportation to the output portal to the vector
@@ -139,6 +169,19 @@ function teleportationState() {
 
         if (dd == 0) {
             //pos = new Vector3(GLOBALS.MAIN_CAMERA.position.x, d.position.y, GLOBALS.MAIN_CAMERA.position.z);
+        }
+
+        if (d.centering && !d.centered) {
+            var posThree = cannonToThreeVector3(d.position);
+            posThree.lerp(d.newPosition, 0.1);
+            posThree.y = d.position.y;
+
+            d.position.copy(posThree);
+
+            if (posThree.x == d.newPosition.x && posThree.z == d.newPosition.z) {
+                d.centered = true;
+                console.log("centered")
+            }
         }
 
         d.collisionFilterMask = GLOBALS.CGROUP_ALL;
@@ -227,13 +270,13 @@ function teleportationState() {
 
                     if (dd == 0) {
 
-                        if(GLOBALS.CURRENT_ITEM){
+                        if (GLOBALS.CURRENT_ITEM) {
                             GLOBALS.CURRENT_ITEM.body.collisionResponse = 0;
                             setTimeout(() => {
                                 GLOBALS.CURRENT_ITEM.body.collisionResponse = 1;
                             }, 100);
                         }
-                        
+
 
                         //AUDIO.PORTAL_ENTER.pause();
                         AUDIO.PORTAL_ENTER.currentTime = 0;

@@ -34,9 +34,8 @@ $("body").on('click', '#view-fps', function () {
     //
     $("#loading-parent").css("opacity", 1)
     $("#loading-parent").css("pointer-events", "all")
-    window.ttt = true;
 
-    if(GLOBALS.GUN){
+    if(GLOBALS.PLAYER_MODEL){
         viewFPS();
     }else{
         loadAvatar();
@@ -153,7 +152,7 @@ function viewFPS() {
 
             //GLOBALS.CUBES.remove(GLOBALS.PLANE_LEVEL_INSTANCED);
 
-            //GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+            GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
             //GLOBALS.RENDERER.dispose()
             window.loaded = true;
         }, 500);
@@ -164,7 +163,7 @@ function viewFPS() {
 
         GLOBALS.SCENE.environment = null;
         GLOBALS.LIGHT_GROUP.visible = true;
-        GLOBALS.STATS.container.style.display = "block";
+        GLOBALS.STATS.dom.style.display = "block";
         GLOBALS.OBSERVATION_ROOM.visible = true;
         GLOBALS.SCENE.getObjectByName("window").visible = false;
         //--------------------------------------------------------------------------

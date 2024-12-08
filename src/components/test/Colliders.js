@@ -277,7 +277,7 @@ function addColliderItem(items, type, mass, offset) {
                 }
             } else if (type == "dispenser") {
                 //var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.7));
-                
+
 
                 if (offset == 1) {
                     var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.01));
@@ -387,6 +387,12 @@ function addColliderItem(items, type, mass, offset) {
                     addPositionalAudio('audio-impact', box, false, false, true, 8);
 
                 box.addEventListener("collide", function (event) {
+
+                    event.body.looping = false;
+                    event.body.looping2 = false;
+                    event.body.centered = false;
+                    event.body.centering = false;
+                    event.body.heightDifference = null;
 
                     if (event.body.type != "blue") {
                         if (event.target.impactVelocity) {
@@ -612,6 +618,10 @@ function corridorColliderNames(corridor, update) {
                 child.material = new MeshBasicMaterial({
                     color: new Color(2, 2, 2)
                 });
+
+                if (child.children[0]) {
+                    child.remove(child.children[0])
+                }
 
                 const light = new SpotLight(0xffffff, 20);
                 light.angle = Math.PI / 2;

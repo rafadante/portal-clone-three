@@ -77,9 +77,10 @@ function raycastSelected(found, event, type) {
                     else
                         $(".gel").css("display", "block");
 
-                    if ((GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere") ||
-                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") ||
-                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_cube"))) {
+                    if ((GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "sphere" ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "cube" ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "cube_2" ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "laser_cube")) {
                         $(".dispenser").css("display", "block");
                         $("#state-dispenser").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.hasDispenser);
                         $("#dispenser-opened").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.opened);
@@ -162,8 +163,10 @@ function raycastSelected(found, event, type) {
                         $("#ligh-color-input").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.lightColor)
                     }
 
-                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") ||
-                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere")) {
+                    if ((GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "sphere" ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "cube" ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "cube_2" ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "laser_cube")) {
                         $(".physics").css("display", "block");
 
                         $("#restitution").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.restitution)

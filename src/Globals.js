@@ -19,7 +19,6 @@ import {
     OrbitControls
 } from 'three/addons/controls/OrbitControls.js';
 import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh';
-import { metalness } from 'three/examples/jsm/nodes/Nodes.js';
 
 // Add the extension functions
 BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
@@ -612,11 +611,27 @@ var GLOBALS = {
         },
         pellet_launcher: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         pellet_catcher: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         laser_cube: {
             count: 0,
@@ -692,7 +707,15 @@ var GLOBALS = {
         },
         camera: {
             count: 0,
-            max: 5
+            max: 5,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: false,
+            ceiling: false,
+            trigger: false
         },
         portal_0: {
             count: 0,
