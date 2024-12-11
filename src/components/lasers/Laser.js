@@ -100,9 +100,9 @@ function addLaserToCube(cube) {
     const laserParentClone = laserParent.clone();
     laserParentClone.visible = false;
     laserParent.clone = laserParentClone;
-    GLOBALS.SCENE_CHILDREN.add(laserParentClone);
+    GLOBALS.SCENE_FPS.add(laserParentClone);
 
-    GLOBALS.SCENE_CHILDREN.add(laserParent);
+    GLOBALS.SCENE_FPS.add(laserParent);
     cube.laser = laserParent;
 }
 

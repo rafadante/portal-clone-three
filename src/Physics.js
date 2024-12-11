@@ -65,7 +65,7 @@ const planeGeometry = new PlaneGeometry(100, 100)
 movementPlane = new Mesh(planeGeometry, new MeshBasicMaterial())
 movementPlane.visible = false // Hide it..
 
-const cannonDebugger = new CannonDebugger(GLOBALS.SCENE, world, {
+const cannonDebugger = new CannonDebugger(GLOBALS.DEBUGGER_GROUP, world, {
     onInit(body, mesh) {
         mesh.visible = false;
         $("body").on('input', '#debug-input', function () {

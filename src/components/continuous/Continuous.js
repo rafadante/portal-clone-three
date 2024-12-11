@@ -156,7 +156,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
         mass: 0,
         material: PHYSICS_MATERIAL
     })
-    GLOBALS.CANNON_BODIES.push(box);
+    //GLOBALS.CANNON_BODIES.push(box);
     box.position.copy(plane.position);
     box.quaternion.copy(plane.quaternion);
 
@@ -207,6 +207,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
         box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
         box.collisionResponse = 0;
         object.bodyLaserField = box;
+        box.isItem = true;
         GLOBALS.CANNON_WORLD.addBody(box);
 
         if (item == "laser_field") {
@@ -378,7 +379,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 mass: 0,
                 material: PHYSICS_MATERIAL
             })
-            GLOBALS.CANNON_BODIES.push(box);
+            //GLOBALS.CANNON_BODIES.push(box);
             box.position.copy(plane.position);
             box.quaternion.copy(plane.quaternion);
 

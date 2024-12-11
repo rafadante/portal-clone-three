@@ -3,6 +3,7 @@ import {
     Vector3,
     Quaternion,
     Box3,
+    Object3D,
 } from 'three';
 import $ from 'jquery';
 import {
@@ -29,15 +30,16 @@ import { addGel } from '../gels/Gels.js';
 import { findPath } from '../findPath/FindPath.js';
 import { levelEnteredFunction } from '../events/states.js';
 import { loadAvatar } from '../loadObj/LoaderOBJ.js';
+import { deletePortal, portalButton } from '../portal/CreatePortal.js';
 
 $("body").on('click', '#view-fps', function () {
     //
     $("#loading-parent").css("opacity", 1)
     $("#loading-parent").css("pointer-events", "all")
 
-    if(GLOBALS.PLAYER_MODEL){
+    if (GLOBALS.PLAYER_MODEL) {
         viewFPS();
-    }else{
+    } else {
         loadAvatar();
     }
 });
@@ -58,7 +60,45 @@ function loadingTxt() {
     }
 }
 
-function viewFPS() {
+function renderThingsBefore() {
+
+    var pointInSpace = [];
+
+    for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
+
+        if (GLOBALS.PLANE_USER_DATA[i].exists) {
+            const obj = new Object3D();
+            obj.position.copy(GLOBALS.PLANE_USER_DATA[i].position);
+            obj.rotation.copy(GLOBALS.PLANE_USER_DATA[i].rotation);
+            obj.side = GLOBALS.PLANE_USER_DATA[i].side;
+            obj.instanceId = GLOBALS.PLANE_USER_DATA[i].id_instanced;
+            obj.userData.planeInstancedId = GLOBALS.PLANE_USER_DATA[i].id_instanced;
+            pointInSpace.push(obj);
+        }
+
+        if (pointInSpace.length == 2) {
+            break;
+        }
+    }
+
+    portalButton(0, pointInSpace[0], GLOBALS.MAIN_CAMERA);
+    portalButton(2, pointInSpace[1], GLOBALS.MAIN_CAMERA);
+
+    setTimeout(() => {
+
+        if (GLOBALS.ITEMS_ADDED.getObjectByName("spawn")) {
+            deletePortal(0);
+            deletePortal(1);
+        }
+
+
+        setTimeout(() => {
+            setup();
+        }, 1000);
+    }, 2000);
+}
+
+function viewFPS(firstRender) {
 
     p = 0;
     loadingTxt()
@@ -75,7 +115,7 @@ function viewFPS() {
     obj.translateZ(1);
     GLOBALS.PLAYER.spawnPosition = obj.position.clone();
 
-    
+
     $("#container").css("filter", "blur(3px)")
     $(".img").addClass("image");
     GLOBALS.FLASH.visible = true;
@@ -132,29 +172,10 @@ function viewFPS() {
         //----------------------------------------------
 
         setTimeout(() => {
-            addGel();
-            GLOBALS.MAIN_CAMERA.lookAt(GLOBALS.ENTER_DOOR.position);
-            GLOBALS.PAUSED = false;
-            GLOBALS.CORRIDOR_ENTER.visible = true;
-            setTimeout(() => {
-                GLOBALS.PAUSED = true;
-            }, 100);
-            //UI SETUP
-            $("#ui").css("display", "none");
-            $("#reticle").css("display", "flex");
-            $("#blocker").css("display", "block");
-            $("#blocker").css("pointer-events", "all");
-            $("#loading-parent").css("opacity", 0)
-            $("#loading-parent").css("pointer-events", "none")
-
-            if (GLOBALS.MOBILE)
-                $("#mobile-controls").css("display", "block");
-
-            //GLOBALS.CUBES.remove(GLOBALS.PLANE_LEVEL_INSTANCED);
-
-            GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
-            //GLOBALS.RENDERER.dispose()
-            window.loaded = true;
+            if (firstRender)
+                renderThingsBefore();
+            else
+                setup();
         }, 500);
 
         GLOBALS.CONTROLS.enabled = false;
@@ -288,6 +309,33 @@ function viewFPS() {
         }
     }, 500);
 };
+
+function setup() {
+    addGel();
+    GLOBALS.DEBUGGER_GROUP.visible = true;
+    GLOBALS.MAIN_CAMERA.lookAt(GLOBALS.ENTER_DOOR.position);
+    GLOBALS.PAUSED = false;
+    GLOBALS.CORRIDOR_ENTER.visible = true;
+    setTimeout(() => {
+        GLOBALS.PAUSED = true;
+    }, 100);
+    //UI SETUP
+    $("#ui").css("display", "none");
+    $("#reticle").css("display", "flex");
+    $("#blocker").css("display", "block");
+    $("#blocker").css("pointer-events", "all");
+    $("#loading-parent").css("opacity", 0)
+    $("#loading-parent").css("pointer-events", "none")
+
+    if (GLOBALS.MOBILE)
+        $("#mobile-controls").css("display", "block");
+
+    //GLOBALS.CUBES.remove(GLOBALS.PLANE_LEVEL_INSTANCED);
+
+    GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+    //GLOBALS.RENDERER.dispose()
+    window.loaded = true;
+}
 
 function blockPortal() {
     for (var i = 0; i < GLOBALS.LIGHT_BRIDGE_RAYCASTER.length; i++) {

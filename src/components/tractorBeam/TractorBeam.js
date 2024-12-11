@@ -9,7 +9,9 @@ function tractorBeam() {
 
         let pos = new Vector3(d.position.x, d.position.y - 1, d.position.z);
 
-        if (d.holding) continue;
+        if (d.holding){
+            continue;
+        }
 
         pos.y += 1;
 

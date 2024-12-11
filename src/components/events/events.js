@@ -399,6 +399,7 @@ function interactWithItem() {
         }
       }
     } else {
+
       if (intersects[0].distance < 1.5) {
 
         var instancedId = intersects[0].instanceId;
@@ -412,7 +413,7 @@ function interactWithItem() {
         }
 
         if (test.body.mass == 0) {
-          return;
+          //return;
         }
 
         GLOBALS.HOLDING_ITEM = true;

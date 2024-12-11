@@ -102,7 +102,7 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
 
             if (fpsDefaultLoaded == 2) {
                 fpsPropsLoading = false;
-                viewFPS();
+                viewFPS(true);
             }
         } else {
 
@@ -118,8 +118,6 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
     };
 
     manager.onProgress = function (url, itemsLoaded, itemsTotal) { };
-
-    console.log(path)
 
     loader2.load(path, async function (glb) {
 
@@ -162,11 +160,10 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
 }
 
 function instancedTransform(scene, name, interactive, roughness, envIntensity, max) {
+    
     var geometry = scene.children[0].geometry.clone();
     geometry.computeVertexNormals();
     geometry.computeBoundsTree();
-
-    console.log(scene)
 
     var item = new InstancedMesh(geometry, scene.children[0].material.clone(), max);
     item.instanceMatrix.setUsage(DynamicDrawUsage); // will be updated every frame
@@ -646,9 +643,9 @@ GLOBALS.LIGHT_PORTAL_0 = new PointLight(new Color(0, 0.3, 1), 3, 2);
 GLOBALS.FLASH = new PointLight(0xff0000, 10);
 
 if (localStorage.getItem("quality-select") == "epic") {
-    GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
-    GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
-    GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
+    //GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
+    //GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
+    //GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
 }
 
 setTimeout(() => {

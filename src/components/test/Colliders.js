@@ -241,7 +241,7 @@ function addColliderItem(items, type, mass, offset) {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.126, 0.35, 0.126));
                 objHolder.translateY(0.35)
             } else if (type == "radio") {
-                var shape = new CANNON.Box(new CANNON.Vec3(0.11, 0.07, 0.049));
+                var shape = new CANNON.Box(new CANNON.Vec3(0.15, 0.07, 0.1));
                 offset = 0.07;
             } else if (type == "button_weight") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.117, 0.5));
@@ -318,7 +318,7 @@ function addColliderItem(items, type, mass, offset) {
                 shape: shape,
                 mass: mass,
                 material: PHYSICS_MATERIAL
-            })
+            });
 
             box.position.copy(objHolder.position);
             box.quaternion.copy(rot);

@@ -14,7 +14,7 @@ var allowPortal = true;
 
 function portalButton(button, auto, camera) {
 
-    if(!GLOBALS.LEVEL_ENTERED)
+    if (!GLOBALS.LEVEL_ENTERED && !auto)
         return;
 
 
@@ -177,7 +177,7 @@ function portalButton(button, auto, camera) {
                 else if (button == 2)
                     portalID = 0;
 
-                if (!paintMode) {
+                if (!paintMode && !auto) {
                     if (GLOBALS.PORTAL_BOX[portalID]) {
                         for (let p of portalPoints) {
                             if (!isInOtherPortalArea(p, normal, intersects[0].object, portalID)) {
@@ -243,8 +243,6 @@ function portalButton(button, auto, camera) {
 
                 if (button == 0) { // left click
 
-
-
                     if (GLOBALS.GUN_MODE == "paint") {
                         if (GLOBALS.PAINTING_GUN_MODE[0]) {
                             shootGel(0, point, normal, body, playerUpDirection, userData)
@@ -265,10 +263,12 @@ function portalButton(button, auto, camera) {
 
                     GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(0.0, 1.25, 2.5);
 
-                    if (GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha.value == 0.0) {
-                        new TWEEN.Tween(GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha).to({
-                            value: 0.5
-                        }, 300).start();
+                    if (!auto) {
+                        if (GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha.value == 0.0) {
+                            new TWEEN.Tween(GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha).to({
+                                value: 0.5
+                            }, 300).start();
+                        }
                     }
 
                     GLOBALS.PORTALS[0].normal = normal;
@@ -299,13 +299,15 @@ function portalButton(button, auto, camera) {
 
                     newPortal(1, 0, point, normal, body, playerUpDirection, userData.rotation, userData.side)
 
-                    
+
                     GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(2.5, 0.7, 0.0);
 
-                    if (GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha.value == 0.0) {
-                        new TWEEN.Tween(GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha).to({
-                            value: 0.5
-                        }, 300).start();
+                    if (!auto) {
+                        if (GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha.value == 0.0) {
+                            new TWEEN.Tween(GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iAlpha).to({
+                                value: 0.5
+                            }, 300).start();
+                        }
                     }
 
                     GLOBALS.PORTALS[1].normal = normal;
@@ -411,8 +413,8 @@ function deletePortal(portalIndex) {
         if (index > -1) {
 
             for (let d of GLOBALS.DYNAMIC_OBJECTS) {
-                if(d.inTractor && d.tractor == index){
-                    outOfTheTractor(d,index)
+                if (d.inTractor && d.tractor == index) {
+                    outOfTheTractor(d, index)
                 }
             }
 

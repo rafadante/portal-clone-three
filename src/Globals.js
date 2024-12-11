@@ -106,6 +106,7 @@ controls.minDistance = 0;
 var GLOBALS = {
 
     PIXEL_RATIO: pixelRatio,
+    DEBUGGER_GROUP: new Group(),
 
     SCENE: new Scene(),
     SCENE_CHILDREN: new Group(),
