@@ -271,10 +271,10 @@ function addItem(found, loaded) {
                 item.position.copy(userData.position);
 
                 //PORTALS CAN NOT SPAWN ON ITEM POSITION
-                GLOBALS.PLANE_USER_DATA[userData.id_instanced].portal = false;
+                /*GLOBALS.PLANE_USER_DATA[userData.id_instanced].portal = false;
                 GLOBALS.PLANE_USER_DATA[userData.id_instanced].planeColor = 0x808080;
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(userData.id_instanced, new Color(0x808080));
-                GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+                GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;*/
             }
 
             item.position.copy(userData.position);
@@ -313,12 +313,16 @@ function addItem(found, loaded) {
                         boxTop[0].hasItem = true;
                         boxTop[0].itemName = "dispenser";
                         boxTop[0].item = item2;
+                        boxTop[0].isInstanced = true;
+                        boxTop[0].dispenserPosition = item2.position;
+                        boxTop[0].dispenserID = idInstanced;
+                        boxTop[0].instancedName = "dispenser";
                         item2.translateY(j);
                         break;
                     }
                 }
 
-                item.dispenserPosition = item2.position.clone();
+                item.dispenserPosition = item2.position;
                 item.dispenserID = idInstanced;
 
                 item2.item = item;

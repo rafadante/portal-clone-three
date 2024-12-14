@@ -18,6 +18,7 @@ import {
 } from '../../Globals.js';
 import { clickItem } from './AddItem.js';
 import { targetFaithPlateUpdate } from '../faithPlate/FaithPlate.js';
+import { getPlaneByName } from '../../Utils.js';
 
 let lineFollow;
 let isDrawStart = false;
@@ -200,25 +201,41 @@ function deleteItemInstanced(item, moving) {
     instanced.setMatrixAt(item.item.userData.idInstanced, dummy.matrix);
     instanced.instanceMatrix.needsUpdate = true;
 
+    console.log("888888888888")
+
     if (item.instancedName == "cube" || item.instancedName == "sphere"
         || item.instancedName == "cube_2" || item.instancedName == "laser_cube") {
+
         var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
         var dummy = new Object3D();
         dummy.scale.set(0, 0, 0);
         dummy.updateMatrix();
         instanced.setMatrixAt(item.item.dispenserID, dummy.matrix);
         instanced.instanceMatrix.needsUpdate = true;
+
+        console.log(item)
+
+        if (GLOBALS.DYMANIC_ITEMS["dispenser"][item.item.dispenserID].dispenserPosition.y != item.position.y) {
+            var planeDispenser = getPlaneByName(
+                GLOBALS.DYMANIC_ITEMS["dispenser"][item.item.dispenserID].dispenserPosition.x + "/" +
+                GLOBALS.DYMANIC_ITEMS["dispenser"][item.item.dispenserID].dispenserPosition.y + "/" +
+                GLOBALS.DYMANIC_ITEMS["dispenser"][item.item.dispenserID].dispenserPosition.z
+            );
+
+            planeInstanceReset(planeDispenser[0], false, null, null, null, null, null, null, null, false, null, false, false);
+        }
+
         GLOBALS.DYMANIC_ITEMS["dispenser"][item.item.dispenserID] = [];
     }
 
     GLOBALS.DYMANIC_ITEMS[item.instancedName][item.item.userData.idInstanced] = [];
 
-    if (moving){
+    if (moving) {
         window.changingPosition = true;
         window.changingPositionPlane = item;
         clickItem($("#" + item.instancedName));
     }
-        
+
     $("#" + item.instancedName).parent().children("span").text(GLOBALS.ITEMS_COUNT[item.instancedName]["max"] - GLOBALS.ITEMS_COUNT[item.instancedName]["count"]);
 }
 

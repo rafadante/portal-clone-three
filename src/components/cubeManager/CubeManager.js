@@ -274,8 +274,11 @@ function trasnlatePlane(id, val, portal, old) {
                 item.position.copy(plane.position);
                 item.rotation.copy(plane.item.rotation);
 
+                console.log(plane)
+
                 if (plane.instancedName == "cube" || plane.instancedName == "sphere" 
-                    || plane.instancedName == "cube_2" || plane.instancedName == "laser_cube") {
+                    || plane.instancedName == "cube_2" || plane.instancedName == "laser_cube" ) {
+
                     item.translateY(1);
 
                     //UPDATE DISPENSER
@@ -286,6 +289,8 @@ function trasnlatePlane(id, val, portal, old) {
                     GLOBALS.ITEMS_ADDED.getObjectByName("dispenser").instanceMatrix.needsUpdate = true;
 
                     plane.item.dispenserPosition = item2.position.clone();
+
+                    console.log("2222222222")
                 }
 
                 item.updateMatrix();
@@ -554,7 +559,8 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
                 idConnection: [],
                 line: [],
                 normal: normal,
-                planeColor: planeColor
+                planeColor: planeColor,
+                connectionPoints: []
             }
 
             GLOBALS.BUDGET -= 1;

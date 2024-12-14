@@ -1,6 +1,7 @@
 import {
     Clock,
-    Vector3
+    Vector3,
+    Color
 } from 'three';
 import {
     generateMeshPortalShader
@@ -41,7 +42,7 @@ const animateShader = (time) => {
     animateShader2();
 };
 
-const effectOrigin = new Vector3(1,1,5)
+const effectOrigin = new Vector3(1, 1, 5)
 
 const animateShader2 = (time) => {
     var val = clock.getDelta();
@@ -71,6 +72,32 @@ const animateShader2 = (time) => {
 
     //GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value = effectOrigin;
     GLOBALS.UNIFORMS_DISSOLVER.u_Time.value = t;
+
+    //
+    //const time = t / 1000; // Convert time to seconds
+
+    const time2 = t; // Convert time to seconds
+
+    // Update the colors for the trail
+    for (var j = 0; j < window.lines.length; j++) {
+        for (let i = 0; i <= 100; i++) {
+            const t2 = i / 100; // Position along the line
+
+            // Fade calculation with valid ranges
+            const wave = Math.sin((time2 * 2 - t2 * 10) % (2 * Math.PI)); // Wrap values into a valid range
+            const fade = Math.max(0, wave); // Ensure no negative or NaN values
+
+            //console.log(fade)
+
+            const color = new Color();
+
+            color.setHSL(0.6, 1.0, fade); // Use HSL color (adjust lightness with `fade`)
+            window.lines[j].colorAttribute.setXYZ(i, color.r, color.g, color.b);
+        }
+
+        window.lines[j].colorAttribute.needsUpdate = true;
+    }
+
 };
 
 export {

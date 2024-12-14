@@ -8,7 +8,13 @@ import {
 import {
     Mesh,
     Color,
-    Vector3
+    Vector3,
+    BufferGeometry,
+    LineBasicMaterial,
+    Line,
+    AdditiveBlending,
+    Float32BufferAttribute,
+    MathUtils
 } from 'three';
 import $ from 'jquery';
 import { animate } from '../../Main';
@@ -47,7 +53,7 @@ function manageConnection(instanceId, from) {
             line: line,
             from: from,
             line2: null,
-            to:  GLOBALS.PLANE_USER_DATA[instanceId]
+            to: GLOBALS.PLANE_USER_DATA[instanceId]
         });
 
         from.item.userData.connectedTo.push(instanceId);
@@ -61,31 +67,59 @@ function manageConnection(instanceId, from) {
     GLOBALS.CURRENT_LINE = null;
 }
 
-function addLine(position, endPos){
+function addLine(position, endPos) {
 
-    const points = [];
-    points.push(new Vector3(
+    // Two points for the line
+    const pointA = new Vector3(
         position.x,
         position.y,
         position.z
-    ));
-    points.push(endPos);
+    ); // Starting point
+    const pointB = endPos;  // Ending point
+    const N = 100; // Number of vertices along the line
 
-    const geometry = new MeshLineGeometry()
-    geometry.setPoints(points)
-    const material = new MeshLineMaterial({
-        color: 0xffa500,
-        side: 2,
-        depthTest: true,
-        transparent: true
-    })
-    material.uniforms.alphaTest.value = 0;
-    material.uniforms.dashArray.value = 0.01;
-    material.uniforms.lineWidth.value = 0.1;
-    material.uniforms.useDash.value = 1;
+    // Create a line with interpolated vertices
+    const positions = [];
+    for (let i = 0; i <= N; i++) {
+        const t = i / N; // Interpolation factor (0 to 1)
+        const x = MathUtils.lerp(pointA.x, pointB.x, t);
+        const y = MathUtils.lerp(pointA.y, pointB.y, t);
+        const z = MathUtils.lerp(pointA.z, pointB.z, t);
+        positions.push(x, y, z);
+    }
 
-    return new Mesh(geometry, material);
+    // Define initial vertex colors for the trail effect
+    const colors = [];
+    const color = new Color();
+    for (let i = 0; i <= N; i++) {
+        color.setHSL( 0.6, 1, (1-i/(N-1))**4 );
+		colors.push( color.r, color.g, color.b );
+    }
+
+    // Create the geometry and material for the line
+    const geometry = new BufferGeometry();
+    geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
+    geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
+
+    const material = new LineBasicMaterial({
+        vertexColors: true, // Use the colors defined above
+        blending: AdditiveBlending, // Additive blending for a glow-like effect
+        transparent: true, // Enable transparency
+        opacity: 0.8, // Optional opacity control
+    });
+
+    const line = new Line(geometry, material);
+
+    // Get references to the geometry attributes
+    line.colorAttribute = geometry.getAttribute("color");
+    line.color = color;
+
+    window.lines.push(line);
+
+    return line;
 }
+
+window.lines = [];
 
 $("body").on('click', '.removeConnection', function () {
 

@@ -194,6 +194,8 @@ $("body").on('click', '#delete', function () {
 
 $("body").on('input', '#state-dispenser', function () {
 
+    console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserPosition)
+
     var scale;
 
     if (this.checked)
@@ -207,7 +209,7 @@ $("body").on('input', '#state-dispenser', function () {
     var dummy = new Object3D();
     dummy.scale.copy(scale);
     dummy.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserPosition);
-    dummy.rotation.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.rotation);
+    dummy.rotation.set(0,0,0);
     dummy.updateMatrix();
     instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserID, dummy.matrix);
     instanced.instanceMatrix.needsUpdate = true;

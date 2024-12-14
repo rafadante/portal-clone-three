@@ -9,7 +9,10 @@ import {
     CircleGeometry,
     Matrix4,
     Color,
-    SphereGeometry
+    SphereGeometry,
+    LineBasicMaterial,
+    BufferGeometry,
+    Line
 } from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import {
@@ -69,7 +72,7 @@ function findPath(ini, target, found, found2, line2) {
     //GLOBALS.SELECTED_FOR_CONNECTION.check = plane;
 
     for (var j = 0; j < GLOBALS.PLANE_USER_DATA.length; j++) {
-        if (GLOBALS.PLANE_USER_DATA[j].exists) {//&& !GLOBALS.PLANE_USER_DATA[j].hasItem
+        if (GLOBALS.PLANE_USER_DATA[j].exists && !GLOBALS.PLANE_USER_DATA[j].hasItem) {//
             nodes.push(GLOBALS.PLANE_USER_DATA[j]);
         }
     }
@@ -107,7 +110,32 @@ function findPath(ini, target, found, found2, line2) {
         scene.getObjectByName(target.x + '/' + target.y + '/' + target.z).id, side, found, found2, line2)
 }
 
+var pointCollection = [];
+
+function getOccurrence(array, value) {
+    return array.filter((v) => (v.equals(value))).length;
+}
+
+function manageOffSet(pos, rot) {
+
+    var newPos = pos;
+
+    console.log(getOccurrence(pointCollection, pos))
+
+    var obj = new Object3D;
+    obj.position.copy(pos);
+    obj.rotation.copy(rot);
+    obj.translateY(0.2 * getOccurrence(pointCollection, pos));
+    newPos = obj.position.clone();
+
+    pointCollection.push(pos.clone());
+
+    return newPos;
+}
+
 function path2(dgraph, start, end, side, found, found2, line2) {
+
+    console.log(line2)
 
     var shortestpath = dgraph.findShortestPath(start, end);
 
@@ -135,35 +163,75 @@ function path2(dgraph, start, end, side, found, found2, line2) {
 
         fromObj.node.hasLine = true;
 
+        /*function checkAge(pos) {
+            return pos.equals(fromObj.position);
+        }
+
+        function checkAge2(pos) {
+            return pos.equals(toObj.position);
+        }
+
+        if (pointCollection.find(checkAge)) {
+            fromObj.translateY(0.2);
+            toObj.translateY(0.2);
+
+            console.log("--------------------")
+            console.log(fromObj.position)
+            console.log(toObj.position)
+        }
+
+        pointCollection.push(fromObj.position.clone());*/
+
         points.push(fromObj.position)
         rotPoints.push(fromObj.rotation)
 
         if (i >= shortestpath.length - 2) {
-            points.push(toObj.position)
-            rotPoints.push(toObj.rotation)
+            points.push(toObj.position);
+            rotPoints.push(toObj.rotation);
+
+            /*if (pointCollection.find(checkAge2)) {
+                console.log("3333333333333")
+                //fromObj.translateY(0.2);
+                toObj.translateY(0.2);
+            }
+            
+            pointCollection.push(toObj.position.clone());
+
+            console.log(toObj.position)*/
         }
     }
 
-    pathPoints.push(points[0])
-    pathPointsRot.push(rotPoints[0])
+    pathPoints.push(points[0]);
+    pathPointsRot.push(rotPoints[0]);
+
+    //console.log(pointCollection)
+    //console.log(points)
 
     for (var j = 1; j < points.length; j++) {
 
-        if (points[j - 1].distanceTo(points[j]) != 2) {
+        if (!rotPoints[j - 1].equals(rotPoints[j])) {//points[j - 1].distanceTo(points[j]) != 2
 
             var array = getPlaneMiddleEdges(points[j - 1], rotPoints[j - 1]);
 
             for (var w = 0; w < array.length; w++) {
                 if (array[w].distanceTo(points[j]) <= 1) {
+
+                    //array[w] = manageOffSet(array[w], rotPoints[j - 1])
+
                     pathPointsRot.push(rotPoints[j - 1])
                     pathPoints.push(array[w])
                     break;
                 }
             }
 
-            pathPointsRot.push(rotPoints[j])
-            pathPoints.push(points[j])
+            points[j] = manageOffSet(points[j], rotPoints[j])
+
+            pathPointsRot.push(rotPoints[j]);
+            pathPoints.push(points[j]);
         } else {
+
+            points[j] = manageOffSet(points[j], rotPoints[j])
+
             pathPointsRot.push(rotPoints[j])
             pathPoints.push(points[j])
         }
@@ -172,7 +240,20 @@ function path2(dgraph, start, end, side, found, found2, line2) {
         direction.subVectors(pathPoints[j - 1], points[j]).normalize();
     }
 
+    console.log(pathPoints)
+    console.log(pointCollection)
+
     var dir = new Vector3(); // create once an reuse it
+
+    if (!pathPoints[pathPoints.length - 2] || !pathPoints[pathPoints.length - 1]) {
+
+        line2['line'].visible = true;
+
+        line2['line2'] = line2['line'];
+
+        return;
+    }
+
     dir.subVectors(pathPoints[pathPoints.length - 2], pathPoints[pathPoints.length - 1]).normalize();
 
     if (side) {
