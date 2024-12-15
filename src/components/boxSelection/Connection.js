@@ -59,8 +59,6 @@ function manageConnection(instanceId, from) {
         from.item.userData.connectedTo.push(instanceId);
 
         //findPath(from.position, GLOBALS.PLANE_USER_DATA[instanceId].position, GLOBALS.PLANE_USER_DATA[instanceId], from)
-
-        //console.log(GLOBALS.CONNECTIONS)
     }
 
     GLOBALS.ITEM_CUBE.visible = false;

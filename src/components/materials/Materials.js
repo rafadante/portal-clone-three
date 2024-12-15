@@ -22,9 +22,9 @@ function loadMaterials() {
         null,//'floor/nonPortalable/1/roughness.jpg'
         null,
         null,
-        1,
+        0.7,
         0,
-        0.4,
+        0.2,
         0,
         null,
         null
@@ -129,7 +129,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.4,
+        0.2,
         0,
         null,
         null
@@ -146,7 +146,7 @@ function loadMaterials() {
         null,
         1,
         0,
-        0.4,
+        0.2,
         0,
         null,
         null
@@ -214,6 +214,9 @@ function loadMaterial(material, base, normal, ao, rough, metal, alpha, roughValu
     if (normal) {
         map = new TextureLoader().load('./assets/textures/' + normal);
         material.normalMap = map;
+        //material.normalScale.x = 2;
+        //material.normalScale.y = 2;
+        ///console.log(material)
 
         if (repeatX)
             applyRepeat(map, repeatX, repeatY);

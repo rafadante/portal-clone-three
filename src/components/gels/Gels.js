@@ -102,6 +102,13 @@ GLOBALS.INSTANCED_WHITE_GEL.computeBoundingSphere();
 
 function addGel() {
 
+    resetGels(instancedGelPlane);
+    resetGels(instancedGelPlaneDynamic);
+    resetGels(instancedGelPlaneDynamicReflection);
+    resetGels(GLOBALS.INSTANCED_WHITE_GEL);
+
+    //
+
     instancedGelPlane.material.envMap = GLOBALS.ENV_MAP;
     GLOBALS.SCENE_FPS.add(instancedGelPlane);
 
@@ -119,6 +126,17 @@ function addGel() {
     }
 
     addGelBlob();
+}
+
+function resetGels(item) {
+    var clone = new Object3D();
+
+    for (var i = 0; i < 1000; i++) {
+        clone.scale.set(0, 0, 0);
+        clone.position.set(100000, 100000, 100000);
+        clone.updateMatrix();
+        item.setMatrixAt(i, clone.matrix);
+    }
 }
 
 function spawnInstanced(item, color, gelType, side, dynamic, size) {
@@ -151,22 +169,26 @@ function spawnInstanced(item, color, gelType, side, dynamic, size) {
 }
 
 function gelCollider(dummy, type, side, size, instanced, color) {
-    var shape = new CANNON.Box(new CANNON.Vec3(size, size, 0.025));
+    var shape = new CANNON.Box(new CANNON.Vec3(size, size, 0.01));
     var gel = new CANNON.Body({
         shape: shape,
         mass: 0,
         material: GLOBALS.PHYSICS_MATERIAL
     });
+    dummy.translateZ(-0.005);
     gel.position.copy(dummy.position);
     gel.quaternion.copy(dummy.quaternion);
     //gel.collisionResponse = 0;
 
     gel.name = "gel";
     gel.type = type;
-    gel.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
-    gel.collisionFilterMask = GLOBALS.CGROUP_ALL;
+    //gel.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
+    //gel.collisionFilterMask = GLOBALS.CGROUP_ALL;
+    gel.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT;
+    gel.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
     gel.side = side;
     gel.color = color;
+    gel.room = true;
 
     dummy.gelBody = gel;
     GLOBALS.GEL_TRIGGER.push(dummy);
@@ -186,6 +208,7 @@ function gelCollider(dummy, type, side, size, instanced, color) {
 
     GLOBALS.CANNON_BODIES.push(gel);
     GLOBALS.CANNON_WORLD.addBody(gel);
+    GLOBALS.WALL_BODIES.push(gel);
 
     if (type == "white") {
         instanced.array.push(gel);
@@ -256,13 +279,18 @@ function gelTrigger(event) {
             }
 
             event.target.applyImpulse(impulse, event.target.position);
+
+            //PLAY SOUND
+            event.target.soundRepulsion.position.copy(cannonToThreeVector3(event.target.position));
+            event.target.soundRepulsion.audio.currentTime = 0;
+            event.target.soundRepulsion.audio.play();
         }
     } else if (event.body.type == "orange") {
-        /*if (!event.target.OrangeContact) {
+        if (!event.target.OrangeContact) {
             AUDIO.PROPULSION.currentTime = 0;
             AUDIO.PROPULSION.play();
             AUDIO.WALK.volume = 0;
-        }*/
+        }
 
         event.target.OrangeContact = true;
     } else if (event.body.type == "purple") {
@@ -401,7 +429,9 @@ function addTileGel(item, type, color, id) {
 
 $("body").on('click', '#remove-gel', function () {
     for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
+
         if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].gelType) {
+
             GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].hasItem = false;
             GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].itemName = null;
             GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].gelType = null;

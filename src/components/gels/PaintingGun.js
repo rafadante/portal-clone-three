@@ -8,11 +8,7 @@ function fillPaintingGun(button, item) {
     if (button == 2)
         button = 1;
 
-    console.log(item)
-    console.log(GLOBALS.DYMANIC_ITEMS['gel_recharger'])
     GLOBALS.PAINTING_GUN_MODE[button] = GLOBALS.DYMANIC_ITEMS['gel_recharger'][item.instanceId].userData.gel;
-
-    console.log(GLOBALS.PAINTING_GUN_MODE);
 
     if(button == 0){
         GLOBALS.PAINT_GUN.getObjectByName("left").material.color = getGelColor(GLOBALS.PAINTING_GUN_MODE[button]);
@@ -69,8 +65,6 @@ $("body").on('click', '.gel_recharger-type', function () {
 function gelRecharger(gel, item){
     $("#gel_recharger-type").find(".title").text("Gel type: " + gel)
     $("#gel-type").data("gel", gel)
-
-    //console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item)
 
     //const item = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item;
     item.userData.gel = gel;

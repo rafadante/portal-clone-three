@@ -45,7 +45,6 @@ function teleportPhysicalObject(object, portal) {
 
         if (object.heightDifference && object.looping2) {
             if (object.heightDifference != heightDifference) {
-                console.log("changed")
                 object.looping2 = false;
                 object.looping = false;
                 object.centered = false;
@@ -180,7 +179,6 @@ function teleportationState() {
 
             if (posThree.x == d.newPosition.x && posThree.z == d.newPosition.z) {
                 d.centered = true;
-                console.log("centered")
             }
         }
 
@@ -207,9 +205,8 @@ function teleportationState() {
             // collision disable, might be partially intersecting with portal
             if (GLOBALS.PORTALS[p].CDBB.containsPoint(pos)) {
 
-                if (d.name != "player") {
+                if (d.name != "player") 
                     d.wakeUp();
-                }
 
                 d.collisionFilterMask &=
                     ~GLOBALS.PORTALS[p].hostObjects.collisionFilterGroup;
@@ -265,7 +262,6 @@ function teleportationState() {
                             clearTimeout(d.pellet.timeout);
                             resetBall(d.pellet, false);
                         }
-
                     }
 
                     if (dd == 0) {
@@ -277,14 +273,8 @@ function teleportationState() {
                             }, 100);
                         }
 
-
-                        //AUDIO.PORTAL_ENTER.pause();
                         AUDIO.PORTAL_ENTER.currentTime = 0;
                         play(AUDIO.PORTAL_ENTER)
-
-                        /*AUDIO.PORTAL_EXIT.pause();
-                        AUDIO.PORTAL_EXIT.currentTime = 0;
-                        play(AUDIO.PORTAL_EXIT);*/
 
                         removeJointConstraint();
                         teleportObject3D(GLOBALS.PIVOT, GLOBALS.PORTALS[p]);
@@ -306,12 +296,6 @@ function teleportationState() {
                             cameraUp,
                             cameraForward.negate()
                         );
-
-                        /*GLOBALS.MAIN_CAMERA.quaternion.setFromRotationMatrix(cameraMat);
-                        GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
-                        GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
-                        GLOBALS.PORTAL_GUN_CAMERA.position.copy(GLOBALS.MAIN_CAMERA.position);
-                        GLOBALS.PORTAL_GUN_CAMERA.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);*/
 
                         var qq = new Quaternion();
                         qq.setFromRotationMatrix(cameraMat);
@@ -339,11 +323,11 @@ function addCameraBody(obj) {
     PHYSICS_MATERIAL.friction = 0.4; //0.01
     PHYSICS_MATERIAL.restitution = 0; //0.1
 
-    var shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.2, 0.2));
+    var shape = new CANNON.Box(new CANNON.Vec3(0.15, 0.25, 0.25));
 
     var box = new CANNON.Body({
         shape: shape,
-        mass: 10,
+        mass: 5,
         material: PHYSICS_MATERIAL,
     });
     GLOBALS.CANNON_BODIES.push(box);

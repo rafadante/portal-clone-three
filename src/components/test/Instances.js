@@ -49,7 +49,8 @@ function manageInstances() {
 
         if (GLOBALS.PLANE_USER_DATA[i].exists) {
             if (GLOBALS.PLANE_USER_DATA[i].itemName != enterDoor &&
-                GLOBALS.PLANE_USER_DATA[i].itemName != "exitDoor") {
+                GLOBALS.PLANE_USER_DATA[i].itemName != "exitDoor" &&
+                GLOBALS.PLANE_USER_DATA[i].itemName != "gel") {
 
                 GLOBALS.PLANE_USER_DATA[i].checked = false;
                 GLOBALS.PLANE_USER_DATA[i].position.checked = false;

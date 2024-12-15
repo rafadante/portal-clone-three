@@ -201,8 +201,6 @@ function deleteItemInstanced(item, moving) {
     instanced.setMatrixAt(item.item.userData.idInstanced, dummy.matrix);
     instanced.instanceMatrix.needsUpdate = true;
 
-    console.log("888888888888")
-
     if (item.instancedName == "cube" || item.instancedName == "sphere"
         || item.instancedName == "cube_2" || item.instancedName == "laser_cube") {
 
@@ -212,8 +210,6 @@ function deleteItemInstanced(item, moving) {
         dummy.updateMatrix();
         instanced.setMatrixAt(item.item.dispenserID, dummy.matrix);
         instanced.instanceMatrix.needsUpdate = true;
-
-        console.log(item)
 
         if (GLOBALS.DYMANIC_ITEMS["dispenser"][item.item.dispenserID].dispenserPosition.y != item.position.y) {
             var planeDispenser = getPlaneByName(

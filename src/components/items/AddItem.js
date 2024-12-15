@@ -85,8 +85,6 @@ function addItem(found, loaded) {
 
         $("#follow").css("display", "none");
 
-        console.log(GLOBALS.ITEM_HOLDED_NAME)
-
         load3D(
             "/items/" + GLOBALS.ITEM_HOLDED_NAME + ".glb",
             GLOBALS.ITEM_HOLDED_NAME,

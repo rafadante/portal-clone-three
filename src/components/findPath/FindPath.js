@@ -120,8 +120,6 @@ function manageOffSet(pos, rot) {
 
     var newPos = pos;
 
-    console.log(getOccurrence(pointCollection, pos))
-
     var obj = new Object3D;
     obj.position.copy(pos);
     obj.rotation.copy(rot);
@@ -134,8 +132,6 @@ function manageOffSet(pos, rot) {
 }
 
 function path2(dgraph, start, end, side, found, found2, line2) {
-
-    console.log(line2)
 
     var shortestpath = dgraph.findShortestPath(start, end);
 
@@ -163,49 +159,18 @@ function path2(dgraph, start, end, side, found, found2, line2) {
 
         fromObj.node.hasLine = true;
 
-        /*function checkAge(pos) {
-            return pos.equals(fromObj.position);
-        }
-
-        function checkAge2(pos) {
-            return pos.equals(toObj.position);
-        }
-
-        if (pointCollection.find(checkAge)) {
-            fromObj.translateY(0.2);
-            toObj.translateY(0.2);
-
-            console.log("--------------------")
-            console.log(fromObj.position)
-            console.log(toObj.position)
-        }
-
-        pointCollection.push(fromObj.position.clone());*/
-
         points.push(fromObj.position)
         rotPoints.push(fromObj.rotation)
 
         if (i >= shortestpath.length - 2) {
             points.push(toObj.position);
             rotPoints.push(toObj.rotation);
-
-            /*if (pointCollection.find(checkAge2)) {
-                console.log("3333333333333")
-                //fromObj.translateY(0.2);
-                toObj.translateY(0.2);
-            }
-            
-            pointCollection.push(toObj.position.clone());
-
-            console.log(toObj.position)*/
         }
     }
 
     pathPoints.push(points[0]);
     pathPointsRot.push(rotPoints[0]);
 
-    //console.log(pointCollection)
-    //console.log(points)
 
     for (var j = 1; j < points.length; j++) {
 
@@ -239,9 +204,6 @@ function path2(dgraph, start, end, side, found, found2, line2) {
         var direction = new Vector3(); // create once an reuse it
         direction.subVectors(pathPoints[j - 1], points[j]).normalize();
     }
-
-    console.log(pathPoints)
-    console.log(pointCollection)
 
     var dir = new Vector3(); // create once an reuse it
 

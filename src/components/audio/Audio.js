@@ -56,6 +56,8 @@ function play(elem) {
 
     if (!isPlaying) {//
         // Show loading animation.
+
+        elem.volume = elem.getAttribute("volume");
         var playPromise = elem.play();
 
         if (playPromise !== undefined) {
@@ -71,7 +73,7 @@ function play(elem) {
     }
 }
 
-function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, volume) {
+function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, nameSound) {
 
     if (!listernAdded) {
         listernAdded = true;
@@ -107,7 +109,7 @@ function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, vo
     }
 
     // finally add the sound to the mesh
-    parent.sound = sound;
+    parent[nameSound] = sound;
     GLOBALS.SCENE_FPS.add(sound);
 
     if (staticPosition)
@@ -223,8 +225,6 @@ function fadeAudio(audio) {
     POSITIVE: positive
 }*/
 
-console.log(document.getElementById("AUDIO-AMBIENT"))
-
 var AUDIO = {
     AMBIENT: document.getElementById("AUDIO-AMBIENT"),
     EDITOR: document.getElementById("AUDIO-EDITOR"),
@@ -243,7 +243,8 @@ var AUDIO = {
     WALK: document.getElementById("AUDIO-WALK"),
     JUMP: document.getElementById("AUDIO-JUMP"),
     AERIAL: document.getElementById("AUDIO-AERIAL"),
-    POSITIVE: document.getElementById("AUDIO-POSITIVE")
+    POSITIVE: document.getElementById("AUDIO-POSITIVE"),
+    PROPULSION: document.getElementById("AUDIO-PROPULSION"),
 }
 
 export {

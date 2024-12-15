@@ -169,7 +169,7 @@ function fizzlerTrigger(body) {
             var clone2 = clone.clone();
             clone2.position.y += 1;
 
-            addPositionalAudio('audio-dissolve', clone, true, false, true, 8)
+            addPositionalAudio('audio-dissolve', clone, true, false, true, 8, 'sound')
 
             tweenCamera(3000, GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value, clone.position)
             tweenCamera(3000, clone.position, clone2.position)
@@ -276,8 +276,9 @@ function addColliderItem(items, type, mass, offset) {
                     objHolder.translateX(-a1)
                 }
             } else if (type == "dispenser") {
-                //var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.7));
-
+                
+                objHolder.position.copy(items[i].dispenserPosition);
+                objHolder.rotation.set(0,0,0);
 
                 if (offset == 1) {
                     var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.01));
@@ -293,7 +294,7 @@ function addColliderItem(items, type, mass, offset) {
                     objHolder.translateX(-0.7)
                 }
 
-                objHolder.translateY(-0.2)
+                objHolder.translateY(-0.8)
 
             } else if (type == "ramp" || type == "ramp_half" || type == "ramp_half2" || type == "stairs") {
                 const result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), {
@@ -319,6 +320,7 @@ function addColliderItem(items, type, mass, offset) {
                 mass: mass,
                 material: PHYSICS_MATERIAL
             });
+        
 
             box.position.copy(objHolder.position);
             box.quaternion.copy(rot);
@@ -336,21 +338,24 @@ function addColliderItem(items, type, mass, offset) {
             GLOBALS.SCENE.remove(objHolder);
 
             if (type == "radio") {
-                addPositionalAudio('audio-radio', box, true, true, false, 8)
+                addPositionalAudio('audio-radio', box, true, true, false, 8, 'sound')
             } else if (type == "door") {
-                addPositionalAudio('audio-door', items[i], false, false, true, 8)
+                addPositionalAudio('audio-door', items[i], false, false, true, 8, 'sound')
             } else if (type == "laser_cube") {
                 addLaserToCube(box)
             }
 
             if (type == "faith_plate") {
                 box.collisionResponse = 0;
-                addPositionalAudio('faith_plate_hit', box, false, false, true, 20)
+                addPositionalAudio('faith_plate_hit', box, false, false, true, 20, 'sound')
             }
 
             if (mass > 0) {
 
+                addPositionalAudio('audio-repulsion', box, false, false, true, 20, 'soundRepulsion');
+
                 if ((type == "cube" || type == "cube_2" || type == "laser_cube" || type == "sphere")) {
+
                     if (items[i].userData.hasDispenser) {
 
                         box.mass = 0;
@@ -377,6 +382,7 @@ function addColliderItem(items, type, mass, offset) {
                 box.arrayPos = [];
                 box.arrayRot = [];
                 box.dynamic = true;
+                box.playingAudioGel = false;
 
                 const clone = GLOBALS.ITEMS_ADDED.getObjectByName(type).clone.clone();
                 clone.visible = false;
@@ -384,7 +390,7 @@ function addColliderItem(items, type, mass, offset) {
                 box.clone = clone;
 
                 if (type != "radio")
-                    addPositionalAudio('audio-impact', box, false, false, true, 8);
+                    addPositionalAudio('audio-impact', box, false, false, true, 8, 'sound');
 
                 box.addEventListener("collide", function (event) {
 
@@ -437,7 +443,18 @@ function addColliderItem(items, type, mass, offset) {
                     }*/
 
                     if (event.body.name == "gel") {
-                        gelTrigger(event)
+
+                        if (!event.target.playingAudioGel) {
+                            event.target.playingAudioGel = true;
+                            setTimeout(() => {
+                                event.target.playingAudioGel = false;
+                            }, 2000);
+                        }
+
+
+                        gelTrigger(event);
+
+                        return;
                     }
 
                     if (event.body.name == "faith_plate") {
@@ -447,9 +464,9 @@ function addColliderItem(items, type, mass, offset) {
                     if (event.target.name == "radio")
                         return;
 
-                    if (Math.abs(event.target.velocity.x) > 1.5 ||
+                    if ((Math.abs(event.target.velocity.x) > 1.5 ||
                         Math.abs(event.target.velocity.y) > 1.5 ||
-                        Math.abs(event.target.velocity.z) > 1.5) {
+                        Math.abs(event.target.velocity.z) > 1.5)) {
                         event.target.sound.position.copy(event.target.position)
                         //event.target.sound.audio.currentTime = 0;
                         event.target.sound.audio.play();

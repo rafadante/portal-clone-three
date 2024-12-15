@@ -274,8 +274,6 @@ function trasnlatePlane(id, val, portal, old) {
                 item.position.copy(plane.position);
                 item.rotation.copy(plane.item.rotation);
 
-                console.log(plane)
-
                 if (plane.instancedName == "cube" || plane.instancedName == "sphere" 
                     || plane.instancedName == "cube_2" || plane.instancedName == "laser_cube" ) {
 
@@ -289,8 +287,6 @@ function trasnlatePlane(id, val, portal, old) {
                     GLOBALS.ITEMS_ADDED.getObjectByName("dispenser").instanceMatrix.needsUpdate = true;
 
                     plane.item.dispenserPosition = item2.position.clone();
-
-                    console.log("2222222222")
                 }
 
                 item.updateMatrix();
@@ -512,16 +508,12 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
                 walls = true;
                 item = GLOBALS.ENTER_DOOR;
                 allowconnection = true;
-
-                console.log(item)
             } else if (clone.position.equals(new Vector3(13, 1, 0))) {
                 hasItem = true;
                 itemName = "exitDoor";
                 walls = true;
                 item = GLOBALS.EXIT_DOOR;
                 allowconnection = true;
-
-                console.log(item)
             } else if (clone.position.equals(new Vector3(16, 7, 7))) {
                 hasItem = true;
                 itemName = "window";

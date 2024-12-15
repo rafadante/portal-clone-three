@@ -67,13 +67,17 @@ function renderThingsBefore() {
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
 
         if (GLOBALS.PLANE_USER_DATA[i].exists) {
-            const obj = new Object3D();
-            obj.position.copy(GLOBALS.PLANE_USER_DATA[i].position);
-            obj.rotation.copy(GLOBALS.PLANE_USER_DATA[i].rotation);
-            obj.side = GLOBALS.PLANE_USER_DATA[i].side;
-            obj.instanceId = GLOBALS.PLANE_USER_DATA[i].id_instanced;
-            obj.userData.planeInstancedId = GLOBALS.PLANE_USER_DATA[i].id_instanced;
-            pointInSpace.push(obj);
+            if (GLOBALS.PLANE_USER_DATA[i].itemName != "enterDoor" &&
+                GLOBALS.PLANE_USER_DATA[i].itemName != "exitDoor" &&
+                GLOBALS.PLANE_USER_DATA[i].itemName != "gel") {
+                const obj = new Object3D();
+                obj.position.copy(GLOBALS.PLANE_USER_DATA[i].position);
+                obj.rotation.copy(GLOBALS.PLANE_USER_DATA[i].rotation);
+                obj.side = GLOBALS.PLANE_USER_DATA[i].side;
+                obj.instanceId = GLOBALS.PLANE_USER_DATA[i].id_instanced;
+                obj.userData.planeInstancedId = GLOBALS.PLANE_USER_DATA[i].id_instanced;
+                pointInSpace.push(obj);
+            }
         }
 
         if (pointInSpace.length == 2) {
@@ -121,8 +125,8 @@ function viewFPS(firstRender) {
     GLOBALS.FLASH.visible = true;
 
     //ADD PORTAL AMBIENT AUDIO
-    addPositionalAudio('audio-portal-ambient', GLOBALS.PORTAL_AUDIO[0], false, true, false, 3);
-    addPositionalAudio('audio-portal-ambient', GLOBALS.PORTAL_AUDIO[1], false, true, false, 3);
+    addPositionalAudio('audio-portal-ambient', GLOBALS.PORTAL_AUDIO[0], false, true, false, 3, 'sound');
+    addPositionalAudio('audio-portal-ambient', GLOBALS.PORTAL_AUDIO[1], false, true, false, 3, 'sound');
 
     setTimeout(() => {
 
@@ -132,8 +136,8 @@ function viewFPS(firstRender) {
         //
         manageInstances();
 
-        addPositionalAudio('audio-door', GLOBALS.EXIT_DOOR, false, false, true, 8);
-        addPositionalAudio('audio-door', GLOBALS.ENTER_DOOR, false, false, true, 8);
+        addPositionalAudio('audio-door', GLOBALS.EXIT_DOOR, false, false, true, 8, 'sound');
+        addPositionalAudio('audio-door', GLOBALS.ENTER_DOOR, false, false, true, 8, 'sound');
 
         GLOBALS.UNIFORMS_LASER_FIELD.fade = 1;
         GLOBALS.MATERIAL_TRACTOR_BEAM.depthWrite = false;
@@ -172,9 +176,10 @@ function viewFPS(firstRender) {
         //----------------------------------------------
 
         setTimeout(() => {
-            if (firstRender)
+            if (firstRender) {
+                addPositionalAudio('audio-repulsion', GLOBALS.PLAYER, false, false, true, 20, 'soundRepulsion');
                 renderThingsBefore();
-            else
+            } else
                 setup();
         }, 500);
 

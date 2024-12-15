@@ -194,8 +194,6 @@ $("body").on('click', '#delete', function () {
 
 $("body").on('input', '#state-dispenser', function () {
 
-    console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserPosition)
-
     var scale;
 
     if (this.checked)

@@ -142,7 +142,7 @@ function addPelletBall(item) {
     pellets.push(energyBall);
 
     //
-    addPositionalAudio('pelletHit', ball, false, false, false, 10);
+    addPositionalAudio('pelletHit', ball, false, false, false, 10, 'sound');
 }
 
 function addPelletCatcher(item) {
