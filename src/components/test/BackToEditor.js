@@ -12,9 +12,15 @@ import { Vector3 } from 'three';
 //BACK FROM EDITOR
 $("body").on('click', '#back-editor', function () {
 
+    if (GLOBALS.ITEMS_ADDED.getObjectByName("spawn")) {
+        GLOBALS.CORRIDOR_ENTER.visible = false;
+        GLOBALS.ITEMS_ADDED.getObjectByName("spawn").visible = true;
+        GLOBALS.ENTER_DOOR.visible = true;
+    }
+
     GLOBALS.DEBUGGER_GROUP.visible = false;
 
-    GLOBALS.GROUP_LINE_TRAGECTORY.visible=true;
+    GLOBALS.GROUP_LINE_TRAGECTORY.visible = true;
     GLOBALS.STATS.dom.style.display = "none";
     GLOBALS.ROOM.visible = true;
     GLOBALS.CONTROLS.enabled = true;

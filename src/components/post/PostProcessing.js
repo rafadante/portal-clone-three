@@ -38,7 +38,7 @@ function initPost() {
     const toneMappingEffect = new ToneMappingEffect({
         mode: ToneMappingMode.ACES_FILMIC,
         //blendFunction: BlendFunction.SKIP,
-        resolution: 256,
+        resolution: 64,
         whitePoint: 4.0,
         middleGrey: 0.6,
         minLuminance: 0.01,
@@ -53,7 +53,7 @@ function initPost() {
         luminanceThreshold: 0.3,
         luminanceSmoothing: 0.2,
         radius: 0.618,
-        resolutionScale: 4,
+        resolutionScale: 1,
         //blendFunction: BlendFunction.SCREEN
     });
     selectiveBloom.selection = GLOBALS.SELECTED_FOR_BLOOM;

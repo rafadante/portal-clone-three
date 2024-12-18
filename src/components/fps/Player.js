@@ -222,6 +222,31 @@ function playerExitPurpleGel() {
     }
 }
 
+function resetPlayerBody() {
+    // Position
+    GLOBALS.PLAYER.position.setZero();
+    GLOBALS.PLAYER.previousPosition.setZero();
+    GLOBALS.PLAYER.interpolatedPosition.setZero();
+    GLOBALS.PLAYER.initPosition.setZero();
+
+    // orientation
+    GLOBALS.PLAYER.quaternion.set(0, 0, 0, 1);
+    GLOBALS.PLAYER.initQuaternion.set(0, 0, 0, 1);
+    //GLOBALS.PLAYER.previousQuaternion.set(0, 0, 0, 1);
+    GLOBALS.PLAYER.interpolatedQuaternion.set(0, 0, 0, 1);
+
+    // Velocity
+    GLOBALS.PLAYER.velocity.setZero();
+    GLOBALS.PLAYER.initVelocity.setZero();
+    GLOBALS.PLAYER.angularVelocity.setZero();
+    GLOBALS.PLAYER.initAngularVelocity.setZero();
+
+    // Force
+    GLOBALS.PLAYER.force.setZero();
+    GLOBALS.PLAYER.torque.setZero();
+}
+
 export {
-    playerExitPurpleGel
+    playerExitPurpleGel,
+    resetPlayerBody
 }

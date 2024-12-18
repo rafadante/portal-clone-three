@@ -143,13 +143,13 @@ const updatePlayer = function (deltaTime) {
             var gamepadPressed = 0;
 
             if (gamepad.axes[1] < -0.5)
-                movePlayerJoystick(forward, f, movementMultiplier, gamepadPressed)
+                movePlayerJoystick(forward, f, movementMultiplier, gamepadPressed,deltaTime)
             if (gamepad.axes[1] > 0.5)
-                movePlayerJoystick(backward, f, movementMultiplier, gamepadPressed)
+                movePlayerJoystick(backward, f, movementMultiplier, gamepadPressed,deltaTime)
             if (gamepad.axes[0] < -0.5)
-                movePlayerJoystick(left, f, movementMultiplier, gamepadPressed)
+                movePlayerJoystick(left, f, movementMultiplier, gamepadPressed,deltaTime)
             if (gamepad.axes[0] > 0.5)
-                movePlayerJoystick(right, f, movementMultiplier, gamepadPressed)
+                movePlayerJoystick(right, f, movementMultiplier, gamepadPressed,deltaTime)
         }
 
         if (GLOBALS.MOBILE && controllerIndex == null) {
@@ -174,13 +174,13 @@ const updatePlayer = function (deltaTime) {
             var posPlayer = new Vector3(GLOBALS.PLAYER.position.x, GLOBALS.PLAYER.position.y, GLOBALS.PLAYER.position.z)
 
             if (INPUT.controller["KeyW"].pressed)
-                movePlayerKeyboard(forward, posPlayer, f, movementMultiplier)
+                movePlayerKeyboard(forward, posPlayer, f, movementMultiplier,deltaTime)
             if (INPUT.controller["KeyS"].pressed)
-                movePlayerKeyboard(backward, posPlayer, f, movementMultiplier)
+                movePlayerKeyboard(backward, posPlayer, f, movementMultiplier,deltaTime)
             if (INPUT.controller["KeyA"].pressed)
-                movePlayerKeyboard(left, posPlayer, f, movementMultiplier)
+                movePlayerKeyboard(left, posPlayer, f, movementMultiplier,deltaTime)
             if (INPUT.controller["KeyD"].pressed)
-                movePlayerKeyboard(right, posPlayer, f, movementMultiplier)
+                movePlayerKeyboard(right, posPlayer, f, movementMultiplier,deltaTime)
 
             INPUT.shouldJump = false;
             // handle jumping when space bar is pressed
@@ -409,7 +409,7 @@ function setAction(action) {
     }
 }
 
-function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
+function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier, delta) {
 
     GLOBALS.PLAYER.centering = false;
 
@@ -427,7 +427,7 @@ function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier) {
 
     GLOBALS.PLAYER_MOVING = true;
     if (GLOBALS.PLAYER.mass == 0) {
-        posPlayer.add(direction.clone().multiplyScalar(0.02));
+        posPlayer.add(direction.clone().multiplyScalar(delta * 1));
         GLOBALS.PLAYER.position.copy(posPlayer);
     } else
         GLOBALS.PLAYER.applyForce(direction.clone().multiplyScalar(f * movementMultiplier), GLOBALS.PLAYER.position)

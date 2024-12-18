@@ -72,11 +72,6 @@ function raycastSelected(found, event, type) {
                 if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem) {
                     $("#delete").css("display", "block");
 
-                    if (!GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel_recharger"))
-                        $(".gel").css("display", "none");
-                    else
-                        $(".gel").css("display", "block");
-
                     if ((GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "sphere" ||
                         GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "cube" ||
                         GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "cube_2" ||
@@ -221,12 +216,21 @@ function raycastSelected(found, event, type) {
                         $(".gel_recharger").css("display", "block");
                     }
 
-                } else {
-                    $(".gel").css("display", "block");
                 }
             }
 
-            GLOBALS.SELECTED_ID.push(instanceId);
+            if (!GLOBALS.SELECTED_ID.includes(instanceId))
+                GLOBALS.SELECTED_ID.push(instanceId);
+
+            $(".gel").css("display", "block");
+
+            for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
+                if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].hasItem) {
+                    $(".gel").css("display", "none");
+                    break
+                }
+            }
+
             showMenu(event.pageX, event.pageY);
             GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(instanceId, orange);
         }
@@ -415,7 +419,10 @@ function raycastSelected(found, event, type) {
 
             if (GLOBALS.SELECTED_ID.length == 0) {
                 initialPosition = GLOBALS.PLANE_USER_DATA[instanceId].position;
-                GLOBALS.SELECTED_ID.push(instanceId);
+
+                if (!GLOBALS.SELECTED_ID.includes(instanceId))
+                    GLOBALS.SELECTED_ID.push(instanceId);
+
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.PLANE_USER_DATA[instanceId].id_instanced, orange);
                 firstSelected = instanceId;
             } else {
@@ -462,7 +469,9 @@ function raycastSelected(found, event, type) {
                                 if (plane[0]) {
                                     GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(plane[0].id_instanced, orange);
                                     GLOBALS.SELECTED_ID_ORANGE.push(plane[0]);
-                                    GLOBALS.SELECTED_ID.push(plane[0].id_instanced);
+
+                                    if (!GLOBALS.SELECTED_ID.includes(plane[0].id_instanced))
+                                        GLOBALS.SELECTED_ID.push(plane[0].id_instanced);
                                 }
                             }
                         }

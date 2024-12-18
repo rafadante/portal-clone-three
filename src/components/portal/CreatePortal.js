@@ -370,7 +370,7 @@ function validPortalPoint(point, normal, object) {
 
     if (intersects.length > 0) {
         var userData = GLOBALS.PLANE_USER_DATA[intersects[0].instanceId];
-        if (!userData.portal || intersects[0].distance > 1.1) {
+        if (!userData.portal || intersects[0].distance > 1.1 || userData.hasItem) {
             pointsChecked.push([])
             return false
         }

@@ -17,7 +17,10 @@ import {
     AnimationMixer,
     DynamicDrawUsage,
     InstancedMesh,
-    MeshStandardMaterial
+    MeshStandardMaterial,
+    Euler,
+    Quaternion,
+    SphereGeometry
 } from 'three';
 import {
     GLTFLoader
@@ -160,7 +163,7 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
 }
 
 function instancedTransform(scene, name, interactive, roughness, envIntensity, max) {
-    
+
     var geometry = scene.children[0].geometry.clone();
     geometry.computeVertexNormals();
     geometry.computeBoundsTree();
@@ -179,6 +182,8 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity, m
 
     item.instanceMatrix.needsUpdate = true;
     item.computeBoundingSphere();
+
+    //fakeLight.object.init(item, 0, true);
 
     item.name = name;
     item.receiveShadow = true;
@@ -281,6 +286,8 @@ function loadEnterDoor(scene) {
                 child.material = new MeshBasicMaterial();
                 child.material.color = new Color(0x000000);
             }
+
+            //fakeLight.object.init(child, 1, true);
         }
 
     })
@@ -371,6 +378,8 @@ function loadGunManager(scene) {
             child.receiveShadow = true;
             child.material.envMap = GLOBALS.ENV_MAP;
             child.material.envMapIntensity = 0.5;
+
+            //fakeLight.object.init(child, 1, true);
         }
 
         if (child.name == "sphere") {
@@ -642,20 +651,271 @@ GLOBALS.LIGHT_PORTAL_1 = new PointLight(new Color(1, 0.25, 0), 3, 2);
 GLOBALS.LIGHT_PORTAL_0 = new PointLight(new Color(0, 0.3, 1), 3, 2);
 GLOBALS.FLASH = new PointLight(0xff0000, 10);
 
-if (localStorage.getItem("quality-select") == "epic") {
+/*if (localStorage.getItem("quality-select") == "epic") {
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
-    //GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
 }
 
 setTimeout(() => {
     GLOBALS.LIGHT_PORTAL_0.visible = false;
     GLOBALS.LIGHT_PORTAL_1.visible = false;
     GLOBALS.FLASH.visible = false;
-}, 3000);
+}, 3000);*/
+
+/*var rA = [];
+var aRA = function (t) {
+    if (rA.includes(t) === false && t !== undefined) {
+        rA.push(t)
+    }
+};
+var rRA = function (t) {
+    var index = rA.indexOf(t);
+    if (index > -1) {
+        rA.splice(index, 1);
+    }
+};
+
+var fakeLight = {
+    object: {
+        arr: [], //fakeLight.object.arr
+        waitArr: [], //fakeLight.object.waitArr
+        init: function (object, ambientRate, force) { //fakeLight.object.init
+            fakeLight.object.waitArr.push([object, ambientRate, force]);
+            aRA(fakeLight.object.waitRun);
+        },
+        waitRun: function () { //fakeLight.object.waitRun
+            var h = fakeLight.object.waitArr.length;
+            console.log(h)
+            if (h > 0) {
+                while (h--) {
+                    var object = fakeLight.object.waitArr[h][0];
+                    var currentParent = object;
+                    while (currentParent.parent && currentParent.parent !== GLOBALS.SCENE) {
+                        currentParent = currentParent.parent;
+                    }
+                    object.worldReference = object;
+
+                    if (object.worldReference !== null) {
+                        fakeLight.object.add(fakeLight.object.waitArr[h][0], fakeLight.object.waitArr[h][1], fakeLight.object.waitArr[h][2]);
+                        var index = fakeLight.object.waitArr.indexOf(fakeLight.object.waitArr[h]);
+                        if (index > -1) {
+                            fakeLight.object.waitArr.splice(index, 1);
+                        };
+                    }
+                }
+            } else {
+                rRA(fakeLight.object.waitRun)
+            }
+        },
+        add: function (object, ambientRate, force) {
+            object.material.onBeforeCompile = function (shader) {
+                // Add a varying for the transformed normal
+                shader.vertexShader = `
+                          varying vec3 vTransformedNormal;
+                          ` + shader.vertexShader;
+
+                shader.vertexShader = shader.vertexShader.replace(
+                    `#include <worldpos_vertex>`,
+                    `
+                             #include <worldpos_vertex>
+                             vTransformedNormal = normalize(normalMatrix * normal);
+                             `
+                );
+
+                // Define the uniforms for world position, light directions, colors, intensities, and ambient light
+                shader.fragmentShader = `
+                             uniform vec3 worldPosition;
+                             uniform vec3 lightDirections[3];
+                             uniform vec3 lightColors[3];
+                             uniform float lightIntensities[3];
+                             uniform float uBaseLight;
+                             uniform vec3 uAmbientLight; // New uniform for ambient light
+                             varying vec3 vTransformedNormal;
+                       ` + shader.fragmentShader;
+
+                // Replace with the fake lighting logic using uniforms for 3 lights
+                shader.fragmentShader = shader.fragmentShader.replace(
+                    `vec4 diffuseColor = vec4( diffuse, opacity );`,
+                    `
+                           vec4 diffuseColor = vec4( diffuse, opacity );
+                           vec3 totalLight = uAmbientLight; // Start with the ambient light
+                           for(int i = 0; i < 3; i++) {
+                             float fakeDiffuse = max(dot(vTransformedNormal, lightDirections[i]), uBaseLight);
+                             totalLight += lightColors[i] * fakeDiffuse * lightIntensities[i];
+                           }
+                           diffuseColor.rgb = clamp(diffuseColor.rgb * totalLight, 0.0, 3.0);
+                           `
+                );
+
+                // Define the uniforms as you specified
+                shader.uniforms.worldPosition = { value: new Vector3() };
+                shader.uniforms.lightDirections = { value: [new Vector3(), new Vector3(), new Vector3()] };
+                shader.uniforms.lightColors = { value: [new Vector3(1, 1, 1), new Vector3(1, 1, 1), new Vector3(1, 1, 1)] };
+                shader.uniforms.lightIntensities = { value: [1.0, 1.0, 4.0] };
+                shader.uniforms.uAmbientLight = { value: new Vector3(ambientRate, ambientRate, ambientRate) }; // Default ambient light set to mid-grey
+
+                object.material.userData.shader = shader;
+            };
+
+            fakeLight.object.arr.push(object)
+        }
+    },
+    math: {
+        objectVec: undefined, //j.t.fakeLight.math.objectVec
+        directionVec: undefined, //j.t.fakeLight.math.directionVec
+        directionEuler: undefined //j.t.fakeLight.math.directionEuler
+    },
+    init: function () {
+        fakeLight.math.objectVec = new Vector3();
+        fakeLight.math.objectQuat = new Quaternion();
+        fakeLight.math.directionVec = new Vector3();
+        fakeLight.math.directionEuler = new Euler(0, 0, 0, 'XYZ');
+        aRA(this.run)
+    },
+    arr: [],
+    getF3: function (object) { //fakeLight.getF3
+        let distances = fakeLight.arr.map(function (eachLightPos) {
+            let dx = eachLightPos[0] - window.ppp.x;
+            let dy = eachLightPos[1] - window.ppp.y;
+            let dz = eachLightPos[2] - window.ppp.z;
+            return {
+                data: eachLightPos,
+                distance: dx * dx + dy * dy + dz * dz  // squared distance for performance
+            };
+        });
+
+        // Filter out lights with a distance greater than 5000^2 (since we're using squared distance for performance)
+        distances = distances.filter(lightInfo => lightInfo.distance < lightInfo.data[3] * lightInfo.data[3]);
+
+        // Sort by distance
+        distances.sort(function (a, b) {
+            return a.distance - b.distance;
+        });
+
+        // Get up to the first 3 lights
+        let closestLights = distances.slice(0, 3).map(lightInfo => [lightInfo.data[0], lightInfo.data[1], lightInfo.data[2], fakeLight.computeIntensity(Math.sqrt(lightInfo.distance), lightInfo.data[3], lightInfo.data[5]), lightInfo.data[4]]);
+
+        return closestLights;
+    },
+    computeIntensity: function (distance, maxDistance, intensity) { //fakeLight.computeIntensity
+        return Math.max(0, (1.0 - (distance / maxDistance)) * intensity);
+    },
+    run: function () { //fakeLight.run
+        //console.log("running fakeLight")
+        var h = fakeLight.object.arr.length;
+        while (h--) {
+            var object = fakeLight.object.arr[h];
+
+            if (!window.ppp)
+                return;
+
+            //console.log(window.ppp)
+
+            //console.log(object.material.userData)
+            if (object.material.userData.shader !== undefined) {
+                var worldRef = object.worldReference;
+                //console.log(window.ppp)
+                object.material.userData.shader.uniforms.worldPosition.value.copy(window.ppp);
+                //console.log(worldRef.position.x , worldRef.position.y, worldRef.position.z)
+                //var objClone = object.clone();
+                //console.log(objClone)
+                //console.log(object)
+                //object.worldReference.position.x = 2;
+                //object.worldReference.position.y = 1;
+                //object.worldReference.position.z = 2;
+                var closestThree = fakeLight.getF3(object);
+                //console.log(closestThree)
+                for (let i = 0; i < 3; i++) {
+                    if (closestThree[i]) {
+                        //console.log(worldRef.position)
+                        //worldRef.position.x = window.ppp.x;
+                        //worldRef.position.y = window.ppp.y;
+                        //worldRef.position.z = window.ppp.z;
+                        fakeLight.math.directionVec.set(closestThree[i][0] - window.ppp.x, closestThree[i][1] - window.ppp.y, closestThree[i][2] - window.ppp.z).normalize();
+                        //console.log(worldRef.quaternion)
+                        //console.log(worldRef.position)
+                        fakeLight.math.directionVec.applyQuaternion(window.qqq)
+                        object.material.userData.shader.uniforms.lightDirections.value[i].copy(fakeLight.math.directionVec);
+
+                        object.material.userData.shader.uniforms.lightIntensities.value[i] = closestThree[i][3] * 5;
+                        object.material.userData.shader.uniforms.lightColors.value[i].set(closestThree[i][4][0], closestThree[i][4][1], closestThree[i][4][2]);
+                    } else {
+                        object.material.userData.shader.uniforms.lightColors.value[i].set(1, 1, 1);
+                        object.material.userData.shader.uniforms.lightIntensities.value[i] = 0.0;
+                    }
+                }
+            }
+        };
+
+    }
+};
+
+var lightData = {};
+
+for (let i = 0; i < 0; i++) {
+    let maxDist = 2; // Just using the same maxDist for simplicity, modify as needed
+    let lightColor = [1, 0, 0]; // Random color values between 1 and 3
+    let lightIntensity = 2; // Random intensity between 1 and 2
+    lightData[i] = [maxDist, lightColor, lightIntensity];
+    console.log(lightColor)
+}
+
+var lightSpheres = [];
+var circleRadius = 8;
+let sphereGeometry = new SphereGeometry(1, 32, 32);
+for (let key in lightData) {
+    let colorArray = lightData[key][1];
+    let color = new Color(1, 0, 0); // Convert 0-2 range to 0-1 range for Color
+
+    let sphereMaterial = new MeshBasicMaterial({ color: color });
+    let lightSphere = new Mesh(sphereGeometry, sphereMaterial);
+
+    if (key < 6) {
+        let angle = (Math.PI / 3) * key; // Divide 2*PI (full circle) by 6
+        let x = 2;
+        let y = 1; // Placing the spheres a bit above the ground
+        let z = 2;
+        lightSphere.position.set(2, 1, 2);
+    } else {
+        let x = (Math.random() * 250) - 10; // Random position between -10 and 10 for x
+        let y = (Math.random() * 1.5) + 1;  // Random position between 1 and 6 for y
+        let z = (Math.random() * -250) - 20; // Random position starting from -20 for z
+        lightSphere.position.set(2, 1, 2);
+    };
+
+    GLOBALS.SCENE.add(lightSphere);
+
+    fakeLight.arr.push([lightSphere.position.x, lightSphere.position.y, lightSphere.position.z, lightData[key][0], lightData[key][1], lightData[key][2]])
+};
+
+//central light try manual one
+let sphereMaterial_center = new MeshBasicMaterial();
+let sphereMaterial = new MeshBasicMaterial({ color: 0x00f6ff });
+let lightSphere_center = new Mesh(sphereGeometry, sphereMaterial);
+GLOBALS.SCENE.add(lightSphere_center)
+lightSphere_center.position.x = 15;
+lightSphere_center.position.y = 1;
+fakeLight.arr.push([lightSphere_center.position.x, lightSphere_center.position.y, lightSphere_center.position.z, 7, [1, 0,0], 2]);
+
+//fakeLight.init();
+
+console.log(GLOBALS.SCENE)
+
+window.fakeLight = fakeLight;
+*/
+
+function animarrrr() {
+    /*var i = rA.length
+    while (i--) {
+        rA[i]()
+    };*/
+}
+
 
 export {
     loadDefault,
     load3D,
-    loadAvatar
+    loadAvatar,
+    animarrrr
 };

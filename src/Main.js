@@ -10,7 +10,7 @@ import { TWEEN } from './Tween.js';
 import { Lights } from './components/lights/Lights.js';
 import { animateShader } from "./components/shaders/AnimateShaders.js"
 import { updatePlayer, updateCamera } from './components/fps/Fps.js';
-import { loadDefault } from './components/loadObj/LoaderOBJ.js';
+import { animarrrr, loadDefault } from './components/loadObj/LoaderOBJ.js';
 import { updateRay, recreateRay } from './components/ray/Ray.js';
 import './components/test/Test.js';
 import Stats from "stats-gl";
@@ -69,6 +69,7 @@ GLOBALS.ITEM_CUBE.name = "ITEM_CUBE";
 document.getElementById("container").appendChild(GLOBALS.RENDERER.domElement);
 //
 function init() {
+    console.log(GLOBALS.SCENE)
     // SCENE
     GLOBALS.ROOM.name = "ROOM";
     GLOBALS.ITEMS_ADDED.name = "ITEMS";
@@ -96,7 +97,7 @@ function init() {
 
     envMap.dispose();
     pmremGenerator.dispose();
-    
+
     loadDefault();
     loadMaterials();
 
@@ -158,14 +159,16 @@ function fixedUpdate() { //60 fps always for physics
         updateRay(deltaTime);
     }
 
-    if (Date.now() >= timeTarget && !GLOBALS.STOP_TIME) {
+    //if (Date.now() >= timeTarget && !GLOBALS.STOP_TIME) {
 
-        const timeStep = (1 / 60);
-        GLOBALS.CANNON_WORLD.step(timeStep)
-        timeTarget += 1000 / GLOBALS.PHYSICS_UPDATEPERSEC_LIMIT
-        if (Date.now() >= timeTarget)
-            timeTarget = Date.now()
-    }
+    const timeStep = (1 / 60);
+    //GLOBALS.CANNON_WORLD.step(timeStep)
+    // Update the physics world with a fixed time step
+    GLOBALS.CANNON_WORLD.step(timeStep, deltaTime, 3);
+    //timeTarget += 1000 / GLOBALS.PHYSICS_UPDATEPERSEC_LIMIT
+    //if (Date.now() >= timeTarget)
+    //    timeTarget = Date.now()
+    //}
 }
 
 var statsBegin = false;
@@ -189,6 +192,8 @@ function render(time) {
         GLOBALS.STATS.update();
         statsBegin = true;
     }
+
+    animarrrr()
 
     fixedUpdate();
     animateShader();
@@ -223,7 +228,8 @@ function render(time) {
 
     if (localStorage.getItem("quality-select") == "epic" && GLOBALS.COMPOSER) {
         GLOBALS.COMPOSER.render();
-        GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
+        //console.log(GLOBALS.RENDERER.info);
+        //GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
     } else {
         GLOBALS.RENDERER.autoClear = false;
         GLOBALS.RENDERER.clear();

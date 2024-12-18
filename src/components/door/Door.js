@@ -62,6 +62,7 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
         setTimeout(() => {
           GLOBALS.EXIT_DOOR.add(GLOBALS.CORRIDOR_ENTER);
           corridorColliderNames(GLOBALS.CORRIDOR_ENTER, true);
+          GLOBALS.CORRIDOR_ENTER.visible = false;
           //GLOBALS.CORRIDOR_ENTER.getObjectByName("elevatorOBJ").visible = false;
           //GLOBALS.CORRIDOR_ENTER.getObjectByName("leftDoor").visible = false;
           //GLOBALS.CORRIDOR_ENTER.getObjectByName("rightDoor").visible = false;
@@ -75,6 +76,8 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
         GLOBALS.CORRIDOR_ENTER.visible = false;
         GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
       }*/
+
+        
     }, vel);
   }, timeToTrigger);
 }

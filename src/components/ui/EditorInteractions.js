@@ -464,6 +464,7 @@ function raycastManager(event, type) {
             }
 
             if (type == "up") {
+                console.log("888888888888")
                 if (intersection.length > 0)
                     addItem(intersection, false);
             }

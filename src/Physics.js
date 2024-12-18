@@ -191,9 +191,13 @@ function updatePhysics() {
                             rotateInstanced(instanced, GLOBALS.DYMANIC_ITEMS[property][i], i, -0.075)
                     }
                 } else {
+                    
                     var item = new Object3D();
                     item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
                     item.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
+
+                    //window.ppp = item.position;
+                    //window.qqq = item.quaternion;
 
                     item.updateMatrix();
                     instanced.setMatrixAt(i, item.matrix)

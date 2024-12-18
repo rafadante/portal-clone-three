@@ -31,6 +31,7 @@ import { findPath } from '../findPath/FindPath.js';
 import { levelEnteredFunction } from '../events/states.js';
 import { loadAvatar } from '../loadObj/LoaderOBJ.js';
 import { deletePortal, portalButton } from '../portal/CreatePortal.js';
+import { resetPlayerBody } from '../fps/Player.js';
 
 $("body").on('click', '#view-fps', function () {
     //
@@ -103,6 +104,8 @@ function renderThingsBefore() {
 }
 
 function viewFPS(firstRender) {
+
+    resetPlayerBody();
 
     p = 0;
     loadingTxt()
