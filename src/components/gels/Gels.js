@@ -5,7 +5,6 @@ import CANNON from 'cannon';
 import { cannonToThreeVector3, threeToCannonVector3, tweenCamera } from '../../Utils.js';
 import { AUDIO } from '../audio/Audio.js';
 import { addGelBlob } from './GelDispenser.js';
-import { animate } from '../../Main';
 
 //
 const geometryGel = new PlaneGeometry(2, 2);
@@ -162,7 +161,7 @@ function spawnInstanced(item, color, gelType, side, dynamic, size) {
 
     gelCollider(dummy, gelType, side, size, instanced, color);
 
-    instanced.instanceColor.needsUpdate = true;
+    //instanced.instanceColor.needsUpdate = true;
     instanced.instanceMatrix.needsUpdate = true;
     instanced.computeBoundingSphere();
     instanced.current += 1;
@@ -401,8 +400,6 @@ $("body").on('click', '#add-gel', function () {
             GLOBALS.SELECTED_ID[i]
         );
     }
-
-    animate();
 });
 
 function addTileGel(item, type, color, id) {
@@ -419,7 +416,7 @@ function addTileGel(item, type, color, id) {
     item.gelType = type;
     item.planeColor = color;
     GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(id, new Color(color));
-    GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+    //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
     const index = GLOBALS.GELS.indexOf(item);
     if (index <= -1) { // only splice array when item is found
@@ -444,7 +441,7 @@ $("body").on('click', '#remove-gel', function () {
 
             GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor = color;
             GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(color));
-            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+            //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
             const index = GLOBALS.GELS.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
             if (index > -1) {

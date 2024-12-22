@@ -19,9 +19,6 @@ import {
     GLOBALS
 } from '../../Globals.js';
 import { respawn } from '../events/states.js';
-import {
-    animate
-} from '../../Main.js';
 import { getPlaneByName } from '../../Utils.js';
 import { updateMaterialRepeat } from '../materials/Materials.js';
 import { fizzlerTrigger } from '../test/Colliders.js';
@@ -171,7 +168,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
         GLOBALS.PLANE_USER_DATA[otherSide[0].id_instanced].portal = false;
         GLOBALS.PLANE_USER_DATA[otherSide[0].id_instanced].planeColor = 0x808080;
         GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(otherSide[0].id_instanced, new Color(0x808080));
-        GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+        //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
     }
 
     if (otherSide.length > 0 && item != "tractor_beam") {
@@ -482,7 +479,6 @@ function ContinuousTrigger(item, trigger, elem, name) {
     }
 
     if (name == "glass") {
-        animate();
         return;
     }
 
@@ -507,8 +503,6 @@ function ContinuousTrigger(item, trigger, elem, name) {
 
     instanced.instanceMatrix.needsUpdate = true;
     instanced.computeBoundingSphere();
-
-    animate();
 }
 
 export {

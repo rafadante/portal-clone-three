@@ -516,21 +516,26 @@ function addItem(found, loaded) {
                 item.scale.set(1, 1, 1);
                 item.updateMatrix();
                 item.initialPosition = item.position.clone();
+                instanced.setVisibilityAt(idInstanced, true);
                 instanced.setMatrixAt(idInstanced, item.matrix);
 
                 if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_blue") {
                     instanced.setColorAt(idInstanced, new Color(0x0000ff));
-                    instanced.instanceColor.needsUpdate = true;
+                    //instanced.instanceColor.needsUpdate = true;
                 } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_orange") {
                     instanced.setColorAt(idInstanced, new Color(0xffa500));
-                    instanced.instanceColor.needsUpdate = true;
+                    //instanced.instanceColor.needsUpdate = true;
                 } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_white") {
                     instanced.setColorAt(idInstanced, new Color(0xffffff));
-                    instanced.instanceColor.needsUpdate = true;
+                    //instanced.instanceColor.needsUpdate = true;
                 }
 
-                instanced.instanceMatrix.needsUpdate = true;
+                
                 instanced.computeBoundingSphere();
+
+                instanced.dispose();
+
+                instanced.instanceMatrix.needsUpdate = true;
             }
 
             itemCount++;

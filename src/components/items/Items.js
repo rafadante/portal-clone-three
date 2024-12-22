@@ -11,9 +11,6 @@ import {
 } from 'three';
 import $ from 'jquery';
 import {
-    animate
-} from '../../Main.js';
-import {
     GLOBALS
 } from '../../Globals.js';
 import { clickItem } from './AddItem.js';
@@ -164,9 +161,6 @@ function hoverItem(found, connecting) {
 
     GLOBALS.ITEM_CUBE.position.copy(userData.position);
     GLOBALS.ITEM_CUBE.visible = true;
-
-    if (connecting)
-        animate();
 }
 
 function planeInstanceReset(planeInstance, hasItem, itemName, item, state, canRotate, floor, ceiling, walls, isInstanced, instancedName, allowconnection, continuousEnding) {

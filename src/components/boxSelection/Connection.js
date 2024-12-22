@@ -17,7 +17,6 @@ import {
     MathUtils
 } from 'three';
 import $ from 'jquery';
-import { animate } from '../../Main';
 import { findPath } from '../findPath/FindPath.js';
 import { targetFaithPlateEnd } from '../faithPlate/FaithPlate.js';
 
@@ -143,8 +142,6 @@ $("body").on('click', '.removeConnection', function () {
             $("#connections").append(elem);
         }
     }
-
-    animate();
 });
 
 $("body").on('mouseenter', '.removeConnection', function () {
@@ -153,7 +150,6 @@ $("body").on('mouseenter', '.removeConnection', function () {
     GLOBALS.ITEM_CUBE.translateZ(1)
     GLOBALS.ITEM_CUBE.material.color = new Color(0xff0000);
     GLOBALS.ITEM_CUBE.visible = true;
-    animate();
 });
 
 $("body").on('mouseleave', '.removeConnection', function () {

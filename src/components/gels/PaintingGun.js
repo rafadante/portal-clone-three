@@ -71,7 +71,7 @@ function gelRecharger(gel, item){
 
     const instanced = GLOBALS.ITEMS_ADDED.getObjectByName("gel_recharger");
     instanced.setColorAt(item.userData.idInstanced, getGelColor(gel));
-    instanced.instanceColor.needsUpdate = true;
+    //instanced.instanceColor.needsUpdate = true;
 }
 
 export { shootGel, fillPaintingGun, gelRecharger }

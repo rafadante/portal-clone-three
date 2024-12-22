@@ -107,7 +107,7 @@ function portalButton(button, auto, camera) {
                     //allowPortal = false;
                     tweenCamera(150, GLOBALS.GUN.children[0].position, new Vector3(GLOBALS.GUN.children[0].position.x,
                         GLOBALS.GUN.children[0].position.y,
-                        0.00005));
+                        0.003));
                     setTimeout(() => {
                         tweenCamera(150, GLOBALS.GUN.children[0].position, new Vector3(GLOBALS.GUN.children[0].position.x,
                             GLOBALS.GUN.children[0].position.y,

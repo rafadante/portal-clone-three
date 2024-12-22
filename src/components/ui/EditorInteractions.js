@@ -8,7 +8,6 @@ import {
     Vector2,
     Raycaster
 } from 'three';
-import { animate } from '../../Main';
 import {
     planeInstanceReset,
     deleteItemInstanced
@@ -67,8 +66,6 @@ $("body").on('click', '#rotate-item', function () {
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.rotation.copy(dummy.rotation);
 
     }
-
-    animate();
 });
 
 $("body").on('click', '#delete', function () {
@@ -188,8 +185,6 @@ $("body").on('click', '#delete', function () {
 
     planeInstanceReset(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false, null, null, null, null, null, null, null, false, null, false, false);
     $(".menu").removeClass("menu-show");
-
-    animate();
 });
 
 $("body").on('input', '#state-dispenser', function () {
@@ -211,8 +206,6 @@ $("body").on('input', '#state-dispenser', function () {
     dummy.updateMatrix();
     instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserID, dummy.matrix);
     instanced.instanceMatrix.needsUpdate = true;
-
-    animate();
 });
 
 $("body").on('input', '#dispenser-opened', function () {
@@ -225,8 +218,6 @@ $("body").on('input', '#state-lines', function () {
             //GLOBALS.CONNECTIONS[i]["line"].visible = this.checked;
         }
     }
-
-    animate();
 })
 
 $("body").on('input', '#state-pedetsal-infinity', function () {
@@ -273,8 +264,6 @@ $("body").on('input', '#tractor-state-input, #light-bridge-state-input, #laser-f
         else
             GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
     }
-
-    animate();
 });
 
 $("body").on('input', '#tractor-direction-input', function () {
@@ -285,8 +274,6 @@ $("body").on('input', '#tractor-direction-input', function () {
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_TRACTOR_BEAM_REVERSE;
     else
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_TRACTOR_BEAM;
-
-    animate();
 });
 
 $("body").on('click', '.tractor-triggers', function () {
@@ -342,15 +329,12 @@ $("body").on('input', '#grid-state-input', function () {
         )*/
     }
     //GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.material = GLOBALS.MATERIAL_GLASS;
-
-    animate()
 });
 
 //
 document.getElementById("container").addEventListener('pointerdown', onDocumentMouseDown, false);
 document.getElementById("container").addEventListener('pointermove', onDocumentMouseMove, false);
 document.getElementById("container").addEventListener('pointerup', onDocumentMouseUp, false);
-document.getElementById("container").addEventListener('wheel', onDocumentMouseWheel, false);
 
 $(document).on('keypress', function (event) {
     if (!GLOBALS.FPS_MODE) {
@@ -365,19 +349,13 @@ $(document).on('keypress', function (event) {
                 justClicked = false;
             }, 100);
         }
-        animate();
     }
 });
 
 function onDocumentMouseDown(event) {
     if (!GLOBALS.FPS_MODE) {
         raycastManager(event, "down");
-        animate();
     }
-}
-
-function onDocumentMouseWheel() {
-    animate();
 }
 
 function onDocumentMouseMove(event) {
@@ -386,7 +364,6 @@ function onDocumentMouseMove(event) {
         mouse2.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
         raycastManager(event, "move");
-        animate()
     }
 }
 
@@ -398,7 +375,7 @@ function onDocumentMouseUp(event) {
             window.faithPlateMoved.portal = false;
             window.faithPlateMoved.planeColor = 0x808080;
             GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(window.faithPlateMoved.id_instanced, new Color(0x808080));
-            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+            //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
             targetFaithPlateStart(window.faithPlateMoved.item);
         }
 
@@ -428,7 +405,6 @@ function onDocumentMouseUp(event) {
             GLOBALS.ITEM_CUBE.visible = false;
         }
 
-        animate();
         window.faithPlateMoved = null;
     }
 }
@@ -514,7 +490,7 @@ $("body").on('click', '#portalable', function () {
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(0x808080));
             }
 
-            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+           // GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
         }
     }
 
@@ -649,5 +625,4 @@ $("body").on('click', '.angled_panel_option', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.angle = $(this).data("angle");
 
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.getObjectByName("pivot2").rotation.x = Math.PI / 180 * $(this).data("real");
-    animate();
 })

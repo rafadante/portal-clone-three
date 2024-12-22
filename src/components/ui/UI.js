@@ -87,7 +87,7 @@ $('#quality-select').on('change', function () {
         $("#resolution-select").val(1).change();
         $("#shadows-resolution-select").val(4096).change();
         localStorage.setItem("antialising", true);
-        //GLOBALS.RENDERER.shadowMap.autoUpdate = true;
+        GLOBALS.RENDERER.shadowMap.autoUpdate = true;
     }
 
     /*if (window.loaded) {

@@ -87,7 +87,7 @@ const renderer = new WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.canvasWidth, window.canvasHeight);
 renderer.outputColorSpace = SRGBColorSpace;
-renderer.toneMapping = NeutralToneMapping;;
+renderer.toneMapping = ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1;
 renderer.shadowMap.enabled = shadowMap;
 renderer.shadowMap.type = PCFSoftShadowMap;
@@ -95,7 +95,8 @@ renderer.shadowMap.needsUpdate = true;
 renderer.localClippingEnabled = true;
 renderer.physicallyCorrectLights = true;
 renderer.domElement.id = "viewer-3d";
-renderer.shadowMap.autoUpdate = false;
+renderer.shadowMap.autoUpdate = true;
+renderer.info.autoReset = false;
 
 console.log(renderer)
 
@@ -206,6 +207,7 @@ var GLOBALS = {
     PLAYER_MODEL_CLONE: null,
     PLAYER_ANIMATIONS: null,
     MIXERS: null,
+    MIXERS_CLONE: null,
     BOX_BODY: [],
     SPHERE_BODY: [],
     TRIGGER: {
@@ -337,7 +339,7 @@ var GLOBALS = {
     IMG_CHECK: null,
     IMG_CLOSE: null,
 
-    SMOOTHNESS: 0.2,
+    SMOOTHNESS: 0.1,
 
     GOO_PLANES: [],
     GOO_BOXES: [],
@@ -847,7 +849,7 @@ var GLOBALS = {
     GOO_REFLECTIONS: false,
     CUSTOM_GRAVITY: [],
     SPEED: 1,
-    HEAD_BOB_SPEED: 5,
+    HEAD_BOB_SPEED: 6,
     ANGLED_PANELS: [],
     INSTANCED_WHITE_GEL: [],
     GEL_TRIGGER: [],

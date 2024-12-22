@@ -491,7 +491,6 @@ function laserEmitterPosition(item, trigger, elem, name) {
     instanced.computeBoundingSphere();
 
     if (name == "laser_receiver") {
-        animate();
         return;
     }
 
@@ -503,8 +502,6 @@ function laserEmitterPosition(item, trigger, elem, name) {
             GLOBALS.LASER_EMITTER_RAYCASTER[i],
             i);
     }
-
-    animate();
 }
 
 export {

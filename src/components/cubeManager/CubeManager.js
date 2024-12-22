@@ -7,7 +7,8 @@ import {
     BoxGeometry,
     MeshBasicMaterial,
     Mesh,
-    Box3
+    Box3,
+    DynamicDrawUsage
 } from 'three';
 import { GLOBALS } from '../../Globals.js';
 import { getPlaneByName, warning } from '../../Utils.js';
@@ -15,6 +16,7 @@ import { checkToUpdateContinuous } from './UpdateRaycast.js';
 import { removeSelection } from '../boxSelection/BoxSelection.js';
 import { updateLines } from '../items/AddItem.js';
 import { addLine } from '../boxSelection/Connection.js';
+import { InstancedMesh2, createRadixSort } from '@three.ez/instanced-mesh';
 
 var IndexArray = [];
 var remove;
@@ -77,7 +79,7 @@ function cubeState(button) {
         erase.updateMatrix();
         GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(IndexArray[i], erase.matrix);
         GLOBALS.PLANE_USER_DATA[IndexArray[i]] = {};
-        GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
+        //GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
 
         GLOBALS.BUDGET += 1;
@@ -188,7 +190,7 @@ function trasnlatePlane(id, val, portal, old) {
     if (frontExists.length > 0) {
 
         GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(id, new Color(0xffffff));
-        GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+        //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
         var erase = new Object3D();
         erase.scale.set(0, 0, 0);
@@ -197,7 +199,7 @@ function trasnlatePlane(id, val, portal, old) {
         GLOBALS.PLANE_USER_DATA[id] = {};
 
         GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(frontExists[0].id_instanced, new Color(0xffffff));
-        GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+        //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
         //---------------------------------------
         var erase = new Object3D();
@@ -274,8 +276,8 @@ function trasnlatePlane(id, val, portal, old) {
                 item.position.copy(plane.position);
                 item.rotation.copy(plane.item.rotation);
 
-                if (plane.instancedName == "cube" || plane.instancedName == "sphere" 
-                    || plane.instancedName == "cube_2" || plane.instancedName == "laser_cube" ) {
+                if (plane.instancedName == "cube" || plane.instancedName == "sphere"
+                    || plane.instancedName == "cube_2" || plane.instancedName == "laser_cube") {
 
                     item.translateY(1);
 
@@ -346,7 +348,7 @@ function checkSides(dummy, val, id, side, portal) {
         }
 
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
-        GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+        //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
 
         dummy.position.copy(dummy.position.round());
@@ -417,21 +419,33 @@ function buildIniCubes(obj) {
         const geometry = new PlaneGeometry(2, 2);
         geometry.computeBoundsTree();
 
-        GLOBALS.PLANE_LEVEL_INSTANCED = new InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
+        GLOBALS.PLANE_LEVEL_INSTANCED = new InstancedMesh2(geometry, GLOBALS.MATERIAL_PORTAL_EDITOR);
+        GLOBALS.PLANE_LEVEL_INSTANCED.sortObjects = true;
+        GLOBALS.PLANE_LEVEL_INSTANCED.customSort = createRadixSort(GLOBALS.PLANE_LEVEL_INSTANCED);
+
+        GLOBALS.PLANE_LEVEL_INSTANCED.addInstances(GLOBALS.BUDGET, (obj, index) => {
+            obj.position.x = index;
+        });
+    
+        GLOBALS.PLANE_LEVEL_INSTANCED.raycastOnlyFrustum = true;
+        GLOBALS.PLANE_LEVEL_INSTANCED.computeBVH();
+
+        //GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.setUsage(DynamicDrawUsage); // will be updated every frame
+
         GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = false;
         GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = false;
         GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
         GLOBALS.CUBES.add(GLOBALS.PLANE_LEVEL_INSTANCED);
 
-        var clone = new Object3D();
+        /*var clone = new Object3D();
 
         for (var i = 0; i < GLOBALS.BUDGET; i++) {
             clone.scale.set(0, 0, 0);
             clone.position.set(100000, 100000, 100000);
             clone.updateMatrix();
             GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(i, clone.matrix);
-        }
+        }*/
 
         //GROUND
         buildLayer(-1, -1, 0, 'x', 'z', 'y', 6, 8, "down", new Vector3(-Math.PI / 2, 0, 0), new Vector3(0, 0, 0));
@@ -448,6 +462,8 @@ function buildIniCubes(obj) {
 
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
+
+
     }
 }
 

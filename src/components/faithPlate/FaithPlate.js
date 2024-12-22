@@ -15,7 +15,6 @@ import { GLOBALS } from "../../Globals.js";
 import { AUDIO, fadeAudio, play } from "../audio/Audio.js";
 import * as CANNON from 'cannon';
 import $ from 'jquery';
-import { animate } from "../../Main.js";
 
 //TARGET
 const map = new TextureLoader().load('./assets/textures/target.png');
@@ -207,8 +206,6 @@ $('#plate-max-height-value').on('change', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.position.y + parseInt(this.value),
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.target
   )
-
-  animate();
 });
 
 $('#faith-plate-line').on('change', function () {

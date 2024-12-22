@@ -104,7 +104,7 @@ function addBody(obj, type, color, material) {
             else
                 instanced.setColorAt(event.body.item.userData.idInstanced, gelBlob.colorGel);
 
-            instanced.instanceColor.needsUpdate = true;
+            //instanced.instanceColor.needsUpdate = true;
         }
 
         gelBlob.sphereClone.visible = false;

@@ -4,7 +4,8 @@ import {
     InstancedMesh,
     Color,
     BatchedMesh,
-    Matrix4
+    Matrix4,
+    DynamicDrawUsage
 } from 'three';
 import {
     GLOBALS
@@ -20,8 +21,10 @@ import {
     MeshLineGeometry,
     MeshLineMaterial
 } from 'meshline';
+import { InstancedMesh2 } from '@three.ez/instanced-mesh';
 
 var id = 0;
+var first = true;
 
 function manageInstances() {
 
@@ -97,22 +100,26 @@ function manageInstances() {
     let percentages = [5, 85, 5, 5];
     var arr = shuffle(meshesWallPortal);
     let result = groupByPercentage(arr, percentages);
-    createInstances(result[0], GLOBALS.MATERIAL_WALL_PORTAL);
-    createInstances(result[1], GLOBALS.MATERIAL_WALL_PORTAL2);
-    createInstances(result[2], GLOBALS.MATERIAL_WALL_PORTAL3);
-    createInstances(result[3], GLOBALS.MATERIAL_WALL_PORTAL4);
+    createInstances(result[0], GLOBALS.MATERIAL_WALL_PORTAL, 0);
+    createInstances(result[1], GLOBALS.MATERIAL_WALL_PORTAL2, 1);
+    createInstances(result[2], GLOBALS.MATERIAL_WALL_PORTAL3, 2);
+    createInstances(result[3], GLOBALS.MATERIAL_WALL_PORTAL4, 3);
     //
     percentages = [50, 50];
     arr = shuffle(meshesWallNonPortal);
     result = groupByPercentage(arr, percentages);
-    createInstances(result[0], GLOBALS.MATERIAL_WALL_NON_PORTAL)
-    createInstances(result[1], GLOBALS.MATERIAL_WALL_NON_PORTAL2)
+    createInstances(result[0], GLOBALS.MATERIAL_WALL_NON_PORTAL, 4)
+    createInstances(result[1], GLOBALS.MATERIAL_WALL_NON_PORTAL2, 5)
     //
-    createInstances(meshesFloorPortal, GLOBALS.MATERIAL_FLOOR_PORTAL)
-    createInstances(meshesFloorNonPortal, GLOBALS.MATERIAL_FLOOR_NON_PORTAL)
+    createInstances(meshesFloorPortal, GLOBALS.MATERIAL_FLOOR_PORTAL, 6)
+    createInstances(meshesFloorNonPortal, GLOBALS.MATERIAL_FLOOR_NON_PORTAL, 7)
+
+    first = false;
 }
 
-function createInstances(meshes, material) {
+window.instances = [];
+
+function createInstances(meshes, material, index) {
 
     if (meshes.length == 0)
         return;
@@ -123,7 +130,23 @@ function createInstances(meshes, material) {
 
     const geometry = new PlaneGeometry(2, 2);
     geometry.computeBoundsTree();
-    var mesh = new InstancedMesh(geometry.clone(), material, meshes.length);
+
+    var mesh;
+
+    if(first){
+        mesh = new InstancedMesh2(geometry.clone(), material);
+        window.instances.push(mesh)
+    }else{
+        mesh = window.instances[index];
+    }
+    
+
+    console.log(mesh)
+
+    mesh.addInstances(meshes.length, (obj, index) => {
+        obj.visible = false;
+    });
+
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     mesh.name = "Instanced-" + id;
@@ -164,6 +187,7 @@ function createInstances(meshes, material) {
         dummy.updateMatrix();
 
         mesh.setMatrixAt(i, dummy.matrix);
+        mesh.setVisibilityAt(i, true);
     }
 
     GLOBALS.SCENE.remove(leftWindowObsRoom)

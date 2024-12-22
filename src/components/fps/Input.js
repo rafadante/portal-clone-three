@@ -155,11 +155,11 @@ document.addEventListener('keydown', (event) => {
         if (event.code == "ControlLeft" && !INPUT.crouched) {
             INPUT.crouched = true;
             Crouch(-0.25);
-        } else if (event.code == "KeyE" && !holdDown){
+        } else if (event.code == "KeyE" && !holdDown) {
             holdDown = true;
             interactWithItem();
         }
-            
+
     }
 });
 
@@ -174,8 +174,53 @@ $("body").on('click', '#item', function () {
     interactWithItem();
 })
 
+window.blockCamRotation = false;
+var timeout;
+
+const pitchLimit = Math.PI / 2;  // Max vertical rotation (90 degrees)
+const yawLimit = Math.PI * 2;    // Full horizontal rotation (360 degrees)
+
+document.body.addEventListener('mousemove', (event) => {
+
+    if (document.pointerLockElement === document.body && !GLOBALS.PAUSED) {
+
+        GLOBALS.MAIN_CAMERA.rotation.y -= event.movementX / 1000;
+        GLOBALS.MAIN_CAMERA.rotation.x -= event.movementY / 1000;
+
+        // Apply vertical rotation limit (prevent camera from rotating beyond certain pitch)
+        GLOBALS.MAIN_CAMERA.rotation.x = Math.max(
+            -pitchLimit, Math.min(pitchLimit, GLOBALS.MAIN_CAMERA.rotation.x)
+        );
+
+        // Apply horizontal rotation limit (wrap around to avoid large values)
+        if (GLOBALS.MAIN_CAMERA.rotation.y > Math.PI) {
+            GLOBALS.MAIN_CAMERA.rotation.y -= yawLimit; // Wrap around if rotation exceeds 360°
+        } else if (GLOBALS.MAIN_CAMERA.rotation.y < -Math.PI) {
+            GLOBALS.MAIN_CAMERA.rotation.y += yawLimit; // Wrap around if rotation goes below -360°
+        }
+
+        if (!GLOBALS.TELEPORTING_TARGET_QUATERNION)
+            GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, 0.075);
+
+        window.blockCamRotation = true;
+
+        clearTimeout(timeout);
+        timeout = setTimeout(function () { window.blockCamRotation = false; }, 10);
+    }
+
+});
+
 $("body").on('click', '#settings-close', function () {
     if (GLOBALS.FPS_MODE && allowEnterFPS) {
+
+        play(AUDIO.AMBIENT);
+
+        document.getElementById('blocker').style.display = 'none';
+        GLOBALS.PAUSED = false;
+
+        setTimeout(() => {
+            GLOBALS.ALLOW_PLACE_PORTALS = true;
+        }, 1000);
 
         INPUT.controller = {
             "KeyE": {
@@ -254,9 +299,29 @@ function openFullscreen() {
     }
 }
 
+// Detect pointer lock changes
+document.addEventListener('pointerlockchange', () => {
+    if (document.pointerLockElement === document.body) {
+        console.log('Pointer is now locked');
+        // The pointer is locked, you can enable FPS controls or hide the cursor
+    } else {
+        console.log('Pointer is unlocked');
+        // The pointer is unlocked, you can restore the cursor or stop FPS controls
+        $("#container").css("filter", "blur(2px)")
+        document.getElementById('blocker').style.display = 'block';
+        GLOBALS.ALLOW_PLACE_PORTALS = false;
+        allowEnterFPS = false;
+        GLOBALS.PAUSED = true;
+
+        setTimeout(() => {
+            allowEnterFPS = true;
+        }, 1500);
+    }
+});
+
 function controlsLock() {
-    GLOBALS.POINTER_CONTROLS = new PointerLockControls(GLOBALS.MAIN_CAMERA, document.body);
-    GLOBALS.POINTER_CONTROLS.pointerSpeed = 0.5;
+    /*GLOBALS.POINTER_CONTROLS = new PointerLockControls(GLOBALS.MAIN_CAMERA, document.body);
+    GLOBALS.POINTER_CONTROLS.pointerSpeed = 1;
 
     GLOBALS.POINTER_CONTROLS.addEventListener('lock', function () {
 
@@ -280,12 +345,12 @@ function controlsLock() {
         setTimeout(() => {
             allowEnterFPS = true;
         }, 1500);
-    });
+    });*/
 }
 
 document.addEventListener('keyup', (event) => {
 
-    if(!GLOBALS.FPS_MODE)
+    if (!GLOBALS.FPS_MODE)
         return;
 
     holdDown = false;
@@ -322,7 +387,7 @@ $("body").on('pointerup', '#crouch', function () {
 
 document.addEventListener('mousedown', (event) => {
     if (!GLOBALS.MOBILE && document.pointerLockElement !== null)
-        portalButton(event.button,null,GLOBALS.MAIN_CAMERA)
+        portalButton(event.button, null, GLOBALS.MAIN_CAMERA)
 });
 
 //LEFT PORTAL MOBILE
@@ -330,14 +395,14 @@ document.getElementById("portal_l").addEventListener('pointerdown', portal_l_Tou
 
 function portal_l_Touch() {
     GLOBALS.ALLOW_PLACE_PORTALS = true;
-    portalButton(0,null,GLOBALS.MAIN_CAMERA);
+    portalButton(0, null, GLOBALS.MAIN_CAMERA);
 }
 //RIGHT PORTAL MOBILE
 document.getElementById("portal_r").addEventListener('pointerdown', portal_r_Touch, false);
 
 function portal_r_Touch() {
     GLOBALS.ALLOW_PLACE_PORTALS = true;
-    portalButton(2,null,GLOBALS.MAIN_CAMERA)
+    portalButton(2, null, GLOBALS.MAIN_CAMERA)
 }
 //JUMP MOBILE
 document.getElementById("jump").addEventListener('pointerdown', jumpTouch, false);

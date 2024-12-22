@@ -23,6 +23,15 @@ import './components/gels/Gels.js';
 import { GLOBALS } from './Globals.js';
 import { teleportationState } from './components/portal/Teleportation.js';
 import { hideMaterial } from "./Utils.js";
+import { ThreePerf } from 'three-perf'
+
+const perf = new ThreePerf({
+    anchorX: 'right',
+    anchorY: 'bottom',
+    domElement: document.body, // or other canvas rendering wrapper
+    renderer: GLOBALS.RENDERER, // three js renderer instance you use for rendering
+    showGraph: true,
+});
 
 //VARIABLES
 var angleHolder = 0;
@@ -41,7 +50,7 @@ let mainContainer = document.createElement('div');
 mainContainer.id = 'main-container';
 document.body.appendChild(mainContainer);
 
-GLOBALS.STATS = new Stats({
+/*GLOBALS.STATS = new Stats({
     trackGPU: true,
     trackHz: true,
     trackCPT: true,
@@ -56,7 +65,7 @@ GLOBALS.STATS = new Stats({
 });
 mainContainer.appendChild(GLOBALS.STATS.dom);
 GLOBALS.STATS.init(GLOBALS.RENDERER);
-GLOBALS.STATS.dom.style.display = "none";
+GLOBALS.STATS.dom.style.display = "none";*/
 //
 const geometry = new BoxGeometry(2, 2, 2);
 const material = new MeshBasicMaterial({
@@ -127,11 +136,12 @@ function onWindowResize() {
 }
 
 GLOBALS.RENDERER.info.autoReset = true;
+GLOBALS.RENDERER.setAnimationLoop( animate );
 
 function animate(time) {
 
-    if (GLOBALS.FPS_MODE)
-        requestAnimationFrame(animate);
+    //if (GLOBALS.FPS_MODE)
+    //    requestAnimationFrame(animate);
 
     if (!GLOBALS.FPS_MODE) {
         //GLOBALS.COMPOSER.render();
@@ -189,7 +199,7 @@ else if (localStorage.getItem("quality-select") != "high")
 function render(time) {
 
     if (GLOBALS.LEVEL_ENTERED) {
-        GLOBALS.STATS.update();
+        //GLOBALS.STATS.update();
         statsBegin = true;
     }
 
@@ -227,6 +237,12 @@ function render(time) {
     GLOBALS.RENDERER.clippingPlanes = [];
 
     if (localStorage.getItem("quality-select") == "epic" && GLOBALS.COMPOSER) {
+        GLOBALS.RENDERER.autoClear = false;
+        GLOBALS.RENDERER.clear();
+        GLOBALS.RENDERER.info.reset();
+        perf.begin();
+        GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+        perf.end();
         GLOBALS.COMPOSER.render();
         //console.log(GLOBALS.RENDERER.info);
         //GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
@@ -238,6 +254,9 @@ function render(time) {
         GLOBALS.RENDERER.clearDepth()
         GLOBALS.RENDERER.render(GLOBALS.GUN_GROUP, GLOBALS.PORTAL_GUN_CAMERA);
     }
+
+    
+
 }
 
 function animatePortal() {
@@ -456,6 +475,5 @@ function portalIsVisibleInCamera(camera, portal, clippingPlane) {
 }
 
 export {
-    animate,
     init
 };

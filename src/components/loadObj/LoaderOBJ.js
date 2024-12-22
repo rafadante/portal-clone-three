@@ -31,9 +31,6 @@ import {
 } from '../cubeManager/CubeManager.js';
 import $, { globalEval } from 'jquery';
 import {
-    animate
-} from '../../Main.js';
-import {
     loadLevelJSON
 } from '../mainMenu/MainMenu.js';
 import {
@@ -43,6 +40,7 @@ import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { hex2rgb } from '../../Utils.js';
 import { viewFPS } from '../test/Test.js';
 import { addItem } from '../items/AddItem.js';
+import { InstancedMesh2 } from '@three.ez/instanced-mesh';
 
 var defaultLoaded = 0;
 var fpsDefaultLoaded = 0;
@@ -83,7 +81,6 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
     };
 
     manager.onLoad = function () {
-        animate();
 
         if (defaultLoaded < 3) {
 
@@ -168,20 +165,28 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity, m
     geometry.computeVertexNormals();
     geometry.computeBoundsTree();
 
-    var item = new InstancedMesh(geometry, scene.children[0].material.clone(), max);
-    item.instanceMatrix.setUsage(DynamicDrawUsage); // will be updated every frame
+    const item = new InstancedMesh2(geometry, scene.children[0].material.clone());
 
-    var clone = new Object3D();
+    item.addInstances(max, (obj, index) => {
+        obj.visible = false;
+    });
+
+    //item.instanceMatrix.setUsage(DynamicDrawUsage); // will be updated every frame
+
+    /*var clone = new Object3D();
 
     for (var i = 0; i < max; i++) {
         clone.scale.set(0, 0, 0);
         clone.position.set(100000, 100000, 100000);
         clone.updateMatrix();
         item.setMatrixAt(i, clone.matrix);
-    }
+    }*/
 
-    item.instanceMatrix.needsUpdate = true;
-    item.computeBoundingSphere();
+
+    //item.computeBoundingSphere();
+    //item.geometry.computeBoundingBox();
+    //item.geometry.boundingBox.expandByScalar(0.01); // Adjust as needed
+
 
     //fakeLight.object.init(item, 0, true);
 
@@ -192,6 +197,8 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity, m
     item.material.envMapIntensity = envIntensity;
     item.material.roughness = roughness;
     item.frustumCulled = true;
+
+    item.instanceMatrix.needsUpdate = true;
 
     if (interactive)
         GLOBALS.INTERACTIVE.push(item);
@@ -359,9 +366,11 @@ function loadGunManager(scene) {
     var newGroup = new Group();
 
     GLOBALS.GUN.add(newGroup);
-    newGroup.add(scene);
+
 
     GLOBALS.GUN_CLONE = new Group();
+    newGroup.add(scene);
+
     var gunClone = scene.clone();
     gunClone.rotation.x = MathUtils.degToRad(10);
     gunClone.position.set(-0.05, 0.075, -0.1)
@@ -417,9 +426,17 @@ function loadGunManager(scene) {
     }
 
     GLOBALS.GUN.name = "GUN";
+
+    console.log(GLOBALS.GUN)
     GLOBALS.GUN_GROUP.add(GLOBALS.GUN);
-    scene.scale.set(0.001, 0.001, 0.001)
-    scene.position.set(0.00009, -0.00013, -0.00012);
+    //scene.scale.set(0.0015, 0.0015, 0.0015)
+    //scene.position.set(0.00009, -0.00013, -0.00012);
+    //scene.rotation.y = -Math.PI/15;
+    //scene.rotation.x = -Math.PI/10;
+
+    scene.scale.set(0.07, 0.07, 0.05)
+    scene.position.set(0.007, -0.01, -0.0095);
+    scene.rotation.y = -0.1;
 
     GLOBALS.GUN_CLONE.scale.setScalar(0.7);
     GLOBALS.GUN_CLONE2.scale.setScalar(0.7);
@@ -508,9 +525,12 @@ function loadAvatar() {
 
         GLOBALS.PLAYER_MODEL = fbx;
         GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
+        GLOBALS.MIXERS_CLONE = new AnimationMixer(GLOBALS.PLAYER_MODEL_CLONE)
 
         GLOBALS.PLAYER_MODEL.position.y = 100000;
         GLOBALS.PLAYER_MODEL_CLONE.position.y = 100000;
+
+        console.log(GLOBALS.PLAYER_MODEL_CLONE)
 
         if ((!GLOBALS.MOBILE && (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high"))
             || (window.playerState)) {
@@ -519,6 +539,7 @@ function loadAvatar() {
         }
 
         GLOBALS.PLAYER_MODEL.animationActions = {};
+        GLOBALS.PLAYER_MODEL_CLONE.animationActions = {};
         GLOBALS.PLAYER_MODEL.modelReady = true;
     }).then(() => {
         let animationPromises = []
@@ -528,6 +549,9 @@ function loadAvatar() {
             anim.then((anim) => {
                 const animationAction = GLOBALS.MIXERS.clipAction(anim.animations[0])
                 GLOBALS.PLAYER_MODEL.animationActions[index] = animationAction
+
+                const animationActionClone = GLOBALS.MIXERS_CLONE.clipAction(anim.animations[0])
+                GLOBALS.PLAYER_MODEL_CLONE.animationActions[index] = animationActionClone;
             })
             animationPromises.push(anim)
         }

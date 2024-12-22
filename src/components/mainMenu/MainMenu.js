@@ -465,7 +465,7 @@ function loadLevel(data) {
             else
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(i, new Color().setHex(0x808080));
 
-            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+            //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
             var planeColor = 0x808080;
 

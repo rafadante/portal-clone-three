@@ -6,7 +6,7 @@ import * as CANNON from 'cannon';
 import {
     GLOBALS
 } from '../../Globals.js';
-import { AUDIO, fadeAudio, play } from '../audio/Audio.js';
+import { AUDIO, fadeAudio, play, addPositionalAudio } from '../audio/Audio.js';
 import { faithPlate } from '../faithPlate/FaithPlate.js';
 import { gelTrigger } from '../gels/Gels.js';
 import { tweenCamera } from '../../Utils.js';
@@ -65,7 +65,7 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
         if (event.target.OrangeContact) {
             event.target.OrangeContact = false;
             GLOBALS.SPEED = 1;
-            GLOBALS.HEAD_BOB_SPEED = 5;
+            GLOBALS.HEAD_BOB_SPEED = 6;
             AUDIO.WALK.volume = 0.25;
             fadeAudio(AUDIO.PROPULSION)
         }
@@ -126,6 +126,8 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
     if (GLOBALS.PLAYER.inJump) {
         play(AUDIO.JUMP)
     }
+
+    addPositionalAudio('audio-repulsion', GLOBALS.PLAYER, false, false, true, 20, 'soundRepulsion');
 })
 
 GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
@@ -177,7 +179,7 @@ for (let d of GLOBALS.DYNAMIC_OBJECTS) {
 
 function playerExitPurpleGel() {
 
-    GLOBALS.HEAD_BOB_SPEED = 5;
+    GLOBALS.HEAD_BOB_SPEED = 6;
     GLOBALS.PLAYER.PURPLE_CONTACT = false;
     GLOBALS.PLAYER.customGravity = null;
     GLOBALS.PLAYER.side = null;

@@ -7,9 +7,6 @@ import {
 } from 'three';
 import $ from 'jquery';
 import {
-    animate
-} from '../../Main.js';
-import {
     GLOBALS
 } from '../../Globals.js';
 import {
@@ -192,7 +189,7 @@ function viewFPS(firstRender) {
 
         GLOBALS.SCENE.environment = null;
         GLOBALS.LIGHT_GROUP.visible = true;
-        GLOBALS.STATS.dom.style.display = "block";
+        //GLOBALS.STATS.dom.style.display = "block";
         GLOBALS.OBSERVATION_ROOM.visible = true;
         GLOBALS.SCENE.getObjectByName("window").visible = false;
         //--------------------------------------------------------------------------
@@ -240,7 +237,6 @@ function viewFPS(firstRender) {
             child.frustumCulled = true;
         })
 
-        animate();
         testLightsManager();
 
         //GLOBALS.SCENE.background = new Color(0x000000);//0xff0000
@@ -287,8 +283,6 @@ function viewFPS(firstRender) {
             stateDoor(0, true, false, GLOBALS.EXIT_DOOR);*/
 
         GLOBALS.GROUP_LINE_TRAGECTORY.visible = false;
-
-        animate()
 
         if (GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic" && localStorage.getItem("quality-select") != "high"))
             GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;

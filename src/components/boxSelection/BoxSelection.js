@@ -479,7 +479,7 @@ function raycastSelected(found, event, type) {
                 }
             }
 
-            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+            //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
         }
     }
 }
@@ -491,7 +491,7 @@ function removeSelection() {
         if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor) {
             GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor));
 
-            GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+            //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
         }
 
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].selected = false;

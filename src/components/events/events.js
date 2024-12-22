@@ -303,7 +303,7 @@ function interactWithItem() {
   if (GLOBALS.HOLDING_ITEM) {
 
     AUDIO.HOLD.pause();
-    tweenCamera(250, GLOBALS.GUN.children[0].children[0].position, new Vector3(0.00009, -0.00013, -0.00012))
+    tweenCamera(250, GLOBALS.GUN.children[0].children[0].position, new Vector3(0.007, -0.01, -0.0095))
     GLOBALS.HOLDING_ITEM = false;
 
     if (itemHolder) {
@@ -415,8 +415,8 @@ function interactWithItem() {
           //return;
         }
 
-        GLOBALS.HOLDING_ITEM = true;
-        tweenCamera(250, GLOBALS.GUN.children[0].children[0].position, new Vector3(0.00009, -0.00013, -0.00001))
+        GLOBALS.HOLDING_ITEM = true;//0.00009, -0.00013, -0.00012
+        tweenCamera(250, GLOBALS.GUN.children[0].children[0].position, new Vector3(0.007, -0.01, -0.004))
 
         if (intersects[0].object.name != "camera") {
           GLOBALS.CURRENT_ITEM = GLOBALS.DYMANIC_ITEMS[name][instancedId];
