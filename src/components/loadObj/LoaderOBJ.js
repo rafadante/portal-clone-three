@@ -119,6 +119,8 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
 
     manager.onProgress = function (url, itemsLoaded, itemsTotal) { };
 
+    console.log(path)
+
     loader2.load(path, async function (glb) {
 
         const scene = glb.scene;
@@ -165,7 +167,7 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity, m
     geometry.computeVertexNormals();
     geometry.computeBoundsTree();
 
-    const item = new InstancedMesh2(geometry, scene.children[0].material.clone());
+    const item = new InstancedMesh2(geometry, scene.children[0].material.clone(), { createInstances: true });
 
     item.addInstances(max, (obj, index) => {
         obj.visible = false;
@@ -296,7 +298,6 @@ function loadEnterDoor(scene) {
 
             //fakeLight.object.init(child, 1, true);
         }
-
     })
     //
     GLOBALS.EXIT_DOOR = SkeletonUtils.clone(GLOBALS.ENTER_DOOR);

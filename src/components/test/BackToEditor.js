@@ -125,7 +125,7 @@ $("body").on('click', '#back-editor', function () {
 
     resetAll();
 
-    const dynamics = ["cube", "cube_2", "radio", "sphere", "laser_cube"]
+    const dynamics = ["cube", "cube_2", "radio", "sphere", "laser_cube", "scale_cube"]
 
     for (var i = 0; i < dynamics.length; i++) {
         for (var j = 0; j < GLOBALS.DYMANIC_ITEMS[dynamics[i]].length; j++) {

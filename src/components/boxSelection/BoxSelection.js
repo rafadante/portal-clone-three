@@ -17,7 +17,7 @@ import {
     getPlaneByName,
     warning
 } from '../../Utils.js';
-import { clickItem, updateLines } from '../items/AddItem.js';
+import { addConnectionPoints, clickItem, updateLines } from '../items/AddItem.js';
 import { manageConnection } from './Connection.js';
 
 const orange = new Color("rgb(255, 165, 0)");
@@ -39,7 +39,7 @@ function raycastSelected(found, event, type) {
 
     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName) {
         $("#sample-audio").prop("value", "");
-        if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area")) {
+        if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_voice")) {
             $("#sample-audio").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.speech);
             $("#audio-trigger").css("display", "flex");
         } else {
@@ -75,7 +75,8 @@ function raycastSelected(found, event, type) {
                     if ((GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "sphere" ||
                         GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "cube" ||
                         GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "cube_2" ||
-                        GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "laser_cube")) {
+                        GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "laser_cube" ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "scale_cube")) {
                         $(".dispenser").css("display", "block");
                         $("#state-dispenser").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.hasDispenser);
                         $("#dispenser-opened").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.opened);
@@ -161,7 +162,8 @@ function raycastSelected(found, event, type) {
                     if ((GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "sphere" ||
                         GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "cube" ||
                         GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "cube_2" ||
-                        GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "laser_cube")) {
+                        GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "laser_cube" ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "scale_cube")) {
                         $(".physics").css("display", "block");
 
                         $("#restitution").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.restitution)
@@ -214,6 +216,10 @@ function raycastSelected(found, event, type) {
 
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel_recharger")) {
                         $(".gel_recharger").css("display", "block");
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area")) {
+                        $(".trigger_area").css("display", "block");
                     }
 
                 }
@@ -389,6 +395,7 @@ function raycastSelected(found, event, type) {
 
                             window.changingPosition = true;
                             window.changingPositionPlane = planeInstanceOld;
+                            addConnectionPoints(planeInstanceNew);
                             updateLines(planeInstanceNew, false)
                         }
 
@@ -508,9 +515,9 @@ function showMenu(x, y) {
     menu.classList.add('menu-show');
 }
 
-$('#sample-audio').on('input', function () {
+/*$('#sample-audio').on('input', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.speech = $("#sample-audio").prop("value");
-});
+});*/
 
 export {
     raycastSelected,

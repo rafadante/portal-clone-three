@@ -76,7 +76,7 @@ const animateShader2 = (time) => {
     //
     //const time = t / 1000; // Convert time to seconds
 
-    const time2 = t; // Convert time to seconds
+    /*const time2 = t; // Convert time to seconds
 
     // Update the colors for the trail
     for (var j = 0; j < window.lines.length; j++) {
@@ -96,7 +96,7 @@ const animateShader2 = (time) => {
         }
 
         window.lines[j].colorAttribute.needsUpdate = true;
-    }
+    }*/
 
 };
 

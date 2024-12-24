@@ -24,6 +24,7 @@ import { GLOBALS } from './Globals.js';
 import { teleportationState } from './components/portal/Teleportation.js';
 import { hideMaterial } from "./Utils.js";
 import { ThreePerf } from 'three-perf'
+import { checkForTriggerContact } from "./components/triggers/Triggers.js";
 
 const perf = new ThreePerf({
     anchorX: 'right',
@@ -212,6 +213,7 @@ function render(time) {
     updateCamera(time);
     teleportationState()
     updateEvents();
+    checkForTriggerContact();
     TWEEN.update();
     animatePortal();
 
@@ -237,9 +239,11 @@ function render(time) {
     GLOBALS.RENDERER.clippingPlanes = [];
 
     if (localStorage.getItem("quality-select") == "epic" && GLOBALS.COMPOSER) {
-        GLOBALS.RENDERER.autoClear = false;
+        //GLOBALS.RENDERER.autoClear = false;
+        //GLOBALS.RENDERER.clear();
+        /*GLOBALS.RENDERER.autoClear = false;
         GLOBALS.RENDERER.clear();
-        GLOBALS.RENDERER.info.reset();
+        GLOBALS.RENDERER.info.reset();*/
         perf.begin();
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         perf.end();
@@ -254,9 +258,6 @@ function render(time) {
         GLOBALS.RENDERER.clearDepth()
         GLOBALS.RENDERER.render(GLOBALS.GUN_GROUP, GLOBALS.PORTAL_GUN_CAMERA);
     }
-
-    
-
 }
 
 function animatePortal() {
@@ -354,20 +355,20 @@ function animatePortal() {
     GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
 }
 
+let portalCamera = GLOBALS.MAIN_CAMERA.clone();
+
 function renderPortal2(thisIndex, pairIndex) {
 
     if (GLOBALS.PORTALS[thisIndex] === null || GLOBALS.PORTALS[pairIndex] === null)
         return
 
     var qua = new Quaternion();
-    GLOBALS.MAIN_CAMERA.getWorldQuaternion(qua)
-
-    let portalCamera = GLOBALS.MAIN_CAMERA.clone();
+    GLOBALS.MAIN_CAMERA.getWorldQuaternion(qua);
 
     portalCamera.position.copy(GLOBALS.PIVOT.position);
     portalCamera.quaternion.copy(qua);
 
-    // ensure that uniforms and render target are correctly sized
+    /*// ensure that uniforms and render target are correctly sized
     const {
         width,
         height
@@ -376,7 +377,7 @@ function renderPortal2(thisIndex, pairIndex) {
     GLOBALS.PORTALS[thisIndex].mesh.material.uniforms.ww.value = width
     GLOBALS.PORTALS[thisIndex].mesh.material.uniforms.wh.value = height
     GLOBALS.PORTAL_TARGETS[thisIndex].setSize(width, height)
-    GLOBALS.PORTAL_TMP_TARGETS[thisIndex].setSize(width, height)
+    GLOBALS.PORTAL_TMP_TARGETS[thisIndex].setSize(width, height)*/
 
     GLOBALS.PORTALS[thisIndex].mesh.material.stencilWrite = true;
     GLOBALS.RENDERER.clearStencil();

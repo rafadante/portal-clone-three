@@ -1,12 +1,7 @@
 import {
-    MeshLineGeometry,
-    MeshLineMaterial
-} from 'meshline';
-import {
     GLOBALS
 } from '../../Globals.js';
 import {
-    Mesh,
     Color,
     Vector3,
     BufferGeometry,
@@ -14,11 +9,34 @@ import {
     Line,
     AdditiveBlending,
     Float32BufferAttribute,
-    MathUtils
+    MathUtils,
+    Object3D,
+    SphereGeometry,
+    MeshBasicMaterial,
+    MeshStandardMaterial
 } from 'three';
 import $ from 'jquery';
 import { findPath } from '../findPath/FindPath.js';
 import { targetFaithPlateEnd } from '../faithPlate/FaithPlate.js';
+import { InstancedMesh2 } from '@three.ez/instanced-mesh';
+
+const geometry = new SphereGeometry(0.1, 8, 4);
+const material = new MeshStandardMaterial({ color: 0xffffff, depthTest: false, transparent: true });
+console.log(material)
+window.checkers = new InstancedMesh2(geometry, material, { createInstances: true });
+window.checkers.addInstances(1000, (obj, index) => {
+    obj.color = "white";
+    obj.visible = false;
+});
+window.checkers.instanceMatrix.needsUpdate = true;
+GLOBALS.SCENE.add(window.checkers);
+
+window.checkersIndexes = [];
+
+for (var i = 0; i < 1000; i++)
+    window.checkersIndexes.push(false);
+
+const colorInnactive = new Color(0, 2.0, 5.0);
 
 function manageConnection(instanceId, from) {
     GLOBALS.CONNECTING = false;
@@ -31,18 +49,45 @@ function manageConnection(instanceId, from) {
 
     if (GLOBALS.FAITH_PLATE_TARGET) {
         targetFaithPlateEnd(GLOBALS.PLANE_USER_DATA[instanceId])
-    } else if (GLOBALS.PLANE_USER_DATA[instanceId].allowconnection) {
+    } else if (GLOBALS.PLANE_USER_DATA[instanceId].allowconnection &&
+        !GLOBALS.SELECTED_FOR_CONNECTION.item.userData.connectedTo.includes(GLOBALS.PLANE_USER_DATA[instanceId].id_instanced) &
+        GLOBALS.PLANE_USER_DATA[instanceId].item.userData.connections < 10) {
+
 
         GLOBALS.PLANE_USER_DATA[instanceId].item.userData.connections += 1;
 
-        var endPos = new Vector3(
-            GLOBALS.PLANE_USER_DATA[instanceId].position.x,
-            GLOBALS.PLANE_USER_DATA[instanceId].position.y,
-            GLOBALS.PLANE_USER_DATA[instanceId].position.z
-        );
+        var endPos, checker, clone;
 
-        if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cube") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sphere"))
-            endPos = GLOBALS.PLANE_USER_DATA[instanceId].item.dispenserPosition
+        for (var i = 0; i < 10; i++) {
+
+            console.log(GLOBALS.PLANE_USER_DATA[instanceId])
+
+            clone = GLOBALS.PLANE_USER_DATA[instanceId].item.checkersSlots[i]
+
+            if (!clone.visible) {
+
+                clone.visible = true;
+                endPos = clone.position;
+
+                //GET INSTANCE INDEX
+                for (var j = 0; j < window.checkersIndexes.length; j++) {
+                    if (!window.checkersIndexes[j]) {
+
+                        window.checkersIndexes[j] = true;
+                        //window.checkers.instances[j].customData = {};
+                        window.checkers.instances[j].position.copy(endPos);
+                        window.checkers.setVisibilityAt(j, true);
+                        window.checkers.setColorAt(j, colorInnactive);
+                        window.checkers.instances[j].updateMatrix(); // necessary after transformations
+                        window.checkers.computeBoundingSphere();
+                        checker = j;
+                        break;
+                    }
+                }
+
+                break;
+            }
+        }
 
         const line = addLine(from.position, endPos);
 
@@ -52,28 +97,52 @@ function manageConnection(instanceId, from) {
             line: line,
             from: from,
             line2: null,
-            to: GLOBALS.PLANE_USER_DATA[instanceId]
+            to: GLOBALS.PLANE_USER_DATA[instanceId],
+            checker: checker,
+            clone: clone
         });
 
         from.item.userData.connectedTo.push(instanceId);
-
         //findPath(from.position, GLOBALS.PLANE_USER_DATA[instanceId].position, GLOBALS.PLANE_USER_DATA[instanceId], from)
+
+        console.log(from)
+        console.log(line)
+
+        if(from.instancedName == "trigger_area")
+            line.visible = false;
     }
 
     GLOBALS.ITEM_CUBE.visible = false;
     GLOBALS.CURRENT_LINE = null;
 }
 
-function addLine(position, endPos) {
+function addLine(position, endPos, index) {
 
-    // Two points for the line
+    /*if (index) {
+        window.checkers.instances[index].position.copy(endPos);
+        window.checkers.instances[index].updateMatrix(); // necessary after transformations
+        window.checkers.computeBoundingSphere();
+    }*/
+
+    const points = [];
+    points.push(position);
+    points.push(endPos);
+
+    const geometry = new BufferGeometry().setFromPoints(points);
+    const materialLine = new LineBasicMaterial({
+        transparent: true, // Enable transparency
+        color: colorInnactive
+    });
+    const line = new Line(geometry, materialLine);
+
+    /*// Two points for the line
     const pointA = new Vector3(
         position.x,
         position.y,
         position.z
     ); // Starting point
     const pointB = endPos;  // Ending point
-    const N = 100; // Number of vertices along the line
+    const N = 10; // Number of vertices along the line
 
     // Create a line with interpolated vertices
     const positions = [];
@@ -89,8 +158,8 @@ function addLine(position, endPos) {
     const colors = [];
     const color = new Color();
     for (let i = 0; i <= N; i++) {
-        color.setHSL( 0.6, 1, (1-i/(N-1))**4 );
-		colors.push( color.r, color.g, color.b );
+        color.setHSL(0.6, 1, (1 - i / (N - 1)) ** 4);
+        colors.push(color.r, color.g, color.b);
     }
 
     // Create the geometry and material for the line
@@ -109,7 +178,7 @@ function addLine(position, endPos) {
 
     // Get references to the geometry attributes
     line.colorAttribute = geometry.getAttribute("color");
-    line.color = color;
+    line.color = color;*/
 
     window.lines.push(line);
 

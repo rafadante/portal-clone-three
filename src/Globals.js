@@ -51,6 +51,7 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
 const camera = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 100);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
+window.fov = fov;
 
 var hFOV = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180 / 2) * camera.aspect) * 180 / Math.PI; // degrees
 
@@ -96,7 +97,7 @@ renderer.localClippingEnabled = true;
 renderer.physicallyCorrectLights = true;
 renderer.domElement.id = "viewer-3d";
 renderer.shadowMap.autoUpdate = true;
-renderer.info.autoReset = false;
+//renderer.info.autoReset = false;
 
 console.log(renderer)
 
@@ -148,8 +149,8 @@ var GLOBALS = {
     //PORTALS
     PORTALS: [null, null],
     PORTAL_RECURSION_LEVELS: portalsRecursive,
-    PORTAL_TARGETS: [new WebGLRenderTarget(1, 1), new WebGLRenderTarget(1, 1)],
-    PORTAL_TMP_TARGETS: [new WebGLRenderTarget(1, 1), new WebGLRenderTarget(1, 1)],
+    PORTAL_TARGETS: [new WebGLRenderTarget(window.canvasWidth / 1, window.canvasHeight / 1), new WebGLRenderTarget(window.canvasWidth / 1, window.canvasHeight / 1)],
+    PORTAL_TMP_TARGETS: [new WebGLRenderTarget(window.canvasWidth / 1, window.canvasHeight / 1), new WebGLRenderTarget(window.canvasWidth / 1, window.canvasHeight / 1)],
     PORTAL_WIDTH: 0.9,
     PORTAL_DEPTH: 1.8,
     PORTAL_EPS: 0.01,
@@ -221,6 +222,7 @@ var GLOBALS = {
     DYMANIC_ITEMS: {
         cube: [],
         cube_2: [],
+        scale_cube: [],
         sphere: [],
         gel_gun_blue: [],
         gel_gun_orange: [],
@@ -261,12 +263,16 @@ var GLOBALS = {
         glass: [],
         portal_gun: [],
         trigger_area: [],
+        trigger_save: [],
+        trigger_voice: [],
         pellet_launcher: [],
         pellet_catcher: [],
         angled_panel: [],
         paint_gun: [],
         spawn: []
     },
+
+    TRIGGER_BOXES: [],
 
     INTERACTIVE: [],
     ITEM_CUBE: null,
@@ -425,6 +431,18 @@ var GLOBALS = {
             trigger: false
         },
         cube_2: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: false,
+            ceiling: true,
+            trigger: false
+        },
+        scale_cube: {
             count: 0,
             max: 10,
             instanced: true,
@@ -788,6 +806,14 @@ var GLOBALS = {
             count: 0,
             max: 10
         },
+        trigger_voice: {
+            count: 0,
+            max: 10
+        },
+        trigger_save: {
+            count: 0,
+            max: 10
+        },
         portal: {
             count: 0,
             max: 10
@@ -880,6 +906,18 @@ function reset() {
         cube_2: {
             count: 0,
             max: 10
+        },
+        scale_cube: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: false,
+            ceiling: true,
+            trigger: false
         },
         door: {
             count: 0,
@@ -1062,6 +1100,14 @@ function reset() {
             max: 2
         },
         trigger_area: {
+            count: 0,
+            max: 10
+        },
+        trigger_save: {
+            count: 0,
+            max: 10
+        },
+        trigger_voice: {
             count: 0,
             max: 10
         },

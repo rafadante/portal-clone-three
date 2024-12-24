@@ -25,6 +25,7 @@ import { addItem } from '../items/AddItem.js';
 import { updateMaterialRepeat } from '../materials/Materials.js';
 import { hex2rgb } from '../../Utils.js';
 import { targetFaithPlateEnd, targetFaithPlateStart } from '../faithPlate/FaithPlate';
+import { respawn } from '../events/states';
 
 window.addEventListener("contextmenu", e => e.preventDefault());
 
@@ -73,6 +74,14 @@ $("body").on('click', '#delete', function () {
     var indexesToDelete = [];
 
     for (var j = 0; j < GLOBALS.CONNECTIONS.length; j++) {
+
+        if (GLOBALS.CONNECTIONS[j]['from'].item.userData.connectedTo.includes(GLOBALS.CONNECTIONS[j]["to"].id_instanced)) {
+
+            const index = GLOBALS.CONNECTIONS[j]['from'].item.userData.connectedTo.indexOf(GLOBALS.CONNECTIONS[j]["to"].id_instanced);
+            GLOBALS.CONNECTIONS[j]['from'].item.userData.connectedTo.splice(index);
+
+        }
+
         if (GLOBALS.CONNECTIONS[j]["from"] == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]]) {
             indexesToDelete.push(j);
         } else if (GLOBALS.CONNECTIONS[j]["to"] == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]]) {
@@ -80,8 +89,16 @@ $("body").on('click', '#delete', function () {
         }
     }
 
-    for (var j = 0; j < indexesToDelete.length; j++) {
+    console.log(indexesToDelete)
+    console.log(GLOBALS.CONNECTIONS)
+
+    for (var j = indexesToDelete.length - 1; j >= 0; j--) {
         GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[indexesToDelete[j]]["line"]);
+
+        window.checkers.setVisibilityAt(GLOBALS.CONNECTIONS[indexesToDelete[j]]["checker"], false);
+        window.checkersIndexes[GLOBALS.CONNECTIONS[indexesToDelete[j]]["checker"]] = false;
+        GLOBALS.CONNECTIONS[indexesToDelete[j]]["clone"].visible = false;
+
         GLOBALS.CONNECTIONS.splice(indexesToDelete[j], 1);
     }
 
@@ -202,14 +219,25 @@ $("body").on('input', '#state-dispenser', function () {
     var dummy = new Object3D();
     dummy.scale.copy(scale);
     dummy.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserPosition);
-    dummy.rotation.set(0,0,0);
+    dummy.rotation.set(0, 0, 0);
     dummy.updateMatrix();
     instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserID, dummy.matrix);
     instanced.instanceMatrix.needsUpdate = true;
 });
 
 $("body").on('input', '#dispenser-opened', function () {
+
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.opened = this.checked;
+
+    var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName);
+
+    if (this.checked) {
+        instanced.instances[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.id].position.y = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.y + 1;
+    } else {
+        instanced.instances[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.id].position.y = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserPosition.y - 1;
+    }
+
+    instanced.instances[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.id].updateMatrix(); // necessary after transformations
 })
 
 $("body").on('input', '#state-lines', function () {
@@ -490,7 +518,7 @@ $("body").on('click', '#portalable', function () {
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(0x808080));
             }
 
-           // GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+            // GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
         }
     }
 
@@ -625,4 +653,9 @@ $("body").on('click', '.angled_panel_option', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.angle = $(this).data("angle");
 
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.getObjectByName("pivot2").rotation.x = Math.PI / 180 * $(this).data("real");
-})
+});
+
+$("body").on('click', '#reset-check-point', function () {
+    if (GLOBALS.LEVEL_ENTERED)
+        respawn(GLOBALS.PLAYER);
+});

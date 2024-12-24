@@ -18,7 +18,7 @@ var gamepadButton6 = false;
 var gamepadButton7 = false;
 var gamepadButton12 = false;
 var gamepadButton15 = false;
-var headBobHeight = 0.00005;//
+var headBobHeight = 0.01;//
 let controllerIndex = null;
 var finalRotationY;
 window.PLAYER_JUMPING_FROM_BLUE_GEL = false;
@@ -231,7 +231,7 @@ const updatePlayer = function (deltaTime) {
     updateHeadBob(deltaTime);
 
     if (GLOBALS.PLAYER_MOVING) {
-        GLOBALS.GUN.children[0].position.x += Math.sin(INPUT.headBobTimer * GLOBALS.HEAD_BOB_SPEED) * headBobHeight;
+        GLOBALS.GUN.children[0].position.x += Math.sin(INPUT.headBobTimer * GLOBALS.HEAD_BOB_SPEED) * headBobHeight * deltaTime;
         //GLOBALS.PAINT_GUN.children[0].position.x += Math.sin(INPUT.headBobTimer * GLOBALS.HEAD_BOB_SPEED) * headBobHeight * 700;
     }
 
@@ -250,6 +250,16 @@ function isSlerpComplete(currentQuat, endQuat, tolerance = 0.001) {
 }
 
 window.gg = false;
+
+function animateIdleGun(gun, time) {
+    //const time = idleClock.getElapsedTime();
+    const breathingAmplitude = 0.0025; // Adjust for subtlety
+    const breathingSpeed = 0.001; // How fast the gun moves
+
+    // Apply a gentle up-and-down movement
+    gun.position.y += Math.sin(time * breathingSpeed) * breathingAmplitude;
+    gun.rotation.x += Math.sin(time * breathingSpeed) * (breathingAmplitude / 2);
+}
 
 const updateCamera = function (deltaTime) {
 
@@ -272,8 +282,12 @@ const updateCamera = function (deltaTime) {
         window.targetRotationOnMouseDownX = GLOBALS.TARGET_ROTATION_X;
         window.targetRotationOnMouseDownY = GLOBALS.TARGET_ROTATION_Y;
     } else {
-        if (!window.blockCamRotation)
+        if (!window.blockCamRotation) {
             GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, 0.075);
+
+            animateIdleGun(GLOBALS.GUN, deltaTime); // `gun` is the 3D object for the weapon
+
+        }
     }
 
     // always look where the camera points

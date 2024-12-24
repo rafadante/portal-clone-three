@@ -125,8 +125,9 @@ const generateMeshPortalShader = () => {
         },
         vertexShader: vshader,
         fragmentShader: fshader,
-        side: 0,
+        side: 2,
         transparent: true,
+        depthTest: false,
         polygonOffset: true,
             polygonOffsetFactor: -10,
             depthWrite: false
@@ -157,12 +158,15 @@ const generateMeshPortalShader = () => {
         },
         vertexShader: vshader,
         fragmentShader: fshader,
-        side: 0,
+        side: 2,
         transparent: true,
+        depthTest: false,
         polygonOffset: true,
             polygonOffsetFactor: -10,
             depthWrite: false
     });
+
+    console.log(mat2)
 
     var planegeometry = new CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
     planegeometry.computeBoundsTree();

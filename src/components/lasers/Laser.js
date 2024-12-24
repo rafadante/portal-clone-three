@@ -140,6 +140,7 @@ function updateLaserCubeRaycaster(item, laser) {
         GLOBALS.ITEMS_ADDED.getObjectByName("cube"),
         GLOBALS.ITEMS_ADDED.getObjectByName("sphere"),
         GLOBALS.ITEMS_ADDED.getObjectByName("cube_2"),
+        GLOBALS.ITEMS_ADDED.getObjectByName("scale_cube"),
         GLOBALS.ITEMS_ADDED.getObjectByName("laser_receiver"),
         GLOBALS.ITEMS_ADDED.getObjectByName("laser_relay"),
     ]
@@ -325,6 +326,7 @@ function updateLaserEmitterRaycaster() {
             GLOBALS.ITEMS_ADDED.getObjectByName("cube"),
             GLOBALS.ITEMS_ADDED.getObjectByName("sphere"),
             GLOBALS.ITEMS_ADDED.getObjectByName("cube_2"),
+            GLOBALS.ITEMS_ADDED.getObjectByName("scale_cube"),
             GLOBALS.ITEMS_ADDED.getObjectByName("laser_receiver"),
             GLOBALS.ITEMS_ADDED.getObjectByName("laser_relay"),
         ]

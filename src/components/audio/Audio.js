@@ -14,6 +14,22 @@ if (window.hasOwnProperty("speechSynthesis")) {
 
 const speechSynth = window.speechSynthesis,
     form = document.querySelector("form"),
+    playSample = () => {
+        if (speechSynth.speaking) {
+            speechSynth.cancel();
+            // doesn't work as expected with default voice on Chrome on Windows
+        }
+        utterance = new SpeechSynthesisUtterance(form.sample.value);
+        utterance.voice = voices[form.voice.selectedIndex];
+        utterance.volume = form.volume.valueAsNumber * 0.01;
+        utterance.pitch = form.pitch.valueAsNumber * 0.01;
+        utterance.rate = form.rate.valueAsNumber * 0.01;
+        speechSynth.speak(utterance);
+
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.speech = form.sample.value;
+
+        console.log(form.rate.valueAsNumber);
+    },
     init = () => {
         if (!voices) { // fixes triple trigger weirdness
             voices = speechSynth.getVoices();
@@ -22,10 +38,14 @@ const speechSynth = window.speechSynthesis,
                 opt.textContent = v.name;
                 if (v.name === "Google US English") {
                     opt.selected = true;
-                    form.rate.value = 65;
+                    //form.rate.value = 65;
                 }
                 form.voice.appendChild(opt);
             });
+
+            form.addEventListener( "input", playSample, false );
+            form.play.addEventListener( "click", playSample, false );
+            //playSample();
         }
     };
 if (speechSynth.onvoiceschanged !== undefined) {
@@ -35,12 +55,12 @@ if (speechSynth.onvoiceschanged !== undefined) {
     init();
 }
 
-function playVoice(txt) {
+function playVoice(data) {
     if (speechSynth.speaking) {
         speechSynth.cancel();
         // doesn't work as expected with default voice on Chrome on Windows
     }
-    utterance = new SpeechSynthesisUtterance(txt);
+    utterance = new SpeechSynthesisUtterance(data.txt);
     utterance.voice = voices[form.voice.selectedIndex];
     utterance.volume = form.volume.valueAsNumber * 0.01;
     utterance.pitch = 100 * 0.01;
@@ -50,7 +70,6 @@ function playVoice(txt) {
 
 function play(elem) {
 
-    //return
     var isPlaying = elem.currentTime > 0 && !elem.paused && !elem.ended
         && elem.readyState > elem.HAVE_CURRENT_DATA;
 
@@ -74,6 +93,8 @@ function play(elem) {
 }
 
 function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, nameSound) {
+
+    //return
 
     if (!listernAdded) {
         listernAdded = true;

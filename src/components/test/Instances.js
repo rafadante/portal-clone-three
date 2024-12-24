@@ -130,8 +130,9 @@ function createInstances(meshes, material, index) {
 
     const geometry = new PlaneGeometry(2, 2);
     geometry.computeBoundsTree();
+    var mesh = new InstancedMesh(geometry.clone(), material, meshes.length);
 
-    var mesh;
+    /*var mesh;
 
     if(first){
         mesh = new InstancedMesh2(geometry.clone(), material);
@@ -145,7 +146,7 @@ function createInstances(meshes, material, index) {
 
     mesh.addInstances(meshes.length, (obj, index) => {
         obj.visible = false;
-    });
+    });*/
 
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -187,7 +188,7 @@ function createInstances(meshes, material, index) {
         dummy.updateMatrix();
 
         mesh.setMatrixAt(i, dummy.matrix);
-        mesh.setVisibilityAt(i, true);
+        //mesh.setVisibilityAt(i, true);
     }
 
     GLOBALS.SCENE.remove(leftWindowObsRoom)

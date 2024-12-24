@@ -361,3 +361,25 @@ select {
     }
   }
 }
+
+form{
+  background-color: rgba(0, 0, 0, 0.404);
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  right: 5px;
+  position: absolute;
+  backdrop-filter: blur(30px);
+
+  textarea{
+    height: 100px;
+  }
+
+  label, textarea{
+    margin: 10px;
+  }
+
+  input[name="sample"]{
+    height: 100px;
+  }
+}

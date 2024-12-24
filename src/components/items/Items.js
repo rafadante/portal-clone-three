@@ -137,9 +137,18 @@ function hoverItem(found, connecting) {
         targetFaithPlateUpdate(GLOBALS.ITEM_CUBE);
 
     if (connecting) {
-        if (userData.allowconnection || GLOBALS.FAITH_PLATE_TARGET) {
+        if (GLOBALS.FAITH_PLATE_TARGET) {
             GLOBALS.ITEM_CUBE.material.color = new Color(0x00ff00)
             GLOBALS.ITEM_CUBE.place = true;
+        } else if (userData.allowconnection) {
+            if (!GLOBALS.SELECTED_FOR_CONNECTION.item.userData.connectedTo.includes(userData.id_instanced) &&
+                userData.item.userData.connections < 10) {
+                GLOBALS.ITEM_CUBE.material.color = new Color(0x00ff00)
+                GLOBALS.ITEM_CUBE.place = true;
+            } else {
+                GLOBALS.ITEM_CUBE.material.color = new Color(0xff0000)
+                GLOBALS.ITEM_CUBE.place = false;
+            }
         } else {
             GLOBALS.ITEM_CUBE.material.color = new Color(0xff0000)
             GLOBALS.ITEM_CUBE.place = false;
@@ -196,7 +205,8 @@ function deleteItemInstanced(item, moving) {
     instanced.instanceMatrix.needsUpdate = true;
 
     if (item.instancedName == "cube" || item.instancedName == "sphere"
-        || item.instancedName == "cube_2" || item.instancedName == "laser_cube") {
+        || item.instancedName == "cube_2" || item.instancedName == "laser_cube"
+        || item.instancedName == "scale_cube") {
 
         var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
         var dummy = new Object3D();

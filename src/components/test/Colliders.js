@@ -45,6 +45,7 @@ function colliderItemManager() {
 
     addColliderItem(GLOBALS.DYMANIC_ITEMS['cube'], "cube", 5)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['cube_2'], "cube_2", 5)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['scale_cube'], "scale_cube", 5)
     addColliderItem(GLOBALS.DYMANIC_ITEMS["sphere"], "sphere", 5)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['gel_gun_blue'], "gel_gun_blue", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['gel_gun_orange'], "gel_gun_orange", 0)
@@ -128,7 +129,7 @@ function addColliderDoorsDefault(obj) {
     //ADD FIZZLER
     const geometry = new PlaneGeometry(2, 2);
     const plane = new Mesh(geometry, GLOBALS.MATERIAL_FIZZLER);
-    plane.translateZ(-0.1)
+    plane.translateZ(-0.1);
     obj.fizzler = plane;
     obj.add(plane);
 
@@ -146,7 +147,8 @@ function fizzlerTrigger(body) {
             deletePortal(1)
             GLOBALS.PORTAL_BOX = [];
         } else if (e.body.name == "sphere" || e.body.name == "cube" ||
-            e.body.name == "radio" || e.body.name == "cube_2" || e.body.name == "laser_cube") {
+            e.body.name == "radio" || e.body.name == "cube_2" || e.body.name == "laser_cube" ||
+            e.body.name == "scale_cube") {
             //CREATE A CLONE TO APPLY DISSOLVE SHADER
             const clone = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.name).scene.clone();
             clone.position.set(e.body.position.x, e.body.position.y, e.body.position.z);
@@ -217,7 +219,7 @@ function addColliderItem(items, type, mass, offset) {
                 var vec = new Quaternion();
                 items[i].children[0].getWorldQuaternion(vec)
                 var rot = vec;
-            } else if (type == "cube" || type == "cube_2" || type == "laser_cube") {
+            } else if (type == "cube" || type == "cube_2" || type == "laser_cube" || type == "scale_cube") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.3, 0.3));
                 shape.height = 0.6;
                 shape.width = 0.6;
@@ -276,9 +278,9 @@ function addColliderItem(items, type, mass, offset) {
                     objHolder.translateX(-a1)
                 }
             } else if (type == "dispenser") {
-                
+
                 objHolder.position.copy(items[i].dispenserPosition);
-                objHolder.rotation.set(0,0,0);
+                objHolder.rotation.set(0, 0, 0);
 
                 if (offset == 1) {
                     var shape = new CANNON.Box(new CANNON.Vec3(0.7, 0.77, 0.01));
@@ -320,7 +322,7 @@ function addColliderItem(items, type, mass, offset) {
                 mass: mass,
                 material: PHYSICS_MATERIAL
             });
-        
+
 
             box.position.copy(objHolder.position);
             box.quaternion.copy(rot);
@@ -354,7 +356,7 @@ function addColliderItem(items, type, mass, offset) {
 
                 addPositionalAudio('audio-repulsion', box, false, false, true, 20, 'soundRepulsion');
 
-                if ((type == "cube" || type == "cube_2" || type == "laser_cube" || type == "sphere")) {
+                if ((type == "cube" || type == "cube_2" || type == "laser_cube" || type == "sphere" || type == "scale_cube")) {
 
                     if (items[i].userData.hasDispenser) {
 

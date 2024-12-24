@@ -5,6 +5,7 @@ import {
 } from "../audio/Audio.js";
 import { stateDoor } from "../door/Door.js";
 import { deletePortal } from "../portal/CreatePortal.js";
+import { interactWithItem } from "./events.js";
 
 function laserFieldState(obj) {
     obj.item.userData.state = !obj.item.userData.state;
@@ -103,6 +104,9 @@ function respawn(d) {
 
     if (d.name == "player") {
 
+        if (GLOBALS.HOLDING_ITEM)
+            interactWithItem();
+
         document.getElementById("death-screen").style.backgroundColor = "rgb(255, 0, 0)";
         document.getElementById("death-screen").style.opacity = 0.75;
 
@@ -137,7 +141,7 @@ function respawn(d) {
         setTimeout(() => {
 
             if (d.name != "player") {
-                
+
                 if (d.item.userData.connections == 0) {
                     d.mass = 5;
                 } else {

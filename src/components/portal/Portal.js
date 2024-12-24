@@ -93,6 +93,12 @@ class Portal extends Group {
 
         /*#include <tonemapping_fragment>
             #include <colorspace_fragment>*/
+
+        const {
+            width,
+            height
+        } = GLOBALS.RENDERER.domElement
+
         const geometry = new CylinderGeometry(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_HEIGHT);
         const uniforms = {
             texture1: {
@@ -101,11 +107,11 @@ class Portal extends Group {
             },
             ww: {
                 type: 'f',
-                value: 1
+                value: width
             }, // not correct values at time of creation necessarily, will be updated later in render loop
             wh: {
                 type: 'f',
-                value: 1
+                value: height
             }
         }
 

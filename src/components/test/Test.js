@@ -287,7 +287,9 @@ function viewFPS(firstRender) {
         if (GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic" && localStorage.getItem("quality-select") != "high"))
             GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;
 
-        for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+        window.checkers.material.envMap = GLOBALS.ENV_MAP;
+
+        /*for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
             GLOBALS.CONNECTIONS[i]["line"].visible = false;
             findPath(
                 GLOBALS.CONNECTIONS[i]["from"].position,
@@ -296,7 +298,7 @@ function viewFPS(firstRender) {
                 GLOBALS.CONNECTIONS[i]["from"],
                 GLOBALS.CONNECTIONS[i]
             )
-        }
+        }*/
 
         if (GLOBALS.ITEMS_ADDED.getObjectByName("spawn")) {
             GLOBALS.CORRIDOR_ENTER.visible = false;

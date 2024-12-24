@@ -60,14 +60,41 @@ function updateLines(userData, instanced) {
 
             } else if (GLOBALS.CONNECTIONS[j]["to"] == window.changingPositionPlane) {
 
+                //
+
+                console.log(userData)
+
                 GLOBALS.CONNECTIONS[j]["to"] = userData;
-                GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[j]["line"]);
-                const line = addLine(GLOBALS.CONNECTIONS[j]["from"].position, GLOBALS.CONNECTIONS[j]["to"].position);
-                GLOBALS.SCENE_CHILDREN.add(line);
-                GLOBALS.CONNECTIONS[j]["line"] = line;
 
                 if (instanced)
                     GLOBALS.CONNECTIONS[j]["to"].item.userData.connections += 1;
+
+                var endPos, clone;
+
+                for (var i = 0; i < 10; i++) {
+
+                    clone = userData.item.checkersSlots[i]
+
+                    if (!clone.visible) {
+
+                        clone.visible = true;
+                        endPos = clone.position;
+
+                        window.checkers.instances[GLOBALS.CONNECTIONS[j]["checker"]].position.copy(endPos);
+                        window.checkers.instances[GLOBALS.CONNECTIONS[j]["checker"]].updateMatrix(); // necessary after transformations
+                        window.checkers.computeBoundingSphere();
+                        GLOBALS.CONNECTIONS[j]["clone"] = clone;
+
+                        break;
+                    }
+                }
+
+                //
+
+                GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[j]["line"]);
+                const line = addLine(GLOBALS.CONNECTIONS[j]["from"].position, endPos);
+                GLOBALS.SCENE_CHILDREN.add(line);
+                GLOBALS.CONNECTIONS[j]["line"] = line;
             }
         }
     }
@@ -78,6 +105,8 @@ function addItem(found, loaded) {
     if (!GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME)
         && GLOBALS.ITEM_HOLDED_NAME != "glass"
         && GLOBALS.ITEM_HOLDED_NAME != "trigger_area"
+        && GLOBALS.ITEM_HOLDED_NAME != "trigger_save"
+        && GLOBALS.ITEM_HOLDED_NAME != "trigger_voice"
         && GLOBALS.ITEM_HOLDED_NAME != "spawn"
         && GLOBALS.ITEM_HOLDED_NAME != "goo"
         && GLOBALS.ITEM_HOLDED_NAME != "door"
@@ -158,17 +187,24 @@ function addItem(found, loaded) {
                 const material = new MeshBasicMaterial({ color: 0xff0000 });
                 const cone = new Mesh(geometry, material);
                 var item = cone;
-            } else if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
+            } else if (GLOBALS.ITEM_HOLDED_NAME.includes("trigger")) {
+
                 const geometry = new BoxGeometry(2, 2, 2);
 
-                var material = GLOBALS.MATERIAL_TRIGGER_ONCE;
+                //var material = GLOBALS.MATERIAL_TRIGGER_ONCE;
 
                 /*if (loaded) {
                     if (!userDataLoadedItem.userData.state)
                         material = GLOBALS.MATERIAL_TRIGGER_MULT;
                 }*/
 
-                const box = new Mesh(geometry, material);
+                const box = new Mesh(geometry, new MeshBasicMaterial({
+                    color: new Color($("#" + GLOBALS.ITEM_HOLDED_NAME).data("color")),
+                    side: 2,
+                    transparent: true,
+                    opacity: 0.5
+
+                }));
                 var item = box;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
                 var item = GLOBALS.GUN_CLONE.clone();
@@ -284,7 +320,8 @@ function addItem(found, loaded) {
                 item.translateY(0.5);
 
             if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
-                GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
+                GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube" ||
+                GLOBALS.ITEM_HOLDED_NAME == "scale_cube") {
 
                 var idInstanced;
                 userData.dispenser = true;
@@ -322,7 +359,6 @@ function addItem(found, loaded) {
 
                 item.dispenserPosition = item2.position;
                 item.dispenserID = idInstanced;
-
                 item2.item = item;
                 item2.userData.id = idInstanced;
 
@@ -336,6 +372,10 @@ function addItem(found, loaded) {
 
                 item2.updateMatrix();
                 instanced2.setMatrixAt(idInstanced, item2.matrix);
+
+                if (item2.scale.x == 1)
+                    instanced2.setVisibilityAt(idInstanced, true);
+
                 instanced2.instanceMatrix.needsUpdate = true;
                 instanced2.computeBoundingSphere();
             }
@@ -353,11 +393,11 @@ function addItem(found, loaded) {
                 bb.setFromObject(cube);
 
                 if (userData.instancedName == "button_box") {
-                    bb.accept = "cube-cube_2-laser_cube";
+                    bb.accept = "cube-cube_2-laser_cube-scale_cube";
                 } else if (userData.instancedName == "button_sphere") {
                     bb.accept = "sphere";
                 } else if (userData.instancedName == "button_weight") {
-                    bb.accept = "sphere-cube-player-laser_cube-cube_2";
+                    bb.accept = "sphere-cube-player-laser_cube-cube_2-scale_cube";
                 }
 
                 userData.box3 = bb;
@@ -395,7 +435,7 @@ function addItem(found, loaded) {
             } else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
                 GLOBALS.DYMANIC_ITEMS['angled_panel'].push(item)
                 GLOBALS.ITEMS_ADDED.add(item);
-            } else if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area") {
+            } else if (GLOBALS.ITEM_HOLDED_NAME.includes("trigger")) {
 
                 GLOBALS.ITEMS_ADDED.add(item);
                 item.translateY(1);
@@ -412,6 +452,10 @@ function addItem(found, loaded) {
                     data: userDataLoadedItem,
                     item: userData
                 });
+
+                if (GLOBALS.ITEM_HOLDED_NAME != "trigger_area") {
+                    GLOBALS.TRIGGER_BOXES.push(userData);
+                }
 
             } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
                 item.scale.set(1, 1, 1);
@@ -530,7 +574,7 @@ function addItem(found, loaded) {
                     //instanced.instanceColor.needsUpdate = true;
                 }
 
-                
+
                 instanced.computeBoundingSphere();
 
                 instanced.dispose();
@@ -546,6 +590,7 @@ function addItem(found, loaded) {
                 manageItemVariables(item, userData, instanced);
 
             //Update Connection Lines
+            addConnectionPoints(userData);
             updateLines(userData, true);
         }
     }
@@ -575,7 +620,8 @@ function manageItemVariables(item, userData, instanced) {
     } else if (GLOBALS.ITEM_HOLDED_NAME == "door" || GLOBALS.ITEM_HOLDED_NAME == "pedestal_button") {
         item.userData.rotationY = 0;
     } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
-        GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
+        GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube" ||
+        GLOBALS.ITEM_HOLDED_NAME == "scale_cube") {
         item.userData.hasDispenser = true;
         item.userData.state = "open";
     } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_field") {
@@ -651,7 +697,8 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
 
         item.rotation.copy(dummy.rotation);
     } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
-        GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube") {
+        GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube" ||
+        GLOBALS.ITEM_HOLDED_NAME == "scale_cube") {
         item.userData.hasDispenser = userDataLoadedItem.hasDispenser;
         item.userData.state = userDataLoadedItem.state;
     } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_field") {
@@ -712,8 +759,75 @@ function clickItem(elem) {
     GLOBALS.DRAGGED_ITEM_ELEMENT = elem;
 }
 
+const colorInnactive = new Color(0, 2.0, 5.0);
+
+function addConnectionPoints(userData) {
+    userData.item.checkersSlots = [];
+
+    const obj = new Object3D();
+    obj.visible = false;
+
+    if (userData.item.dispenserPosition) {
+        obj.position.copy(userData.item.dispenserPosition);
+    } else {
+        obj.position.copy(userData.position);
+    }
+
+    obj.rotation.copy(userData.rotation);
+
+    var clone = obj.clone();
+    clone.translateX(0.9);
+    userData.item.checkersSlots.push(clone);
+
+    var clone = obj.clone();
+    clone.translateX(0.9);
+    clone.translateY(0.4);
+    userData.item.checkersSlots.push(clone);
+
+    var clone = obj.clone();
+    clone.translateX(0.9);
+    clone.translateY(0.8);
+    userData.item.checkersSlots.push(clone);
+
+    var clone = obj.clone();
+    clone.translateX(0.9);
+    clone.translateY(-0.4);
+    userData.item.checkersSlots.push(clone);
+
+    var clone = obj.clone();
+    clone.translateX(0.9);
+    clone.translateY(-0.8);
+    userData.item.checkersSlots.push(clone);
+
+    //
+    var clone = obj.clone();
+    clone.translateX(-0.9);
+    userData.item.checkersSlots.push(clone);
+
+    var clone = obj.clone();
+    clone.translateX(-0.9);
+    clone.translateY(0.4);
+    userData.item.checkersSlots.push(clone);
+
+    var clone = obj.clone();
+    clone.translateX(-0.9);
+    clone.translateY(0.8);
+    userData.item.checkersSlots.push(clone);
+
+    var clone = obj.clone();
+    clone.translateX(-0.9);
+    clone.translateY(-0.4);
+    userData.item.checkersSlots.push(clone);
+
+    var clone = obj.clone();
+    clone.translateX(-0.9);
+    clone.translateY(-0.8);
+    userData.item.checkersSlots.push(clone);
+}
+
 export {
     addItem,
     clickItem,
-    updateLines
+    updateLines,
+    addConnectionPoints
 }

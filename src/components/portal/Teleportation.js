@@ -205,7 +205,7 @@ function teleportationState() {
             // collision disable, might be partially intersecting with portal
             if (GLOBALS.PORTALS[p].CDBB.containsPoint(pos)) {
 
-                if (d.name != "player") 
+                if (d.name != "player")
                     d.wakeUp();
 
                 d.collisionFilterMask &=
@@ -214,6 +214,9 @@ function teleportationState() {
 
                 if (dd == 0) {
                     inArea++;
+
+                    if (!GLOBALS.PORTALS[p].mesh.material.depthTest)
+                        GLOBALS.PORTALS[p].portalShader.material.depthTest = true;
 
                     // show the clone of player
                     if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
@@ -239,6 +242,10 @@ function teleportationState() {
                         teleportObject3D(d.clone, GLOBALS.PORTALS[p]);
                         d.clone.visible = true;
                     }
+                }
+            } else {
+                if (dd == 0 && GLOBALS.PORTALS[p].mesh.material.depthTest) {
+                    GLOBALS.PORTALS[p].portalShader.material.depthTest = false;
                 }
             }
 
