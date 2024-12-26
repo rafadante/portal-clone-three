@@ -24,6 +24,7 @@ const orange = new Color("rgb(255, 165, 0)");
 var initialPosition = null;
 var currentID = null;
 var firstSelected;
+const form = document.querySelector("form")
 
 function raycastSelected(found, event, type) {
 
@@ -60,7 +61,8 @@ function raycastSelected(found, event, type) {
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_0") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_1") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("angled_panel") ||
-                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal_button"))) {
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal_button") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_gun"))) {
                 $("#rotate-item").css("display", "block");
             } else {
                 $("#rotate-item").css("display", "none");
@@ -218,10 +220,19 @@ function raycastSelected(found, event, type) {
                         $(".gel_recharger").css("display", "block");
                     }
 
-                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area")) {
-                        $(".trigger_area").css("display", "block");
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger")) {
+                        $(".trigger").css("display", "block");
+                        $("#state-trigger-visibility").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggerVisibility);
                     }
 
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_voice")) {
+                        $("#state-trigger-multiple").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.multipleTrigger);
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_audio")) {
+                        $(".trigger_audio").css("display", "block");
+                        $("#state-trigger-loop").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.soundEffectLoop);
+                    }
                 }
             }
 
@@ -403,6 +414,27 @@ function raycastSelected(found, event, type) {
                         GLOBALS.SELECTED_ID[0] = instanceId;
                         return;
                     }
+                }
+            }
+        }
+
+        if (type == "down" && instanceId) {
+            if (GLOBALS.PLANE_USER_DATA[instanceId].itemName) {
+                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_voice")) {
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].item.userData.speech) {
+                        form.sample.value = GLOBALS.PLANE_USER_DATA[instanceId].item.userData.speech;
+                        form.voice.value = GLOBALS.PLANE_USER_DATA[instanceId].item.userData.voice;
+                        form.volume.value = GLOBALS.PLANE_USER_DATA[instanceId].item.userData.volume * 100;
+                        form.pitch.value = GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pitch * 100;
+                        form.rate.value = GLOBALS.PLANE_USER_DATA[instanceId].item.userData.rate * 100;
+                    } else {
+                        form.sample.value = "Hello. And again, welcome to the aperture science computer aided enrichment center. We hope your brief detention in the relaxation vault has been a pleasant one.";
+                        form.voice.value = "Google US English";
+                        form.volume.value = 100;
+                        form.pitch.value = 100;
+                        form.rate.value = 100;
+                    }
+
                 }
             }
         }

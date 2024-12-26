@@ -215,9 +215,6 @@ function teleportationState() {
                 if (dd == 0) {
                     inArea++;
 
-                    if (!GLOBALS.PORTALS[p].mesh.material.depthTest)
-                        GLOBALS.PORTALS[p].portalShader.material.depthTest = true;
-
                     // show the clone of player
                     if (p == 0 || (p > 0 && !CDBB_isOverlap)) {
 
@@ -242,10 +239,6 @@ function teleportationState() {
                         teleportObject3D(d.clone, GLOBALS.PORTALS[p]);
                         d.clone.visible = true;
                     }
-                }
-            } else {
-                if (dd == 0 && GLOBALS.PORTALS[p].mesh.material.depthTest) {
-                    GLOBALS.PORTALS[p].portalShader.material.depthTest = false;
                 }
             }
 

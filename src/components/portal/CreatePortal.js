@@ -138,7 +138,7 @@ function portalButton(button, auto, camera) {
                 userData.itemName = '';
 
             if (((userData.portal) || intersectsGelWhite.length > 0 || intersectPanel.length > 0 || paintMode) 
-                && (!userData.hasItem || auto || userData.itemName.includes("camera"))) {//!userData.hasItem || (userData.itemName.includes("camera"))
+                && (!userData.hasItem || auto || userData.itemName.includes("camera") || userData.itemName.includes("trigger"))) {//!userData.hasItem || (userData.itemName.includes("camera"))
                 var point = new Vector3(x, y, z);
                 // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                 // define playerUpDirection

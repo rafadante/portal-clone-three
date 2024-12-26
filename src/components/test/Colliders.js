@@ -444,7 +444,7 @@ function addColliderItem(items, type, mass, offset) {
                         }
                     }*/
 
-                    if (event.body.name == "gel") {
+                    if (event.body.name == "gel" && event.body.type == "blue") {
 
                         if (!event.target.playingAudioGel) {
                             event.target.playingAudioGel = true;

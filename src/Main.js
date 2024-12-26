@@ -113,6 +113,7 @@ function init() {
 
     window.addEventListener('resize', onWindowResize);
     recreateRay();
+    GLOBALS.RENDERER.setAnimationLoop( animate );
 }
 
 function onWindowResize() {
@@ -137,7 +138,7 @@ function onWindowResize() {
 }
 
 GLOBALS.RENDERER.info.autoReset = true;
-GLOBALS.RENDERER.setAnimationLoop( animate );
+
 
 function animate(time) {
 
@@ -368,7 +369,7 @@ function renderPortal2(thisIndex, pairIndex) {
     portalCamera.position.copy(GLOBALS.PIVOT.position);
     portalCamera.quaternion.copy(qua);
 
-    /*// ensure that uniforms and render target are correctly sized
+    // ensure that uniforms and render target are correctly sized
     const {
         width,
         height
@@ -377,7 +378,7 @@ function renderPortal2(thisIndex, pairIndex) {
     GLOBALS.PORTALS[thisIndex].mesh.material.uniforms.ww.value = width
     GLOBALS.PORTALS[thisIndex].mesh.material.uniforms.wh.value = height
     GLOBALS.PORTAL_TARGETS[thisIndex].setSize(width, height)
-    GLOBALS.PORTAL_TMP_TARGETS[thisIndex].setSize(width, height)*/
+    GLOBALS.PORTAL_TMP_TARGETS[thisIndex].setSize(width, height)
 
     GLOBALS.PORTALS[thisIndex].mesh.material.stencilWrite = true;
     GLOBALS.RENDERER.clearStencil();

@@ -72,7 +72,7 @@
         <label>Volume: <input name="volume" type="range" min="0" max="100" value="100"></label>
         <label>Pitch: <input name="pitch" type="range" min="0" max="200" value="100"></label>
         <label>Rate: <input name="rate" type="range" min="1" max="100" value="100"></label>
-        <input name="play" type="button" value="Play it again Sam">
+        <input name="play" type="button" value="Save Voice To Play On Trigger Enter">
       </form>
     </div>
 
@@ -101,6 +101,24 @@
                 <option value="left" id="left-gun">Left Portal</option>
                 <option value="right" id="right-gun">Right Portal</option>
                 <option value="none" id="none-gun">No Portals</option>
+              </select>
+            </div>
+          </div>
+          <div class="options-row">
+            <span class="option-name" id="">Ambient Sound:</span>
+            <div class="option-value">
+              <select name="ambient_sound" id="ambient-sound-select">
+                <option value="1">Halls Of Science 4</option>
+                <option value="2">9999999</option>
+                <option value="3">Comedy = Tragedy + Time</option>
+                <option value="4">I'm Different</option>
+                <option value="5">Music of the Spheres</option>
+                <option value="6">Overgrowth</option>
+                <option value="7">Technical Difficulties</option>
+                <option value="8">TEST</option>
+                <option value="9">The Courtesy Call</option>
+                <option value="10">The Future Starts With You</option>
+                <option value="11">You are Not Part of the Control Group</option>
               </select>
             </div>
           </div>
@@ -378,36 +396,6 @@
             class="item" data-name="paint_gun" src="../assets/ui/items/paint_gun.webp" data-allowconnection="false"
             data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" id="paint_gun" />-->
 
-          <div>
-            <img alt="image"
-              data-content="An area that triggers once the players walks into it, you can link to items just like buttons. You can choose between a one time trigger or a multiple one."
-              data-title="TRIGGER ENTER" class="item" data-name="trigger_area" src="../assets/ui/items/trigger.jpg"
-              data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-              data-color="rgb(255,127,80)" id="trigger_area" />
-            <span>10</span>
-          </div>
-
-          <div>
-            <img alt="image" data-content="" data-title="TRIGGER SAVE" class="item" data-name="trigger_save"
-              src="../assets/ui/items/save.jpg" data-allowconnection="false" data-rotate="false" data-floor="true"
-              data-ceiling="true" data-walls="true" data-color="rgb(0,255,0)" id="trigger_save" />
-            <span>10</span>
-          </div>
-
-          <div>
-            <img alt="image" data-content="" data-title="TRIGGER VOICE" class="item" data-name="trigger_voice"
-              src="../assets/ui/items/voice.jpg" data-allowconnection="false" data-rotate="false" data-floor="true"
-              data-ceiling="true" data-walls="true" data-color="rgb(255,0,0)" id="trigger_voice" />
-            <span>10</span>
-          </div>
-
-          <div>
-            <img alt="image" data-content="" data-title="TRIGGER SOUND" class="item" data-name="trigger_sound"
-              src="../assets/ui/items/sound.jpg" data-allowconnection="false" data-rotate="false" data-floor="true"
-              data-ceiling="true" data-walls="true" ata-color="rgb(0,0,255)" id="trigger_sound" />
-            <span>10</span>
-          </div>
-
           <!--
           <img alt="image"
             data-content="Piston Platforms will move up and down whenever the player stands on it. If it is connected to a trigger then the trigger must be activated before it will begin to move. You can adjust the height of the platform using the arrows that appear when the object is selected."
@@ -461,8 +449,8 @@
           <div class="">
             <img alt="image" data-content="Obtainable item: you can define how many portals it will have."
               data-title="PORTAL GUN" class="item" data-name="portal_gun" src="../assets/ui/items/gun2.webp"
-              data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
-              id="portal_gun" />
+              data-instanced="true" data-allowconnection="false" data-rotate="true" data-floor="true"
+              data-ceiling="false" data-walls="false" id="portal_gun" />
             <span>10</span>
           </div>
 
@@ -478,6 +466,36 @@
               class="item" data-name="camera" src="../assets/ui/items/camera.webp" data-allowconnection="false"
               data-rotate="false" data-floor="false" data-ceiling="false" data-walls="true" data-instanced="false"
               id="camera" />
+            <span>10</span>
+          </div>
+
+          <div>
+            <img alt="image"
+              data-content="An area that triggers once the players walks into it, you can link to items just like buttons. You can choose between a one time trigger or a multiple one."
+              data-title="TRIGGER ENTER" class="item" data-name="trigger_area" src="../assets/ui/items/trigger.jpg"
+              data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+              data-color="rgb(255,127,80)" id="trigger_area" />
+            <span>10</span>
+          </div>
+
+          <div>
+            <img alt="image" data-content="" data-title="TRIGGER SAVE" class="item" data-name="trigger_save"
+              src="../assets/ui/items/save.jpg" data-allowconnection="false" data-rotate="false" data-floor="true"
+              data-ceiling="true" data-walls="true" data-color="rgb(0,255,0)" id="trigger_save" />
+            <span>10</span>
+          </div>
+
+          <div>
+            <img alt="image" data-content="" data-title="TRIGGER VOICE" class="item" data-name="trigger_voice"
+              src="../assets/ui/items/voice.jpg" data-allowconnection="false" data-rotate="false" data-floor="true"
+              data-ceiling="true" data-walls="true" data-color="rgb(255,0,0)" id="trigger_voice" />
+            <span>10</span>
+          </div>
+
+          <div>
+            <img alt="image" data-content="" data-title="TRIGGER SOUND" class="item" data-name="trigger_audio"
+              src="../assets/ui/items/sound.jpg" data-allowconnection="false" data-rotate="false" data-floor="true"
+              data-ceiling="true" data-walls="true" data-color="rgb(0,0,255)" id="trigger_audio" />
             <span>10</span>
           </div>
         </div>
@@ -565,21 +583,6 @@
         <span class="menu-text">Rotate Item</span>
       </button>
     </li>
-
-    <!--TRIGGER AREA OPTIONS-->
-
-    <!--<li id="trigger_area_visibility" class="menu-item hasItem trigger_area">
-      <a href="#" class="menu-btn">
-        <input type="checkbox" checked id="state-trigger_area_visibility" />
-        <span class="menu-text">Visibility</span>
-      </a>
-    </li>
-    <li id="trigger_area_checkpoint" class="menu-item hasItem trigger_area">
-      <a href="#" class="menu-btn">
-        <input type="checkbox" checked id="state-trigger_area_checkpoint" />
-        <span class="menu-text">CHECKPOINT</span>
-      </a>
-    </li>-->
 
     <!---->
     <li id="light-bridge-state" class="menu-item hasItem light-bridge">
@@ -956,6 +959,142 @@
         <span class="menu-text">Start Opened</span>
       </a>
     </li>
+
+    <!--TRIGGER STATES-->
+    <li id="trigger-visibility" class="menu-item hasItem trigger">
+      <a href="#" class="menu-btn">
+        <input type="checkbox" checked id="state-trigger-visibility" />
+        <span class="menu-text">Visible</span>
+      </a>
+    </li>
+
+    <li id="trigger-multiple" class="menu-item hasItem trigger">
+      <a href="#" class="menu-btn">
+        <input type="checkbox" id="state-trigger-multiple" />
+        <span class="menu-text">Multiple Triggers</span>
+      </a>
+    </li>
+
+    <!---->
+
+    <li id="trigger-loop" class="menu-item hasItem trigger_audio">
+      <a href="#" class="menu-btn">
+        <input type="checkbox" id="state-trigger-loop" />
+        <span class="menu-text">Loop (replace ambient sound)</span>
+      </a>
+    </li>
+    
+    <li class="menu-item menu-item-submenu hasItem trigger_audio">
+      <button type="button" class="menu-btn">
+        <i class="fa fa-music"></i>
+        <span class="menu-text title">Sound Effect:</span>
+      </button>
+      <ul class="menu" id="trigger_audio-state">
+        <li data-state="DavidYustin03_1.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from DavidYustin03_1</span>
+          </button>
+        </li>
+        <li data-state="gaming_cube_1.wav" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from gaming_cube_1</span>
+          </button>
+        </li>
+        <li data-state="gaming_cube_2.wav" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from gaming_cube_2</span>
+          </button>
+        </li>
+        <li data-state="gaming_cube_3.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from gaming_cube_3</span>
+          </button>
+        </li>
+        <li data-state="gaming_cube_4.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from gaming_cube_4</span>
+          </button>
+        </li>
+        <li data-state="homeless_man_1.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from homeless_man_1</span>
+          </button>
+        </li>
+        <li data-state="homeless_man_2.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from homeless_man_2</span>
+          </button>
+        </li>
+        <li data-state="homeless_man_3.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from homeless_man_3</span>
+          </button>
+        </li>
+        <li data-state="homeless_man_4.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from homeless_man_4</span>
+          </button>
+        </li>
+        <li data-state="homeless_man_5.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from homeless_man_5</span>
+          </button>
+        </li>
+        <li data-state="homeless_man_6.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from homeless_man_6</span>
+          </button>
+        </li>
+        <li data-state="homeless_man_7.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from homeless_man_7</span>
+          </button>
+        </li>
+        <li data-state="homeless_man_8.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from homeless_man_8</span>
+          </button>
+        </li>
+        <li data-state="homeless_man_9.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from homeless_man_9</span>
+          </button>
+        </li>
+        <li data-state="homeless_man_10.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from homeless_man_10</span>
+          </button>
+        </li>
+        <li data-state="homeless_man_11.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from homeless_man_11</span>
+          </button>
+        </li>
+        <li data-state="homeless_man_12.mp3" class="menu-item trigger_audio-state">
+          <button type="button" class="menu-btn">
+            <i class="fa fa-music"></i>
+            <span class="menu-text">from homeless_man_12</span>
+          </button>
+        </li>
+      </ul>
+    </li>
+
 
     <!---->
     <li class="menu-item hasItem physics">
@@ -1603,10 +1742,6 @@
 
   <!--AUDIOS-->
 
-  <audio id="AUDIO-AMBIENT" preload="none" style="display: none" volume="0.15" loop>
-    <source src="./audio/ambient.mp3" type="audio/mp3">
-  </audio>
-  ]
   <audio id="AUDIO-EDITOR" preload="none" style="display: none" volume="0.5" loop>
     <source src="./audio/editor.mp3" type="audio/mp3">
   </audio>
@@ -1731,6 +1866,45 @@
 
   <audio id="pelletHit" preload="none">
     <source src="./audio/pelletHit.wav" type="audio/wav">
+  </audio>
+
+  <!---->
+  <audio id="AUDIO-AMBIENT" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/ambient.mp3" type="audio/mp3">
+  </audio>
+
+  <audio id="ambient-1" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/ambient/1.mp3" type="audio/mp3">
+  </audio>
+  <audio id="ambient-2" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/ambient/2.mp3" type="audio/mp3">
+  </audio>
+  <audio id="ambient-3" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/ambient/3.mp3" type="audio/mp3">
+  </audio>
+  <audio id="ambient-4" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/ambient/4.mp3" type="audio/mp3">
+  </audio>
+  <audio id="ambient-5" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/ambient/5.mp3" type="audio/mp3">
+  </audio>
+  <audio id="ambient-6" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/ambient/6.mp3" type="audio/mp3">
+  </audio>
+  <audio id="ambient-7" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/ambient/7.mp3" type="audio/mp3">
+  </audio>
+  <audio id="ambient-8" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/ambient/8.mp3" type="audio/mp3">
+  </audio>
+  <audio id="ambient-9" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/ambient/9.mp3" type="audio/mp3">
+  </audio>
+  <audio id="ambient-10" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/ambient/10.mp3" type="audio/mp3">
+  </audio>
+  <audio id="ambient-11" preload="none" style="display: none" volume="0.15" loop>
+    <source src="./audio/ambient/11.mp3" type="audio/mp3">
   </audio>
 
   <span id="warning-game" style="    position: absolute;

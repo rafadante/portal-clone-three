@@ -165,7 +165,7 @@ function updateEvents() {
                   GLOBALS.PLAYER.spawnPosition = GLOBALS.CONNECTIONS[i]['from'].position;
                   GLOBALS.PLAYER.spawnPosition.y += 0.5;
 
-                  playVoice(GLOBALS.CONNECTIONS[i]['from'].item.userData.speech)
+                  //playVoice(GLOBALS.CONNECTIONS[i]['from'].item.userData.speech)
                 }
               }
 

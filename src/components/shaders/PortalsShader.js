@@ -127,10 +127,8 @@ const generateMeshPortalShader = () => {
         fragmentShader: fshader,
         side: 2,
         transparent: true,
-        depthTest: false,
         polygonOffset: true,
             polygonOffsetFactor: -10,
-            depthWrite: false
     });
 
     var planegeometry = new CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
@@ -160,10 +158,8 @@ const generateMeshPortalShader = () => {
         fragmentShader: fshader,
         side: 2,
         transparent: true,
-        depthTest: false,
         polygonOffset: true,
             polygonOffsetFactor: -10,
-            depthWrite: false
     });
 
     console.log(mat2)

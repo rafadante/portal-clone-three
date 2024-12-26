@@ -12,6 +12,7 @@ import {
     Object3D,
     Box3,
     ConeGeometry,
+    PlaneGeometry,
 } from 'three';
 import {
     AddGoo
@@ -100,6 +101,13 @@ function updateLines(userData, instanced) {
     }
 }
 
+const textureLoader = new TextureLoader();
+const trigger_border = textureLoader.load('./assets/textures/trigger_border.png');
+const trigger_connection = textureLoader.load('./assets/textures/trigger_connection.png');
+const trigger_save = textureLoader.load('./assets/textures/trigger_save.png');
+const trigger_voice = textureLoader.load('./assets/textures/trigger_voice.png');
+const trigger_audio = textureLoader.load('./assets/textures/trigger_audio.png');
+
 function addItem(found, loaded) {
 
     if (!GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME)
@@ -107,10 +115,10 @@ function addItem(found, loaded) {
         && GLOBALS.ITEM_HOLDED_NAME != "trigger_area"
         && GLOBALS.ITEM_HOLDED_NAME != "trigger_save"
         && GLOBALS.ITEM_HOLDED_NAME != "trigger_voice"
+        && GLOBALS.ITEM_HOLDED_NAME != "trigger_audio"
         && GLOBALS.ITEM_HOLDED_NAME != "spawn"
         && GLOBALS.ITEM_HOLDED_NAME != "goo"
-        && GLOBALS.ITEM_HOLDED_NAME != "door"
-        && GLOBALS.ITEM_HOLDED_NAME != "portal_gun") {
+        && GLOBALS.ITEM_HOLDED_NAME != "door") {
 
         $("#follow").css("display", "none");
 
@@ -189,32 +197,45 @@ function addItem(found, loaded) {
                 var item = cone;
             } else if (GLOBALS.ITEM_HOLDED_NAME.includes("trigger")) {
 
-                const geometry = new BoxGeometry(2, 2, 2);
-
-                //var material = GLOBALS.MATERIAL_TRIGGER_ONCE;
-
-                /*if (loaded) {
-                    if (!userDataLoadedItem.userData.state)
-                        material = GLOBALS.MATERIAL_TRIGGER_MULT;
-                }*/
-
+                const geometry = new BoxGeometry(1.98, 2, 1.98);
                 const box = new Mesh(geometry, new MeshBasicMaterial({
                     color: new Color($("#" + GLOBALS.ITEM_HOLDED_NAME).data("color")),
                     side: 2,
                     transparent: true,
-                    opacity: 0.5
+                    opacity: 0.5,
+                    map: trigger_border
 
                 }));
+                box.userData.multipleTrigger = false;
+                box.userData.triggerVisibility = true;
+                box.userData.soundEffect = null;
+                box.userData.soundEffectLoop = false;
+
+                //
+                var map;
+                if(GLOBALS.ITEM_HOLDED_NAME == "trigger_area")
+                    map = trigger_connection;
+                else if(GLOBALS.ITEM_HOLDED_NAME == "trigger_save")
+                    map = trigger_save;
+                else if(GLOBALS.ITEM_HOLDED_NAME == "trigger_voice")
+                    map = trigger_voice;
+                else if(GLOBALS.ITEM_HOLDED_NAME == "trigger_audio")
+                    map = trigger_audio;
+
+                const geometryPlane = new PlaneGeometry(1, 1);
+                const materialPlane = new MeshBasicMaterial({ 
+                    color: new Color($("#" + GLOBALS.ITEM_HOLDED_NAME).data("color")), 
+                    map: map, 
+                    transparent: true,
+                    side: 2,
+                    opacity: 0.5,
+                    depthWrite: false
+                });
+                const plane = new Mesh(geometryPlane, materialPlane);
+                box.add(plane);
+
+                //
                 var item = box;
-            } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
-                var item = GLOBALS.GUN_CLONE.clone();
-                item.name = "portal_gun";
-                const camera = GLOBALS.MAIN_CAMERA.clone();
-                camera.position.set(0, 0, 0)
-                camera.rotation.set(0, 0, 0)
-                item.add(camera);
-                item.camera = camera;
-                window.ttt = camera;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "paint_gun") {
                 var item = GLOBALS.PAINT_GUN.clone();
                 item.name = "paint_gun";
@@ -232,6 +253,9 @@ function addItem(found, loaded) {
                         GLOBALS.CAMERA_OBJ_VERTICAL.push(child)
                 })
             } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
+                var item = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
+                item.visible = true;
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
                 var item = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
                 item.visible = true;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "observation_room") {
@@ -453,15 +477,10 @@ function addItem(found, loaded) {
                     item: userData
                 });
 
-                if (GLOBALS.ITEM_HOLDED_NAME != "trigger_area") {
-                    GLOBALS.TRIGGER_BOXES.push(userData);
-                }
+                //if (GLOBALS.ITEM_HOLDED_NAME != "trigger_area") {
+                GLOBALS.TRIGGER_BOXES.push(userData);
+                //}
 
-            } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
-                item.scale.set(1, 1, 1);
-                item.position.y += 0.65;
-                GLOBALS.ITEMS_ADDED.add(item);
-                GLOBALS.PORTAL_GUN_BOX.push(item);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "paint_gun") {
                 item.scale.set(1, 1, 1);
                 item.position.y += 0.65;
@@ -530,6 +549,10 @@ function addItem(found, loaded) {
             } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
                 GLOBALS.ITEMS_ADDED.add(item);
                 GLOBALS.DOORS.push(item)
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
+                GLOBALS.ITEMS_ADDED.add(item);
+                GLOBALS.PORTAL_GUN_BOX.push(item);
+                //GLOBALS.DOORS.push(item)
             } else {
                 var idInstanced;
 

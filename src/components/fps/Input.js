@@ -210,11 +210,15 @@ document.body.addEventListener('mousemove', (event) => {
 
 });
 
+var started = false;
+
 $("body").on('click', '#settings-close', function () {
     if (GLOBALS.FPS_MODE && allowEnterFPS) {
 
-        play(AUDIO.AMBIENT);
+        if (!started)
+            play(AUDIO.AMBIENT);
 
+        started = true;
         document.getElementById('blocker').style.display = 'none';
         GLOBALS.PAUSED = false;
 

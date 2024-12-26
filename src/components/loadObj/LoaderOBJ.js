@@ -157,6 +157,8 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
                 loadFaithPlateManager(scene);
             else if (name == "camera")
                 loadCameraManager(scene);
+            else if (name == "portal_gun")
+                loadPortalGunStand(scene);
         }
     });
 }
@@ -463,6 +465,19 @@ function loadCorridorEnter(scene) {
     GLOBALS.CORRIDOR_ENTER = corridor;
     GLOBALS.CORRIDOR_ENTER.name = "corridorEnter";
     GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
+}
+
+function loadPortalGunStand(scene){
+
+    scene.traverse(child => {
+        if (child.material) {
+            child.material.envMap = GLOBALS.ENV_MAP;
+        }
+    });
+
+    scene.name = "portal_gun";
+    scene.visible = false;
+    GLOBALS.ITEMS_ADDED.add(scene);
 }
 
 function loadAvatar() {

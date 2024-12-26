@@ -310,6 +310,7 @@ select {
   .options-row {
     color: black;
     display: flex;
+    margin-top: 10px;
 
     span {
       width: 50%;
@@ -382,4 +383,9 @@ form{
   input[name="sample"]{
     height: 100px;
   }
+}
+
+#trigger_audio-state{
+  max-height: 200px;
+  overflow-y: scroll;
 }

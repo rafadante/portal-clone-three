@@ -265,6 +265,7 @@ var GLOBALS = {
         trigger_area: [],
         trigger_save: [],
         trigger_voice: [],
+        trigger_audio: [],
         pellet_launcher: [],
         pellet_catcher: [],
         angled_panel: [],
@@ -796,7 +797,15 @@ var GLOBALS = {
         },
         portal_gun: {
             count: 0,
-            max: 1
+            max: 1,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
         },
         paint_gun: {
             count: 0,
@@ -807,6 +816,10 @@ var GLOBALS = {
             max: 10
         },
         trigger_voice: {
+            count: 0,
+            max: 10
+        },
+        trigger_audio: {
             count: 0,
             max: 10
         },
@@ -1108,6 +1121,10 @@ function reset() {
             max: 10
         },
         trigger_voice: {
+            count: 0,
+            max: 10
+        },
+        trigger_audio: {
             count: 0,
             max: 10
         },

@@ -335,13 +335,13 @@ window.unlockedFPS = 0;
 function animate(time) {
     if (!stopMenuLoop) {
 
-        if (getMonitorFPS) {
+        /*if (getMonitorFPS) {
             t.unshift(time);
             if (t.length > 10) {
                 var t0 = t.pop();
                 window.unlockedFPS = Math.floor(1000 * 10 / (time - t0));
             }
-        }
+        }*/
 
         if (transition)
             GLOBALS.MATERIAL_MAIN_MENU.uniforms.iTime.value += clock.getDelta();

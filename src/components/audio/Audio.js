@@ -27,8 +27,12 @@ const speechSynth = window.speechSynthesis,
         speechSynth.speak(utterance);
 
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.speech = form.sample.value;
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.voice = form.voice.selectedIndex;
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.volume = form.volume.valueAsNumber * 0.01;
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.pitch = form.pitch.valueAsNumber * 0.01;
+        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.rate = form.rate.valueAsNumber * 0.01;
 
-        console.log(form.rate.valueAsNumber);
+        console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData);
     },
     init = () => {
         if (!voices) { // fixes triple trigger weirdness
@@ -43,7 +47,7 @@ const speechSynth = window.speechSynthesis,
                 form.voice.appendChild(opt);
             });
 
-            form.addEventListener( "input", playSample, false );
+            //form.addEventListener( "input", playSample, false );
             form.play.addEventListener( "click", playSample, false );
             //playSample();
         }
@@ -56,15 +60,20 @@ if (speechSynth.onvoiceschanged !== undefined) {
 }
 
 function playVoice(data) {
+    console.log(data)
+
+    if(!data.speech)
+        return;
+    
     if (speechSynth.speaking) {
         speechSynth.cancel();
         // doesn't work as expected with default voice on Chrome on Windows
     }
-    utterance = new SpeechSynthesisUtterance(data.txt);
-    utterance.voice = voices[form.voice.selectedIndex];
-    utterance.volume = form.volume.valueAsNumber * 0.01;
-    utterance.pitch = 100 * 0.01;
-    utterance.rate = 100 * 0.01;
+    utterance = new SpeechSynthesisUtterance(data.speech);
+    utterance.voice = voices[data.voice];
+    utterance.volume = data.volume;
+    utterance.pitch = data.pitch;
+    utterance.rate = data.rate;
     speechSynth.speak(utterance);
 }
 
