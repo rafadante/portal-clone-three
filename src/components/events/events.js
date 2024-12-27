@@ -142,8 +142,8 @@ function updateEvents() {
         || GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("laser_relay")
         || GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("pellet_catcher"))
         continue
-      else if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area") && GLOBALS.CONNECTIONS[i]['from'].item.visible)
-        GLOBALS.CONNECTIONS[i]['from'].item.visible = false;
+      //else if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area") && GLOBALS.CONNECTIONS[i]['from'].item.visible)
+      //  GLOBALS.CONNECTIONS[i]['from'].item.visible = false;
 
       var notInPos = 0;
 

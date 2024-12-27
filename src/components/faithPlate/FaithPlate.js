@@ -153,7 +153,7 @@ function targetFaithPlateEnd(item, h) {
 
   GLOBALS.FAITH_PLATE_TARGET.target = clone;
 
-  if (h) {
+  /*if (h) {
     height = h;
   } else {
     var height = GLOBALS.FAITH_PLATE_TARGET.position.y + 2;
@@ -161,23 +161,30 @@ function targetFaithPlateEnd(item, h) {
     if (GLOBALS.FAITH_PLATE_TARGET.position.y < clone.position.y) {
       height = clone.position.y + 2;
     }
-  }
+  }*/
 
-  GLOBALS.FAITH_PLATE_TARGET.userData.height = 2;
+  //GLOBALS.FAITH_PLATE_TARGET.userData.height = height;
   GLOBALS.FAITH_PLATE_TARGET.userData.targetPos = clone.position;
   GLOBALS.FAITH_PLATE_TARGET.userData.targetRot = clone.rotation;
   GLOBALS.FAITH_PLATE_TARGET.userData.target = clone;
 
-  createCurve(GLOBALS.FAITH_PLATE_TARGET.position, clone.position, height, clone)
+  createCurve(GLOBALS.FAITH_PLATE_TARGET.position, clone.position, 2, clone, GLOBALS.FAITH_PLATE_TARGET)
 
   GLOBALS.FAITH_PLATE_TARGET = null;
 }
 
-function createCurve(start, end, height, target) {
+function createCurve(start, end, height, target, plate) {
 
   //Find the middle
   const middlePoint = new Vector3().addVectors(start, end).multiplyScalar(0.5);
-  middlePoint.y = height;
+
+  if (start.y > end.y)
+    middlePoint.y = height + start.y;
+  else
+    middlePoint.y = height + end.y;
+
+  plate.userData.height = Math.abs(start.y - middlePoint.y)
+  plate.userData.heightLine = height;
 
   //Create a closed wavey loop
   const curve = new CatmullRomCurve3([
@@ -199,12 +206,13 @@ function createCurve(start, end, height, target) {
 
 $('#plate-max-height-value').on('change', function () {
   GLOBALS.GROUP_LINE_TRAGECTORY.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.target.line);
-  GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.height = parseInt(this.value);
+  //GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.height = parseInt(this.value);
   createCurve(
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.position,
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.target.position,
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.position.y + parseInt(this.value),
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.target
+    parseInt(this.value),
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.target,
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item
   )
 });
 

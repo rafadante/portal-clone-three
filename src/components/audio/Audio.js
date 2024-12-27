@@ -8,7 +8,7 @@ var listener;
 
 var opt, voices, utterance;
 
-if (window.hasOwnProperty("speechSynthesis")) {
+/*if (window.hasOwnProperty("speechSynthesis")) {
 
 }
 
@@ -58,11 +58,17 @@ if (speechSynth.onvoiceschanged !== undefined) {
 } else {
     init();
 }
+*/
 
 function playVoice(data) {
     console.log(data)
 
-    if(!data.speech)
+    if(!data.link)
+        return;
+
+    data.voice.play();
+
+    /*if(!data.speech)
         return;
     
     if (speechSynth.speaking) {
@@ -74,7 +80,7 @@ function playVoice(data) {
     utterance.volume = data.volume;
     utterance.pitch = data.pitch;
     utterance.rate = data.rate;
-    speechSynth.speak(utterance);
+    speechSynth.speak(utterance);*/
 }
 
 function play(elem) {

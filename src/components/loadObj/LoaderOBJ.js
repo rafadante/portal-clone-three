@@ -175,6 +175,9 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity, m
         obj.visible = false;
     });
 
+    item.raycastOnlyFrustum = true;
+    item.computeBVH();
+
     //item.instanceMatrix.setUsage(DynamicDrawUsage); // will be updated every frame
 
     /*var clone = new Object3D();
@@ -317,9 +320,24 @@ function loadEnterDoor(scene) {
     const geometryExitDoor = new PlaneGeometry(1, 1);
     const materialExitDoor = new MeshBasicMaterial({ map: map });
     const planeExitDoor = new Mesh(geometryExitDoor, materialExitDoor);
-    planeExitDoor.position.set(0, 1.3, 0.01)
-    planeExitDoor.scale.set(1, 0.5, 1)
+    planeExitDoor.position.set(-0.6, 0.8, 0.16)
+    planeExitDoor.scale.set(0.8, 0.4, 0.8)
+    console.log(planeExitDoor)
     GLOBALS.EXIT_DOOR.add(planeExitDoor);
+
+    //ADD BOX
+    const geometryBox = new BoxGeometry(5.99, 5.99, 7.5);
+    const materialBox = new MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
+    const box = new Mesh(geometryBox, materialBox);
+    box.geometry.computeBoundingBox(); // This is only necessary if not allready computed
+    box.updateMatrixWorld(true); // This might be necessary if box is moved
+    box.name = "trigger";
+    box.position.set(0, 0, -4.01);
+    GLOBALS.EXIT_DOOR.add(box);
+
+    const box2 =box.clone();
+    box2.material = new MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
+    GLOBALS.ENTER_DOOR.add(box2);
 }
 
 function loadWindowManager(scene) {
@@ -467,7 +485,7 @@ function loadCorridorEnter(scene) {
     GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
 }
 
-function loadPortalGunStand(scene){
+function loadPortalGunStand(scene) {
 
     scene.traverse(child => {
         if (child.material) {

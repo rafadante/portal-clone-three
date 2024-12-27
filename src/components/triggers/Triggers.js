@@ -36,9 +36,9 @@ function checkForTriggerContact() {
                 console.log("playing")
                 playVoice(GLOBALS.TRIGGER_BOXES[f].item.userData);
 
-            }if (GLOBALS.TRIGGER_BOXES[f].instancedName == "trigger_audio") {
+            } if (GLOBALS.TRIGGER_BOXES[f].instancedName == "trigger_audio") {
 
-                if(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem){
+                if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem) {
                     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem.pause();
                     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem.currentTime = 0;
                 }
@@ -46,7 +46,7 @@ function checkForTriggerContact() {
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem.play();
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem.loop = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectLoop;
 
-                if(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectLoop){
+                if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectLoop) {
                     AUDIO.AMBIENT.pause();
                 }
             }
@@ -77,9 +77,6 @@ $('#ambient-sound-select').on('change', function () {
     AUDIO.AMBIENT.pause();
     AUDIO.AMBIENT.currentTime = 0;
 
-    AUDIO.EDITOR.pause();
-    AUDIO.EDITOR.currentTime = 0;
-
     AUDIO.AMBIENT = document.getElementById("ambient-" + $(this).val());
     play(AUDIO.AMBIENT);
 
@@ -88,15 +85,14 @@ $('#ambient-sound-select').on('change', function () {
     timeoutAudio = setTimeout(() => {
         AUDIO.AMBIENT.pause();
         AUDIO.AMBIENT.currentTime = 0;
-        play(AUDIO.EDITOR);
-    }, 15000);
+    }, 5000);
 })
 
 $('.trigger_audio-state').on('click', function () {
 
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffect = $(this).data('state');
 
-    if(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem){
+    if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem) {
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem.pause();
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem.currentTime = 0;
     }
@@ -111,8 +107,41 @@ $('.trigger_audio-state').on('click', function () {
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem.pause();
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem.currentTime = 0;
     }, 5000);
-})
+});
 
+
+$("body").on('change', '#state-trigger-voice-link', function () {
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.link = $(this).val().replace("dl=0", 'dl=1');
+});
+
+var audioVoiceTrigger, timeoutTriggerVoice;
+
+$("body").on('click', '#play-trigger-voice', function () {
+    if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.link) {
+        playVoiceTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData)
+    }
+});
+
+async function playVoiceTrigger(userdata) {
+
+    clearTimeout(timeoutTriggerVoice);
+
+    if(audioVoiceTrigger){
+        audioVoiceTrigger.currentTime = 0;
+        audioVoiceTrigger.pause();
+    }
+
+    audioVoiceTrigger = new Audio(userdata.link);
+    audioVoiceTrigger.type = 'audio/wav';
+
+    try {
+        await audioVoiceTrigger.play();
+        userdata.voice = audioVoiceTrigger;
+        console.log('Playing...');
+    } catch (err) {
+        console.log('Failed to play...' + err);
+    }
+}
 
 export {
     checkForTriggerContact

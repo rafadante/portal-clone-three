@@ -12,7 +12,7 @@ var coords = new Vector3();
 var raycaster2 = new Raycaster();
 var allowPortal = true;
 
-function portalButton(button, auto, camera) {
+function portalButton(button, auto, camera, firstToRender) {
 
     if (!GLOBALS.LEVEL_ENTERED && !auto)
         return;
@@ -35,10 +35,12 @@ function portalButton(button, auto, camera) {
 
         raycaster2.setFromCamera(coords, camera);
 
-        var intersectBlockPortal = raycaster2.intersectObjects(GLOBALS.BLOCK_PORTAL);
+        if (!firstToRender)
+            var intersectBlockPortal = raycaster2.intersectObjects(GLOBALS.BLOCK_PORTAL);
+
         var blockPortal = null;
 
-        if (!auto) {
+        if (!auto && !firstToRender) {
             for (var i = 0; i < intersectBlockPortal.length; i++) {
                 if (intersectBlockPortal[i].object.visible) {
                     blockPortal = intersectBlockPortal[i];
@@ -134,10 +136,10 @@ function portalButton(button, auto, camera) {
             if (button == 0 && GLOBALS.PAINTING_GUN_MODE[0] || button == 2 && GLOBALS.PAINTING_GUN_MODE[1])
                 paintMode = true;
 
-            if(!userData.itemName)
+            if (!userData.itemName)
                 userData.itemName = '';
 
-            if (((userData.portal) || intersectsGelWhite.length > 0 || intersectPanel.length > 0 || paintMode) 
+            if (((userData.portal) || intersectsGelWhite.length > 0 || intersectPanel.length > 0 || paintMode)
                 && (!userData.hasItem || auto || userData.itemName.includes("camera") || userData.itemName.includes("trigger"))) {//!userData.hasItem || (userData.itemName.includes("camera"))
                 var point = new Vector3(x, y, z);
                 // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js

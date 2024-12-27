@@ -183,6 +183,23 @@ function addItem(found, loaded) {
         if (loaded) {
             userData = found;
             userDataLoadedItem = userData.item;
+        } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
+            GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube" ||
+            GLOBALS.ITEM_HOLDED_NAME == "scale_cube") {
+
+            userData = GLOBALS.PLANE_USER_DATA[found[i].instanceId];
+
+            //GET CEILING SURFACE
+            for (var x = 0, j = 2; x < 100; x++, j += 2) {
+
+                var boxTop = getPlaneByName(userData.position.x + "/" + (userData.position.y + j) + "/" + userData.position.z);
+
+                if (boxTop.length > 0) {
+                    userData = boxTop[0];
+                    console.log(userData)
+                    break;
+                }
+            }
         } else {
             userData = GLOBALS.PLANE_USER_DATA[found[i].instanceId];
             userData.hasItem = false; //delete here
@@ -210,22 +227,23 @@ function addItem(found, loaded) {
                 box.userData.triggerVisibility = true;
                 box.userData.soundEffect = null;
                 box.userData.soundEffectLoop = false;
+                box.userData.link = null;
 
                 //
                 var map;
-                if(GLOBALS.ITEM_HOLDED_NAME == "trigger_area")
+                if (GLOBALS.ITEM_HOLDED_NAME == "trigger_area")
                     map = trigger_connection;
-                else if(GLOBALS.ITEM_HOLDED_NAME == "trigger_save")
+                else if (GLOBALS.ITEM_HOLDED_NAME == "trigger_save")
                     map = trigger_save;
-                else if(GLOBALS.ITEM_HOLDED_NAME == "trigger_voice")
+                else if (GLOBALS.ITEM_HOLDED_NAME == "trigger_voice")
                     map = trigger_voice;
-                else if(GLOBALS.ITEM_HOLDED_NAME == "trigger_audio")
+                else if (GLOBALS.ITEM_HOLDED_NAME == "trigger_audio")
                     map = trigger_audio;
 
                 const geometryPlane = new PlaneGeometry(1, 1);
-                const materialPlane = new MeshBasicMaterial({ 
-                    color: new Color($("#" + GLOBALS.ITEM_HOLDED_NAME).data("color")), 
-                    map: map, 
+                const materialPlane = new MeshBasicMaterial({
+                    color: new Color($("#" + GLOBALS.ITEM_HOLDED_NAME).data("color")),
+                    map: map,
                     transparent: true,
                     side: 2,
                     opacity: 0.5,
@@ -264,15 +282,16 @@ function addItem(found, loaded) {
 
                 var item = new Group();
 
-                const geometry = new CircleGeometry(0.25, 32);
-                const material = new MeshBasicMaterial({ color: 0x000000 });
+                const geometry = new CircleGeometry(1, 10);
+                const material = new MeshBasicMaterial({ color: new Color(0,2,5), transparent: true, opacity: 0.5 });
                 const circle = new Mesh(geometry, material);
                 circle.rotation.x = -Math.PI / 2;
                 circle.name = "circle_rotation";
-                //item.add(circle);
+                item.add(circle);
                 circle.translateZ(0.01);
 
                 const door = SkeletonUtils.clone(GLOBALS.ENTER_DOOR);
+                door.remove(door.getObjectByName("trigger"))
                 door.position.set(0, 0, 0);
                 door.rotation.set(0, 0, 0);
                 //door.visible=false

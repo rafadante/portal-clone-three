@@ -363,7 +363,7 @@ select {
   }
 }
 
-form{
+form {
   background-color: rgba(0, 0, 0, 0.404);
   display: flex;
   flex-direction: column;
@@ -372,20 +372,45 @@ form{
   position: absolute;
   backdrop-filter: blur(30px);
 
-  textarea{
+  textarea {
     height: 100px;
   }
 
-  label, textarea{
+  label,
+  textarea {
     margin: 10px;
   }
 
-  input[name="sample"]{
+  input[name="sample"] {
     height: 100px;
   }
 }
 
-#trigger_audio-state{
+#trigger_audio-state {
   max-height: 200px;
   overflow-y: scroll;
+}
+
+#audio-trigger {
+  display: none;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 10000;
+  width: auto;
+  padding: 10px;
+  height: auto;
+  flex-direction: column;
+  background-color: white;
+  color: black;
+  font-size: 15px;
+  font-weight: bolder;
+
+  span{
+    margin-bottom: 10px;
+  }
+
+  a{
+    color: blue;
+  }
 }

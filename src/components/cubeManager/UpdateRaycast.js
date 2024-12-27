@@ -3,6 +3,7 @@ import { createLightBridges } from '../continuous/Continuous.js';
 import { ContinuousTrigger } from '../continuous/Continuous.js';
 import $ from 'jquery';
 import { laserEmitterRaycast } from '../lasers/Laser.js';
+import { Color, Vector3, Box3 } from 'three';
 
 function checkToUpdateContinuous() {
 
@@ -86,7 +87,38 @@ function checkToUpdateContinuous() {
             GLOBALS.LASER_EMITTER_RAYCASTER[i],
             i);
     }
+
+    var bb = new Box3(); // for re-use
+    bb.setFromObject(GLOBALS.EXIT_DOOR.getObjectByName("trigger"));
+    GLOBALS.EXIT_DOOR.bb = bb;
+    GLOBALS.EXIT_DOOR.add(GLOBALS.EXIT_DOOR.getObjectByName("trigger"));
+
+    var bb = new Box3(); // for re-use
+    bb.setFromObject(GLOBALS.ENTER_DOOR.getObjectByName("trigger"));
+    GLOBALS.ENTER_DOOR.bb = bb;
+    GLOBALS.ENTER_DOOR.add(GLOBALS.ENTER_DOOR.getObjectByName("trigger"));
+
+    GLOBALS.ENTER_DOOR.getObjectByName("trigger").material.color = new Color(0x00ff00);
+    GLOBALS.EXIT_DOOR.getObjectByName("trigger").material.color = new Color(0x00ff00);
+    window.allowTest = true;
+
+    for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
+        if (GLOBALS.PLANE_USER_DATA[i].exists) {
+
+            if (GLOBALS.ENTER_DOOR.bb.containsPoint(GLOBALS.PLANE_USER_DATA[i].position)) {
+                GLOBALS.ENTER_DOOR.getObjectByName("trigger").material.color = new Color(0xff0000);
+                window.allowTest = false;
+            }
+
+            if (GLOBALS.EXIT_DOOR.bb.containsPoint(GLOBALS.PLANE_USER_DATA[i].position)) {
+                GLOBALS.EXIT_DOOR.getObjectByName("trigger").material.color = new Color(0xff0000);
+                window.allowTest = false;
+            }
+        }
+    }
 }
+
+window.allowTest = true;
 
 export {
     checkToUpdateContinuous

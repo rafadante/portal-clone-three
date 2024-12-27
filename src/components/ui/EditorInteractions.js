@@ -230,7 +230,7 @@ $("body").on('input', '#dispenser-opened', function () {
 
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.opened = this.checked;
 
-    var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName);
+    {/**var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName);
 
     if (this.checked) {
         instanced.instances[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.id].position.y = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].position.y + 1;
@@ -238,7 +238,7 @@ $("body").on('input', '#dispenser-opened', function () {
         instanced.instances[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.id].position.y = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserPosition.y - 1;
     }
 
-    instanced.instances[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.id].updateMatrix(); // necessary after transformations
+    instanced.instances[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.id].updateMatrix(); // necessary after transformations */}
 })
 
 $("body").on('input', '#state-lines', function () {

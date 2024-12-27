@@ -19,6 +19,7 @@ import {
 } from '../../Utils.js';
 import { addConnectionPoints, clickItem, updateLines } from '../items/AddItem.js';
 import { manageConnection } from './Connection.js';
+import { checkToUpdateContinuous } from '../cubeManager/UpdateRaycast.js';
 
 const orange = new Color("rgb(255, 165, 0)");
 var initialPosition = null;
@@ -209,7 +210,7 @@ function raycastSelected(found, event, type) {
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("faith_plate")) {
                         $(".faith_plate").css("display", "block");
                         //$("#plate-max-height-value").prop("min", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height - 2);
-                        $("#plate-max-height-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height);
+                        $("#plate-max-height-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.heightLine);
                     }
 
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("angled_panel")) {
@@ -226,6 +227,8 @@ function raycastSelected(found, event, type) {
                     }
 
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_voice")) {
+                        $(".trigger_voice").css("display", "block");
+                        $("#state-trigger-voice-link").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.link);
                         $("#state-trigger-multiple").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.multipleTrigger);
                     }
 
@@ -407,34 +410,21 @@ function raycastSelected(found, event, type) {
                             window.changingPosition = true;
                             window.changingPositionPlane = planeInstanceOld;
                             addConnectionPoints(planeInstanceNew);
-                            updateLines(planeInstanceNew, false)
+                            updateLines(planeInstanceNew, false);
+
+                            if (planeInstanceNew.item) {
+                                if (planeInstanceNew.item.name.includes("Door")) {
+                                    setTimeout(() => {
+                                        checkToUpdateContinuous();
+                                    }, 10);
+                                }
+                            }
                         }
 
                         removeSelection();
                         GLOBALS.SELECTED_ID[0] = instanceId;
                         return;
                     }
-                }
-            }
-        }
-
-        if (type == "down" && instanceId) {
-            if (GLOBALS.PLANE_USER_DATA[instanceId].itemName) {
-                if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_voice")) {
-                    if (GLOBALS.PLANE_USER_DATA[instanceId].item.userData.speech) {
-                        form.sample.value = GLOBALS.PLANE_USER_DATA[instanceId].item.userData.speech;
-                        form.voice.value = GLOBALS.PLANE_USER_DATA[instanceId].item.userData.voice;
-                        form.volume.value = GLOBALS.PLANE_USER_DATA[instanceId].item.userData.volume * 100;
-                        form.pitch.value = GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pitch * 100;
-                        form.rate.value = GLOBALS.PLANE_USER_DATA[instanceId].item.userData.rate * 100;
-                    } else {
-                        form.sample.value = "Hello. And again, welcome to the aperture science computer aided enrichment center. We hope your brief detention in the relaxation vault has been a pleasant one.";
-                        form.voice.value = "Google US English";
-                        form.volume.value = 100;
-                        form.pitch.value = 100;
-                        form.rate.value = 100;
-                    }
-
                 }
             }
         }

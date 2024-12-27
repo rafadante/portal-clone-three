@@ -9,6 +9,9 @@ import { Vector3 } from 'three';
 //BACK FROM EDITOR
 $("body").on('click', '#back-editor', function () {
 
+    GLOBALS.ENTER_DOOR.getObjectByName("trigger").visible = true;
+    GLOBALS.EXIT_DOOR.getObjectByName("trigger").visible = true;
+
     const cleanMaterial = material => {
         console.log('dispose material!')
         material.dispose()

@@ -48,8 +48,13 @@
 
   <div id="ui">
 
-    <!--<input id="sample-audio" name="sample" type="text" value="">-->
-    <div id="audio-trigger" style="
+    <div id="audio-trigger">
+      <span>You can create voice lines from GLaDOS in this link <a href="https://glados.c-net.org/" target="_blank">link</a></span>
+      <span>After processing, download the audio and store in <a href="https://www.dropbox.com/home" target="_blank">dropbox</a> account</span>
+      <span>After that, just share the link and copy in the voice input field.</span>
+    </div>
+
+    <!--<div id="audio-trigger" style="
     display: none;
     position: absolute;
     top: 10px;
@@ -58,12 +63,6 @@
     width: 300px;
     height: 150px;
     flex-direction: column;">
-
-      <!--<label for="story" style="color: black; font-weight: bolder;">Audio to play on trigger enter:</label>
-      <textarea name="story" id="sample-audio" style="
-      width: 300px;
-      height: 150px;
-      "></textarea>-->
 
       <form id="">
         <textarea
@@ -74,7 +73,7 @@
         <label>Rate: <input name="rate" type="range" min="1" max="100" value="100"></label>
         <input name="play" type="button" value="Save Voice To Play On Trigger Enter">
       </form>
-    </div>
+    </div>-->
 
     <div id="side-bar-left">
       <div id="info-box">
@@ -471,7 +470,7 @@
 
           <div>
             <img alt="image"
-              data-content="An area that triggers once the players walks into it, you can link to items just like buttons. You can choose between a one time trigger or a multiple one."
+              data-content="An area that triggers once the players walks into it, you can link to items just like buttons. You can choose between a one time trigger or a multiple one. You can also change the visibility."
               data-title="TRIGGER ENTER" class="item" data-name="trigger_area" src="../assets/ui/items/trigger.jpg"
               data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
               data-color="rgb(255,127,80)" id="trigger_area" />
@@ -479,21 +478,21 @@
           </div>
 
           <div>
-            <img alt="image" data-content="" data-title="TRIGGER SAVE" class="item" data-name="trigger_save"
+            <img alt="image" data-content="An area that saves once the players walks into it. You can also change the visibility." data-title="TRIGGER SAVE" class="item" data-name="trigger_save"
               src="../assets/ui/items/save.jpg" data-allowconnection="false" data-rotate="false" data-floor="true"
               data-ceiling="true" data-walls="true" data-color="rgb(0,255,0)" id="trigger_save" />
             <span>10</span>
           </div>
 
           <div>
-            <img alt="image" data-content="" data-title="TRIGGER VOICE" class="item" data-name="trigger_voice"
+            <img alt="image" data-content="An area that plays a voice once the players walks into it. You can also change the visibility." data-title="TRIGGER VOICE" class="item" data-name="trigger_voice"
               src="../assets/ui/items/voice.jpg" data-allowconnection="false" data-rotate="false" data-floor="true"
               data-ceiling="true" data-walls="true" data-color="rgb(255,0,0)" id="trigger_voice" />
             <span>10</span>
           </div>
 
           <div>
-            <img alt="image" data-content="" data-title="TRIGGER SOUND" class="item" data-name="trigger_audio"
+            <img alt="image" data-content="An area that plays a sound effect once the players walks into it. You can also change the visibility." data-title="TRIGGER SOUND" class="item" data-name="trigger_audio"
               src="../assets/ui/items/sound.jpg" data-allowconnection="false" data-rotate="false" data-floor="true"
               data-ceiling="true" data-walls="true" data-color="rgb(0,0,255)" id="trigger_audio" />
             <span>10</span>
@@ -981,6 +980,18 @@
       <a href="#" class="menu-btn">
         <input type="checkbox" id="state-trigger-loop" />
         <span class="menu-text">Loop (replace ambient sound)</span>
+      </a>
+    </li>
+
+    <li class="menu-item hasItem trigger_voice">
+      <a href="#" class="menu-btn">
+        <input placeholder="link to audio" type="text" id="state-trigger-voice-link" />
+      </a>
+    </li>
+
+    <li class="menu-item hasItem trigger_voice">
+      <a href="#" class="menu-btn">
+        <button id="play-trigger-voice">Play/Save Voice</button>
       </a>
     </li>
     

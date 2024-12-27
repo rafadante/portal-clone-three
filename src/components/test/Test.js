@@ -31,14 +31,17 @@ import { deletePortal, portalButton } from '../portal/CreatePortal.js';
 import { resetPlayerBody } from '../fps/Player.js';
 
 $("body").on('click', '#view-fps', function () {
-    //
-    $("#loading-parent").css("opacity", 1)
-    $("#loading-parent").css("pointer-events", "all")
+    if (window.allowTest) {
+        $("#loading-parent").css("opacity", 1)
+        $("#loading-parent").css("pointer-events", "all")
 
-    if (GLOBALS.PLAYER_MODEL) {
-        viewFPS();
+        if (GLOBALS.PLAYER_MODEL) {
+            viewFPS();
+        } else {
+            loadAvatar();
+        }
     } else {
-        loadAvatar();
+        alert("The corridor enter and exit bounding box must be green!")
     }
 });
 
@@ -83,8 +86,8 @@ function renderThingsBefore() {
         }
     }
 
-    portalButton(0, pointInSpace[0], GLOBALS.MAIN_CAMERA);
-    portalButton(2, pointInSpace[1], GLOBALS.MAIN_CAMERA);
+    portalButton(0, pointInSpace[0], GLOBALS.MAIN_CAMERA, true);
+    portalButton(2, pointInSpace[1], GLOBALS.MAIN_CAMERA, true);
 
     setTimeout(() => {
 
@@ -315,6 +318,10 @@ function viewFPS(firstRender) {
 };
 
 function setup() {
+
+    GLOBALS.ENTER_DOOR.getObjectByName("trigger").visible = false;
+    GLOBALS.EXIT_DOOR.getObjectByName("trigger").visible = false;
+
     addGel();
     GLOBALS.DEBUGGER_GROUP.visible = true;
     GLOBALS.MAIN_CAMERA.lookAt(GLOBALS.ENTER_DOOR.position);
@@ -362,9 +369,14 @@ function blockPortal() {
     }
 
     for (var i = 0; i < GLOBALS.DOORS.length; i++) {
-        GLOBALS.BLOCK_PORTAL.push(GLOBALS.DOORS[i].children[0].children[0])
-        GLOBALS.BLOCK_PORTAL.push(GLOBALS.DOORS[i].children[0].children[1])
+
+        console.log(GLOBALS.DOORS[i].children[1])
+
+        GLOBALS.BLOCK_PORTAL.push(GLOBALS.DOORS[i].children[1].children[0])
+        GLOBALS.BLOCK_PORTAL.push(GLOBALS.DOORS[i].children[1].children[1])
     }
+
+    console.log(GLOBALS.BLOCK_PORTAL)
 }
 
 export {
