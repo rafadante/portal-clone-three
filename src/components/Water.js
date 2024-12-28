@@ -79,7 +79,7 @@ class Water extends Mesh {
 					'alpha': { value: 1.0 },
 					'time': { value: 0.0 },
 					'size': { value: 1.0 },
-					'distortionScale': { value: 20.0 },
+					'distortionScale': { value: 0.0 },
 					'textureMatrix': { value: new Matrix4() },
 					'sunColor': { value: new Color(0x7F7F7F) },
 					'sunDirection': { value: new Vector3(0.70707, 0.70707, 0) },
@@ -221,6 +221,8 @@ class Water extends Mesh {
 			if (!GLOBALS.FPS_MODE) {
 				return;
 			}
+
+			return;
 
 			if (!GLOBALS.GOO_REFLECTIONS) {
 				if(first){

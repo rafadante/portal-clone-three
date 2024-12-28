@@ -4,6 +4,7 @@ import { ContinuousTrigger } from '../continuous/Continuous.js';
 import $ from 'jquery';
 import { laserEmitterRaycast } from '../lasers/Laser.js';
 import { Color, Vector3, Box3 } from 'three';
+import { AddGoo } from '../goo/Goo.js';
 
 function checkToUpdateContinuous() {
 
@@ -116,6 +117,43 @@ function checkToUpdateContinuous() {
             }
         }
     }
+
+    //uPDATE GOO
+    for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
+        if (GLOBALS.PLANE_USER_DATA[i].exists && GLOBALS.PLANE_USER_DATA[i].hasItem && GLOBALS.PLANE_USER_DATA[i].hasGoo) {
+
+            const item = GLOBALS.PLANE_USER_DATA[i].item;
+            //item.translateY(1)
+
+            GLOBALS.SCENE_CHILDREN.remove(item.water);
+            GLOBALS.SCENE_CHILDREN.remove(item.lava);
+            //GLOBALS.SCENE.remove(item);
+
+            for (var j = 0; j < item.ids.length; j++) {
+                GLOBALS.PLANE_USER_DATA[item.ids[j]].hasGoo = false;
+            }
+
+            for (var j = GLOBALS.GOO_BOXES.length - 1; j >= 0; j--) {
+                if (GLOBALS.GOO_BOXES[j].idPlane == GLOBALS.PLANE_USER_DATA[i].id_instanced) {
+                    const index = GLOBALS.GOO_BOXES.indexOf(GLOBALS.GOO_BOXES[j]);
+                    if (index > -1) { // only splice array when item is found
+                        GLOBALS.GOO_BOXES.splice(index, 1); // 2nd parameter means remove one item only
+                    }
+                }
+            }
+
+            //NOW ADD AGAIN
+            const userData = GLOBALS.PLANE_USER_DATA[i];
+            userData.hasItem = true;
+            userData.itemName = "goo";
+            userData.item = item;
+
+            console.log(userData)
+
+            AddGoo(userData);
+        }
+    }
+
 }
 
 window.allowTest = true;

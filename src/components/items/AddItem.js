@@ -107,6 +107,7 @@ const trigger_connection = textureLoader.load('./assets/textures/trigger_connect
 const trigger_save = textureLoader.load('./assets/textures/trigger_save.png');
 const trigger_voice = textureLoader.load('./assets/textures/trigger_voice.png');
 const trigger_audio = textureLoader.load('./assets/textures/trigger_audio.png');
+const falling = textureLoader.load('./assets/textures/falling.png');
 
 function addItem(found, loaded) {
 
@@ -148,15 +149,41 @@ function addItem(found, loaded) {
         else
             userData = GLOBALS.PLANE_USER_DATA[found[0].instanceId];
 
+        if (userData.hasGoo) {
+            alert("Already has goo!")
+            return;
+        }
+
         userData.hasItem = true;
+        userData.hasGoo = true;
         userData.itemName = "goo";
 
+        const geometry = new BoxGeometry(1.98, 2, 1.98);
+        const box = new Mesh(geometry, new MeshBasicMaterial({
+            color: new Color("rgb(150,75,0)"),
+            side: 2,
+            transparent: true,
+            opacity: 0.5,
+            map: trigger_border
+        }));
 
-        if (loaded) {
-            var ar = [found]
-            AddGoo(ar, true);
-        } else
-            AddGoo(found, false);
+        box.position.copy(userData.position);
+        box.translateY(1)
+        GLOBALS.SCENE.add(box);
+        userData.item = box;
+
+        const geometryPlane = new PlaneGeometry(2, 2);
+        const materialPlane = new MeshBasicMaterial({
+            color: new Color("rgb(150,75,0)"),
+            map: falling,
+            side: 2,
+            depthTest: false,
+            transparent: true
+        });
+        const plane = new Mesh(geometryPlane, materialPlane);
+        box.add(plane);
+
+        AddGoo(userData);
 
         return;
     }
@@ -283,7 +310,7 @@ function addItem(found, loaded) {
                 var item = new Group();
 
                 const geometry = new CircleGeometry(1, 10);
-                const material = new MeshBasicMaterial({ color: new Color(0,2,5), transparent: true, opacity: 0.5 });
+                const material = new MeshBasicMaterial({ color: new Color(0, 2, 5), transparent: true, opacity: 0.5 });
                 const circle = new Mesh(geometry, material);
                 circle.rotation.x = -Math.PI / 2;
                 circle.name = "circle_rotation";

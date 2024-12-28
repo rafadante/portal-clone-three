@@ -9,6 +9,10 @@ import { Vector3 } from 'three';
 //BACK FROM EDITOR
 $("body").on('click', '#back-editor', function () {
 
+    for(var i=0; i<GLOBALS.GOO_PLANES.length;i++){
+        GLOBALS.GOO_PLANES[i].item.visible = true;
+    }
+
     GLOBALS.ENTER_DOOR.getObjectByName("trigger").visible = true;
     GLOBALS.EXIT_DOOR.getObjectByName("trigger").visible = true;
 

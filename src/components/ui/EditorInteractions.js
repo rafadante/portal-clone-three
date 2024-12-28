@@ -174,31 +174,56 @@ $("body").on('click', '#delete', function () {
         deleteItemInstanced(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false);
     } else {
 
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "faith_plate") {
-            GLOBALS.SCENE.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target);
-            GLOBALS.GROUP_LINE_TRAGECTORY.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target.line);
-        }
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName == "goo") {
 
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "glass") {
-            const index = GLOBALS.GLASS_RAYCASTER.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.raycaster);
-            if (index > -1) { // only splice array when item is found
-                GLOBALS.GLASS_RAYCASTER.splice(index, 1); // 2nd parameter means remove one item only
+            const item = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item;
+
+            GLOBALS.SCENE_CHILDREN.remove(item.water);
+            GLOBALS.SCENE_CHILDREN.remove(item.lava);
+            GLOBALS.SCENE.remove(item);
+
+            for (var j = 0; j < item.ids.length; j++) {
+                GLOBALS.PLANE_USER_DATA[item.ids[j]].hasGoo = false;
             }
+
+            for (var j = GLOBALS.GOO_BOXES.length - 1; j >= 0; j--) {
+                if (GLOBALS.GOO_BOXES[j].idPlane == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].id_instanced) {
+                    const index = GLOBALS.GOO_BOXES.indexOf(GLOBALS.GOO_BOXES[j]);
+                    if (index > -1) { // only splice array when item is found
+                        GLOBALS.GOO_BOXES.splice(index, 1); // 2nd parameter means remove one item only
+                    }
+                }
+            }
+
+        } else {
+
+            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "faith_plate") {
+                GLOBALS.SCENE.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target);
+                GLOBALS.GROUP_LINE_TRAGECTORY.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target.line);
+            }
+
+            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "glass") {
+                const index = GLOBALS.GLASS_RAYCASTER.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.raycaster);
+                if (index > -1) { // only splice array when item is found
+                    GLOBALS.GLASS_RAYCASTER.splice(index, 1); // 2nd parameter means remove one item only
+                }
+            }
+
+            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous) {
+                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide.hasItem = false;
+                GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous);
+            }
+
+            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge) {
+                GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge)
+            }
+
+            GLOBALS.ITEMS_COUNT[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName]["count"] -= 1;
+            GLOBALS.ITEMS_ADDED.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item);
+
+            $("#" + GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName).parent().children("span").text(GLOBALS.ITEMS_COUNT[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName]["max"] - GLOBALS.ITEMS_COUNT[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName]["count"])
+
         }
-
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous) {
-            GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide.hasItem = false;
-            GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous);
-        }
-
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge) {
-            GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge)
-        }
-
-        GLOBALS.ITEMS_COUNT[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName]["count"] -= 1;
-        GLOBALS.ITEMS_ADDED.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item);
-
-        $("#" + GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName).parent().children("span").text(GLOBALS.ITEMS_COUNT[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName]["max"] - GLOBALS.ITEMS_COUNT[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName]["count"])
     }
 
     planeInstanceReset(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false, null, null, null, null, null, null, null, false, null, false, false);

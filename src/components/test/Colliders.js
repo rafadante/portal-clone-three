@@ -35,6 +35,10 @@ import { gelTrigger } from '../gels/Gels.js';
 
 function colliderItemManager() {
 
+    for(var i=0; i<GLOBALS.GOO_PLANES.length;i++){
+        GLOBALS.GOO_PLANES[i].item.visible = false;
+    }
+
     //CORRIDOR ENTER COLLIDERS
     corridorColliderNames(GLOBALS.CORRIDOR_ENTER, false);
 
