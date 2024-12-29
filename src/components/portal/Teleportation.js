@@ -1,8 +1,4 @@
-import {
-    Matrix4,
-    Quaternion,
-    Vector3
-} from 'three';
+import { Matrix4, Quaternion, Vector3 } from 'three';
 import * as CANNON from "cannon";
 import { AUDIO, play } from '../audio/Audio.js';
 import { removeJointConstraint } from "../../Physics.js";
@@ -339,6 +335,7 @@ function addCameraBody(obj) {
     obj.body = box;
     obj.cube.body = box;
     obj.name = "camera";
+    box.name = "camera";
     GLOBALS.DYNAMIC_OBJECTS.push(box);
     GLOBALS.CANNON_WORLD.addBody(box);
     GLOBALS.INTERACTIVE.push(obj.cube);

@@ -1,43 +1,21 @@
-import {
-    Vector3,
-    Quaternion,
-    Object3D,
-    MeshBasicMaterial,
-    RectAreaLight,
-    MeshStandardMaterial,
-    PlaneGeometry,
-    Mesh,
-    SpotLight,
-    Color
-} from 'three';
+import { Vector3, Quaternion, Object3D, MeshBasicMaterial, MeshStandardMaterial, SpotLight, Color } from 'three';
 import * as CANNON from 'cannon';
-import {
-    threeToCannon,
-    ShapeType
-} from 'three-to-cannon';
-import {
-    GLOBALS
-} from '../../Globals.js';
+import { threeToCannon, ShapeType } from 'three-to-cannon';
+import { GLOBALS } from '../../Globals.js';
 import { addPositionalAudio } from '../audio/Audio.js';
 import { deletePortal } from '../portal/CreatePortal.js';
-import {
-    tweenCamera,
-} from '../../Utils.js';
+import { tweenCamera, } from '../../Utils.js';
 import { interactWithItem } from '../events/events.js';
 import { respawn } from '../events/states.js';
 import { addLaserToCube } from '../lasers/Laser.js';
-import {
-    addPelletBall,
-    addPelletCatcher
-} from '../pellet/Pellet.js';
+import { addPelletBall, addPelletCatcher } from '../pellet/Pellet.js';
 import { faithPlate } from '../faithPlate/FaithPlate.js';
 import { gelTrigger } from '../gels/Gels.js';
 
 function colliderItemManager() {
 
-    for(var i=0; i<GLOBALS.GOO_PLANES.length;i++){
+    for (var i = 0; i < GLOBALS.GOO_PLANES.length; i++)
         GLOBALS.GOO_PLANES[i].item.visible = false;
-    }
 
     //CORRIDOR ENTER COLLIDERS
     corridorColliderNames(GLOBALS.CORRIDOR_ENTER, false);
@@ -131,12 +109,6 @@ function addColliderDoorsDefault(obj) {
     GLOBALS.CANNON_WORLD.addBody(door);
 
     //ADD FIZZLER
-    const geometry = new PlaneGeometry(2, 2);
-    const plane = new Mesh(geometry, GLOBALS.MATERIAL_FIZZLER);
-    plane.translateZ(-0.1);
-    obj.fizzler = plane;
-    obj.add(plane);
-
     fizzlerTrigger(door)
 }
 
@@ -216,12 +188,12 @@ function addColliderItem(items, type, mass, offset) {
                 var shape = new CANNON.Box(new CANNON.Vec3(1, 1, 0.01));
 
                 var vec = new Vector3();
-                items[i].children[0].getWorldPosition(vec)
+                items[i].children[1].getWorldPosition(vec)
                 var pos = vec;
                 objHolder.position.copy(pos);
 
                 var vec = new Quaternion();
-                items[i].children[0].getWorldQuaternion(vec)
+                items[i].children[1].getWorldQuaternion(vec)
                 var rot = vec;
             } else if (type == "cube" || type == "cube_2" || type == "laser_cube" || type == "scale_cube") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.3, 0.3));
@@ -439,15 +411,6 @@ function addColliderItem(items, type, mass, offset) {
                         }
                     }
 
-                    /*if (event.body.type != "purple") {
-                        if (GLOBALS.PLAYER.customGravity) {
-                            clearTimeout(event.target.timeout);
-                            event.target.timeout = setTimeout(() => {
-                                playerExitPurpleGel();
-                            }, 1000);
-                        }
-                    }*/
-
                     if (event.body.name == "gel" && event.body.type == "blue") {
 
                         if (!event.target.playingAudioGel) {
@@ -493,8 +456,6 @@ function addColliderItem(items, type, mass, offset) {
                 box.addEventListener('wakeup', (event) => {
                     box.sleeping = false;
                 })
-            } else {
-
             }
 
             GLOBALS.CANNON_WORLD.addBody(box);

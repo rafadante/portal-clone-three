@@ -114,6 +114,8 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
 
     raycaster.name = item;
 
+    raycaster.far = intersects[0].distance + 0.1;
+
     if (update)
         rayItem = raycaster;
     else
@@ -220,6 +222,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
             fizzlerTrigger(box);
         }
     } else if (item == "tractor_beam") {
+
         var bb = new Box3(); // for re-use
         bb.setFromObject(plane);
         bb.side = 1;
@@ -235,6 +238,9 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
             GLOBALS.TRACTOR_BEAM.push(plane);
             GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.push(bb);
         }
+
+        console.log(GLOBALS.TRACTOR_BEAM)
+        console.log(GLOBALS.TRACTOR_BEAM_BOUNDING_BOX)
     }
 }
 

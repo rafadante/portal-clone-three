@@ -505,8 +505,11 @@
       <div id="top-menu-left">
         <span id="save-level">Save</span>
         <span id="load-level">Load</span>
-        <span>Help</span>
+        <!--<span>Help</span>-->
         <span id="view-fps">Test</span>
+        <input id="chamber-name-to-save" type="text" value="" placeholder="Name of the Chamber">
+        <span style="font-weight: normal;">by</span>
+        <input id="author-name-to-save" type="text" value="" placeholder="Name of the Author">
       </div>
     </div>
   </div>
@@ -563,12 +566,12 @@
       </a>
     </li>
 
-    <!--<li id="lines" class="menu-item hasItem buttons" style="display: none !important;">
+    <li id="lines" class="menu-item hasItem buttons" style="display: none !important;">
       <a href="#" class="menu-btn">
         <input type="checkbox" checked id="state-lines" />
         <span class="menu-text">Show Lines</span>
       </a>
-    </li>-->
+    </li>
 
     <li id="dispenser" class="menu-item hasItem dispenser">
       <a href="#" class="menu-btn">
@@ -1916,6 +1919,10 @@
   </audio>
   <audio id="ambient-11" preload="none" style="display: none" volume="0.15" loop>
     <source src="./audio/ambient/11.mp3" type="audio/mp3">
+  </audio>
+
+  <audio id="tiktok" preload="none" style="display: none" volume="1" loop>
+    <source src="./audio/tiktok.mp3" type="audio/mp3">
   </audio>
 
   <span id="warning-game" style="    position: absolute;

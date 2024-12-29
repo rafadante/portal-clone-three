@@ -1,11 +1,6 @@
-import {
-    Euler,
-    Vector3
-} from 'three';
+import { Euler, Vector3 } from 'three';
 import * as CANNON from 'cannon';
-import {
-    GLOBALS
-} from '../../Globals.js';
+import { GLOBALS } from '../../Globals.js';
 import { AUDIO, fadeAudio, play, addPositionalAudio } from '../audio/Audio.js';
 import { faithPlate } from '../faithPlate/FaithPlate.js';
 import { gelTrigger } from '../gels/Gels.js';

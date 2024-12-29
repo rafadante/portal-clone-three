@@ -9,7 +9,7 @@ function tractorBeam() {
 
         let pos = new Vector3(d.position.x, d.position.y - 1, d.position.z);
 
-        if (d.holding){
+        if (d.holding) {
             continue;
         }
 
@@ -112,7 +112,10 @@ function tractorBeam() {
 }
 
 function outOfTheTractor(d, j) {
-    
+
+    if(d.tractor != j)
+        return;
+
     if (d.name == "player") d.mass = 50;
     else d.mass = 5;
 
@@ -129,4 +132,4 @@ function outOfTheTractor(d, j) {
     }
 }
 
-export { tractorBeam,outOfTheTractor }
+export { tractorBeam, outOfTheTractor }

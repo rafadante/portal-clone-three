@@ -71,13 +71,12 @@ $("body").on('change', '#state-trigger-loop', function () {
 var timeoutAudio;
 
 $('#ambient-sound-select').on('change', function () {
-    console.log($(this).val())
-    console.log(document.getElementById("ambient-" + $(this).val()))
 
     AUDIO.AMBIENT.pause();
     AUDIO.AMBIENT.currentTime = 0;
 
     AUDIO.AMBIENT = document.getElementById("ambient-" + $(this).val());
+    AUDIO.AMBIENT.value = $(this).val();
     play(AUDIO.AMBIENT);
 
     clearTimeout(timeoutAudio);

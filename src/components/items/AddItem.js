@@ -1,43 +1,18 @@
 import {
-    Vector3,
-    Group,
-    MeshBasicMaterial,
-    CircleGeometry,
-    Mesh,
-    TextureLoader,
-    SRGBColorSpace,
-    BoxGeometry,
-    Color,
-    MeshStandardMaterial,
-    Object3D,
-    Box3,
-    ConeGeometry,
-    PlaneGeometry,
+    Vector3, Group, MeshBasicMaterial, CircleGeometry, Mesh, TextureLoader,
+    BoxGeometry, Color, Object3D, Box3, ConeGeometry, PlaneGeometry,
 } from 'three';
-import {
-    AddGoo
-} from '../goo/Goo.js';
-import {
-    GLOBALS
-} from '../../Globals.js';
+import { AddGoo } from '../goo/Goo.js';
+import { GLOBALS } from '../../Globals.js';
 import { findPath } from '../findPath/FindPath.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
-import {
-    createLightBridges
-} from '../continuous/Continuous.js';
+import { createLightBridges } from '../continuous/Continuous.js';
 import { ContinuousTrigger } from '../continuous/Continuous.js';
 import { getPlaneByName } from '../../Utils.js';
 import $ from 'jquery';
 import { planeInstanceReset } from './Items.js';
-import {
-    laserEmitterRaycast,
-    laserEmitterPosition
-} from '../lasers/Laser.js';
-import {
-    targetFaithPlateStart,
-    targetFaithPlateEnd,
-    targetFaithPlateUpdate
-} from '../faithPlate/FaithPlate.js';
+import { laserEmitterRaycast, laserEmitterPosition } from '../lasers/Laser.js';
+import { targetFaithPlateStart, targetFaithPlateEnd, targetFaithPlateUpdate } from '../faithPlate/FaithPlate.js';
 import { gelRecharger } from '../gels/PaintingGun.js';
 import { addLine } from '../boxSelection/Connection.js';
 import { load3D } from '../loadObj/LoaderOBJ.js';
@@ -55,15 +30,11 @@ function updateLines(userData, instanced) {
 
                 GLOBALS.CONNECTIONS[j]["from"] = userData;
                 GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[j]["line"]);
-                const line = addLine(GLOBALS.CONNECTIONS[j]["from"].position, GLOBALS.CONNECTIONS[j]["to"].position);
+                const line = addLine(GLOBALS.CONNECTIONS[j]["from"], GLOBALS.CONNECTIONS[j]["to"].position);
                 GLOBALS.SCENE_CHILDREN.add(line);
                 GLOBALS.CONNECTIONS[j]["line"] = line;
 
             } else if (GLOBALS.CONNECTIONS[j]["to"] == window.changingPositionPlane) {
-
-                //
-
-                console.log(userData)
 
                 GLOBALS.CONNECTIONS[j]["to"] = userData;
 
@@ -93,7 +64,7 @@ function updateLines(userData, instanced) {
                 //
 
                 GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[j]["line"]);
-                const line = addLine(GLOBALS.CONNECTIONS[j]["from"].position, endPos);
+                const line = addLine(GLOBALS.CONNECTIONS[j]["from"], endPos);
                 GLOBALS.SCENE_CHILDREN.add(line);
                 GLOBALS.CONNECTIONS[j]["line"] = line;
             }
@@ -110,6 +81,11 @@ const trigger_audio = textureLoader.load('./assets/textures/trigger_audio.png');
 const falling = textureLoader.load('./assets/textures/falling.png');
 
 function addItem(found, loaded) {
+
+    if (loaded) {
+        GLOBALS.ITEM_HOLDED_NAME = found.itemName.split('-')[0];
+        GLOBALS.DRAGGED_ITEM_ELEMENT = $("#" + GLOBALS.ITEM_HOLDED_NAME)
+    }
 
     if (!GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME)
         && GLOBALS.ITEM_HOLDED_NAME != "glass"
@@ -188,16 +164,11 @@ function addItem(found, loaded) {
         return;
     }
 
-    if (loaded) {
-        GLOBALS.ITEM_HOLDED_NAME = found.itemName.split('-')[0];
-        GLOBALS.DRAGGED_ITEM_ELEMENT = $("#" + GLOBALS.ITEM_HOLDED_NAME)
-    }
-
     const i = 0;
 
     if (GLOBALS.CONNECTING) {
 
-        target = GLOBALS.PLANE_USER_DATA[found[i].instanceId];
+        var target = GLOBALS.PLANE_USER_DATA[found[i].instanceId];
 
         GLOBALS.SELECTED_FOR_CONNECTION.trigger = target;
         GLOBALS.SELECTED_FOR_CONNECTION.normal = found[i].normal;
@@ -223,7 +194,6 @@ function addItem(found, loaded) {
 
                 if (boxTop.length > 0) {
                     userData = boxTop[0];
-                    console.log(userData)
                     break;
                 }
             }
@@ -319,6 +289,7 @@ function addItem(found, loaded) {
 
                 const door = SkeletonUtils.clone(GLOBALS.ENTER_DOOR);
                 door.remove(door.getObjectByName("trigger"))
+                door.remove(door.getObjectByName("fizzler"))
                 door.position.set(0, 0, 0);
                 door.rotation.set(0, 0, 0);
                 //door.visible=false
@@ -363,26 +334,16 @@ function addItem(found, loaded) {
             );
 
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
-                var target = new Vector3(); // create once an reuse it
-
-                if (loaded)
-                    target = found.position;
+                if (userData.side == "back" && userData.normal.y == 0)
+                    item.rotation.set(userData.normal.x, Math.PI, userData.normal.z)
                 else
-                    found[i].object.getWorldPosition(target);
-
-                item.position.copy(target);
+                    item.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
             } else {
-                item.position.copy(userData.position);
-
-                //PORTALS CAN NOT SPAWN ON ITEM POSITION
-                /*GLOBALS.PLANE_USER_DATA[userData.id_instanced].portal = false;
-                GLOBALS.PLANE_USER_DATA[userData.id_instanced].planeColor = 0x808080;
-                GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(userData.id_instanced, new Color(0x808080));
-                GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;*/
+                item.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
             }
 
             item.position.copy(userData.position);
-            item.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
+
             item.renderOrder = 2;
             item.name = GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount;
 
@@ -472,6 +433,7 @@ function addItem(found, loaded) {
 
                 userData.box3 = bb;
                 item.userData.connectedTo = [];
+                item.userData.showLines = true;
 
                 GLOBALS.LOADED_CONNECTIONS.push({
                     data: userDataLoadedItem,
@@ -564,29 +526,11 @@ function addItem(found, loaded) {
             } else if (GLOBALS.ITEM_HOLDED_NAME == "observation_room") {
                 GLOBALS.ITEMS_ADDED.add(item);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
+
                 item.translateY(0.025);
-
-                /*var bb = new Box3(); // for re-use
-                bb.setFromObject(item);
-                bb.side = 1;
-                bb.position = item.position;
-                bb.item = item;
-
-                GLOBALS.FAITH_PLATE_CONTACT_BOX.push(bb);
-
-                item.traverse(child => {
-                    if (child.name == "launch") {
-                        GLOBALS.FAITH_PLATE_TO_ROTATE.push(child)
-                    }
-                })
-
-                item.side = userData.side;
-                GLOBALS.ITEMS_ADDED.add(item);*/
-
                 item.traverse(child => {
                     if (child.name == "launch") {
                         item.ToRotate = child;
-                        //GLOBALS.FAITH_PLATE_TO_ROTATE.push(child)
                     }
                 })
 
@@ -598,7 +542,6 @@ function addItem(found, loaded) {
             } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
                 GLOBALS.ITEMS_ADDED.add(item);
                 GLOBALS.PORTAL_GUN_BOX.push(item);
-                //GLOBALS.DOORS.push(item)
             } else {
                 var idInstanced;
 
@@ -632,22 +575,15 @@ function addItem(found, loaded) {
                 instanced.setVisibilityAt(idInstanced, true);
                 instanced.setMatrixAt(idInstanced, item.matrix);
 
-                if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_blue") {
+                if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_blue")
                     instanced.setColorAt(idInstanced, new Color(0x0000ff));
-                    //instanced.instanceColor.needsUpdate = true;
-                } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_orange") {
+                else if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_orange")
                     instanced.setColorAt(idInstanced, new Color(0xffa500));
-                    //instanced.instanceColor.needsUpdate = true;
-                } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_white") {
+                else if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_white")
                     instanced.setColorAt(idInstanced, new Color(0xffffff));
-                    //instanced.instanceColor.needsUpdate = true;
-                }
-
 
                 instanced.computeBoundingSphere();
-
                 instanced.dispose();
-
                 instanced.instanceMatrix.needsUpdate = true;
             }
 
@@ -674,6 +610,7 @@ function addItem(found, loaded) {
 
 function manageItemVariables(item, userData, instanced) {
     item.userData.buttons = 0;
+    item.userData.showLines = true;
     item.userData.connections = 0;
     item.userData.opened = true;
     item.userData.instancedName = GLOBALS.ITEM_HOLDED_NAME;
@@ -732,6 +669,7 @@ function manageItemVariables(item, userData, instanced) {
 
 function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData) {
     item.userData.buttons = userDataLoadedItem.buttons;
+    item.userData.showLines = userDataLoadedItem.showLines;
     item.userData.connections = 0;//userDataLoadedItem.connections
     item.userData.opened = userDataLoadedItem.opened;
     item.userData.instancedName = userDataLoadedItem.instancedName;
@@ -827,8 +765,6 @@ function clickItem(elem) {
     $("#follow").attr("src", elem.attr("src"));
     GLOBALS.DRAGGED_ITEM_ELEMENT = elem;
 }
-
-const colorInnactive = new Color(0, 2.0, 5.0);
 
 function addConnectionPoints(userData) {
     userData.item.checkersSlots = [];

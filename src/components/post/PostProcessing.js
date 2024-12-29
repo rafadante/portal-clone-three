@@ -17,8 +17,15 @@ import { GLOBALS } from "../../Globals";
 
 //POST
 GLOBALS.SELECTED_FOR_BLOOM = new Selection();
+var initiated = false;
 
 function initPost() {
+
+    if(initiated)
+        return;
+
+    initiated = true;
+
     //
     GLOBALS.COMPOSER = new EffectComposer(GLOBALS.RENDERER, {
         multisampling: Math.min(4, GLOBALS.RENDERER.capabilities.maxSamples),

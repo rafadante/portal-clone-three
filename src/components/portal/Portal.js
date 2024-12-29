@@ -152,11 +152,13 @@ class Portal extends Group {
             this.mesh.userData.other = 1;
 
             light = GLOBALS.LIGHT_PORTAL_0;
+            light.intensity = 3;
         } else {
             this.mesh.userData.this = 1;
             this.mesh.userData.other = 0;
 
             light = GLOBALS.LIGHT_PORTAL_1;
+            light.intensity = 3;
         }
 
         light.position.copy(this.mesh.position)

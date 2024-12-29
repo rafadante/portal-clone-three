@@ -1,24 +1,10 @@
-import {
-    Group,
-    Vector3,
-    Quaternion,
-    Box3,
-    Object3D,
-} from 'three';
+import { Group, Vector3, Quaternion, Box3, Object3D, } from 'three';
 import $ from 'jquery';
-import {
-    GLOBALS
-} from '../../Globals.js';
-import {
-    addPositionalAudio,
-    AUDIO,
-    addAudio
-} from '../audio/Audio.js';
+import { GLOBALS } from '../../Globals.js';
+import { addPositionalAudio, AUDIO, addAudio } from '../audio/Audio.js';
 import { initPost } from '../post/PostProcessing.js';
 import './Colliders.js';
-import {
-    colliderItemManager
-} from './Colliders.js';
+import { colliderItemManager } from './Colliders.js';
 import { testLightsManager } from '../lights/Lights.js';
 import { manageInstances } from './Instances.js';
 import './BackToEditor.js';
@@ -35,11 +21,10 @@ $("body").on('click', '#view-fps', function () {
         $("#loading-parent").css("opacity", 1)
         $("#loading-parent").css("pointer-events", "all")
 
-        if (GLOBALS.PLAYER_MODEL) {
+        if (GLOBALS.PLAYER_MODEL)
             viewFPS();
-        } else {
+        else
             loadAvatar();
-        }
     } else {
         alert("The corridor enter and exit bounding box must be green!")
     }
@@ -62,6 +47,10 @@ function loadingTxt() {
 }
 
 function renderThingsBefore() {
+
+    setup();
+
+    return;
 
     var pointInSpace = [];
 
@@ -116,7 +105,6 @@ function viewFPS(firstRender) {
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.SCENE_FPS);
 
     GLOBALS.ITEM_CUBE.visible = false;
-    //GLOBALS.SPOTLIGHT.intensity = 0;
 
     var obj = GLOBALS.ENTER_DOOR.clone();
     obj.translateZ(1);
@@ -167,7 +155,6 @@ function viewFPS(firstRender) {
         var r = new Quaternion();
         GLOBALS.ENTER_DOOR.cube.getWorldQuaternion(r);
 
-        //GLOBALS.SCENE.add(cube);
         cube.position.copy(p);
         cube.quaternion.copy(r);
 
@@ -206,7 +193,6 @@ function viewFPS(firstRender) {
             GLOBALS.SCENE_FPS.add(GLOBALS.GUN_CLONE2);
         }
 
-
         GLOBALS.GUN.children[0].children[0].add(GLOBALS.LIGHTNIN_STRIKE_1,
             GLOBALS.LIGHTNIN_STRIKE_2, GLOBALS.LIGHTNIN_STRIKE_3);
 
@@ -242,7 +228,6 @@ function viewFPS(firstRender) {
 
         testLightsManager();
 
-        //GLOBALS.SCENE.background = new Color(0x000000);//0xff0000
         GLOBALS.FLASH.visible = false;
 
         blockPortal();
@@ -254,14 +239,12 @@ function viewFPS(firstRender) {
             GLOBALS.GUN.children[0].visible = false;
             GLOBALS.GUN_CLONE.children[0].visible = false;
             GLOBALS.GUN_CLONE2.children[0].visible = false;
-            //document.getElementById("reticle-img").style.display = "none";
             document.getElementById("reticle-img").src = './assets/textures/crosshairNull.png';
             document.getElementById("reticle-img").style.filter = "invert(1)";
         } else {
             GLOBALS.GUN.children[0].visible = true;
             GLOBALS.GUN_CLONE.children[0].visible = true;
             GLOBALS.GUN_CLONE2.children[0].visible = true;
-            //document.getElementById("reticle-img").style.display = "block";
             document.getElementById("reticle-img").style.filter = "none";
         }
 
@@ -278,30 +261,12 @@ function viewFPS(firstRender) {
 
         GLOBALS.PORTAL_GUN_BOX = holder;
         GLOBALS.FPS_MODE = true;
-
-        //stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
-        /*if (GLOBALS.EXIT_DOOR.userData.connections > 0)
-            stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
-          else
-            stateDoor(0, true, false, GLOBALS.EXIT_DOOR);*/
-
         GLOBALS.GROUP_LINE_TRAGECTORY.visible = false;
 
         if (GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic" && localStorage.getItem("quality-select") != "high"))
             GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;
 
         window.checkers.material.envMap = GLOBALS.ENV_MAP;
-
-        /*for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-            GLOBALS.CONNECTIONS[i]["line"].visible = false;
-            findPath(
-                GLOBALS.CONNECTIONS[i]["from"].position,
-                GLOBALS.CONNECTIONS[i]["to"].position,
-                GLOBALS.CONNECTIONS[i]["to"],
-                GLOBALS.CONNECTIONS[i]["from"],
-                GLOBALS.CONNECTIONS[i]
-            )
-        }*/
 
         if (GLOBALS.ITEMS_ADDED.getObjectByName("spawn")) {
             GLOBALS.CORRIDOR_ENTER.visible = false;
@@ -341,42 +306,30 @@ function setup() {
     if (GLOBALS.MOBILE)
         $("#mobile-controls").css("display", "block");
 
-    //GLOBALS.CUBES.remove(GLOBALS.PLANE_LEVEL_INSTANCED);
-
-    GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+    //GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
     //GLOBALS.RENDERER.dispose()
     window.loaded = true;
 }
 
 function blockPortal() {
-    for (var i = 0; i < GLOBALS.LIGHT_BRIDGE_RAYCASTER.length; i++) {
+    for (var i = 0; i < GLOBALS.LIGHT_BRIDGE_RAYCASTER.length; i++)
         GLOBALS.BLOCK_PORTAL.push(GLOBALS.LIGHT_BRIDGE_RAYCASTER[i].item.continuous)
-    }
 
-    for (var i = 0; i < GLOBALS.LASER_FIELD_RAYCASTER.length; i++) {
+    for (var i = 0; i < GLOBALS.LASER_FIELD_RAYCASTER.length; i++)
         GLOBALS.BLOCK_PORTAL.push(GLOBALS.LASER_FIELD_RAYCASTER[i].item.continuous)
-    }
 
-    for (var i = 0; i < GLOBALS.FIZZLER_RAYCASTER.length; i++) {
+    for (var i = 0; i < GLOBALS.FIZZLER_RAYCASTER.length; i++)
         GLOBALS.BLOCK_PORTAL.push(GLOBALS.FIZZLER_RAYCASTER[i].item.continuous)
-    }
 
     for (var i = 0; i < GLOBALS.GLASS_RAYCASTER.length; i++) {
-        if (!GLOBALS.GLASS_RAYCASTER[i].item.userData.grid) {
+        if (!GLOBALS.GLASS_RAYCASTER[i].item.userData.grid)
             GLOBALS.BLOCK_PORTAL.push(GLOBALS.GLASS_RAYCASTER[i].item.continuous)
-        }
-
     }
 
     for (var i = 0; i < GLOBALS.DOORS.length; i++) {
-
-        console.log(GLOBALS.DOORS[i].children[1])
-
         GLOBALS.BLOCK_PORTAL.push(GLOBALS.DOORS[i].children[1].children[0])
         GLOBALS.BLOCK_PORTAL.push(GLOBALS.DOORS[i].children[1].children[1])
     }
-
-    console.log(GLOBALS.BLOCK_PORTAL)
 }
 
 export {

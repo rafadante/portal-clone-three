@@ -3,7 +3,7 @@ import { createLightBridges } from '../continuous/Continuous.js';
 import { ContinuousTrigger } from '../continuous/Continuous.js';
 import $ from 'jquery';
 import { laserEmitterRaycast } from '../lasers/Laser.js';
-import { Color, Vector3, Box3 } from 'three';
+import { Color, Box3 } from 'three';
 import { AddGoo } from '../goo/Goo.js';
 
 function checkToUpdateContinuous() {
@@ -123,11 +123,8 @@ function checkToUpdateContinuous() {
         if (GLOBALS.PLANE_USER_DATA[i].exists && GLOBALS.PLANE_USER_DATA[i].hasItem && GLOBALS.PLANE_USER_DATA[i].hasGoo) {
 
             const item = GLOBALS.PLANE_USER_DATA[i].item;
-            //item.translateY(1)
-
             GLOBALS.SCENE_CHILDREN.remove(item.water);
             GLOBALS.SCENE_CHILDREN.remove(item.lava);
-            //GLOBALS.SCENE.remove(item);
 
             for (var j = 0; j < item.ids.length; j++) {
                 GLOBALS.PLANE_USER_DATA[item.ids[j]].hasGoo = false;
@@ -147,8 +144,6 @@ function checkToUpdateContinuous() {
             userData.hasItem = true;
             userData.itemName = "goo";
             userData.item = item;
-
-            console.log(userData)
 
             AddGoo(userData);
         }

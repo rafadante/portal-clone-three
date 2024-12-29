@@ -1,15 +1,4 @@
-import {
-    Object3D,
-    Color,
-    Vector3,
-    PlaneGeometry,
-    InstancedMesh,
-    BoxGeometry,
-    MeshBasicMaterial,
-    Mesh,
-    Box3,
-    DynamicDrawUsage
-} from 'three';
+import { Object3D, Color, Vector3, PlaneGeometry, BoxGeometry, MeshBasicMaterial, Mesh, Box3 } from 'three';
 import { GLOBALS } from '../../Globals.js';
 import { getPlaneByName, warning } from '../../Utils.js';
 import { checkToUpdateContinuous } from './UpdateRaycast.js';
@@ -30,24 +19,19 @@ function cubeState(button) {
 
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
             for (var j = 0; j < 6; j++) {
-                //if (GLOBALS.PLANE_USER_DATA[i].side != sides[j]) {
                 var exists = checkSidesWithItems(i, 1, sides[j])
                 if (exists) return;
-                //}
             }
         }
 
-        for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
+        for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++)
             trasnlatePlane(GLOBALS.SELECTED_ID[i], 1, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
-        }
     } else if (button == "minus") {
 
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
             for (var j = 0; j < 6; j++) {
-                //if (GLOBALS.PLANE_USER_DATA[i].side != sides[j]) {
                 var exists = checkSidesWithItems(i, -1, sides[j])
                 if (exists) return;
-                //}
             }
         }
 
@@ -78,6 +62,7 @@ function cubeState(button) {
 
         erase.updateMatrix();
         GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(IndexArray[i], erase.matrix);
+        GLOBALS.PLANE_LEVEL_INSTANCED.setVisibilityAt(IndexArray[i], false);
         GLOBALS.PLANE_USER_DATA[IndexArray[i]] = {};
         //GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
@@ -89,9 +74,8 @@ function cubeState(button) {
 
     checkToUpdateContinuous();
 
-    if (remove) {
+    if (remove)
         removeSelection();
-    }
 }
 
 function checkSidesWithItems(i, t, side) {
@@ -99,17 +83,8 @@ function checkSidesWithItems(i, t, side) {
     var sideOther;
 
     var dummy = new Object3D();
-    dummy.position.set(
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.x,
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y,
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.z
-    );
-    dummy.rotation.set(
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].rotation.x,
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].rotation.y,
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].rotation.z
-    );
-
+    dummy.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position);
+    dummy.rotation.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].rotation);
     dummy.translateZ(t);
 
     if (side == "left")
@@ -190,26 +165,25 @@ function trasnlatePlane(id, val, portal, old) {
     if (frontExists.length > 0) {
 
         GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(id, new Color(0xffffff));
-        //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
         var erase = new Object3D();
         erase.scale.set(0, 0, 0);
         erase.updateMatrix();
         GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(id, erase.matrix);
+        GLOBALS.PLANE_LEVEL_INSTANCED.setVisibilityAt(id, false);
         GLOBALS.PLANE_USER_DATA[id] = {};
 
         GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(frontExists[0].id_instanced, new Color(0xffffff));
-        //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
 
         //---------------------------------------
         var erase = new Object3D();
         erase.scale.set(0, 0, 0);
         erase.updateMatrix();
         GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(frontExists[0].id_instanced, erase.matrix);
+        GLOBALS.PLANE_LEVEL_INSTANCED.setVisibilityAt(frontExists[0].id_instanced, false);
         GLOBALS.PLANE_USER_DATA[frontExists[0].id_instanced] = {};
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
-        //
 
         GLOBALS.BUDGET += 2;
         remove = true;
@@ -221,6 +195,7 @@ function trasnlatePlane(id, val, portal, old) {
 
         dummy.updateMatrix();
         GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(id, dummy.matrix)
+        GLOBALS.PLANE_LEVEL_INSTANCED.setVisibilityAt(id, true)
 
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
@@ -234,7 +209,7 @@ function trasnlatePlane(id, val, portal, old) {
 
                     GLOBALS.CONNECTIONS[j]["from"] = plane;
                     GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[j]["line"]);
-                    const line = addLine(GLOBALS.CONNECTIONS[j]["from"].position, GLOBALS.CONNECTIONS[j]["to"].position);
+                    const line = addLine(GLOBALS.CONNECTIONS[j]["from"], GLOBALS.CONNECTIONS[j]["to"].position);
                     GLOBALS.SCENE_CHILDREN.add(line);
                     GLOBALS.CONNECTIONS[j]["line"] = line;
 
@@ -262,7 +237,7 @@ function trasnlatePlane(id, val, portal, old) {
 
                     GLOBALS.CONNECTIONS[j]["to"] = plane;
                     GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[j]["line"]);
-                    const line = addLine(GLOBALS.CONNECTIONS[j]["from"].position, GLOBALS.CONNECTIONS[j]["to"].position);
+                    const line = addLine(GLOBALS.CONNECTIONS[j]["from"], GLOBALS.CONNECTIONS[j]["to"].position);
                     GLOBALS.SCENE_CHILDREN.add(line);
                     GLOBALS.CONNECTIONS[j]["line"] = line;
                 }
@@ -277,7 +252,7 @@ function trasnlatePlane(id, val, portal, old) {
                 item.rotation.copy(plane.item.rotation);
 
                 if (plane.instancedName == "cube" || plane.instancedName == "sphere"
-                    || plane.instancedName == "cube_2" || plane.instancedName == "laser_cube" 
+                    || plane.instancedName == "cube_2" || plane.instancedName == "laser_cube"
                     || plane.instancedName == "scale_cube") {
 
                     item.translateY(1);
@@ -338,6 +313,7 @@ function checkSides(dummy, val, id, side, portal) {
         }
 
         GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(idEmptyToFill, dummy.matrix);
+        GLOBALS.PLANE_LEVEL_INSTANCED.setVisibilityAt(idEmptyToFill, true);
 
         var planeColor = 0x808080;
 
@@ -349,7 +325,6 @@ function checkSides(dummy, val, id, side, portal) {
         }
 
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
-        //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
 
         dummy.position.copy(dummy.position.round());
@@ -425,28 +400,17 @@ function buildIniCubes(obj) {
         GLOBALS.PLANE_LEVEL_INSTANCED.customSort = createRadixSort(GLOBALS.PLANE_LEVEL_INSTANCED);
 
         GLOBALS.PLANE_LEVEL_INSTANCED.addInstances(GLOBALS.BUDGET, (obj, index) => {
-            obj.position.x = index;
+            obj.visible = false;
         });
-    
+
         GLOBALS.PLANE_LEVEL_INSTANCED.raycastOnlyFrustum = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.computeBVH();
-
-        //GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.setUsage(DynamicDrawUsage); // will be updated every frame
 
         GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = false;
         GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = false;
         GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
         GLOBALS.CUBES.add(GLOBALS.PLANE_LEVEL_INSTANCED);
-
-        /*var clone = new Object3D();
-
-        for (var i = 0; i < GLOBALS.BUDGET; i++) {
-            clone.scale.set(0, 0, 0);
-            clone.position.set(100000, 100000, 100000);
-            clone.updateMatrix();
-            GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(i, clone.matrix);
-        }*/
 
         //GROUND
         buildLayer(-1, -1, 0, 'x', 'z', 'y', 6, 8, "down", new Vector3(-Math.PI / 2, 0, 0), new Vector3(0, 0, 0));
@@ -463,8 +427,6 @@ function buildIniCubes(obj) {
 
         GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
         GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
-
-
     }
 }
 
@@ -491,6 +453,7 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
 
             clone.updateMatrix();
             GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(a, clone.matrix);
+            GLOBALS.PLANE_LEVEL_INSTANCED.setVisibilityAt(a, true);
 
             var portal;
             var planeColor = 0x808080;
@@ -574,7 +537,7 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
 
             GLOBALS.BUDGET -= 1;
 
-            if(itemName == "exitDoor"){
+            if (itemName == "exitDoor") {
                 addConnectionPoints(GLOBALS.PLANE_USER_DATA[a]);
             }
 

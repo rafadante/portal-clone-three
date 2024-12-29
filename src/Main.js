@@ -10,7 +10,7 @@ import { TWEEN } from './Tween.js';
 import { Lights } from './components/lights/Lights.js';
 import { animateShader } from "./components/shaders/AnimateShaders.js"
 import { updatePlayer, updateCamera } from './components/fps/Fps.js';
-import { animarrrr, loadDefault } from './components/loadObj/LoaderOBJ.js';
+import { loadDefault } from './components/loadObj/LoaderOBJ.js';
 import { updateRay, recreateRay } from './components/ray/Ray.js';
 import './components/test/Test.js';
 import Stats from "stats-gl";
@@ -51,7 +51,7 @@ let mainContainer = document.createElement('div');
 mainContainer.id = 'main-container';
 document.body.appendChild(mainContainer);
 
-/*GLOBALS.STATS = new Stats({
+GLOBALS.STATS = new Stats({
     trackGPU: true,
     trackHz: true,
     trackCPT: true,
@@ -66,7 +66,7 @@ document.body.appendChild(mainContainer);
 });
 mainContainer.appendChild(GLOBALS.STATS.dom);
 GLOBALS.STATS.init(GLOBALS.RENDERER);
-GLOBALS.STATS.dom.style.display = "none";*/
+//GLOBALS.STATS.dom.style.display = "none";
 //
 const geometry = new BoxGeometry(2, 2, 2);
 const material = new MeshBasicMaterial({
@@ -84,6 +84,7 @@ function init() {
     GLOBALS.ROOM.name = "ROOM";
     GLOBALS.ITEMS_ADDED.name = "ITEMS";
     GLOBALS.CUBES.name = "CUBES";
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.LINES);
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.ROOM);
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.ITEMS_ADDED);
     GLOBALS.ROOM.add(GLOBALS.CUBES);
@@ -141,6 +142,8 @@ GLOBALS.RENDERER.info.autoReset = true;
 
 
 function animate(time) {
+
+    GLOBALS.STATS.update();
 
     //if (GLOBALS.FPS_MODE)
     //    requestAnimationFrame(animate);
@@ -201,11 +204,9 @@ else if (localStorage.getItem("quality-select") != "high")
 function render(time) {
 
     if (GLOBALS.LEVEL_ENTERED) {
-        //GLOBALS.STATS.update();
+        //
         statsBegin = true;
     }
-
-    animarrrr()
 
     fixedUpdate();
     animateShader();
@@ -245,9 +246,9 @@ function render(time) {
         /*GLOBALS.RENDERER.autoClear = false;
         GLOBALS.RENDERER.clear();
         GLOBALS.RENDERER.info.reset();*/
-        perf.begin();
-        GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
-        perf.end();
+        //perf.begin();
+        //GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+        //perf.end();
         GLOBALS.COMPOSER.render();
         //console.log(GLOBALS.RENDERER.info);
         //GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);

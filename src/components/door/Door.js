@@ -69,15 +69,14 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
         }, 300);
       }
 
-      if (door == GLOBALS.EXIT_DOOR) {
+      if (door == GLOBALS.EXIT_DOOR ) {
+        console.log(open)
         GLOBALS.CORRIDOR_ENTER.visible = open;
       }
       /*} else {
         GLOBALS.CORRIDOR_ENTER.visible = false;
         GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
       }*/
-
-        
     }, vel);
   }, timeToTrigger);
 }

@@ -1,28 +1,12 @@
-import {
-    GLOBALS
-} from '../../Globals.js';
-import {
-    Color,
-    Vector3,
-    BufferGeometry,
-    LineBasicMaterial,
-    Line,
-    AdditiveBlending,
-    Float32BufferAttribute,
-    MathUtils,
-    Object3D,
-    SphereGeometry,
-    MeshBasicMaterial,
-    MeshStandardMaterial
-} from 'three';
+import { GLOBALS } from '../../Globals.js';
+import { Color, BufferGeometry, LineBasicMaterial, Line, SphereGeometry, MeshStandardMaterial } from 'three';
 import $ from 'jquery';
-import { findPath } from '../findPath/FindPath.js';
+//import { findPath } from '../findPath/FindPath.js';
 import { targetFaithPlateEnd } from '../faithPlate/FaithPlate.js';
 import { InstancedMesh2 } from '@three.ez/instanced-mesh';
 
 const geometry = new SphereGeometry(0.1, 8, 4);
 const material = new MeshStandardMaterial({ color: 0xffffff, depthTest: false, transparent: true });
-console.log(material)
 window.checkers = new InstancedMesh2(geometry, material, { createInstances: true });
 window.checkers.addInstances(1000, (obj, index) => {
     obj.color = "white";
@@ -53,14 +37,11 @@ function manageConnection(instanceId, from) {
         !GLOBALS.SELECTED_FOR_CONNECTION.item.userData.connectedTo.includes(GLOBALS.PLANE_USER_DATA[instanceId].id_instanced) &
         GLOBALS.PLANE_USER_DATA[instanceId].item.userData.connections < 10) {
 
-
         GLOBALS.PLANE_USER_DATA[instanceId].item.userData.connections += 1;
 
         var endPos, checker, clone;
 
         for (var i = 0; i < 10; i++) {
-
-            console.log(GLOBALS.PLANE_USER_DATA[instanceId])
 
             clone = GLOBALS.PLANE_USER_DATA[instanceId].item.checkersSlots[i]
 
@@ -89,9 +70,9 @@ function manageConnection(instanceId, from) {
             }
         }
 
-        const line = addLine(from.position, endPos);
+        const line = addLine(from, endPos);
 
-        GLOBALS.SCENE_CHILDREN.add(line);
+        GLOBALS.LINES.add(line);
 
         GLOBALS.CONNECTIONS.push({
             line: line,
@@ -103,12 +84,8 @@ function manageConnection(instanceId, from) {
         });
 
         from.item.userData.connectedTo.push(instanceId);
-        //findPath(from.position, GLOBALS.PLANE_USER_DATA[instanceId].position, GLOBALS.PLANE_USER_DATA[instanceId], from)
 
-        console.log(from)
-        console.log(line)
-
-        if(from.instancedName == "trigger_area")
+        if (from.instancedName == "trigger_area")
             line.visible = false;
     }
 
@@ -116,16 +93,10 @@ function manageConnection(instanceId, from) {
     GLOBALS.CURRENT_LINE = null;
 }
 
-function addLine(position, endPos, index) {
-
-    /*if (index) {
-        window.checkers.instances[index].position.copy(endPos);
-        window.checkers.instances[index].updateMatrix(); // necessary after transformations
-        window.checkers.computeBoundingSphere();
-    }*/
+function addLine(from, endPos) {
 
     const points = [];
-    points.push(position);
+    points.push(from.position);
     points.push(endPos);
 
     const geometry = new BufferGeometry().setFromPoints(points);
@@ -134,65 +105,15 @@ function addLine(position, endPos, index) {
         color: colorInnactive
     });
     const line = new Line(geometry, materialLine);
-
-    /*// Two points for the line
-    const pointA = new Vector3(
-        position.x,
-        position.y,
-        position.z
-    ); // Starting point
-    const pointB = endPos;  // Ending point
-    const N = 10; // Number of vertices along the line
-
-    // Create a line with interpolated vertices
-    const positions = [];
-    for (let i = 0; i <= N; i++) {
-        const t = i / N; // Interpolation factor (0 to 1)
-        const x = MathUtils.lerp(pointA.x, pointB.x, t);
-        const y = MathUtils.lerp(pointA.y, pointB.y, t);
-        const z = MathUtils.lerp(pointA.z, pointB.z, t);
-        positions.push(x, y, z);
-    }
-
-    // Define initial vertex colors for the trail effect
-    const colors = [];
-    const color = new Color();
-    for (let i = 0; i <= N; i++) {
-        color.setHSL(0.6, 1, (1 - i / (N - 1)) ** 4);
-        colors.push(color.r, color.g, color.b);
-    }
-
-    // Create the geometry and material for the line
-    const geometry = new BufferGeometry();
-    geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
-    geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
-
-    const material = new LineBasicMaterial({
-        vertexColors: true, // Use the colors defined above
-        blending: AdditiveBlending, // Additive blending for a glow-like effect
-        transparent: true, // Enable transparency
-        opacity: 0.8, // Optional opacity control
-    });
-
-    const line = new Line(geometry, material);
-
-    // Get references to the geometry attributes
-    line.colorAttribute = geometry.getAttribute("color");
-    line.color = color;*/
-
-    window.lines.push(line);
+    line.visible = from.item.userData.showLines;
 
     return line;
 }
-
-window.lines = [];
 
 $("body").on('click', '.removeConnection', function () {
 
     GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[$(this).data("id")]["line"]);
     GLOBALS.CONNECTIONS[$(this).data("id")]["to"].item.userData.connections -= 1;
-
-    //
     GLOBALS.CONNECTIONS[$(this).data("id")]["from"].item.userData.connectedTo.splice($(this).data("id"), 1);
 
     //RESET UI

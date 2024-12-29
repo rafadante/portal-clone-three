@@ -894,31 +894,40 @@ var GLOBALS = {
     GEL_TRIGGER: [],
     PAINTING_GUN_MODE: [],
     PAINT_GUN: null,
-    GUN_GROUP: new Group()
+    GUN_GROUP: new Group(),
+    LINES: new Group()
 }
 
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
 
 function reset() {
-    GLOBALS.TRACTOR_BEAM = [];
-    GLOBALS.TRACTOR_BEAM_BOUNDING_BOX = [];
-    GLOBALS.TRACTOR_BEAM_RAYCASTER = [];
-    GLOBALS.LIGHT_BRIDGE_RAYCASTER = [];
-    GLOBALS.LIGHT_BRIDGE_CLONE = [];
-    GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE = [];
-    GLOBALS.LASER_FIELD_RAYCASTER = [];
-    GLOBALS.FIZZLER_RAYCASTER = [];
-    GLOBALS.GLASS_RAYCASTER = [];
-    GLOBALS.DOORS = [];
-    GLOBALS.CAMERAS = [];
+    //
+
+    //
     GLOBALS.ITEMS_COUNT = {
         cube: {
             count: 0,
-            max: 100
+            max: 10,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: false,
+            ceiling: true,
+            trigger: false
         },
         cube_2: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: false,
+            ceiling: true,
+            trigger: false
         },
         scale_cube: {
             count: 0,
@@ -934,11 +943,19 @@ function reset() {
         },
         door: {
             count: 0,
-            max: 10
+            max: 5
         },
         sphere: {
             count: 0,
-            max: 100
+            max: 10,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: false,
+            ceiling: true,
+            trigger: false
         },
         gel_gun_blue: {
             count: 0,
@@ -954,27 +971,75 @@ function reset() {
         },
         pedestal_button: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: true
         },
         radio: {
             count: 0,
-            max: 10
+            max: 1,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
         },
         button_weight: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         button_box: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: true
         },
         button_sphere: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: true
         },
         dispenser: {
             count: 0,
-            max: 50
+            max: 100,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: false,
+            ceiling: true,
+            trigger: false
         },
         ramp: {
             count: 0,
@@ -994,43 +1059,115 @@ function reset() {
         },
         light_bridge: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         tractor_beam: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         laser_emitter: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         laser_receiver: {
             count: 0,
-            max: 10
-        },
-        pellet_launcher: {
-            count: 0,
-            max: 10
-        },
-        pellet_catcher: {
-            count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         laser_relay: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        pellet_launcher: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        pellet_catcher: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         laser_cube: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: false,
+            ceiling: true,
+            trigger: false
         },
         faith_plate: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
         },
         door: {
             count: 0,
-            max: 10
+            max: 5
         },
         light: {
             count: 0,
@@ -1078,23 +1215,63 @@ function reset() {
         },
         camera: {
             count: 0,
-            max: 10
+            max: 5,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: false,
+            ceiling: false,
+            trigger: false
         },
         portal_0: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         portal_1: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         laser_field: {
             count: 0,
-            max: 10
+            max: 20,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         fizzler: {
             count: 0,
-            max: 10
+            max: 20,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         observation_room: {
             count: 0,
@@ -1102,21 +1279,25 @@ function reset() {
         },
         glass: {
             count: 0,
-            max: 100
+            max: 20
         },
         portal_gun: {
             count: 0,
-            max: 2
+            max: 1,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
         },
         paint_gun: {
             count: 0,
-            max: 2
+            max: 1
         },
         trigger_area: {
-            count: 0,
-            max: 10
-        },
-        trigger_save: {
             count: 0,
             max: 10
         },
@@ -1128,11 +1309,65 @@ function reset() {
             count: 0,
             max: 10
         },
+        trigger_save: {
+            count: 0,
+            max: 10
+        },
+        portal: {
+            count: 0,
+            max: 10
+        },
+        spawn: {
+            count: 0,
+            max: 1
+        }
     }
+    //
+    GLOBALS.TRIGGER_BOXES = [];
+    GLOBALS.INTERACTIVE = [];
+    GLOBALS.SELECTED_ID = [];
+    GLOBALS.SELECTED_ID_ORANGE = [];
+    GLOBALS.SELECTED_COLOR = [];
+    GLOBALS.LASER_EMITTER = [];
+    GLOBALS.LASER_EMITTER_OBJ = [];
+    GLOBALS.LASER_EMITTER_LENGTH = 0;
+    GLOBALS.LASER_EMITTER_BOUNDING_BOX = [];
+    GLOBALS.LASER_EMITTER_RAYCASTER = [];
+    GLOBALS.LASER_CUBE = null;
+    GLOBALS.TRACTOR_BEAM = [];
+    GLOBALS.TRACTOR_BEAM_BOUNDING_BOX = [];
+    GLOBALS.TRACTOR_BEAM_RAYCASTER = [];
+    GLOBALS.TRACTOR_BEAM_LENGTH = 0;
+    GLOBALS.LIGHT_BRIDGE_RAYCASTER = [];
+    GLOBALS.LIGHT_BRIDGE_CLONE = [];
+    GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE = [];
+    GLOBALS.LASER_FIELD_RAYCASTER = [];
+    GLOBALS.FIZZLER_RAYCASTER = [];
+    GLOBALS.GLASS_RAYCASTER = [];
+    GLOBALS.CAMERA_OBJ_HORIZONTAL = [];
+    GLOBALS.CAMERA_OBJ_VERTICAL = [];
+    GLOBALS.GOO_PLANES = [];
+    GLOBALS.GOO_BOXES = [];
+    GLOBALS.FAITH_PLATE_TO_ROTATE = [];
+    GLOBALS.FAITH_PLATE_CONTACT_BOX = [];
+    GLOBALS.DOORS = [];
+    GLOBALS.RADIO_MUSIC = [];
+    GLOBALS.CAMERAS = [];
+    GLOBALS.CANNON_BODIES = [];
     GLOBALS.CONNECTIONS = [];
     GLOBALS.GLASS_PANELS = [];
+    GLOBALS.BLOCK_PORTAL = [];
     GLOBALS.LOADED_CONNECTIONS = [];
-    GLOBALS.PORTAL_GUN_BOX = []
+    GLOBALS.PORTAL_GUN_BOX = [];
+    GLOBALS.WALL_BODIES = [];
+    GLOBALS.ACTIVATED = [];
+    GLOBALS.SOUNDS_FPS = [];
+    GLOBALS.LASER_EMITTER_PORTAL_CLONES = [];
+    GLOBALS.DYNAMIC_BODIES = [];
+    GLOBALS.LASER_TRIGGERS = [];
+    GLOBALS.CUSTOM_GRAVITY = [];
+    GLOBALS.ANGLED_PANELS = [];
+    GLOBALS.PAINTING_GUN_MODE = [];
 }
 
 export {

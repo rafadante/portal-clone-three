@@ -1,86 +1,15 @@
 import { PositionalAudio, AudioListener } from 'three';
-import {
-    GLOBALS
-} from '../../Globals.js';
+import { GLOBALS } from '../../Globals.js';
 
 var listernAdded = false;
 var listener;
 
-var opt, voices, utterance;
-
-/*if (window.hasOwnProperty("speechSynthesis")) {
-
-}
-
-const speechSynth = window.speechSynthesis,
-    form = document.querySelector("form"),
-    playSample = () => {
-        if (speechSynth.speaking) {
-            speechSynth.cancel();
-            // doesn't work as expected with default voice on Chrome on Windows
-        }
-        utterance = new SpeechSynthesisUtterance(form.sample.value);
-        utterance.voice = voices[form.voice.selectedIndex];
-        utterance.volume = form.volume.valueAsNumber * 0.01;
-        utterance.pitch = form.pitch.valueAsNumber * 0.01;
-        utterance.rate = form.rate.valueAsNumber * 0.01;
-        speechSynth.speak(utterance);
-
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.speech = form.sample.value;
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.voice = form.voice.selectedIndex;
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.volume = form.volume.valueAsNumber * 0.01;
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.pitch = form.pitch.valueAsNumber * 0.01;
-        GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.rate = form.rate.valueAsNumber * 0.01;
-
-        console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData);
-    },
-    init = () => {
-        if (!voices) { // fixes triple trigger weirdness
-            voices = speechSynth.getVoices();
-            voices.forEach((v) => {
-                opt = document.createElement("option");
-                opt.textContent = v.name;
-                if (v.name === "Google US English") {
-                    opt.selected = true;
-                    //form.rate.value = 65;
-                }
-                form.voice.appendChild(opt);
-            });
-
-            //form.addEventListener( "input", playSample, false );
-            form.play.addEventListener( "click", playSample, false );
-            //playSample();
-        }
-    };
-if (speechSynth.onvoiceschanged !== undefined) {
-    // Only Chrome and Edge at time of posting
-    speechSynth.onvoiceschanged = init;
-} else {
-    init();
-}
-*/
-
 function playVoice(data) {
-    console.log(data)
 
-    if(!data.link)
+    if (!data.link)
         return;
 
     data.voice.play();
-
-    /*if(!data.speech)
-        return;
-    
-    if (speechSynth.speaking) {
-        speechSynth.cancel();
-        // doesn't work as expected with default voice on Chrome on Windows
-    }
-    utterance = new SpeechSynthesisUtterance(data.speech);
-    utterance.voice = voices[data.voice];
-    utterance.volume = data.volume;
-    utterance.pitch = data.pitch;
-    utterance.rate = data.rate;
-    speechSynth.speak(utterance);*/
 }
 
 function play(elem) {
@@ -108,8 +37,6 @@ function play(elem) {
 }
 
 function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, nameSound) {
-
-    //return
 
     if (!listernAdded) {
         listernAdded = true;
@@ -165,63 +92,6 @@ function addAudio(obj, name) {
     }
 }
 
-/*const positive = new Audio('audio/button_synth_positive_01.wav');
-
-const ambient = new Audio('audio/ambient.mp3')
-ambient.volume = 0.15;
-ambient.loop = true;
-
-const walk = new Audio('audio/tile1.wav')
-walk.volume = 0.2;//0.25
-walk.loop = true;
-walk.pause();
-
-const walkGel = new Audio('audio/walkGel.wav')
-walkGel.volume = 0.25;
-walkGel.loop = true;
-walkGel.pause();
-
-const walkLightBridde = new Audio('audio/fs_fm_lightbridge_01.wav')
-walkLightBridde.volume = 0.5;
-walkLightBridde.loop = true;
-walkLightBridde.playbackRate = 1.5;
-walkLightBridde.pause();
-
-const jump = new Audio('audio/p2_fs_jump_land_tile_01.wav')
-jump.volume = 0.2;//0.3
-
-const playerInsideTractorBeam = new Audio('audio/player_enter_tbeam_lp_01.ogg')
-playerInsideTractorBeam.volume = 0.5;
-playerInsideTractorBeam.loop = true;
-
-const deathAudio = new Audio('audio/body_medium_impact_hard1.wav')
-deathAudio.volume = 0.5;
-
-const editor = new Audio('audio/editor.mp3')
-editor.loop = true;
-
-const portal_gun_loop = new Audio('audio/wpn_portal_ambient_lp_01.wav')
-portal_gun_loop.loop = true;
-portal_gun_loop.volume = 0.2;
-
-const falling = new Audio('audio/player_fall_whoosh_lp_01.wav')
-falling.loop = true;
-
-const hold = new Audio('audio/hold_loop.wav')
-hold.loop = true;
-
-const aerial = document.getElementById("faith_plate_loop");
-aerial.volume = 1;
-aerial.loop = false;
-
-const propulsion = new Audio('audio/propulsion.ogg');
-propulsion.volume = 1;
-propulsion.loop = true;*/
-
-function loadAudio(src, volume, loop, playbackRate) {
-
-}
-
 function volume(val) {
 }
 
@@ -239,27 +109,6 @@ function fadeAudio(audio) {
         audio.volume = 1;
     }
 }
-
-/*var AUDIO = {
-    PORTAL_GUN_BLUE: new Audio('audio/portalgun_shoot_blue1.wav'),
-    PORTAL_GUN_ORANGE: new Audio('audio/portalgun_shoot_red1.wav'),
-    PORTAL_ENTER: new Audio('audio/portal_enter2.wav'),
-    PORTAL_EXIT: new Audio('audio/portal_exit2.wav'),
-    PORTAL_GUN_LOOP: portal_gun_loop,
-    PORTAL_INVALID: new Audio('audio/portal_invalid_surface_03.wav'),
-    FALLING: falling,
-    PICK_FAIL: new Audio('audio/object_use_failure_01.wav'),
-    PICK_SUCESS: new Audio('audio/object_use_01.wav'),
-    HOLD: hold,
-    PLAYER_INSIDE_TRACTOR_BEAM: playerInsideTractorBeam,
-    DEATH: deathAudio,
-    WALK_LIGHT_BRIDGE: walkLightBridde,
-    AERIAL: aerial,
-    WALK_NORMAL: walk,
-    WALK_PAINT: walkGel,
-    PROPULSION: propulsion,
-    POSITIVE: positive
-}*/
 
 var AUDIO = {
     AMBIENT: document.getElementById("AUDIO-AMBIENT"),
@@ -282,6 +131,8 @@ var AUDIO = {
     POSITIVE: document.getElementById("AUDIO-POSITIVE"),
     PROPULSION: document.getElementById("AUDIO-PROPULSION"),
 }
+
+AUDIO.AMBIENT.value = 1;
 
 export {
     addPositionalAudio,

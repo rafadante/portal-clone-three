@@ -85,7 +85,7 @@ function wakeUpAll() {
 }
 
 function respawn(d) {
-    if (d.name.includes("gel")) return;
+    if (d.name.includes("gel") || d.name.includes("camera")) return;
 
     // Velocity
     d.velocity.setZero();
@@ -160,6 +160,16 @@ function levelEnteredFunction(trigger) {
     if (!GLOBALS.LEVEL_ENTERED) {
         if (GLOBALS.ENTER_DOOR.box3.containsPoint(GLOBALS.PLAYER.position) || trigger) {
             GLOBALS.LEVEL_ENTERED = true;
+
+            /*setTimeout(() => {
+                GLOBALS.LIGHT_PORTAL_0.visible = false;
+                GLOBALS.LIGHT_PORTAL_1.visible = false;
+                
+            }, 3000);*/
+
+            GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+
+            
             setTimeout(() => {
                 for (var i = 0; i < GLOBALS.BOX_BODY.length; i++) {
                     if (GLOBALS.BOX_BODY[i].item.userData.opened)

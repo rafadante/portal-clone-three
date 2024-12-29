@@ -156,21 +156,21 @@ function loadMaterials() {
     GLOBALS.MATERIAL_GRID = new MeshStandardMaterial({
         side: 2
     });
-    
+
     loadMaterial(
         GLOBALS.MATERIAL_GRID,
-        "wall/grid/Metal_Grill_024_basecolor.webp",
-        "wall/grid/Metal_Grill_024_normal.webp",
+        "wall/grid/1K_chain_1_basecolor.png",
+        "wall/grid/1K_chain_1_normal.png",
+        "wall/grid/1K_chain_1_ambientocclusion.png",
         null,
         null,
-        "wall/grid/Metal_Grill_024_metallic.webp",
-        "wall/grid/Metal_Grill_024_opacity.webp",
-        0.5,
+        "wall/grid/1K_chain_1_opacity.png",
+        0.25,
         1,
         0.5,
         0.5,
-        0.5,
-        3
+        100,
+        100
     );
 
     //GLASS
@@ -257,15 +257,17 @@ function loadMaterial(material, base, normal, ao, rough, metal, alpha, roughValu
     material.envMap = GLOBALS.ENV_MAP;
     material.alphaTest = alphaTest;
 
-    if(GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic" && localStorage.getItem("quality-select") != "high"))
+    if (GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic" && localStorage.getItem("quality-select") != "high"))
         material.envMapIntensity = 0.5;
     else
         material.envMapIntensity = envIntensity;
 }
 
 function applyRepeat(map, repeatX, repeatY) {
+    console.log(map)
     map.wrapS = map.wrapT = RepeatWrapping;
     map.repeat.set(repeatX, repeatY);
+    map.needsUpdate = true;
 }
 
 const textureLoader = new TextureLoader();
@@ -308,34 +310,37 @@ GLOBALS.IMG_CLOSE = new TextureLoader().load('./assets/close.png');
 function updateMaterialRepeat(mesh, newMaterial, distance) {
     mesh.material = newMaterial.clone();
 
+    const x = 5;
+    distance *= 5;
+
     var cloneTexture = mesh.material.map.clone();
     mesh.material.map = cloneTexture;
-    cloneTexture.repeat.set(0.5, distance);
+    cloneTexture.repeat.set(x, distance);
     cloneTexture.needsUpdate = true;
 
     var cloneTexture = mesh.material.normalMap.clone();
     mesh.material.normalMap = cloneTexture;
-    cloneTexture.repeat.set(0.5, distance);
+    cloneTexture.repeat.set(x, distance);
     cloneTexture.needsUpdate = true;
 
     if (mesh.material.metalnessMap) {
         var cloneTexture = mesh.material.metalnessMap.clone();
         mesh.material.metalnessMap = cloneTexture;
-        cloneTexture.repeat.set(0.5, distance);
+        cloneTexture.repeat.set(x, distance);
         cloneTexture.needsUpdate = true;
     }
 
     if (mesh.material.alphaMap) {
         var cloneTexture = mesh.material.alphaMap.clone();
         mesh.material.alphaMap = cloneTexture;
-        cloneTexture.repeat.set(0.5, distance);
+        cloneTexture.repeat.set(x, distance);
         cloneTexture.needsUpdate = true;
     }
 
     if (mesh.material.roughnessMap) {
         var cloneTexture = mesh.material.roughnessMap.clone();
         mesh.material.roughnessMap = cloneTexture;
-        cloneTexture.repeat.set(0.5, distance);
+        cloneTexture.repeat.set(x, distance);
         cloneTexture.needsUpdate = true;
     }
 }
@@ -360,7 +365,7 @@ GLOBALS.MATERIAL_CONE = new MeshStandardMaterial({
     map: texture,
     transparent: true,
     opacity: 0.05,
-    emissive: new Color(2,2,0),
+    emissive: new Color(2, 2, 0),
     side: 2
 });
 

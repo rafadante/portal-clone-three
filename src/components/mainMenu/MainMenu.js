@@ -1,40 +1,25 @@
 import {
-    PlaneGeometry,
-    Mesh,
-    Color,
-    Clock,
-    Object3D,
-    InstancedMesh,
-    Vector2
+    PlaneGeometry, Mesh, Color, Clock, Object3D, Vector2
 } from 'three';
 import $ from 'jquery';
-import {
-    addItem,
-} from '../items/AddItem.js';
-import {
-    AddGoo
-} from '../goo/Goo.js';
-import {
-    viewFPS
-} from '../test/Test.js';
-import {
-    GLOBALS,
-    reset
-} from '../../Globals.js';
+import { addConnectionPoints, addItem } from '../items/AddItem.js';
+import { AddGoo } from '../goo/Goo.js';
+import { viewFPS } from '../test/Test.js';
+import { GLOBALS, reset } from '../../Globals.js';
 import '../shaders/MainMenuShader.js';
 import { init } from '../../Main.js';
 import { AUDIO, play } from '../audio/Audio.js';
 import { manageConnection } from '../boxSelection/Connection.js';
 import { addTileGel } from '../gels/Gels.js';
 
-var plane1;
-var plane2;
-
+var plane1, plane2, level;
 var transition = false;
 var transition2 = false;
 var stopMenuLoop = false;
+let clock = new Clock();
+window.unlockedFPS = 0;
+window.isCustom = false;
 
-//
 $("#blocker").css("display", "flex");
 $("#options-main").css("display", "block");
 $("#loading-parent").css("opacity", "0");
@@ -46,22 +31,6 @@ $("body").on('click', '#option-community-build, #option-single-load', function (
         init();
     }, 2000);
 });
-
-var p = 0;
-
-function loadingTxt(){
-
-    p+=1;
-
-    $(".introduction-text").addClass("loading-disabled");
-    $("#p" + p).removeClass("loading-disabled");
-
-    if(p < 4){
-        setTimeout(() => {
-            loadingTxt()
-        }, 5000);
-    }
-}
 
 if (!stopMenuLoop) {
     setTimeout(() => {
@@ -78,10 +47,6 @@ if (!stopMenuLoop) {
 
         animate();
         window.addEventListener('resize', onWindowResize);
-
-        setTimeout(() => {
-            getMonitorFPS = false;
-        }, 1000);
     }, 1000);
 }
 
@@ -108,7 +73,6 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
     plane2.scale.set(scaleX, scaleY, 1);
 }
 
-var level;
 $("body").on('click', '#option-single-load', function () {
 
     if (!localStorage.getItem("level"))
@@ -132,8 +96,8 @@ $("body").on('click', '#option-single-load', function () {
             }, 3000);*/
             //Do something with json variable
         });
-})
-window.isCustom = false;
+});
+
 $("body").on('click', '.load-custom', function () {
     window.isCustom = true;
     init();
@@ -144,8 +108,7 @@ $("body").on('click', '.load-custom', function () {
             GLOBALS.LOADED_LEVEL = true;
             startLevel();
         });
-})
-
+});
 
 if (localStorage.getItem("load") == "true") {
 
@@ -179,9 +142,6 @@ if (localStorage.getItem("load") == "true") {
     }, 1000);
 }
 
-
-//
-
 function loadLevelJSON() {
 
     $("#portal-gun-select").val(level[0]).change();
@@ -205,22 +165,13 @@ $("body").on('click', '#option-community-build', function () {
     startLevel()
 });
 
-
 $("body").on('click', '#option-single-reset', function () {
     var check = window.confirm("Are you sure you want to reset your progress?");
-    if (check == true) {
+    if (check == true)
         localStorage.setItem("level", 1);
-    }
 });
 
 function startLevel() {
-    /*$("#blocker").css("display", "none");
-        $("#ui").css("display", "block");
-        $("#container #back-effect").css("display", "none");
-        GLOBALS.SCENE_CHILDREN.remove(plane1);
-        GLOBALS.SCENE_CHILDREN.remove(plane2);
-        GLOBALS.SCENE.background = null;
-        stopMenuLoop = true;*/
 
     $("#blocker .body").css("opacity", "0");
     $("#logo").css("opacity", "0");
@@ -326,23 +277,8 @@ function pointerState(display1, display2, title, titleDisplay, id) {
     }, 2000);
 }
 
-let clock = new Clock();
-
-var t = [];
-var getMonitorFPS = true;
-window.unlockedFPS = 0;
-
 function animate(time) {
     if (!stopMenuLoop) {
-
-        /*if (getMonitorFPS) {
-            t.unshift(time);
-            if (t.length > 10) {
-                var t0 = t.pop();
-                window.unlockedFPS = Math.floor(1000 * 10 / (time - t0));
-            }
-        }*/
-
         if (transition)
             GLOBALS.MATERIAL_MAIN_MENU.uniforms.iTime.value += clock.getDelta();
 
@@ -354,13 +290,28 @@ function animate(time) {
     }
 }
 
-//
 $("body").on('click', '#load-level', function () {
     $("#load-level-panel").css("display", "flex")
 })
 
 $("body").on('click', '#close-load-level-panel', function () {
-    $("#load-level-panel").css("display", "none")
+    $("#load-level-panel").css("display", "none");
+
+    //CONNECTIONS
+
+    console.log(GLOBALS.LOADED_CONNECTIONS)
+
+    for (var g = 0; g < GLOBALS.LOADED_CONNECTIONS.length; g++) {
+        for (var h = 0; h < GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo.length; h++) {
+
+            GLOBALS.SELECTED_FOR_CONNECTION = GLOBALS.PLANE_USER_DATA[GLOBALS.LOADED_CONNECTIONS[g]["data"].planeInstancedId];
+
+            manageConnection(
+                GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo[h],
+                GLOBALS.LOADED_CONNECTIONS[g]["item"]
+            );
+        }
+    }
 })
 
 $("body").on('click', '#option-community-play', function () {
@@ -368,13 +319,17 @@ $("body").on('click', '#option-community-play', function () {
     $(".sub-option").css("display", "flex")
 })
 
+var chamberName;
+
 $("#input-level").on('change', function (e) {
     var file = e.target.files[0];
+    chamberName = file.name;
     var path = (window.URL || window.webkitURL).createObjectURL(file);
     readTextFile(path, function (text) {
         var data = JSON.parse(text);
 
-        $("#portal-gun-select").val(data[0]).change();
+        $("#portal-gun-select").val(data[0][0]).change();
+        $("#ambient-sound-select").val(data[0][1]).change();
         loadLevel(data[1])
 
         /*for (var i = 0; i < data[1].length; i++) {
@@ -397,6 +352,9 @@ function readTextFile(file, callback) {
 
 function loadLevel(data) {
 
+    $("#chamber-name-to-save").val(chamberName.substring(0, chamberName.indexOf("_by_"))); 
+    $("#author-name-to-save").val(chamberName.split('_by_').pop().replace('.json',''));
+
     var toRemove = [];
     for (var i = 0; i < GLOBALS.ITEMS_ADDED.children.length; i++) {
         if (GLOBALS.ITEMS_ADDED.children[i].instanceMatrix) {
@@ -415,36 +373,18 @@ function loadLevel(data) {
         }
     }
 
-    for (var i = 0; i < toRemove.length; i++) {
+    for (var i = 0; i < toRemove.length; i++)
         GLOBALS.ITEMS_ADDED.remove(toRemove[i]);
-    }
 
     reset();
 
-    GLOBALS.PLANE_USER_DATA = data;
-    GLOBALS.CUBES.remove(GLOBALS.PLANE_LEVEL_INSTANCED);
-
-    //GLOBALS.RENDERER.renderLists.dispose();
-    //GLOBALS.PLANE_LEVEL_INSTANCED.dispose();
-
-    const geometry = new PlaneGeometry(2, 2);
-
-    GLOBALS.PLANE_LEVEL_INSTANCED = new InstancedMesh(geometry.clone(), GLOBALS.MATERIAL_PORTAL_EDITOR, GLOBALS.BUDGET);
-    GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = true;
-    GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = false;
-    GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = false;
-    GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
-    GLOBALS.CUBES.add(GLOBALS.PLANE_LEVEL_INSTANCED);
-
-    var clone = new Object3D();
-
-    for (var i = 0; i < GLOBALS.BUDGET; i++) {
-        clone.scale.set(0, 0, 0);
-        clone.position.set(100000, 100000, 100000);
-        clone.updateMatrix();
-        GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(i, clone.matrix);
+    for (var prop in GLOBALS.DYMANIC_ITEMS) {
+        for (var i = 0; i < GLOBALS.DYMANIC_ITEMS[prop].length; i++)
+            GLOBALS.DYMANIC_ITEMS[prop][i] = [];
     }
 
+    GLOBALS.PLANE_USER_DATA = data;
+    var clone = new Object3D();
     var triggers = [];
 
     for (var i = 0; i < data.length; i++) {
@@ -457,23 +397,21 @@ function loadLevel(data) {
 
             clone.updateMatrix();
             GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(i, clone.matrix);
-
-            //GLOBALS.PLANE_USER_DATA[i] = data[i];
+            GLOBALS.PLANE_LEVEL_INSTANCED.setVisibilityAt(i, true);
 
             if (data[i].portal)
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(i, new Color().setHex(0xffffff));
             else
                 GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(i, new Color().setHex(0x808080));
 
-            //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
-
             var planeColor = 0x808080;
 
-            if (data[i].portal) {
+            if (data[i].portal)
                 planeColor = 0xffffff;
-            }
 
             data[i].planeColor = planeColor;
+        } else {
+            GLOBALS.PLANE_LEVEL_INSTANCED.setVisibilityAt(i, false);
         }
 
         if (data[i].itemName == "exitDoor") {
@@ -484,12 +422,15 @@ function loadLevel(data) {
             GLOBALS.EXIT_DOOR.userData.connections = 0;
             data[i].item = GLOBALS.EXIT_DOOR;
 
+            addConnectionPoints(data[i]);
         } else if (data[i].itemName == "enterDoor") {
             GLOBALS.ENTER_DOOR.position.set(data[i].position.x, data[i].position.y, data[i].position.z)
             GLOBALS.ENTER_DOOR.rotation.copy(data[i].rotation)
 
             GLOBALS.ENTER_DOOR.userData = data[i].item;
             data[i].item = GLOBALS.ENTER_DOOR;
+
+            addConnectionPoints(data[i]);
         } else if (data[i].itemName == "window") {
             GLOBALS.OBSERVATION_ROOM_IMG.position.set(data[i].position.x, data[i].position.y, data[i].position.z)
             GLOBALS.OBSERVATION_ROOM_IMG.rotation.copy(data[i].rotation)
@@ -502,6 +443,9 @@ function loadLevel(data) {
 
         data[i].hasGoo = false;
     }
+
+    GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
+    GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
 
     for (var i = 0; i < data.length; i++) {
 
@@ -516,26 +460,24 @@ function loadLevel(data) {
 
                     const state = data[i].state;
 
-                    addItem(GLOBALS.PLANE_USER_DATA[i], true)
+                    addItem(data[i], true)
 
-                    GLOBALS.PLANE_USER_DATA[i].state = state;
+                    data[i].state = state;
 
                     if (data[i].trigger) {
-                        triggers.push(GLOBALS.PLANE_USER_DATA[i]);
+                        triggers.push(data[i]);
                     }
                 }
             }
         }
     }
 
-    //CONNECTIONS
-    for (var g = 0; g < GLOBALS.LOADED_CONNECTIONS.length; g++) {
-        for (var h = 0; h < GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo.length; h++) {
-            manageConnection(
-                GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo[h],
-                GLOBALS.LOADED_CONNECTIONS[g]["item"]
-            );
-        }
+    for (var i = 0; i < window.checkers.instances.length; i++) {
+        window.checkers.instances[i].visible = false;
+    }
+
+    for (var i = GLOBALS.LINES.children.length - 1; i >= 0; i--) {
+        GLOBALS.LINES.remove(GLOBALS.LINES.children[i])
     }
 }
 

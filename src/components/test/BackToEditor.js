@@ -181,14 +181,14 @@ $("body").on('click', '#back-editor', function () {
     }
 
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-        GLOBALS.CONNECTIONS[i]['line'].visible = true;
+        //GLOBALS.CONNECTIONS[i]['line'].visible = true;
         if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area"))
             GLOBALS.CONNECTIONS[i]['from'].item.visible = true;
     }
 });
 
 function resetPositions(item, name) {
-    item.position.copy(item.initialPosition);
+    item.position.copy(item.position);
     item.updateMatrix();
     const instanced = GLOBALS.ITEMS_ADDED.getObjectByName(name);
     instanced.setMatrixAt(item.userData.idInstanced, item.matrix);
