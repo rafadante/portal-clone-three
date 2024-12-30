@@ -129,6 +129,8 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
                 loadCameraManager(scene);
             else if (name == "portal_gun")
                 loadPortalGunStand(scene);
+            else if (name == "angled_panel")
+                loadAngledPanelManager(scene);
         }
     });
 }
@@ -549,6 +551,27 @@ function loadAvatar() {
     };
 }
 
+function loadAngledPanelManager(scene) {
+    scene.name = "angled_panel";
+    scene.userData.wall = true;
+    scene.userData.ground = true;
+    scene.userData.ceiling = true;
+    scene.visible = false;
+    GLOBALS.ITEMS_ADDED.add(scene);
+    scene.traverse(child => {
+        if (child.name.includes("panel") && child.material) {
+            child.material.side = 2;
+            child.material.envMap = GLOBALS.ENV_MAP;
+            child.material.envMapIntensity = 0.2;
+            child.material.roughness = 1;
+        }
+
+        if (child.material) {
+            child.material.polygonOffset = true;
+            child.material.polygonOffsetFactor = 2;
+        }
+    });
+}
 function loadHalfWindow() {
     //HALF WINDOW IMG
     loader.load('/3ds/WINDOW_HALF_IMG.glb', (gltf) => {

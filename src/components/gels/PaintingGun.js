@@ -1,4 +1,4 @@
-import { Color, Euler, Object3D, SRGBColorSpace, TextureLoader } from "three";
+import { Color, Euler, Object3D } from "three";
 import { GLOBALS } from "../../Globals";
 import { spawnInstanced } from "./Gels";
 import $ from 'jquery';

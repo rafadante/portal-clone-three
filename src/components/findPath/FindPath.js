@@ -1,23 +1,6 @@
-import {
-    Group,
-    PlaneGeometry,
-    MeshBasicMaterial,
-    DoubleSide,
-    Mesh,
-    Object3D,
-    Vector3,
-    CircleGeometry,
-    Matrix4,
-    Color,
-    SphereGeometry,
-    LineBasicMaterial,
-    BufferGeometry,
-    Line
-} from 'three';
+import { Group, PlaneGeometry, MeshBasicMaterial, DoubleSide, Mesh, Object3D, Vector3, Matrix4, Color, SphereGeometry } from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
-import {
-    GLOBALS
-} from '../../Globals.js';
+import { GLOBALS } from '../../Globals.js';
 import { getPlaneMiddleEdges } from '../../Utils.js';
 
 var visited = {};

@@ -2,7 +2,7 @@ import {PlaneGeometry,Object3D,InstancedMesh,Matrix4} from 'three';
 import {GLOBALS} from '../../Globals.js';
 import {shuffle,groupByPercentage} from '../../Utils.js';
 import {colliderRoom} from './Colliders.js';
-import { InstancedMesh2 } from '@three.ez/instanced-mesh';
+//import { InstancedMesh2 } from '@three.ez/instanced-mesh';
 
 var id = 0;
 

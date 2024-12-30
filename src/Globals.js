@@ -1,23 +1,10 @@
 import {
-    PerspectiveCamera,
-    Object3D,
-    WebGLRenderer,
-    SRGBColorSpace,
-    ACESFilmicToneMapping,
-    NeutralToneMapping,
-    PCFSoftShadowMap,
-    Group,
-    Scene,
-    WebGLRenderTarget,
-    AudioListener,
-    Mesh,
-    BufferGeometry
+    PerspectiveCamera, Object3D, WebGLRenderer, SRGBColorSpace, ACESFilmicToneMapping,
+    PCFSoftShadowMap, Group, Scene, WebGLRenderTarget, AudioListener, Mesh, BufferGeometry
 } from 'three';
 import * as CANNON from 'cannon';
 import "./components/materials/Materials.js"
-import {
-    OrbitControls
-} from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh';
 
 // Add the extension functions
@@ -98,8 +85,6 @@ renderer.physicallyCorrectLights = true;
 renderer.domElement.id = "viewer-3d";
 renderer.shadowMap.autoUpdate = true;
 //renderer.info.autoReset = false;
-
-console.log(renderer)
 
 //CONTROLS
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -685,11 +670,28 @@ var GLOBALS = {
         },
         light: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+
         },
         lightEmissive: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         stripe: {
             count: 0,
@@ -717,7 +719,15 @@ var GLOBALS = {
         },
         angled_panel: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         gel_orange: {
             count: 0,

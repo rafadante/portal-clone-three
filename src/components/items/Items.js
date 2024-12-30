@@ -1,18 +1,6 @@
-import {
-    Vector3,
-    LineBasicMaterial,
-    Color,
-    Object3D,
-    Line,
-    BufferAttribute,
-    BufferGeometry,
-    Raycaster,
-    Vector2
-} from 'three';
+import { Vector3, LineBasicMaterial, Color, Object3D, Line, BufferAttribute, BufferGeometry, Raycaster, Vector2 } from 'three';
 import $ from 'jquery';
-import {
-    GLOBALS
-} from '../../Globals.js';
+import { GLOBALS } from '../../Globals.js';
 import { clickItem } from './AddItem.js';
 import { targetFaithPlateUpdate } from '../faithPlate/FaithPlate.js';
 import { getPlaneByName } from '../../Utils.js';
@@ -141,11 +129,18 @@ function hoverItem(found, connecting) {
             GLOBALS.ITEM_CUBE.material.color = new Color(0x00ff00)
             GLOBALS.ITEM_CUBE.place = true;
         } else if (userData.allowconnection) {
+
+            console.log("---------------------")
+            console.log(GLOBALS.SELECTED_FOR_CONNECTION.item.userData.connectedTo)
+            console.log(userData.id_instanced)
+            console.log(userData.item.userData.connections)
+
             if (!GLOBALS.SELECTED_FOR_CONNECTION.item.userData.connectedTo.includes(userData.id_instanced) &&
                 userData.item.userData.connections < 10) {
                 GLOBALS.ITEM_CUBE.material.color = new Color(0x00ff00)
                 GLOBALS.ITEM_CUBE.place = true;
             } else {
+                console.log("xxxxxxxxxxxx")
                 GLOBALS.ITEM_CUBE.material.color = new Color(0xff0000)
                 GLOBALS.ITEM_CUBE.place = false;
             }

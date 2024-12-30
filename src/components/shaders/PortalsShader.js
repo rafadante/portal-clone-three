@@ -162,8 +162,6 @@ const generateMeshPortalShader = () => {
             polygonOffsetFactor: -10,
     });
 
-    console.log(mat2)
-
     var planegeometry = new CircleGeometry(GLOBALS.PORTAL_WIDTH, 50);
     planegeometry.computeBoundsTree();
     var plane = new Mesh(planegeometry, mat2);

@@ -1,21 +1,9 @@
 import * as CANNON from 'cannon';
 import CannonDebugger from 'cannon-es-debugger';
-import {
-    GLOBALS
-} from './Globals.js';
-import {
-    PlaneGeometry,
-    Mesh,
-    MeshBasicMaterial,
-    Vector3,
-    Object3D,
-    Raycaster
-} from 'three';
+import { GLOBALS } from './Globals.js';
+import { PlaneGeometry, Mesh, MeshBasicMaterial, Vector3, Object3D, Raycaster } from 'three';
 import $ from 'jquery';
-import {
-    updateLaserCubeRaycaster,
-    updateLaserEmitterRaycaster
-} from './components/lasers/Laser.js';
+import { updateLaserCubeRaycaster, updateLaserEmitterRaycaster } from './components/lasers/Laser.js';
 import { laserReceiverTrigger } from './components/events/events.js';
 import { applyCustomGravity } from './components/gels/Gels.js';
 import { updateGelBlob } from './components/gels/GelDispenser.js';
@@ -191,7 +179,7 @@ function updatePhysics() {
                             rotateInstanced(instanced, GLOBALS.DYMANIC_ITEMS[property][i], i, -0.075)
                     }
                 } else {
-                    
+
                     var item = new Object3D();
                     item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
                     item.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);

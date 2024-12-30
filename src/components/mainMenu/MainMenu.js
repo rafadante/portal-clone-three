@@ -1,6 +1,4 @@
-import {
-    PlaneGeometry, Mesh, Color, Clock, Object3D, Vector2
-} from 'three';
+import { PlaneGeometry, Mesh, Color, Clock, Object3D, Vector2 } from 'three';
 import $ from 'jquery';
 import { addConnectionPoints, addItem } from '../items/AddItem.js';
 import { AddGoo } from '../goo/Goo.js';
@@ -30,6 +28,10 @@ $("body").on('click', '#option-community-build, #option-single-load', function (
         play(AUDIO.EDITOR);
         init();
     }, 2000);
+});
+
+$("body").on('click', '#back-main-menu', function () {
+
 });
 
 if (!stopMenuLoop) {
@@ -316,8 +318,8 @@ $("body").on('click', '#close-load-level-panel', function () {
 
 $("body").on('click', '#option-community-play', function () {
     $(".main-option").css("display", "none")
-    $(".sub-option").css("display", "flex")
-})
+    $(".sub-option").css("display", "grid")
+});
 
 var chamberName;
 
@@ -352,8 +354,8 @@ function readTextFile(file, callback) {
 
 function loadLevel(data) {
 
-    $("#chamber-name-to-save").val(chamberName.substring(0, chamberName.indexOf("_by_"))); 
-    $("#author-name-to-save").val(chamberName.split('_by_').pop().replace('.json',''));
+    $("#chamber-name-to-save").val(chamberName.substring(0, chamberName.indexOf("_by_")));
+    $("#author-name-to-save").val(chamberName.split('_by_').pop().replace('.json', ''));
 
     var toRemove = [];
     for (var i = 0; i < GLOBALS.ITEMS_ADDED.children.length; i++) {

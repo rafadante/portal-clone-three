@@ -16,6 +16,7 @@ import { targetFaithPlateStart, targetFaithPlateEnd, targetFaithPlateUpdate } fr
 import { gelRecharger } from '../gels/PaintingGun.js';
 import { addLine } from '../boxSelection/Connection.js';
 import { load3D } from '../loadObj/LoaderOBJ.js';
+import { playVoiceTrigger } from '../triggers/Triggers.js';
 
 var itemCount = 0;
 
@@ -302,6 +303,7 @@ function addItem(found, loaded) {
                 //item.getObjectByName("warning").visible = false;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
                 var item = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
+                item.visible = true;
             } else {
                 var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);
                 var item = new Object3D();
@@ -620,11 +622,11 @@ function manageItemVariables(item, userData, instanced) {
     item.userData.pedestalValue = 3;
     item.userData.friction = 0.4;
     item.userData.restitution = 0;
+    item.userData.rotationY = 0;
+    item.userData.angle = 45;
 
     if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
         item.userData.state = "all";
-    } else if (GLOBALS.ITEM_HOLDED_NAME == "door" || GLOBALS.ITEM_HOLDED_NAME == "pedestal_button") {
-        item.userData.rotationY = 0;
     } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
         GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube" ||
         GLOBALS.ITEM_HOLDED_NAME == "scale_cube") {
@@ -680,12 +682,27 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
     item.userData.friction = userDataLoadedItem.friction;
     item.userData.restitution = userDataLoadedItem.restitution;
 
+
+    item.userData.multipleTrigger = userDataLoadedItem.multipleTrigger;
+    item.userData.triggerVisibility = userDataLoadedItem.triggerVisibility;
+    item.userData.soundEffectLoop = userDataLoadedItem.soundEffectLoop;
+    item.userData.link = userDataLoadedItem.link;
+
+    item.userData.rotationY = userDataLoadedItem.rotationY;
+    item.userData.angle = userDataLoadedItem.angle;
+
+    if (item.userData.link)
+        playVoiceTrigger(item.userData, false);
+
     if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
         item.userData.state = userDataLoadedItem.state;
-    } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
-        item.userData.rotationY = userDataLoadedItem.rotationY;
         item.rotation.y = item.userData.rotationY;
-    } else if (GLOBALS.ITEM_HOLDED_NAME == "pedestal_button") {
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
+        item.rotation.y = item.userData.rotationY;
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
+        item.rotation.y = item.userData.rotationY;
+        item.getObjectByName("pivot2").rotation.x = Math.PI / 180 * item.userData.angle;
+    }else if (GLOBALS.ITEM_HOLDED_NAME == "pedestal_button") {
 
         item.userData.rotationY = userDataLoadedItem.rotationY;
         var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName("pedestal_button");

@@ -94,7 +94,7 @@ function colliderItemManager() {
 }
 
 function addColliderDoorsDefault(obj) {
-    var shape = new CANNON.Box(new CANNON.Vec3(2, 2, 0.01));
+    var shape = new CANNON.Box(new CANNON.Vec3(1, 1, 0.01));
     var door = new CANNON.Body({
         shape: shape,
         mass: 0,
@@ -147,7 +147,7 @@ function fizzlerTrigger(body) {
             var clone2 = clone.clone();
             clone2.position.y += 1;
 
-            addPositionalAudio('audio-dissolve', clone, true, false, true, 8, 'sound')
+            addPositionalAudio('audio-dissolve', clone, true, false, true, 2, 'sound')
 
             tweenCamera(3000, GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value, clone.position)
             tweenCamera(3000, clone.position, clone2.position)
@@ -325,7 +325,7 @@ function addColliderItem(items, type, mass, offset) {
 
             if (type == "faith_plate") {
                 box.collisionResponse = 0;
-                addPositionalAudio('faith_plate_hit', box, false, false, true, 20, 'sound')
+                addPositionalAudio('faith_plate_hit', box, false, false, true, 12, 'sound')
             }
 
             if (mass > 0) {

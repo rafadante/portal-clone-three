@@ -1,27 +1,9 @@
-import {
-    PlaneGeometry,
-    Matrix4,
-    Mesh,
-    Object3D,
-    MeshBasicMaterial,
-    Color,
-    TextureLoader,
-    RepeatWrapping,
-    Vector3,
-    Box3,
-    Quaternion,
-    Clock,
-    MeshStandardMaterial
-} from 'three';
+import { PlaneGeometry, Matrix4, Mesh, Object3D, MeshBasicMaterial, Color, TextureLoader, RepeatWrapping, Vector3, Box3, MeshStandardMaterial } from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
-import {
-    GLOBALS
-} from '../../Globals.js';
-import {
-    Water
-} from '../Water.js';
+import { GLOBALS } from '../../Globals.js';
+import { Water } from '../Water.js';
 import { getPlaneByName } from '../../Utils.js';
-import { MeshBVH } from 'three-mesh-bvh';
+//import { MeshBVH } from 'three-mesh-bvh';
 
 var water, lava;
 var water2 = [];

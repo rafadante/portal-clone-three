@@ -2,7 +2,6 @@ import { Vector3, Quaternion, Clock } from 'three';
 import { portalButton } from '../portal/CreatePortal.js'
 import { interactWithItem } from '../events/events.js'
 import { GLOBALS } from '../../Globals.js';
-import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { AUDIO, play } from '../audio/Audio.js';
 import "./Player.js";
 import "./Input.js";

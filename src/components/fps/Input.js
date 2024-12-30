@@ -1,23 +1,13 @@
-import {
-    Vector3
-} from 'three';
+import { Vector3 } from 'three';
 import $ from 'jquery';
 import nipplejs from 'nipplejs';
-import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+//import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { stateDoor } from '../door/Door.js';
-import {
-    GLOBALS
-} from '../../Globals.js';
+import { GLOBALS } from '../../Globals.js';
 import { AUDIO, play } from '../audio/Audio.js';
-import {
-    portalButton
-} from '../portal/CreatePortal.js';
-import {
-    tweenCamera
-} from '../../Utils.js';
-import {
-    interactWithItem
-} from '../events/events.js';
+import { portalButton } from '../portal/CreatePortal.js';
+import { tweenCamera } from '../../Utils.js';
+import { interactWithItem } from '../events/events.js';
 import { INPUT } from './index.js';
 
 var allowEnterFPS = true;
@@ -210,15 +200,12 @@ document.body.addEventListener('mousemove', (event) => {
 
 });
 
-var started = false;
-
 $("body").on('click', '#settings-close', function () {
     if (GLOBALS.FPS_MODE && allowEnterFPS) {
 
-        if (!started)
-            play(AUDIO.AMBIENT);
+        AUDIO.AMBIENT.currentTime = 0;
+        play(AUDIO.AMBIENT);
 
-        started = true;
         document.getElementById('blocker').style.display = 'none';
         GLOBALS.PAUSED = false;
 
@@ -306,10 +293,8 @@ function openFullscreen() {
 // Detect pointer lock changes
 document.addEventListener('pointerlockchange', () => {
     if (document.pointerLockElement === document.body) {
-        console.log('Pointer is now locked');
         // The pointer is locked, you can enable FPS controls or hide the cursor
     } else {
-        console.log('Pointer is unlocked');
         // The pointer is unlocked, you can restore the cursor or stop FPS controls
         $("#container").css("filter", "blur(2px)")
         document.getElementById('blocker').style.display = 'block';

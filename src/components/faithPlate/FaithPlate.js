@@ -1,15 +1,4 @@
-import {
-  Vector3,
-  PlaneGeometry,
-  MeshBasicMaterial,
-  Mesh,
-  TextureLoader,
-  Quaternion,
-  CatmullRomCurve3,
-  BufferGeometry,
-  LineBasicMaterial,
-  Line
-} from "three";
+import { Vector3, PlaneGeometry, MeshBasicMaterial, Mesh, TextureLoader, CatmullRomCurve3, BufferGeometry, LineBasicMaterial, Line } from "three";
 import { tweenCamera } from "../../Utils.js";
 import { GLOBALS } from "../../Globals.js";
 import { AUDIO, fadeAudio, play } from "../audio/Audio.js";

@@ -1,4 +1,4 @@
-import { Group, Vector3, Quaternion, Box3, Object3D, } from 'three';
+import { Group, Vector3, Quaternion, Box3, Object3D } from 'three';
 import $ from 'jquery';
 import { GLOBALS } from '../../Globals.js';
 import { addPositionalAudio, AUDIO, addAudio } from '../audio/Audio.js';
@@ -8,9 +8,9 @@ import { colliderItemManager } from './Colliders.js';
 import { testLightsManager } from '../lights/Lights.js';
 import { manageInstances } from './Instances.js';
 import './BackToEditor.js';
-import { stateDoor } from '../door/Door.js';
+//import { stateDoor } from '../door/Door.js';
 import { addGel } from '../gels/Gels.js';
-import { findPath } from '../findPath/FindPath.js';
+//import { findPath } from '../findPath/FindPath.js';
 import { levelEnteredFunction } from '../events/states.js';
 import { loadAvatar } from '../loadObj/LoaderOBJ.js';
 import { deletePortal, portalButton } from '../portal/CreatePortal.js';

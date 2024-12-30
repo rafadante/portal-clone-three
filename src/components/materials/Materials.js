@@ -1,15 +1,5 @@
-import {
-    MeshStandardMaterial,
-    TextureLoader,
-    SRGBColorSpace,
-    Vector2,
-    Color,
-    MeshBasicMaterial,
-    RepeatWrapping
-} from 'three';
-import {
-    GLOBALS
-} from '../../Globals.js';
+import { MeshStandardMaterial, TextureLoader, SRGBColorSpace, Vector2, Color, MeshBasicMaterial, RepeatWrapping } from 'three';
+import { GLOBALS } from '../../Globals.js';
 
 function loadMaterials() {
     //MATERIAL FLOOR NON PORTAL
@@ -264,7 +254,6 @@ function loadMaterial(material, base, normal, ao, rough, metal, alpha, roughValu
 }
 
 function applyRepeat(map, repeatX, repeatY) {
-    console.log(map)
     map.wrapS = map.wrapT = RepeatWrapping;
     map.repeat.set(repeatX, repeatY);
     map.needsUpdate = true;

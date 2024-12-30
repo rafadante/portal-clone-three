@@ -1,16 +1,7 @@
-import {
-    Mesh,
-    MeshBasicMaterial,
-    Object3D,
-    PlaneGeometry,
-    Vector3,
-    Vector4
-} from 'three';
+import { Mesh, MeshBasicMaterial, Object3D, PlaneGeometry, Vector3, Vector4 } from 'three';
 import { GLOBALS } from "./Globals";
 import $ from 'jquery';
-import {
-    TWEEN
-} from './Tween.js';
+import { TWEEN } from './Tween.js';
 import * as CANNON from "cannon";
 
 function getPlaneByName(name) {

@@ -1,22 +1,8 @@
-import {
-    Color,
-    Mesh,
-    Vector3,
-    BoxGeometry,
-    MeshBasicMaterial
-} from 'three';
+import { Color, Mesh, Vector3, BoxGeometry, MeshBasicMaterial } from 'three';
 import $ from 'jquery';
-import {
-    GLOBALS
-} from '../../Globals.js';
-import {
-    planeInstanceReset,
-    deleteItemInstanced
-} from '../items/Items.js';
-import {
-    getPlaneByName,
-    warning
-} from '../../Utils.js';
+import { GLOBALS } from '../../Globals.js';
+import { planeInstanceReset, deleteItemInstanced } from '../items/Items.js';
+import { getPlaneByName, warning } from '../../Utils.js';
 import { addConnectionPoints, clickItem, updateLines } from '../items/AddItem.js';
 import { manageConnection } from './Connection.js';
 import { checkToUpdateContinuous } from '../cubeManager/UpdateRaycast.js';
@@ -25,7 +11,6 @@ const orange = new Color("rgb(255, 165, 0)");
 var initialPosition = null;
 var currentID = null;
 var firstSelected;
-const form = document.querySelector("form")
 
 function raycastSelected(found, event, type) {
 
@@ -235,6 +220,11 @@ function raycastSelected(found, event, type) {
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_audio")) {
                         $(".trigger_audio").css("display", "block");
                         $("#state-trigger-loop").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.soundEffectLoop);
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger") &&
+                        !GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_save")) {
+                        $(".trigger-multiple").css("display", "block");
                     }
                 }
             }
@@ -507,8 +497,6 @@ function raycastSelected(found, event, type) {
                     }
                 }
             }
-
-            //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
         }
     }
 }
@@ -517,11 +505,8 @@ function removeSelection() {
     firstSelected = null;
     for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
 
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor) {
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor)
             GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(GLOBALS.SELECTED_ID[i], new Color(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].planeColor));
-
-            //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
-        }
 
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].selected = false;
     }
@@ -536,10 +521,6 @@ function showMenu(x, y) {
     menu.style.top = y + 'px';
     menu.classList.add('menu-show');
 }
-
-/*$('#sample-audio').on('input', function () {
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.speech = $("#sample-audio").prop("value");
-});*/
 
 export {
     raycastSelected,

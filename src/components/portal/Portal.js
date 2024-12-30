@@ -1,25 +1,9 @@
 import {
-    Plane,
-    CylinderGeometry,
-    Matrix4,
-    BoxGeometry,
-    ShaderMaterial,
-    Texture,
-    Mesh,
-    DoubleSide,
-    MeshBasicMaterial,
-    ArrowHelper,
-    EqualStencilFunc,
-    ReplaceStencilOp,
-    Group,
-    Vector3
+    Plane, CylinderGeometry, Matrix4, BoxGeometry, ShaderMaterial, Texture, Mesh, DoubleSide,
+    MeshBasicMaterial, ArrowHelper, EqualStencilFunc, ReplaceStencilOp, Group, Vector3
 } from 'three';
-import {
-    GeneralBB
-} from '../generalBB/GeneralBB.js'
-import {
-    GLOBALS
-} from '../../Globals.js';
+import { GeneralBB } from '../generalBB/GeneralBB.js'
+import { GLOBALS } from '../../Globals.js';
 import './Teleportation.js';
 
 class Portal extends Group {

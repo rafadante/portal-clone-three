@@ -1,16 +1,5 @@
 import { GLOBALS } from '../../Globals';
-import {
-    Group,
-    AmbientLight,
-    SpotLight,
-    Color,
-    PlaneGeometry,
-    MeshStandardMaterial,
-    DoubleSide,
-    Mesh,
-    Vector3,
-    Object3D
-} from 'three';
+import { Group, AmbientLight, SpotLight, Color, PlaneGeometry, MeshStandardMaterial, DoubleSide, Mesh } from 'three';
 
 const Lights = function () {
 
@@ -55,30 +44,31 @@ const Lights = function () {
 };
 
 function testLightsManager() {
-    var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("lightEmissive");
+    var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("light");//lightEmissive
     if (instanced)
         instanced.material.color = new Color(2, 2, 2);
     //instanced.material.emissive = new Color(0xffffff)
     //instanced.material.emissiveIntensity = 100
 
-    for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['stripe'].length; i++) {
-        if (GLOBALS.DYMANIC_ITEMS['stripe'][i].id) {
+    for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['light'].length; i++) {
+        if (GLOBALS.DYMANIC_ITEMS['light'][i].id) {
             const geometry = new PlaneGeometry(1, 1);
             const material = new MeshStandardMaterial({
                 side: DoubleSide,
-                emissive: new Color(0xffffff),
-                emissiveIntensity: 100
+                emissive: new Color(1, 1, 1),
+                emissiveIntensity: 2
             });
             const plane = new Mesh(geometry, material);
-            plane.position.copy(GLOBALS.DYMANIC_ITEMS['stripe'][i].position);
-            plane.rotation.copy(GLOBALS.DYMANIC_ITEMS['stripe'][i].rotation);
+            plane.position.copy(GLOBALS.DYMANIC_ITEMS['light'][i].position);
+            plane.rotation.copy(GLOBALS.DYMANIC_ITEMS['light'][i].rotation);
+            plane.rotateX(-Math.PI / 2)
             plane.scale.set(0.2, 2, 2)
             plane.translateZ(0.025);
             GLOBALS.SCENE_FPS.add(plane);
         }
     }
 
-    for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['light'].length; i++) {
+    /*for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['light'].length; i++) {
 
         if (GLOBALS.DYMANIC_ITEMS['light'][i].id) {
 
@@ -86,6 +76,9 @@ function testLightsManager() {
             lightEmissive.position.copy(GLOBALS.DYMANIC_ITEMS['light'][i].position);
             lightEmissive.rotation.copy(GLOBALS.DYMANIC_ITEMS['light'][i].rotation);
             lightEmissive.updateMatrix();
+
+            console.log(instanced)
+
             instanced.setMatrixAt(i, lightEmissive.matrix);
             instanced.instanceMatrix.needsUpdate = true;
             instanced.computeBoundingSphere();
@@ -118,7 +111,7 @@ function testLightsManager() {
 
             spotLight.target.updateMatrixWorld();
         }
-    }
+    }*/
 
     for (var i = 0; i < GLOBALS.ITEMS_ADDED.children.length; i++) {
         if (GLOBALS.ITEMS_ADDED.children[i].name.includes("observation_room")) {

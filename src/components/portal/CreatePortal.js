@@ -124,6 +124,11 @@ function portalButton(button, auto, camera, firstToRender) {
                 }, 300);
             }
 
+            if (intersectPanel.length > 0) {
+                if (intersectPanel[0].normal.y > 0)
+                    return;
+            }
+
             if (blockPortal) {
                 //NONPORTABLE WALL
                 AUDIO.PORTAL_INVALID.currentTime = 0;
@@ -139,12 +144,12 @@ function portalButton(button, auto, camera, firstToRender) {
             if (!userData.itemName)
                 userData.itemName = '';
 
-            if (((userData.portal) || intersectsGelWhite.length > 0 || intersectPanel.length > 0 || paintMode)
-                && (!userData.hasItem || auto || userData.itemName.includes("camera") || userData.itemName.includes("trigger"))) {//!userData.hasItem || (userData.itemName.includes("camera"))
+            if (intersectPanel.length > 0 || (((userData.portal) || intersectsGelWhite.length > 0 || paintMode)
+                && (!userData.hasItem || auto || userData.itemName.includes("camera") || userData.itemName.includes("trigger")))) {//!userData.hasItem || (userData.itemName.includes("camera"))
                 var point = new Vector3(x, y, z);
                 // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                 // define playerUpDirection
-                let playerUpDirection = new Vector3(0, 1, 0)
+                let playerUpDirection = new Vector3(0, 1, 0);
 
                 var normal;
                 if (userData.side == "front")
@@ -183,7 +188,7 @@ function portalButton(button, auto, camera, firstToRender) {
                 else if (button == 2)
                     portalID = 0;
 
-                if (!paintMode && !auto) {
+                if (!paintMode && !auto && intersectPanel.length == 0) {
                     if (GLOBALS.PORTAL_BOX[portalID]) {
                         for (let p of portalPoints) {
                             if (!isInOtherPortalArea(p, normal, intersects[0].object, portalID)) {
@@ -456,6 +461,13 @@ function deletePortal(portalIndex) {
 
 // creates a new portal and adds it to the scene
 function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject, playerUpDirection, portalPoints, side) {
+
+    for (let body of GLOBALS.DYNAMIC_OBJECTS) {
+        body.looping = false;
+        body.looping2 = false;
+        body.centered = false;
+        body.centering = false;
+    }
 
     let color = GLOBALS.PORTAL_COLORS[thisPortalIndex]
 

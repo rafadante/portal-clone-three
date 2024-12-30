@@ -1,36 +1,13 @@
-import {
-  Vector3,
-  Color,
-  Raycaster,
-  Clock
-} from "three";
+import { Vector3, Color, Raycaster, Clock } from "three";
 import { GLOBALS } from "../../Globals.js";
 import { stateDoor } from '../door/Door.js';
 import { tractorBeam } from "../tractorBeam/TractorBeam.js";
 import { pelletUpdate } from "../pellet/Pellet.js";
-import {
-  portalButton
-} from '../portal/CreatePortal.js';
-import {
-  AUDIO,
-  play,
-  playVoice
-} from "../audio/Audio.js";
-import {
-  removeJointConstraint
-} from '../../Physics.js';
-import {
-  tweenCamera
-} from '../../Utils.js';
-import {
-  laserFieldState,
-  tractorStates,
-  lightBridgeState,
-  dispenserSpawn,
-  respawn,
-  levelEnteredFunction,
-  wakeUpAll
-} from "./states.js";
+import { portalButton } from '../portal/CreatePortal.js';
+import { AUDIO, play, } from "../audio/Audio.js";
+import { removeJointConstraint } from '../../Physics.js';
+import { tweenCamera } from '../../Utils.js';
+import { laserFieldState, tractorStates, lightBridgeState, dispenserSpawn, respawn, levelEnteredFunction, wakeUpAll } from "./states.js";
 
 var itemHolder = null;
 var coords = new Vector3();
@@ -158,7 +135,7 @@ function updateEvents() {
               connectionState(GLOBALS.CONNECTIONS[i], id, true, new Color(2, 1.3, 0))
 
               //PLAY AUDIO POSITIVE
-              if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area")) {
+              /*if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area")) {
                 AUDIO.POSITIVE.play();
               } else {
                 if (d.name == "player") {
@@ -167,7 +144,9 @@ function updateEvents() {
 
                   //playVoice(GLOBALS.CONNECTIONS[i]['from'].item.userData.speech)
                 }
-              }
+              }*/
+
+              AUDIO.POSITIVE.play();
 
               //Manage Door Trigger
               if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
@@ -413,6 +392,9 @@ function interactWithItem() {
         var instancedId = intersects[0].instanceId;
         var name = intersects[0].object.name;
         var test;
+
+        if (GLOBALS.DYMANIC_ITEMS[name][instancedId].body.mass == 0)
+          return;
 
         if (intersects[0].object.name != "camera") {
           test = GLOBALS.DYMANIC_ITEMS[name][instancedId];

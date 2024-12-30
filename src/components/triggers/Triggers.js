@@ -1,12 +1,8 @@
-import {
-    GLOBALS
-} from '../../Globals.js';
-import {
-    AUDIO,
-    play,
-    playVoice
-} from "../audio/Audio.js";
+import { GLOBALS } from '../../Globals.js';
+import { AUDIO, play, playVoice } from "../audio/Audio.js";
 import $ from 'jquery';
+
+var audioVoiceTrigger, timeoutTriggerVoice, timeoutAudio;
 
 function checkForTriggerContact() {
 
@@ -33,26 +29,25 @@ function checkForTriggerContact() {
                 GLOBALS.PLAYER.spawnPosition = GLOBALS.TRIGGER_BOXES[f].item.position;
             } else if (GLOBALS.TRIGGER_BOXES[f].instancedName == "trigger_voice") {
 
-                console.log("playing")
                 playVoice(GLOBALS.TRIGGER_BOXES[f].item.userData);
 
             } if (GLOBALS.TRIGGER_BOXES[f].instancedName == "trigger_audio") {
 
-                if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem) {
+                playVoice(GLOBALS.TRIGGER_BOXES[f].item.userData);
+
+                /*if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem) {
                     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem.pause();
                     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem.currentTime = 0;
                 }
 
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem.play();
-                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem.loop = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectLoop;
+                GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectElem.loop = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectLoop;*/
 
-                if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectLoop) {
+                if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectLoop)
                     AUDIO.AMBIENT.pause();
-                }
             }
-        } else {
+        } else
             GLOBALS.TRIGGER_BOXES[f].item.userData.active = false;
-        }
     }
 }
 
@@ -67,8 +62,6 @@ $("body").on('change', '#state-trigger-visibility', function () {
 $("body").on('change', '#state-trigger-loop', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.soundEffectLoop = this.checked;
 })
-
-var timeoutAudio;
 
 $('#ambient-sound-select').on('change', function () {
 
@@ -85,7 +78,7 @@ $('#ambient-sound-select').on('change', function () {
         AUDIO.AMBIENT.pause();
         AUDIO.AMBIENT.currentTime = 0;
     }, 5000);
-})
+});
 
 $('.trigger_audio-state').on('click', function () {
 
@@ -108,40 +101,58 @@ $('.trigger_audio-state').on('click', function () {
     }, 5000);
 });
 
+$("body").on('input', '#state-trigger-voice-link', function () {
 
-$("body").on('change', '#state-trigger-voice-link', function () {
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.link = $(this).val().replace("dl=0", 'dl=1');
+    var link = $(this).val().replace("dl=0", 'dl=1');
+    link = link.replace(/&st=.*&dl=1/, '');
+    link += '&dl=1';
+    link = link.replace("www", 'dl')
+
+    $(this).val(link);
+
+    console.log(link)
+
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.link = link;
 });
-
-var audioVoiceTrigger, timeoutTriggerVoice;
 
 $("body").on('click', '#play-trigger-voice', function () {
     if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.link) {
-        playVoiceTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData)
+        playVoiceTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData, true)
     }
 });
 
-async function playVoiceTrigger(userdata) {
+async function playVoiceTrigger(userdata, play) {
 
     clearTimeout(timeoutTriggerVoice);
 
-    if(audioVoiceTrigger){
+    if (audioVoiceTrigger) {
         audioVoiceTrigger.currentTime = 0;
         audioVoiceTrigger.pause();
     }
 
     audioVoiceTrigger = new Audio(userdata.link);
-    audioVoiceTrigger.type = 'audio/wav';
+    //audioVoiceTrigger.type = 'audio/wav';
+
+    console.log(userdata.link)
 
     try {
-        await audioVoiceTrigger.play();
+        if (play){
+            await audioVoiceTrigger.play();
+
+            setTimeout(() => {
+                audioVoiceTrigger.pause()
+            }, 5000);
+        }
+            
         userdata.voice = audioVoiceTrigger;
         console.log('Playing...');
     } catch (err) {
         console.log('Failed to play...' + err);
     }
+
 }
 
 export {
-    checkForTriggerContact
+    checkForTriggerContact,
+    playVoiceTrigger
 }

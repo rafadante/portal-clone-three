@@ -1,21 +1,6 @@
-import {
-    Object3D,
-    Vector3,
-    Raycaster,
-    CylinderGeometry,
-    MeshBasicMaterial,
-    Mesh,
-    Group,
-    Color,
-    Quaternion,
-    MathUtils,
-    Matrix4,
-    MeshStandardMaterial
-} from 'three';
-import {
-    GLOBALS
-} from '../../Globals.js';
-import { animate } from '../../Main.js';
+import { Object3D, Vector3, Raycaster, CylinderGeometry, MeshBasicMaterial, Mesh, Group, Color, Quaternion, MathUtils } from 'three';
+import { GLOBALS } from '../../Globals.js';
+//import { animate } from '../../Main.js';
 import $ from 'jquery';
 import { laserReceiverTrigger } from '../events/events.js';
 

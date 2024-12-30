@@ -1,17 +1,6 @@
 import {
-    Vector3,
-    Object3D,
-    MeshBasicMaterial,
-    Mesh,
-    Color,
-    SphereGeometry,
-    PointLight,
-    CylinderGeometry,
-    Raycaster,
-    CircleGeometry,
-    BoxGeometry,
-    InstancedMesh,
-    TextureLoader
+    Vector3, Object3D, MeshBasicMaterial, Mesh, Color, SphereGeometry, PointLight, CylinderGeometry,
+    Raycaster, CircleGeometry, BoxGeometry, InstancedMesh, TextureLoader
 } from 'three';
 import { GLOBALS } from '../../Globals';
 import * as CANNON from 'cannon';
@@ -83,7 +72,7 @@ function addPelletBall(item) {
 
     ball.addEventListener("collide", function (event) {
 
-        if (!event.target.pellet.active || event.body.name== "fizzler")
+        if (!event.target.pellet.active || event.body.name == "fizzler")
             return;
 
         play(event.target.sound.audio);

@@ -1,12 +1,5 @@
-import {
-    Vector3,
-    Mesh,
-    MeshBasicMaterial,
-    Color
-} from 'three';
-import {
-    LightningStrike
-} from '../../LightningStrike.js';
+import { Vector3, Mesh, MeshBasicMaterial, Color } from 'three';
+import { LightningStrike } from '../../LightningStrike.js';
 import { GLOBALS } from '../../Globals.js';
 
 const rayParams1 = {
@@ -85,17 +78,17 @@ function recreateRay() {
 
     lightningStrike = new LightningStrike(rayParams1);
     lightningStrikeMesh = new Mesh(lightningStrike, new MeshBasicMaterial({
-        color: new Color(2,2,2)
+        color: new Color(2, 2, 2)
     }));
 
     lightningStrike2 = new LightningStrike(rayParams2);
     lightningStrikeMesh2 = new Mesh(lightningStrike2, new MeshBasicMaterial({
-        color: new Color(2,2,2)
+        color: new Color(2, 2, 2)
     }));
 
     lightningStrike3 = new LightningStrike(rayParams3);
     lightningStrikeMesh3 = new Mesh(lightningStrike3, new MeshBasicMaterial({
-        color: new Color(2,2,2)
+        color: new Color(2, 2, 2)
     }));
 
     //GLOBALS.SELECTED_FOR_BLOOM.add(lightningStrikeMesh);
@@ -111,9 +104,9 @@ function recreateRay() {
     GLOBALS.LIGHTNIN_STRIKE_3 = lightningStrikeMesh3;
     lightningStrikeMesh3.visible = false;
 
-    GLOBALS.LIGHTNIN_STRIKE_1.scale.set(1,1,1)
-    GLOBALS.LIGHTNIN_STRIKE_2.scale.set(1,1,1)
-    GLOBALS.LIGHTNIN_STRIKE_3.scale.set(1,1,1)
+    GLOBALS.LIGHTNIN_STRIKE_1.scale.set(1, 1, 1)
+    GLOBALS.LIGHTNIN_STRIKE_2.scale.set(1, 1, 1)
+    GLOBALS.LIGHTNIN_STRIKE_3.scale.set(1, 1, 1)
 
     lightningStrikeMesh.layers.mask = 2;
     lightningStrikeMesh2.layers.mask = 2;

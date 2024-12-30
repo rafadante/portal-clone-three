@@ -1,8 +1,5 @@
 import { GLOBALS } from "../../Globals.js";
-import {
-    AUDIO,
-    play
-} from "../audio/Audio.js";
+import { AUDIO, play } from "../audio/Audio.js";
 import { stateDoor } from "../door/Door.js";
 import { deletePortal } from "../portal/CreatePortal.js";
 import { interactWithItem } from "./events.js";
@@ -169,7 +166,7 @@ function levelEnteredFunction(trigger) {
 
             GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
 
-            
+
             setTimeout(() => {
                 for (var i = 0; i < GLOBALS.BOX_BODY.length; i++) {
                     if (GLOBALS.BOX_BODY[i].item.userData.opened)

@@ -1,18 +1,5 @@
-import {
-    EffectComposer,
-    EffectPass,
-    RenderPass,
-    ToneMappingEffect,
-    ToneMappingMode,
-    Selection,
-    SelectiveBloomEffect,
-    BlendFunction,
-    BloomEffect
-} from "postprocessing";
-import {
-    HalfFloatType,
-    Color
-} from 'three';
+import { EffectComposer, EffectPass, RenderPass, ToneMappingEffect, ToneMappingMode, Selection, SelectiveBloomEffect, BloomEffect } from "postprocessing";
+import { HalfFloatType, Color } from 'three';
 import { GLOBALS } from "../../Globals";
 
 //POST
@@ -21,7 +8,7 @@ var initiated = false;
 
 function initPost() {
 
-    if(initiated)
+    if (initiated)
         return;
 
     initiated = true;
@@ -75,17 +62,17 @@ function initPost() {
     });
 
     //
-    if(GLOBALS.MOBILE){
+    if (GLOBALS.MOBILE) {
         GLOBALS.COMPOSER.addPass(new EffectPass(GLOBALS.MAIN_CAMERA,
             toneMappingEffect
         ));
-    }else{
+    } else {
         GLOBALS.COMPOSER.addPass(new EffectPass(GLOBALS.MAIN_CAMERA,
             toneMappingEffect,
             bloom
         ));
     }
-    
+
 }
 
 export { initPost }

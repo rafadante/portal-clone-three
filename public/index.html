@@ -49,8 +49,10 @@
   <div id="ui">
 
     <div id="audio-trigger">
-      <span>You can create voice lines from GLaDOS in this link <a href="https://glados.c-net.org/" target="_blank">link</a></span>
-      <span>After processing, download the audio and store in <a href="https://www.dropbox.com/home" target="_blank">dropbox</a> account</span>
+      <span>You can create voice lines from GLaDOS in this link <a href="https://glados.c-net.org/"
+          target="_blank">link</a></span>
+      <span>After processing, download the audio and store in <a href="https://www.dropbox.com/home"
+          target="_blank">dropbox</a> account</span>
       <span>After that, just share the link and copy in the voice input field.</span>
     </div>
 
@@ -305,10 +307,7 @@
           -->
 
           <!--
-          <img alt="image" data-content="You can choose if you want the panel to be automatically deployed or not."
-            data-title="ANGLED PORTAL PANEL" class="item" data-name="angled_panel" data-allowconnection="true"
-            data-rotate="true" data-floor="true" data-ceiling="true" data-walls="true"
-            src="../assets/ui/items/angled_panel.webp" id="angled_panel" data-instanced="false" />
+          
           -->
 
           <div class="">
@@ -337,14 +336,7 @@
             <span>10</span>
           </div>
 
-          <!--<div class="">
-            <img alt="image"
-              data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
-              data-title="LIGHT TOP" class="item" data-name="light" src="../assets/ui/items/stripe.webp"
-              data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-              data-instanced="true" id="light" />
-            <span>10</span>
-          </div>
+          <!--
 
           <div class="">
             <img alt="image"
@@ -478,31 +470,52 @@
           </div>
 
           <div>
-            <img alt="image" data-content="An area that saves once the players walks into it. You can also change the visibility." data-title="TRIGGER SAVE" class="item" data-name="trigger_save"
-              src="../assets/ui/items/save.jpg" data-allowconnection="false" data-rotate="false" data-floor="true"
-              data-ceiling="true" data-walls="true" data-color="rgb(0,255,0)" id="trigger_save" />
+            <img alt="image"
+              data-content="An area that saves once the players walks into it. You can also change the visibility."
+              data-title="TRIGGER SAVE" class="item" data-name="trigger_save" src="../assets/ui/items/save.jpg"
+              data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+              data-color="rgb(0,255,0)" id="trigger_save" />
             <span>10</span>
           </div>
 
           <div>
-            <img alt="image" data-content="An area that plays a voice once the players walks into it. You can also change the visibility." data-title="TRIGGER VOICE" class="item" data-name="trigger_voice"
-              src="../assets/ui/items/voice.jpg" data-allowconnection="false" data-rotate="false" data-floor="true"
-              data-ceiling="true" data-walls="true" data-color="rgb(255,0,0)" id="trigger_voice" />
+            <img alt="image"
+              data-content="An area that plays a voice once the players walks into it. You can also change the visibility."
+              data-title="TRIGGER VOICE" class="item" data-name="trigger_voice" src="../assets/ui/items/voice.jpg"
+              data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+              data-color="rgb(255,0,0)" id="trigger_voice" />
             <span>10</span>
           </div>
 
           <div>
-            <img alt="image" data-content="An area that plays a sound effect once the players walks into it. You can also change the visibility." data-title="TRIGGER SOUND" class="item" data-name="trigger_audio"
-              src="../assets/ui/items/sound.jpg" data-allowconnection="false" data-rotate="false" data-floor="true"
-              data-ceiling="true" data-walls="true" data-color="rgb(0,0,255)" id="trigger_audio" />
+            <img alt="image"
+              data-content="An area that plays a sound effect once the players walks into it. You can also change the visibility."
+              data-title="TRIGGER SOUND" class="item" data-name="trigger_audio" src="../assets/ui/items/sound.jpg"
+              data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+              data-color="rgb(0,0,255)" id="trigger_audio" />
             <span>10</span>
           </div>
+
+          <div class="">
+            <img alt="image"
+              data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
+              data-title="LIGHT TOP" class="item" data-name="light" src="../assets/ui/items/stripe.webp"
+              data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+              data-instanced="true" id="light" data-instanced="false"/>
+            <span>10</span>
+          </div>
+
+          <img alt="image" data-content="You can choose if you want the panel to be automatically deployed or not."
+            data-title="ANGLED PORTAL PANEL" class="item" data-name="angled_panel" data-allowconnection="true"
+            data-rotate="true" data-floor="true" data-ceiling="true" data-walls="true"
+            src="../assets/ui/items/angled_panel.webp" id="angled_panel" data-instanced="false" />
         </div>
       </div>
     </div>
 
     <div id="ui-top" class="">
       <div id="top-menu-left">
+        <span id="back-main-menu">Back To Main Menu</span>
         <span id="save-level">Save</span>
         <span id="load-level">Load</span>
         <!--<span>Help</span>-->
@@ -970,7 +983,7 @@
       </a>
     </li>
 
-    <li id="trigger-multiple" class="menu-item hasItem trigger">
+    <li id="trigger-multiple" class="menu-item hasItem">
       <a href="#" class="menu-btn">
         <input type="checkbox" id="state-trigger-multiple" />
         <span class="menu-text">Multiple Triggers</span>
@@ -986,19 +999,19 @@
       </a>
     </li>
 
-    <li class="menu-item hasItem trigger_voice">
+    <li class="menu-item hasItem trigger_voice trigger_audio">
       <a href="#" class="menu-btn">
         <input placeholder="link to audio" type="text" id="state-trigger-voice-link" />
       </a>
     </li>
 
-    <li class="menu-item hasItem trigger_voice">
+    <li class="menu-item hasItem trigger_voice trigger_audio">
       <a href="#" class="menu-btn">
-        <button id="play-trigger-voice">Play/Save Voice</button>
+        <button id="play-trigger-voice">Play/Save Audio</button>
       </a>
     </li>
-    
-    <li class="menu-item menu-item-submenu hasItem trigger_audio">
+
+    <!--<li class="menu-item menu-item-submenu hasItem trigger_audio">
       <button type="button" class="menu-btn">
         <i class="fa fa-music"></i>
         <span class="menu-text title">Sound Effect:</span>
@@ -1107,7 +1120,7 @@
           </button>
         </li>
       </ul>
-    </li>
+    </li>-->
 
 
     <!---->
@@ -1308,9 +1321,10 @@
     justify-content: center;
     align-items: center;">
 
-      <img alt="image" id="social-youtube" class="social-link" src="./assets/youtube.png">
+      <img style="height: 25px;" alt="image" id="social-youtube" class="social-link" src="./assets/youtube.png">
       <img alt="image" id="social-discord" class="social-link" src="./assets/discord.png">
       <img alt="image" id="social-twitter" class="social-link" src="./assets/twitter.webp">
+      <img style="filter: invert(1);" alt="image" id="social-github" class="social-link" src="./assets/github.png">
 
     </div>
 
@@ -1329,7 +1343,7 @@
           <span class="option" id="option-community">COMMUNITY CHAMBERS</span>
           <!--<span class="option" id="option-options">OPTIONS</span>-->
           <!--<span class="option" id="option-patreon">PATREON</span>-->
-          <span class="option" id="option-download">DOWNLOAD</span>
+          <!--<span class="option" id="option-download">DOWNLOAD</span>-->
           <span class="option" id="option-about">ABOUT</span>
         </div>
 
@@ -1345,10 +1359,37 @@
           <span class="option main-option" id="option-community-build">BUILD TEST CHAMBER</span>
           <!--<span class="option main-option" id="option-community-workshop">MY WORKSHOP</span>-->
 
-          <span data-id="1" class="option sub-option load-custom" id="option-community-play">A Box and a Button by
+          <!--<span data-id="1" class="option sub-option load-custom" id="option-community-play">A Box and a Button by
             rafadante from <a target="_blank" href="https://www.youtube.com/watch?v=yWL-71JkTlY">link</a></span>
           <span data-id="2" class="option sub-option load-custom" id="option-community-play">Cube Launcher by homeless
-            man</span>
+            man</span>-->
+
+          <div id="list-custm-chambers" class="option sub-option">
+            <div class="custom-chamber" style="background-image: url(./assets/loading/3.webp);">
+              <i class="fas fa-thumbs-up"></i>
+              <i class="fas fa-thumbs-down"></i>
+              <span>chamber by user</span>
+            </div>
+
+            <div class="custom-chamber" style="background-image: url(./assets/loading/3.webp);">
+              <i class="fas fa-thumbs-up"></i>
+              <i class="fas fa-thumbs-down"></i>
+              <span>chamber by user</span>
+            </div>
+
+            <div class="custom-chamber" style="background-image: url(./assets/loading/3.webp);">
+              <i class="fas fa-thumbs-up"></i>
+              <i class="fas fa-thumbs-down"></i>
+              <span>chamber by user</span>
+            </div>
+
+            <div class="custom-chamber" style="background-image: url(./assets/loading/3.webp);">
+              <i class="fas fa-thumbs-up"></i>
+              <i class="fas fa-thumbs-down"></i>
+              <span>chamber by user</span>
+            </div>
+          </div>
+
         </div>
 
         <div id="options-about" class="option-main">
@@ -1850,7 +1891,7 @@
     <source src="./audio/portal_ambient_loop1.wav" type="audio/wav">
   </audio>
 
-  <audio id="audio-dissolve" preload="none">
+  <audio id="audio-dissolve" preload="none" volume="0">
     <source src="./audio/material_emancipation_01.wav" type="audio/wav">
   </audio>
 

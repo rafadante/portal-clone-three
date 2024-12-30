@@ -23,16 +23,16 @@ import './components/gels/Gels.js';
 import { GLOBALS } from './Globals.js';
 import { teleportationState } from './components/portal/Teleportation.js';
 import { hideMaterial } from "./Utils.js";
-import { ThreePerf } from 'three-perf'
+//import { ThreePerf } from 'three-perf'
 import { checkForTriggerContact } from "./components/triggers/Triggers.js";
 
-const perf = new ThreePerf({
+/*const perf = new ThreePerf({
     anchorX: 'right',
     anchorY: 'bottom',
     domElement: document.body, // or other canvas rendering wrapper
     renderer: GLOBALS.RENDERER, // three js renderer instance you use for rendering
     showGraph: true,
-});
+});*/
 
 //VARIABLES
 var angleHolder = 0;
@@ -79,7 +79,6 @@ GLOBALS.ITEM_CUBE.name = "ITEM_CUBE";
 document.getElementById("container").appendChild(GLOBALS.RENDERER.domElement);
 //
 function init() {
-    console.log(GLOBALS.SCENE)
     // SCENE
     GLOBALS.ROOM.name = "ROOM";
     GLOBALS.ITEMS_ADDED.name = "ITEMS";

@@ -394,7 +394,7 @@ form {
 #audio-trigger {
   display: none;
   position: absolute;
-  top: 0px;
+  top: 50px;
   right: 0px;
   z-index: 10000;
   width: auto;
@@ -406,11 +406,62 @@ form {
   font-size: 15px;
   font-weight: bolder;
 
-  span{
+  span {
     margin-bottom: 10px;
   }
 
-  a{
+  a {
     color: blue;
+  }
+}
+
+#list-custm-chambers {
+  display: grid;
+  grid-template-columns: auto auto auto;
+
+  .custom-chamber {
+    width: 95%;
+    height: 300px;
+    margin: 3px;
+    position: relative;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    transition: all 0.5s;
+    border: 5px solid black;
+
+    span{
+      position: absolute;
+      bottom: 0px;
+      background-color: rgba(0, 0, 0, 0.75);
+    }
+
+    .fa-thumbs-up{
+      right: 10px;
+      top: 10px;
+      position: absolute;
+      transition: all 0.5s;
+    }
+
+    .fa-thumbs-down{
+      right: 60px;
+      top: 10px;
+      position: absolute;
+      transition: all 0.5s;
+    }
+
+    .fa-thumbs-up:hover{
+      color: green;
+    }
+
+    .fa-thumbs-down:hover{
+      color: red;
+    }
+  }
+
+  .custom-chamber:hover {
+    filter: drop-shadow(2px 4px 6px black);
+    border: 5px solid orange;
   }
 }

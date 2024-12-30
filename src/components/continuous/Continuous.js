@@ -1,23 +1,7 @@
-import {
-    Object3D,
-    Vector3,
-    Raycaster,
-    BoxGeometry,
-    CylinderGeometry,
-    BufferAttribute,
-    Mesh,
-    Box3,
-    PlaneGeometry,
-    Color
-} from 'three';
+import { Object3D, Vector3, Raycaster, BoxGeometry, CylinderGeometry, BufferAttribute, Mesh, Box3, PlaneGeometry, Color } from 'three';
 import * as CANNON from 'cannon';
-import {
-    threeToCannon,
-    ShapeType
-} from 'three-to-cannon';
-import {
-    GLOBALS
-} from '../../Globals.js';
+import { threeToCannon, ShapeType } from 'three-to-cannon';
+import { GLOBALS } from '../../Globals.js';
 import { respawn } from '../events/states.js';
 import { getPlaneByName } from '../../Utils.js';
 import { updateMaterialRepeat } from '../materials/Materials.js';

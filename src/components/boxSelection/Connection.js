@@ -85,8 +85,8 @@ function manageConnection(instanceId, from) {
 
         from.item.userData.connectedTo.push(instanceId);
 
-        if (from.instancedName == "trigger_area")
-            line.visible = false;
+        //if (from.instancedName == "trigger_area")
+        //    line.visible = false;
     }
 
     GLOBALS.ITEM_CUBE.visible = false;
@@ -112,13 +112,21 @@ function addLine(from, endPos) {
 
 $("body").on('click', '.removeConnection', function () {
 
-    GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[$(this).data("id")]["line"]);
+    GLOBALS.LINES.remove(GLOBALS.CONNECTIONS[$(this).data("id")]["line"]);
+    window.checkers.instances[GLOBALS.CONNECTIONS[$(this).data("id")]["checker"]].visible = false;
+    window.checkersIndexes[GLOBALS.CONNECTIONS[$(this).data("id")]["checker"]] = false;
+    GLOBALS.CONNECTIONS[$(this).data("id")]["clone"].visible = false;
     GLOBALS.CONNECTIONS[$(this).data("id")]["to"].item.userData.connections -= 1;
-    GLOBALS.CONNECTIONS[$(this).data("id")]["from"].item.userData.connectedTo.splice($(this).data("id"), 1);
+
+    const index = GLOBALS.CONNECTIONS[$(this).data("id")]["from"].item.userData.connectedTo.indexOf(GLOBALS.CONNECTIONS[$(this).data("id")]["to"].id_instanced);
+    if (index > -1) { // only splice array when item is found
+        GLOBALS.CONNECTIONS[$(this).data("id")]["from"].item.userData.connectedTo.splice(index, 1); // 2nd parameter means remove one item only
+    }
 
     //RESET UI
     GLOBALS.CONNECTIONS.splice($(this).data("id"), 1);
     $("#connections").empty();
+
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
 
         if (GLOBALS.CONNECTIONS[i]['from'].itemName == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName) {
@@ -135,11 +143,13 @@ $("body").on('click', '.removeConnection', function () {
 });
 
 $("body").on('mouseenter', '.removeConnection', function () {
-    GLOBALS.ITEM_CUBE.position.copy(GLOBALS.CONNECTIONS[$(this).data("id")]["to"].position);
-    GLOBALS.ITEM_CUBE.rotation.copy(GLOBALS.CONNECTIONS[$(this).data("id")]["to"].rotation);
-    GLOBALS.ITEM_CUBE.translateZ(1)
-    GLOBALS.ITEM_CUBE.material.color = new Color(0xff0000);
-    GLOBALS.ITEM_CUBE.visible = true;
+    if (GLOBALS.CONNECTIONS[$(this).data("id")]) {
+        GLOBALS.ITEM_CUBE.position.copy(GLOBALS.CONNECTIONS[$(this).data("id")]["to"].position);
+        GLOBALS.ITEM_CUBE.rotation.copy(GLOBALS.CONNECTIONS[$(this).data("id")]["to"].rotation);
+        GLOBALS.ITEM_CUBE.translateZ(1)
+        GLOBALS.ITEM_CUBE.material.color = new Color(0xff0000);
+        GLOBALS.ITEM_CUBE.visible = true;
+    }
 });
 
 $("body").on('mouseleave', '.removeConnection', function () {

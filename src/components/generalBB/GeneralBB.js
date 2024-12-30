@@ -1,12 +1,4 @@
-import {
-    Vector3,
-    Box3,
-    BoxGeometry,
-    WireframeGeometry,
-    LineSegments,
-    LineBasicMaterial,
-    Vector4
-} from 'three';
+import { Vector3, Box3, BoxGeometry, WireframeGeometry, LineSegments, LineBasicMaterial, Vector4 } from 'three';
 
 class GeneralBB {
     // width, depth, height numbers

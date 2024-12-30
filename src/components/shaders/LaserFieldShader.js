@@ -1,7 +1,4 @@
 import {
-    Color,
-    MeshBasicMaterial,
-    DoubleSide,
     Vector3,
     ShaderMaterial
 } from 'three';

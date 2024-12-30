@@ -35,7 +35,7 @@ function teleportPhysicalObject(object, portal) {
     let velocity = cannonToThreeVector3(object.velocity);
 
     //CORRECT VELOCITY WHEN LOPING VERTICALLY TO AVOID INFINITY VELOCITY
-    if (GLOBALS.PORTALS[0].normal.y != GLOBALS.PORTALS[1].normal.y) {
+    if (Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) {
 
         const heightDifference = getHeightDifference(portal.portalShader.position, portal.output.portalShader.position);
 
@@ -70,13 +70,23 @@ function teleportPhysicalObject(object, portal) {
     velocity = getTeleportedDirectionalVector(velocity, portal)
     force = getTeleportedDirectionalVector(force, portal)
 
+    
+
+    if (Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) {
+        if(velocity.x < 3)
+            velocity.x = 0;
+    
+        if(velocity.z < 3)
+            velocity.z = 0;
+    }
+
     object.previousPosition.copy(previousPosition)
     object.velocity.copy(velocity)
     object.force.copy(force)
     object.quaternion.copy(orientation)
 
     //APPLY PORTAL FUNNELLING
-    if (GLOBALS.PORTALS[0].normal.y != GLOBALS.PORTALS[1].normal.y && object.looping2 == true) {
+    if (Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1 && object.looping2 == true) {
         if (!object.centering) {
 
             object.centering = true;
@@ -86,7 +96,7 @@ function teleportPhysicalObject(object, portal) {
 
             const newPosition = getTeleportedPositionalVector(portal.portalShader.position, portal);
             object.newPosition = newPosition;
-            //tweenCamera(100, object.position, newPosition);
+            //tweenCamera(100, object.position, newPosition)
         } else {
             position = getTeleportedPositionalVector(portal.portalShader.position, portal);
             object.position.copy(position)
@@ -95,6 +105,8 @@ function teleportPhysicalObject(object, portal) {
         position = getTeleportedPositionalVector(position, portal)
         object.position.copy(position)
     }
+
+    console.log(velocity)
 }
 
 // apply teleportation to the output portal to the vector

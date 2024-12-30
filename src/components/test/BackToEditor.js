@@ -3,28 +3,35 @@ import { GLOBALS } from '../../Globals.js';
 import { AUDIO, play } from '../audio/Audio.js';
 import { stateDoor } from '../door/Door.js';
 import { deletePortal } from '../portal/CreatePortal.js';
-import { resetAll } from '../events/events.js';
+import { interactWithItem, resetAll } from '../events/events.js';
 import { Vector3 } from 'three';
 
 //BACK FROM EDITOR
 $("body").on('click', '#back-editor', function () {
 
-    for(var i=0; i<GLOBALS.GOO_PLANES.length;i++){
+    if (GLOBALS.HOLDING_ITEM)
+        interactWithItem();
+
+    for (var i = 0; i < GLOBALS.GOO_PLANES.length; i++) {
         GLOBALS.GOO_PLANES[i].item.visible = true;
+    }
+
+    for (var f = 0; f < GLOBALS.TRIGGER_BOXES.length; f++) {
+        GLOBALS.TRIGGER_BOXES[i].item.visible = true;
     }
 
     GLOBALS.ENTER_DOOR.getObjectByName("trigger").visible = true;
     GLOBALS.EXIT_DOOR.getObjectByName("trigger").visible = true;
 
-    const cleanMaterial = material => {
-        console.log('dispose material!')
+    /*const cleanMaterial = material => {
+        //console.log('dispose material!')
         material.dispose()
     
         // dispose textures
         for (const key of Object.keys(material)) {
             const value = material[key]
             if (value && typeof value === 'object' && 'minFilter' in value) {
-                console.log('dispose texture!')
+                //console.log('dispose texture!')
                 value.dispose()
             }
         }
@@ -33,7 +40,7 @@ $("body").on('click', '#back-editor', function () {
     GLOBALS.SCENE_FPS.traverse(object => {
         if (!object.isMesh) return
         
-        console.log('dispose geometry!')
+        //console.log('dispose geometry!')
         object.geometry.dispose()
     
         if (object.material.isMaterial) {
@@ -42,9 +49,9 @@ $("body").on('click', '#back-editor', function () {
             // an array of materials
             for (const material of object.material) cleanMaterial(material)
         }
-    })
+    })*/
 
-    for(var i=0; i<window.instances.length;i++){
+    for (var i = 0; i < window.instances.length; i++) {
         GLOBALS.SCENE_FPS.remove(window.instances[i]);
     }
 
@@ -111,8 +118,8 @@ $("body").on('click', '#back-editor', function () {
     play(AUDIO.EDITOR)
     AUDIO.AMBIENT.pause();
 
-    GLOBALS.ENTER_DOOR.remove(GLOBALS.ENTER_DOOR.fizzler);
-    GLOBALS.EXIT_DOOR.remove(GLOBALS.EXIT_DOOR.fizzler);
+    //GLOBALS.ENTER_DOOR.remove(GLOBALS.ENTER_DOOR.fizzler);
+    //GLOBALS.EXIT_DOOR.remove(GLOBALS.EXIT_DOOR.fizzler);
     GLOBALS.ENTER_DOOR.children[0].rotation.z += Math.PI;
 
     stateDoor(0, false, false, GLOBALS.ENTER_DOOR, true);

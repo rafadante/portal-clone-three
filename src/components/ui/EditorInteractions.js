@@ -72,7 +72,7 @@ $("body").on('click', '#delete', function () {
     }
 
     for (var j = indexesToDelete.length - 1; j >= 0; j--) {
-        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CONNECTIONS[indexesToDelete[j]]["line"]);
+        GLOBALS.LINE.remove(GLOBALS.CONNECTIONS[indexesToDelete[j]]["line"]);
 
         window.checkers.setVisibilityAt(GLOBALS.CONNECTIONS[indexesToDelete[j]]["checker"], false);
         window.checkersIndexes[GLOBALS.CONNECTIONS[indexesToDelete[j]]["checker"]] = false;
@@ -171,6 +171,11 @@ $("body").on('click', '#delete', function () {
 
         } else {
 
+            const index = GLOBALS.TRIGGER_BOXES.indexOf(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]]);
+            if (index > -1) { // only splice array when item is found
+                GLOBALS.TRIGGER_BOXES.splice(index, 1); // 2nd parameter means remove one item only
+            }
+
             if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "faith_plate") {
                 GLOBALS.SCENE.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target);
                 GLOBALS.GROUP_LINE_TRAGECTORY.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target.line);
@@ -267,16 +272,22 @@ $("body").on('click', '.tile-portal', function () {
     $(".menu").removeClass("menu-show");
 });
 
-$("body").on('input', '#tractor-state-input, #light-bridge-state-input, #laser-field-state-input,#fizzler-state-input', function () {
+$("body").on('input', '#tractor-state-input, #light-bridge-state-input, #laser-field-state-input, #fizzler-state-input', function () {
 
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.state = this.checked;
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.visible = this.checked;
 
+    //bodyLaserField
     if ($(this).attr("id") == "light-bridge-state-input") {
         if (this.checked)
             GLOBALS.CANNON_WORLD.addBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
         else
             GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
+    } else if ($(this).attr("id") == "laser-field-state-input" || $(this).attr("id") == "fizzler-state-input") {
+        if (this.checked)
+            GLOBALS.CANNON_WORLD.addBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField);
+        else
+            GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField);
     }
 });
 
@@ -599,8 +610,9 @@ if (localStorage.getItem("goo_reflections")) {
 }
 
 $("body").on('click', '.angled_panel_option', function () {
+
     $("#angled_panel_option").find(".title").text("Angle: " + $(this).data("angle"));
-    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.angle = $(this).data("angle");
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.angle = $(this).data("real");
 
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.getObjectByName("pivot2").rotation.x = Math.PI / 180 * $(this).data("real");
 });
