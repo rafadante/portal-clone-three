@@ -236,6 +236,8 @@ $("body").on('click', '#settings-close', function () {
 
         GLOBALS.PAUSED = false;
 
+        $("#chamberName").css("opacity", 0);
+
         if (!GLOBALS.MOBILE) {
             document.body.requestPointerLock();
             //openFullscreen();
@@ -301,6 +303,8 @@ document.addEventListener('pointerlockchange', () => {
         GLOBALS.ALLOW_PLACE_PORTALS = false;
         allowEnterFPS = false;
         GLOBALS.PAUSED = true;
+
+        $("#chamberName").css("opacity", 1);
 
         setTimeout(() => {
             allowEnterFPS = true;

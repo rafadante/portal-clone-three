@@ -292,7 +292,7 @@ function loadEnterDoor(scene) {
     const geometryFizzler = new PlaneGeometry(2, 2);
     const planeFizzler = new Mesh(geometryFizzler, GLOBALS.MATERIAL_FIZZLER);
     planeFizzler.name = "fizzler";
-    planeFizzler.translateZ(-0.1);
+    planeFizzler.translateZ(-0.5);
     GLOBALS.ENTER_DOOR.fizzler = planeFizzler;
     GLOBALS.ENTER_DOOR.add(planeFizzler);
 
@@ -429,6 +429,11 @@ function loadCorridorEnter(scene) {
 
             if (child.name == "back")
                 GLOBALS.WALL_CORRIDOR_BACK = child;
+
+            if(child.name == "spawn"){
+                child.name = "spawnElevator"
+                console.log(child)
+            }
         }
     });
 

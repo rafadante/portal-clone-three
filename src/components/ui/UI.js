@@ -6,6 +6,11 @@ import "./Custom.js";
 if (!GLOBALS.MOBILE)
     $(".mobile").css("display", "none");
 
+
+$("body").on('click', '#close-warning', function () {
+    $("#initial-warning").css("display", "none");
+});
+
 $("body").on('click', '.settings-audio', function () {
     $("#options-audio").css("display", "block");
     $("#options-settings").css("display", "none");

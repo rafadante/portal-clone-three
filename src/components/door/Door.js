@@ -69,8 +69,7 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
         }, 300);
       }
 
-      if (door == GLOBALS.EXIT_DOOR) {
-        console.log(open)
+      if (door == GLOBALS.EXIT_DOOR && GLOBALS.FPS_MODE && !GLOBALS.FINISHED) {
         GLOBALS.CORRIDOR_ENTER.visible = open;
       }
       /*} else {

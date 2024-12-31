@@ -85,7 +85,7 @@ $("body").on('click', '#delete', function () {
         if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous) {
             if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide)
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide.hasItem = false;
-            GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous);
+            GLOBALS.ITEMS_ADDED.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous);
         }
 
         if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge)
@@ -115,6 +115,7 @@ $("body").on('click', '#delete', function () {
             if (index > -1) { // only splice array when item is found
                 GLOBALS.TRACTOR_BEAM.splice(index, 1); // 2nd parameter means remove one item only
                 GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.splice(index, 1); // 2nd parameter means remove one item only
+                GLOBALS.TRACTOR_BEAM_RAYCASTER.splice(index, 1); // 2nd parameter means remove one item only
             }
         }
 
@@ -190,7 +191,7 @@ $("body").on('click', '#delete', function () {
 
             if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous) {
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide.hasItem = false;
-                GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous);
+                GLOBALS.ITEMS_ADDED.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous);
             }
 
             if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge)

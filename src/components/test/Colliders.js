@@ -11,6 +11,7 @@ import { addLaserToCube } from '../lasers/Laser.js';
 import { addPelletBall, addPelletCatcher } from '../pellet/Pellet.js';
 import { faithPlate } from '../faithPlate/FaithPlate.js';
 import { gelTrigger } from '../gels/Gels.js';
+import { stateDoor } from '../door/Door.js';
 
 function colliderItemManager() {
 
@@ -53,8 +54,11 @@ function colliderItemManager() {
     addColliderItem(GLOBALS.DYMANIC_ITEMS['pellet_catcher'], "pellet_catcher", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['faith_plate'], "faith_plate", 0)
 
-    addColliderDoorsDefault(GLOBALS.ENTER_DOOR);
-    addColliderDoorsDefault(GLOBALS.EXIT_DOOR);
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['bed'], "bed", 0)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['trash'], "trash", 5)
+
+    addColliderDoorsDefault(GLOBALS.ENTER_DOOR, "enter");
+    addColliderDoorsDefault(GLOBALS.EXIT_DOOR, "exit");
 
     for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['angled_panel'].length; i++) {
         if (GLOBALS.DYMANIC_ITEMS['angled_panel'][i].length != 0) {
@@ -93,13 +97,14 @@ function colliderItemManager() {
     }
 }
 
-function addColliderDoorsDefault(obj) {
+function addColliderDoorsDefault(obj, name) {
     var shape = new CANNON.Box(new CANNON.Vec3(1, 1, 0.01));
     var door = new CANNON.Body({
         shape: shape,
         mass: 0,
         material: new CANNON.Material()
     });
+    door.name = name;
     GLOBALS.CANNON_BODIES.push(door);
     door.position.copy(obj.position);
     door.quaternion.copy(obj.quaternion);
@@ -108,8 +113,27 @@ function addColliderDoorsDefault(obj) {
     obj.body = door;
     GLOBALS.CANNON_WORLD.addBody(door);
 
+    var holder = new Object3D()
+    holder.position.copy(obj.position)
+    holder.quaternion.copy(obj.quaternion)
+    holder.translateZ(-0.5)
+    var fizzler = new CANNON.Body({
+        shape: shape,
+        mass: 0,
+        material: new CANNON.Material()
+    });
+    fizzler.name = name;
+    GLOBALS.CANNON_BODIES.push(fizzler);
+    fizzler.position.copy(holder.position);
+    fizzler.quaternion.copy(holder.quaternion);
+    fizzler.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
+    fizzler.collisionFilterMask = GLOBALS.CGROUP_ALL;
+    fizzler.collisionResponse = 0;
+    GLOBALS.CANNON_WORLD.addBody(fizzler);
+
+
     //ADD FIZZLER
-    fizzlerTrigger(door)
+    fizzlerTrigger(fizzler)
 }
 
 function fizzlerTrigger(body) {
@@ -119,6 +143,12 @@ function fizzlerTrigger(body) {
             return;
 
         if (e.body === GLOBALS.PLAYER) {
+
+            if (e.target.name == "exit" && !GLOBALS.FINISHED) {
+                GLOBALS.FINISHED = true;
+                stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
+            }
+
             deletePortal(0)
             deletePortal(1)
             GLOBALS.PORTAL_BOX = [];
@@ -155,8 +185,10 @@ function fizzlerTrigger(body) {
             //GLOBALS.MATERIAL_DISSOLVER
 
             setTimeout(() => {
-                GLOBALS.SCENE.remove(clone);
-                GLOBALS.SCENE_FPS.remove(clone.sound);
+                if (GLOBALS.SCENE_FPS) {
+                    GLOBALS.SCENE.remove(clone);
+                    GLOBALS.SCENE_FPS.remove(clone.sound);
+                }
             }, 3000);
 
             respawn(e.body);
@@ -183,7 +215,17 @@ function addColliderItem(items, type, mass, offset) {
             objHolder.quaternion.copy(rot);
             GLOBALS.SCENE.add(objHolder);
 
-            if (type == "door") {
+
+            if (type == "bed") {
+                var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.43, 1));
+                objHolder.translateY(0.215)
+            } else if (type == "trash") {
+                var shape = new CANNON.Box(new CANNON.Vec3(0.05, 0.09, 0.05));
+                //offset = 1;
+                //var shape = new CANNON.Box(new CANNON.Vec3(0.126, 0.35, 0.126));
+                //objHolder.translateY(0.35)
+                offset = 0.09;
+            } else if (type == "door") {
 
                 var shape = new CANNON.Box(new CANNON.Vec3(1, 1, 0.01));
 
@@ -300,6 +342,7 @@ function addColliderItem(items, type, mass, offset) {
             });
 
 
+            //console.log(objHolder.position)
             box.position.copy(objHolder.position);
             box.quaternion.copy(rot);
             box.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC
@@ -367,8 +410,9 @@ function addColliderItem(items, type, mass, offset) {
                 GLOBALS.SCENE_FPS.add(clone);
                 box.clone = clone;
 
-                if (type != "radio")
+                if (type != "radio" && type != "trash") {
                     addPositionalAudio('audio-impact', box, false, false, true, 8, 'sound');
+                }
 
                 box.addEventListener("collide", function (event) {
 
@@ -430,7 +474,7 @@ function addColliderItem(items, type, mass, offset) {
                         faithPlate(event.body, event.target)
                     }
 
-                    if (event.target.name == "radio")
+                    if (event.target.name == "radio" || event.target.name == "trash")
                         return;
 
                     if ((Math.abs(event.target.velocity.x) > 1.5 ||

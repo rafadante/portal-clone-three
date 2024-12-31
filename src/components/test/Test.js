@@ -18,6 +18,9 @@ import { resetPlayerBody } from '../fps/Player.js';
 
 $("body").on('click', '#view-fps', function () {
     if (window.allowTest) {
+        $("#chamberName").css("opacity", 1);
+        $("#chamberName").text($("#chamber-name-to-save").val() + "_by_" + $("#author-name-to-save").val());
+
         $("#loading-parent").css("opacity", 1)
         $("#loading-parent").css("pointer-events", "all")
 
@@ -182,6 +185,7 @@ function viewFPS(firstRender) {
         //GLOBALS.STATS.dom.style.display = "block";
         GLOBALS.OBSERVATION_ROOM.visible = true;
         GLOBALS.SCENE.getObjectByName("window").visible = false;
+        GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
         //--------------------------------------------------------------------------
         GLOBALS.OBSERVATION_ROOM.position.copy(GLOBALS.OBSERVATION_ROOM_IMG.position);
         GLOBALS.OBSERVATION_ROOM.rotation.copy(GLOBALS.OBSERVATION_ROOM_IMG.rotation);
@@ -202,7 +206,7 @@ function viewFPS(firstRender) {
 
         //
         var target = new Vector3(); // create once an reuse it
-        GLOBALS.CORRIDOR_ENTER.getObjectByName("spawn").getWorldPosition(target);
+        GLOBALS.CORRIDOR_ENTER.getObjectByName("spawnElevator").getWorldPosition(target);
         GLOBALS.PLAYER.position.copy(target)
         //
 

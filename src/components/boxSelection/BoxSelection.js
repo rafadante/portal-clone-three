@@ -48,6 +48,8 @@ function raycastSelected(found, event, type) {
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_1") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("angled_panel") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal_button") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("bed") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_gun"))) {
                 $("#rotate-item").css("display", "block");
             } else {
@@ -73,7 +75,7 @@ function raycastSelected(found, event, type) {
                     }
 
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_receiver") ||
-                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_area") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_relay") ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_relay") ||
                         GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_catcher")) {
                         $(".buttons").css("display", "block");
                         $("#connections").empty();
@@ -98,7 +100,8 @@ function raycastSelected(found, event, type) {
                         $(".buttons").css("display", "none");
                     }
 
-                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal")) {
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal") ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger")) {
 
                         $(".pedestal").css("display", "block");
                         $("#state-pedetsal-infinity").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.pedestalInfinity);
@@ -109,6 +112,11 @@ function raycastSelected(found, event, type) {
                         } else {
                             $("#pedestal-timer").removeClass("disabled");
                         }
+
+                        if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal"))
+                            $("#pedestal-inifinity").find("span").text("Activation Lasts");
+                        else
+                            $("#pedestal-inifinity").find("span").text("Wait to activate");
                     }
 
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("tractor")) {

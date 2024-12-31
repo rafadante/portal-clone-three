@@ -92,6 +92,7 @@ controls.minDistance = 0;
 
 var GLOBALS = {
 
+    FINISHED: false,
     PIXEL_RATIO: pixelRatio,
     DEBUGGER_GROUP: new Group(),
 
@@ -255,7 +256,9 @@ var GLOBALS = {
         pellet_catcher: [],
         angled_panel: [],
         paint_gun: [],
-        spawn: []
+        spawn: [],
+        bed: [],
+        trash: []
     },
 
     TRIGGER_BOXES: [],
@@ -670,7 +673,7 @@ var GLOBALS = {
         },
         light: {
             count: 0,
-            max: 10,
+            max: 20,
             instanced: true,
             interactive: false,
             roughness: 0.2,
@@ -747,6 +750,30 @@ var GLOBALS = {
             wall: true,
             ground: false,
             ceiling: false,
+            trigger: false
+        },
+        bed: {
+            count: 0,
+            max: 5,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
+        },
+        trash: {
+            count: 0,
+            max: 5,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
             trigger: false
         },
         portal_0: {
@@ -911,9 +938,7 @@ var GLOBALS = {
 GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
 
 function reset() {
-    //
 
-    //
     GLOBALS.ITEMS_COUNT = {
         cube: {
             count: 0,
@@ -1181,11 +1206,28 @@ function reset() {
         },
         light: {
             count: 0,
-            max: 10
+            max: 20,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+
         },
         lightEmissive: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         stripe: {
             count: 0,
@@ -1213,7 +1255,15 @@ function reset() {
         },
         angled_panel: {
             count: 0,
-            max: 10
+            max: 10,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
         },
         gel_orange: {
             count: 0,
@@ -1233,6 +1283,30 @@ function reset() {
             wall: true,
             ground: false,
             ceiling: false,
+            trigger: false
+        },
+        bed: {
+            count: 0,
+            max: 5,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
+        },
+        trash: {
+            count: 0,
+            max: 5,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
             trigger: false
         },
         portal_0: {
@@ -1331,7 +1405,7 @@ function reset() {
             count: 0,
             max: 1
         }
-    }
+    };
     //
     GLOBALS.TRIGGER_BOXES = [];
     GLOBALS.INTERACTIVE = [];

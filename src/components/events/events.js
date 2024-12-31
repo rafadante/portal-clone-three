@@ -131,64 +131,30 @@ function updateEvents() {
           if (GLOBALS.CONNECTIONS[i]['from'].box3.accept.includes(d.name)) {
 
             if (!GLOBALS.CONNECTIONS[i]['line'].active) {
-              GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
-              connectionState(GLOBALS.CONNECTIONS[i], id, true, new Color(2, 1.3, 0))
 
-              //PLAY AUDIO POSITIVE
-              /*if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area")) {
-                AUDIO.POSITIVE.play();
+              var waitFor = 0;
+
+              if (!GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalInfinity) {
+                waitFor = GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalValue * 1000;
+
               } else {
-                if (d.name == "player") {
-                  GLOBALS.PLAYER.spawnPosition = GLOBALS.CONNECTIONS[i]['from'].position;
-                  GLOBALS.PLAYER.spawnPosition.y += 0.5;
-
-                  //playVoice(GLOBALS.CONNECTIONS[i]['from'].item.userData.speech)
-                }
-              }*/
-
-              AUDIO.POSITIVE.play();
-
-              //Manage Door Trigger
-              if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
-                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
-                  stateDoor(0, true, false, GLOBALS.CONNECTIONS[i]['to'].item);
-                }
-              } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("cube") ||
-                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("sphere")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
-                  dispenserSpawn(GLOBALS.CONNECTIONS[i]['to'].item);
-                }
-              } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("tractor")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
-                  tractorStates(GLOBALS.CONNECTIONS[i]['to']);
-                }
-              } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("light_bridge")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
-                  lightBridgeState(GLOBALS.CONNECTIONS[i]['to']);
-                  wakeUpAll()
-                }
-              } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field") ||
-                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("fizzler")) {
-                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
-                  laserFieldState(GLOBALS.CONNECTIONS[i]['to'])
-                }
-              } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
-                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
-
-                GLOBALS.CONNECTIONS[i]['to'].item.active = true;
-
-                if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0"))
-                  portalButton(0, GLOBALS.CONNECTIONS[i]['to'].item, GLOBALS.MAIN_CAMERA)
-                else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1"))
-                  portalButton(2, GLOBALS.CONNECTIONS[i]['to'].item, GLOBALS.MAIN_CAMERA)
+                AUDIO.POSITIVE.play();
+                connectionState(GLOBALS.CONNECTIONS[i], id, true, new Color(2, 1.3, 0))
+                GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
               }
+
+              var to = GLOBALS.CONNECTIONS[i]['to'];
+              var connection = GLOBALS.CONNECTIONS[i];
+              var idHolder = id;
+
+              GLOBALS.CONNECTIONS[i]['line'].active = true;
+              doSetTimeout(to, waitFor, idHolder, connection);
             }
           }
           break;
         } else {//TRIGER ENDS
 
-          if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area"))
+          if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger"))
             continue
 
           notInPos++;
@@ -235,6 +201,53 @@ function updateEvents() {
     }
     id++;
   }
+}
+
+function doSetTimeout(to, waitFor, idHolder, connection) {
+  setTimeout(() => {
+
+    console.log(to.itemName)
+
+    if (waitFor > 0) {
+      connectionState(connection, idHolder, true, new Color(2, 1.3, 0))
+      to.item.userData.buttons += 1;
+    }
+
+    if (to.itemName.includes("door") ||
+      to.itemName.includes("exitDoor")) {
+      if (to.item.userData.connections == to.item.userData.buttons) {
+        stateDoor(0, true, false, to.item);
+      }
+    } else if (to.itemName.includes("cube") ||
+      to.itemName.includes("sphere")) {
+      if (to.item.userData.connections == to.item.userData.buttons) {
+        dispenserSpawn(to.item);
+      }
+    } else if (to.itemName.includes("tractor")) {
+      if (to.item.userData.connections == to.item.userData.buttons) {
+        tractorStates(to);
+      }
+    } else if (to.itemName.includes("light_bridge")) {
+      if (to.item.userData.connections == to.item.userData.buttons) {
+        lightBridgeState(to);
+        wakeUpAll()
+      }
+    } else if (to.itemName.includes("laser_field") ||
+      to.itemName.includes("fizzler")) {
+      if (to.item.userData.connections == to.item.userData.buttons) {
+        laserFieldState(to)
+      }
+    } else if (to.itemName.includes("portal_0") ||
+      to.itemName.includes("portal_1")) {
+
+      to.item.active = true;
+
+      if (to.itemName.includes("portal_0"))
+        portalButton(0, to.item, GLOBALS.MAIN_CAMERA)
+      else if (to.itemName.includes("portal_1"))
+        portalButton(2, to.item, GLOBALS.MAIN_CAMERA)
+    }
+  }, waitFor);
 }
 
 function resetAll() {
@@ -393,8 +406,10 @@ function interactWithItem() {
         var name = intersects[0].object.name;
         var test;
 
-        if (GLOBALS.DYMANIC_ITEMS[name][instancedId].body.mass == 0)
-          return;
+        if (intersects[0].object.name != "camera") {
+          if (GLOBALS.DYMANIC_ITEMS[name][instancedId].body.mass == 0)
+            return;
+        }
 
         if (intersects[0].object.name != "camera") {
           test = GLOBALS.DYMANIC_ITEMS[name][instancedId];

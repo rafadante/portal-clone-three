@@ -445,20 +445,19 @@
             <span>10</span>
           </div>
 
-          <div>
-            <img alt="image" data-content="Purely cosmetic, it will play a radio music." data-title="RADIO" class="item"
-              data-name="radio" src="../assets/ui/items/radio.webp" data-allowconnection="false" data-rotate="false"
-              data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="radio" />
+          <div class="">
+            <img alt="image"
+              data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
+              data-title="LIGHT TOP" class="item" data-name="light" src="../assets/ui/items/stripe.webp"
+              data-allowconnection="true" data-rotate="true" data-floor="true" data-ceiling="true" data-walls="true"
+              data-instanced="true" id="light" data-instanced="false" />
             <span>10</span>
           </div>
 
-          <div>
-            <img alt="image" data-content="Purely cosmetic, it will look at the player." data-title="CAMERA"
-              class="item" data-name="camera" src="../assets/ui/items/camera.webp" data-allowconnection="false"
-              data-rotate="false" data-floor="false" data-ceiling="false" data-walls="true" data-instanced="false"
-              id="camera" />
-            <span>10</span>
-          </div>
+          <img alt="image" data-content="You can choose if you want the panel to be automatically deployed or not."
+            data-title="ANGLED PORTAL PANEL" class="item" data-name="angled_panel" data-allowconnection="true"
+            data-rotate="true" data-floor="true" data-ceiling="true" data-walls="true"
+            src="../assets/ui/items/angled_panel.webp" id="angled_panel" data-instanced="false" />
 
           <div>
             <img alt="image"
@@ -482,7 +481,7 @@
             <img alt="image"
               data-content="An area that plays a voice once the players walks into it. You can also change the visibility."
               data-title="TRIGGER VOICE" class="item" data-name="trigger_voice" src="../assets/ui/items/voice.jpg"
-              data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+              data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
               data-color="rgb(255,0,0)" id="trigger_voice" />
             <span>10</span>
           </div>
@@ -491,24 +490,45 @@
             <img alt="image"
               data-content="An area that plays a sound effect once the players walks into it. You can also change the visibility."
               data-title="TRIGGER SOUND" class="item" data-name="trigger_audio" src="../assets/ui/items/sound.jpg"
-              data-allowconnection="false" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
+              data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
               data-color="rgb(0,0,255)" id="trigger_audio" />
             <span>10</span>
           </div>
 
-          <div class="">
-            <img alt="image"
-              data-content="Light Strips are purely cosmetic and provide your map with additional light. You can place four of them on a single square and they can be placed horizontally or vertically."
-              data-title="LIGHT TOP" class="item" data-name="light" src="../assets/ui/items/stripe.webp"
-              data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
-              data-instanced="true" id="light" data-instanced="false"/>
+          <!---->
+
+          <div>
+            <img alt="image" data-content="Purely cosmetic, it will play a radio music." data-title="RADIO" class="item"
+              data-name="radio" src="../assets/ui/items/radio.webp" data-allowconnection="false" data-rotate="false"
+              data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" id="radio" />
             <span>10</span>
           </div>
 
-          <img alt="image" data-content="You can choose if you want the panel to be automatically deployed or not."
-            data-title="ANGLED PORTAL PANEL" class="item" data-name="angled_panel" data-allowconnection="true"
-            data-rotate="true" data-floor="true" data-ceiling="true" data-walls="true"
-            src="../assets/ui/items/angled_panel.webp" id="angled_panel" data-instanced="false" />
+          <div>
+            <img alt="image" data-content="Purely cosmetic, it will look at the player." data-title="CAMERA"
+              class="item" data-name="camera" src="../assets/ui/items/camera.webp" data-allowconnection="false"
+              data-rotate="false" data-floor="false" data-ceiling="false" data-walls="true" data-instanced="false"
+              id="camera" />
+            <span>10</span>
+          </div>
+
+          <div>
+            <img alt="image"
+              data-content="Purely cosmetic."
+              data-title="BED" class="item" data-name="bed" src="../assets/ui/items/bed.png"
+              data-allowconnection="false" data-rotate="true" data-floor="true" data-ceiling="false" data-walls="false"
+              data-color="rgb(0,0,255)" id="bed" />
+            <span>5</span>
+          </div>
+
+          <div>
+            <img alt="image"
+              data-content="Purely cosmetic."
+              data-title="TRASH" class="item" data-name="trash" src="../assets/ui/items/trash.png"
+              data-allowconnection="false" data-rotate="true" data-floor="true" data-ceiling="true" data-walls="true"
+              data-color="rgb(0,0,255)" id="trash" />
+            <span>5</span>
+          </div>
         </div>
       </div>
     </div>
@@ -1388,6 +1408,54 @@
               <i class="fas fa-thumbs-down"></i>
               <span>chamber by user</span>
             </div>
+
+            <div class="custom-chamber" style="background-image: url(./assets/loading/3.webp);">
+              <i class="fas fa-thumbs-up"></i>
+              <i class="fas fa-thumbs-down"></i>
+              <span>chamber by user</span>
+            </div>
+
+            <div class="custom-chamber" style="background-image: url(./assets/loading/3.webp);">
+              <i class="fas fa-thumbs-up"></i>
+              <i class="fas fa-thumbs-down"></i>
+              <span>chamber by user</span>
+            </div>
+
+            <div class="custom-chamber" style="background-image: url(./assets/loading/3.webp);">
+              <i class="fas fa-thumbs-up"></i>
+              <i class="fas fa-thumbs-down"></i>
+              <span>chamber by user</span>
+            </div>
+
+            <div class="custom-chamber" style="background-image: url(./assets/loading/3.webp);">
+              <i class="fas fa-thumbs-up"></i>
+              <i class="fas fa-thumbs-down"></i>
+              <span>chamber by user</span>
+            </div>
+
+            <div class="custom-chamber" style="background-image: url(./assets/loading/3.webp);">
+              <i class="fas fa-thumbs-up"></i>
+              <i class="fas fa-thumbs-down"></i>
+              <span>chamber by user</span>
+            </div>
+
+            <div class="custom-chamber" style="background-image: url(./assets/loading/3.webp);">
+              <i class="fas fa-thumbs-up"></i>
+              <i class="fas fa-thumbs-down"></i>
+              <span>chamber by user</span>
+            </div>
+
+            <div class="custom-chamber" style="background-image: url(./assets/loading/3.webp);">
+              <i class="fas fa-thumbs-up"></i>
+              <i class="fas fa-thumbs-down"></i>
+              <span>chamber by user</span>
+            </div>
+
+            <div class="custom-chamber" style="background-image: url(./assets/loading/3.webp);">
+              <i class="fas fa-thumbs-up"></i>
+              <i class="fas fa-thumbs-down"></i>
+              <span>chamber by user</span>
+            </div>
           </div>
 
         </div>
@@ -2044,6 +2112,25 @@ flex-direction: column;
   align-items: center;">
     <span style="font-size: 30px; text-align: center; padding: 20px;">Mobile Version only works on landscape
       mode!</span>
+  </div>
+
+  <span id="chamberName"></span>
+
+  <div id="initial-warning" style="display: none;">
+    <button id="close-warning">X</button>
+    <span>
+      This project is currently in beta state, join the discord server to help with feedback.
+      <br></br>
+      For a stable experience please play the official games, they are amazing:
+      <br></br>
+      <a href="https://store.steampowered.com/app/400/Portal/?l=portuguese" target="_blank">Portal</a>
+      <br></br>
+      <a href="https://store.steampowered.com/app/620/Portal_2/?l=portuguese" target="_blank">Portal 2</a>
+      <br></br>
+      Project Portal THREEJS is a fan-made clone of the portal games made by VALVE in the web browser, I do not
+      own the original design work and it is only intended for education under "Fair Use"
+      defined in Section 107 of the Copyright Act (1976).
+    </span>
   </div>
 
 </body>

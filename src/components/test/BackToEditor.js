@@ -18,6 +18,9 @@ $("body").on('click', '#back-editor', function () {
 
     for (var f = 0; f < GLOBALS.TRIGGER_BOXES.length; f++) {
         GLOBALS.TRIGGER_BOXES[i].item.visible = true;
+
+        GLOBALS.TRIGGER_BOXES[f].item.userData.active = false;
+        GLOBALS.TRIGGER_BOXES[f].item.userData.played = false;
     }
 
     GLOBALS.ENTER_DOOR.getObjectByName("trigger").visible = true;
@@ -77,7 +80,8 @@ $("body").on('click', '#back-editor', function () {
     GLOBALS.SCENE_FPS = null;
     GLOBALS.LEVEL_ENTERED = false;
     GLOBALS.DOOR_OPEN_STATE = false;
-    GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
+    GLOBALS.FINISHED = false;
+    //GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
 
     $("#ui").css("display", "block");
     $(".img").removeClass("image");

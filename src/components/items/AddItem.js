@@ -349,7 +349,7 @@ function addItem(found, loaded) {
             item.renderOrder = 2;
             item.name = GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount;
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "radio")
+            if (GLOBALS.ITEM_HOLDED_NAME == "radio" || GLOBALS.ITEM_HOLDED_NAME == "trash")
                 item.translateY(0.5);
 
             if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
@@ -702,10 +702,10 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
     } else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
         item.rotation.y = item.userData.rotationY;
         item.getObjectByName("pivot2").rotation.x = Math.PI / 180 * item.userData.angle;
-    }else if (GLOBALS.ITEM_HOLDED_NAME == "pedestal_button") {
+    }else if (GLOBALS.ITEM_HOLDED_NAME == "pedestal_button" || GLOBALS.ITEM_HOLDED_NAME == "light" || GLOBALS.ITEM_HOLDED_NAME == "bed") {
 
         item.userData.rotationY = userDataLoadedItem.rotationY;
-        var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName("pedestal_button");
+        var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);
 
         var dummy = new Object3D();
         dummy.position.copy(item.position);

@@ -8,6 +8,8 @@ import { AddGoo } from '../goo/Goo.js';
 
 function checkToUpdateContinuous() {
 
+    console.log(GLOBALS.TRACTOR_BEAM_RAYCASTER)
+
     for (var i = 0; i < GLOBALS.TRACTOR_BEAM_RAYCASTER.length; i++) {
         createLightBridges("tractor_beam", GLOBALS.TRACTOR_BEAM_RAYCASTER[i],
             GLOBALS.TRACTOR_BEAM_RAYCASTER[i].item, null, true, i);

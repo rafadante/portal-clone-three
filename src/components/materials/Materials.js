@@ -250,7 +250,7 @@ function loadMaterial(material, base, normal, ao, rough, metal, alpha, roughValu
     if (GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic" && localStorage.getItem("quality-select") != "high"))
         material.envMapIntensity = 0.5;
     else
-        material.envMapIntensity = envIntensity;
+        material.envMapIntensity = envIntensity * 1.5;
 }
 
 function applyRepeat(map, repeatX, repeatY) {

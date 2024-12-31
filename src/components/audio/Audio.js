@@ -9,6 +9,7 @@ function playVoice(data) {
     if (!data.link)
         return;
 
+    data.voice.currentTime = 0;
     data.voice.play();
 }
 
@@ -84,10 +85,10 @@ function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, na
 function addAudio(obj, name) {
     for (var i = 0; i < obj.length; i++) {
         if (obj[i].length != 0) {
-            addPositionalAudio(name, obj[i], true, true, true, 4);
+            addPositionalAudio(name, obj[i], true, true, true, 2);
 
             if (name == 'audio-fizzler' || name == 'audio-laser-beam')
-                addPositionalAudio(name, obj[i].cloneLaserField, true, true, true, 4);
+                addPositionalAudio(name, obj[i].cloneLaserField, true, true, true, 2);
         }
     }
 }

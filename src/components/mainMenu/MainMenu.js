@@ -375,6 +375,31 @@ function loadLevel(data) {
         }
     }
 
+    for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
+
+        if (GLOBALS.PLANE_USER_DATA[i].gelType) {
+
+            GLOBALS.PLANE_USER_DATA[i].hasItem = false;
+            GLOBALS.PLANE_USER_DATA[i].itemName = null;
+            GLOBALS.PLANE_USER_DATA[i].gelType = null;
+
+            var color;
+            if (GLOBALS.PLANE_USER_DATA[i].portal)
+                color = 0xffffff;
+            else
+                color = 0x808080;
+
+            GLOBALS.PLANE_USER_DATA[i].planeColor = color;
+            GLOBALS.PLANE_LEVEL_INSTANCED.setColorAt(i, new Color(color));
+            //GLOBALS.PLANE_LEVEL_INSTANCED.instanceColor.needsUpdate = true;
+
+            const index = GLOBALS.GELS.indexOf(GLOBALS.PLANE_USER_DATA[i]);
+            if (index > -1) {
+                GLOBALS.GELS.splice(index, 1);
+            }
+        }
+    }
+
     for (var i = 0; i < toRemove.length; i++)
         GLOBALS.ITEMS_ADDED.remove(toRemove[i]);
 

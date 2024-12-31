@@ -70,13 +70,13 @@ function teleportPhysicalObject(object, portal) {
     velocity = getTeleportedDirectionalVector(velocity, portal)
     force = getTeleportedDirectionalVector(force, portal)
 
-    
+
 
     if (Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) {
-        if(velocity.x < 3)
+        if (velocity.x < 3)
             velocity.x = 0;
-    
-        if(velocity.z < 3)
+
+        if (velocity.z < 3)
             velocity.z = 0;
     }
 
@@ -309,6 +309,12 @@ function teleportationState() {
                         qq.setFromRotationMatrix(cameraMat);
 
                         GLOBALS.TELEPORTING_TARGET_QUATERNION = qq;
+
+                        /*GLOBALS.MAIN_CAMERA.quaternion.copy(qq);
+                        GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
+                        GLOBALS.GUN.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);
+                        GLOBALS.PORTAL_GUN_CAMERA.position.copy(GLOBALS.MAIN_CAMERA.position);
+                        GLOBALS.PORTAL_GUN_CAMERA.quaternion.copy(GLOBALS.MAIN_CAMERA.quaternion);*/
                     }
 
                     d.collisionFilterMask |=

@@ -465,3 +465,50 @@ form {
     border: 5px solid orange;
   }
 }
+
+#chamberName{
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 1000000;
+  font-size: 30px;
+  filter: drop-shadow(2px 4px 6px black);
+  opacity: 0;
+  transition: all 10s;
+}
+
+#initial-warning{
+  position: absolute;
+  z-index: 1000000;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  top: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  a{
+    color: #00a2ff;
+  }
+
+  span{
+    width: 80%;
+    font-size: 30px;
+    color: 	#ff9a00;
+  }
+
+  #close-warning{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    font-weight: bolder;
+    font-size: 24px;
+    background-color: 	#ff9a00;
+    color: #00a2ff;
+  }
+}
