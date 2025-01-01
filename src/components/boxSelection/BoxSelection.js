@@ -50,6 +50,10 @@ function raycastSelected(found, event, type) {
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal_button") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("bed") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("toilet") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("desk") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cabinet") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sign") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_gun"))) {
                 $("#rotate-item").css("display", "block");
             } else {

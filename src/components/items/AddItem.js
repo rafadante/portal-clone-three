@@ -576,6 +576,7 @@ function addItem(found, loaded) {
                 item.initialPosition = item.position.clone();
                 instanced.setVisibilityAt(idInstanced, true);
                 instanced.setMatrixAt(idInstanced, item.matrix);
+                userData.isInstanced = true;
 
                 if (GLOBALS.ITEM_HOLDED_NAME == "gel_gun_blue")
                     instanced.setColorAt(idInstanced, new Color(0x0000ff));
@@ -702,7 +703,10 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
     } else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
         item.rotation.y = item.userData.rotationY;
         item.getObjectByName("pivot2").rotation.x = Math.PI / 180 * item.userData.angle;
-    }else if (GLOBALS.ITEM_HOLDED_NAME == "pedestal_button" || GLOBALS.ITEM_HOLDED_NAME == "light" || GLOBALS.ITEM_HOLDED_NAME == "bed") {
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "pedestal_button" || GLOBALS.ITEM_HOLDED_NAME == "light"
+        || GLOBALS.ITEM_HOLDED_NAME == "bed" || GLOBALS.ITEM_HOLDED_NAME == "toilet"
+        || GLOBALS.ITEM_HOLDED_NAME == "desk" || GLOBALS.ITEM_HOLDED_NAME == "cabinet"
+        || GLOBALS.ITEM_HOLDED_NAME == "sign") {
 
         item.userData.rotationY = userDataLoadedItem.rotationY;
         var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);

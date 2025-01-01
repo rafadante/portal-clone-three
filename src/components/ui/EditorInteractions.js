@@ -59,12 +59,6 @@ $("body").on('click', '#delete', function () {
     var indexesToDelete = [];
 
     for (var j = 0; j < GLOBALS.CONNECTIONS.length; j++) {
-
-        if (GLOBALS.CONNECTIONS[j]['from'].item.userData.connectedTo.includes(GLOBALS.CONNECTIONS[j]["to"].id_instanced)) {
-            const index = GLOBALS.CONNECTIONS[j]['from'].item.userData.connectedTo.indexOf(GLOBALS.CONNECTIONS[j]["to"].id_instanced);
-            GLOBALS.CONNECTIONS[j]['from'].item.userData.connectedTo.splice(index);
-        }
-
         if (GLOBALS.CONNECTIONS[j]["from"] == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]])
             indexesToDelete.push(j);
         else if (GLOBALS.CONNECTIONS[j]["to"] == GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]])
@@ -72,11 +66,19 @@ $("body").on('click', '#delete', function () {
     }
 
     for (var j = indexesToDelete.length - 1; j >= 0; j--) {
+
+        const index = GLOBALS.CONNECTIONS[indexesToDelete[j]];
+
+        if (index['from'].item.userData.connectedTo.includes(index["to"].id_instanced)) {
+            const indexToRemove = index['from'].item.userData.connectedTo.indexOf(index["to"].id_instanced);
+            index['from'].item.userData.connectedTo.splice(indexToRemove);
+        }
+
         GLOBALS.LINE.remove(GLOBALS.CONNECTIONS[indexesToDelete[j]]["line"]);
 
-        window.checkers.setVisibilityAt(GLOBALS.CONNECTIONS[indexesToDelete[j]]["checker"], false);
-        window.checkersIndexes[GLOBALS.CONNECTIONS[indexesToDelete[j]]["checker"]] = false;
-        GLOBALS.CONNECTIONS[indexesToDelete[j]]["clone"].visible = false;
+        window.checkers.setVisibilityAt(index["checker"], false);
+        window.checkersIndexes[index["checker"]] = false;
+        index["clone"].visible = false;
         GLOBALS.CONNECTIONS.splice(indexesToDelete[j], 1);
     }
 

@@ -301,8 +301,6 @@ $("body").on('click', '#close-load-level-panel', function () {
 
     //CONNECTIONS
 
-    console.log(GLOBALS.LOADED_CONNECTIONS)
-
     for (var g = 0; g < GLOBALS.LOADED_CONNECTIONS.length; g++) {
         for (var h = 0; h < GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo.length; h++) {
 

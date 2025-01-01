@@ -157,8 +157,9 @@ function updatePhysics() {
             property == "portal_0" || property == "portal_1" || property == "pellet_launcher" ||
             property == "gel_recharger" ||
             property == "gel_white" || property == "gel_clear" || property == "gel_reflection" ||
-            property == "pellet_catcher" || property == "faith_plate" || property == "gel_purple"
-            || property == "bed")
+            property == "pellet_catcher" || property == "faith_plate" || property == "gel_purple" || 
+            property == "bed" || property == "toilet" || property == "desk" || property == "cabinet" ||
+            property == "sign")
             continue;
 
         for (var i = 0; i < GLOBALS.DYMANIC_ITEMS[property].length; i++) {

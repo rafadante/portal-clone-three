@@ -331,7 +331,7 @@ function interactWithItem() {
         return;
       }
     }
-
+    
     if (intersects[0].object.name == "pedestal_button") {
 
       if (intersects[0].distance < 1) {

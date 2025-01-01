@@ -90,6 +90,524 @@ renderer.shadowMap.autoUpdate = true;
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.minDistance = 0;
 
+function getItemValues(){
+    return {
+        cube: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: false,
+            ceiling: true,
+            trigger: false
+        },
+        cube_2: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: false,
+            ceiling: true,
+            trigger: false
+        },
+        scale_cube: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: false,
+            ceiling: true,
+            trigger: false
+        },
+        door: {
+            count: 0,
+            max: 5
+        },
+        sphere: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: false,
+            ceiling: true,
+            trigger: false
+        },
+        gel_gun_blue: {
+            count: 0,
+            max: 10
+        },
+        gel_gun_orange: {
+            count: 0,
+            max: 10
+        },
+        gel_gun_white: {
+            count: 0,
+            max: 10
+        },
+        pedestal_button: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: true
+        },
+        radio: {
+            count: 0,
+            max: 1,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
+        },
+        button_weight: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        button_box: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: true
+        },
+        button_sphere: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: true
+        },
+        dispenser: {
+            count: 0,
+            max: 100,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: false,
+            ceiling: true,
+            trigger: false
+        },
+        ramp: {
+            count: 0,
+            max: 10
+        },
+        ramp_half: {
+            count: 0,
+            max: 10
+        },
+        ramp_half2: {
+            count: 0,
+            max: 10
+        },
+        stairs: {
+            count: 0,
+            max: 10
+        },
+        light_bridge: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        tractor_beam: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        laser_emitter: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        laser_receiver: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        laser_relay: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        pellet_launcher: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        pellet_catcher: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        laser_cube: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: false,
+            ceiling: true,
+            trigger: false
+        },
+        faith_plate: {
+            count: 0,
+            max: 10,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
+        },
+        door: {
+            count: 0,
+            max: 5
+        },
+        light: {
+            count: 0,
+            max: 20,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+    
+        },
+        lightEmissive: {
+            count: 0,
+            max: 10,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        stripe: {
+            count: 0,
+            max: 10
+        },
+        gel_blue: {
+            count: 0,
+            max: 10
+        },
+        gel_recharger: {
+            count: 0,
+            max: 10
+        },
+        gel_reflection: {
+            count: 0,
+            max: 10
+        },
+        gel_clear: {
+            count: 0,
+            max: 10
+        },
+        gel_white: {
+            count: 0,
+            max: 10
+        },
+        angled_panel: {
+            count: 0,
+            max: 10,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        gel_orange: {
+            count: 0,
+            max: 10
+        },
+        gel_purple: {
+            count: 0,
+            max: 10
+        },
+        camera: {
+            count: 0,
+            max: 5,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: false,
+            ceiling: false,
+            trigger: false
+        },
+        bed: {
+            count: 0,
+            max: 5,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
+        },
+        trash: {
+            count: 0,
+            max: 5,
+            instanced: true,
+            interactive: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        toilet: {
+            count: 0,
+            max: 5,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
+        },
+        desk: {
+            count: 0,
+            max: 5,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.8,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
+        },
+        cabinet: {
+            count: 0,
+            max: 5,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
+        },
+        sign: {
+            count: 0,
+            max: 5,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
+        },
+        portal_0: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        portal_1: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        laser_field: {
+            count: 0,
+            max: 20,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        fizzler: {
+            count: 0,
+            max: 20,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: true,
+            trigger: false
+        },
+        observation_room: {
+            count: 0,
+            max: 10
+        },
+        glass: {
+            count: 0,
+            max: 20
+        },
+        portal_gun: {
+            count: 0,
+            max: 1,
+            instanced: false,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
+        },
+        paint_gun: {
+            count: 0,
+            max: 1
+        },
+        trigger_area: {
+            count: 0,
+            max: 10
+        },
+        trigger_voice: {
+            count: 0,
+            max: 10
+        },
+        trigger_audio: {
+            count: 0,
+            max: 10
+        },
+        trigger_save: {
+            count: 0,
+            max: 10
+        },
+        portal: {
+            count: 0,
+            max: 10
+        },
+        spawn: {
+            count: 0,
+            max: 1
+        }
+    }
+}
+
 var GLOBALS = {
 
     FINISHED: false,
@@ -258,7 +776,11 @@ var GLOBALS = {
         paint_gun: [],
         spawn: [],
         bed: [],
-        trash: []
+        trash: [],
+        toilet: [],
+        desk: [],
+        cabinet: [],
+        sign: []
     },
 
     TRIGGER_BOXES: [],
@@ -406,473 +928,8 @@ var GLOBALS = {
     RADIO_MUSIC: [],
     CAMERAS: [],
 
-    ITEMS_COUNT: {
-        cube: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: false,
-            ceiling: true,
-            trigger: false
-        },
-        cube_2: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: false,
-            ceiling: true,
-            trigger: false
-        },
-        scale_cube: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: false,
-            ceiling: true,
-            trigger: false
-        },
-        door: {
-            count: 0,
-            max: 5
-        },
-        sphere: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: false,
-            ceiling: true,
-            trigger: false
-        },
-        gel_gun_blue: {
-            count: 0,
-            max: 10
-        },
-        gel_gun_orange: {
-            count: 0,
-            max: 10
-        },
-        gel_gun_white: {
-            count: 0,
-            max: 10
-        },
-        pedestal_button: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: true
-        },
-        radio: {
-            count: 0,
-            max: 1,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: true,
-            ceiling: false,
-            trigger: false
-        },
-        button_weight: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        button_box: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: true
-        },
-        button_sphere: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: true
-        },
-        dispenser: {
-            count: 0,
-            max: 100,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: false,
-            ceiling: true,
-            trigger: false
-        },
-        ramp: {
-            count: 0,
-            max: 10
-        },
-        ramp_half: {
-            count: 0,
-            max: 10
-        },
-        ramp_half2: {
-            count: 0,
-            max: 10
-        },
-        stairs: {
-            count: 0,
-            max: 10
-        },
-        light_bridge: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        tractor_beam: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        laser_emitter: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        laser_receiver: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        laser_relay: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        pellet_launcher: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        pellet_catcher: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        laser_cube: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: false,
-            ceiling: true,
-            trigger: false
-        },
-        faith_plate: {
-            count: 0,
-            max: 10,
-            instanced: false,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: true,
-            ceiling: false,
-            trigger: false
-        },
-        door: {
-            count: 0,
-            max: 5
-        },
-        light: {
-            count: 0,
-            max: 20,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
+    ITEMS_COUNT: getItemValues(),
 
-        },
-        lightEmissive: {
-            count: 0,
-            max: 10,
-            instanced: false,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        stripe: {
-            count: 0,
-            max: 10
-        },
-        gel_blue: {
-            count: 0,
-            max: 10
-        },
-        gel_recharger: {
-            count: 0,
-            max: 10
-        },
-        gel_reflection: {
-            count: 0,
-            max: 10
-        },
-        gel_clear: {
-            count: 0,
-            max: 10
-        },
-        gel_white: {
-            count: 0,
-            max: 10
-        },
-        angled_panel: {
-            count: 0,
-            max: 10,
-            instanced: false,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        gel_orange: {
-            count: 0,
-            max: 10
-        },
-        gel_purple: {
-            count: 0,
-            max: 10
-        },
-        camera: {
-            count: 0,
-            max: 5,
-            instanced: false,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: false,
-            ceiling: false,
-            trigger: false
-        },
-        bed: {
-            count: 0,
-            max: 5,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: true,
-            ceiling: false,
-            trigger: false
-        },
-        trash: {
-            count: 0,
-            max: 5,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        portal_0: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        portal_1: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        laser_field: {
-            count: 0,
-            max: 20,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        fizzler: {
-            count: 0,
-            max: 20,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        observation_room: {
-            count: 0,
-            max: 10
-        },
-        glass: {
-            count: 0,
-            max: 20
-        },
-        portal_gun: {
-            count: 0,
-            max: 1,
-            instanced: false,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: true,
-            ceiling: false,
-            trigger: false
-        },
-        paint_gun: {
-            count: 0,
-            max: 1
-        },
-        trigger_area: {
-            count: 0,
-            max: 10
-        },
-        trigger_voice: {
-            count: 0,
-            max: 10
-        },
-        trigger_audio: {
-            count: 0,
-            max: 10
-        },
-        trigger_save: {
-            count: 0,
-            max: 10
-        },
-        portal: {
-            count: 0,
-            max: 10
-        },
-        spawn: {
-            count: 0,
-            max: 1
-        }
-    },
     SCENE_FPS: null,
     LISTENER: new AudioListener(),
     CANNON_BODIES: [],
@@ -939,474 +996,7 @@ GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
 
 function reset() {
 
-    GLOBALS.ITEMS_COUNT = {
-        cube: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: false,
-            ceiling: true,
-            trigger: false
-        },
-        cube_2: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: false,
-            ceiling: true,
-            trigger: false
-        },
-        scale_cube: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: false,
-            ceiling: true,
-            trigger: false
-        },
-        door: {
-            count: 0,
-            max: 5
-        },
-        sphere: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: false,
-            ceiling: true,
-            trigger: false
-        },
-        gel_gun_blue: {
-            count: 0,
-            max: 10
-        },
-        gel_gun_orange: {
-            count: 0,
-            max: 10
-        },
-        gel_gun_white: {
-            count: 0,
-            max: 10
-        },
-        pedestal_button: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: true
-        },
-        radio: {
-            count: 0,
-            max: 1,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: true,
-            ceiling: false,
-            trigger: false
-        },
-        button_weight: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        button_box: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: true
-        },
-        button_sphere: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: true
-        },
-        dispenser: {
-            count: 0,
-            max: 100,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: false,
-            ceiling: true,
-            trigger: false
-        },
-        ramp: {
-            count: 0,
-            max: 10
-        },
-        ramp_half: {
-            count: 0,
-            max: 10
-        },
-        ramp_half2: {
-            count: 0,
-            max: 10
-        },
-        stairs: {
-            count: 0,
-            max: 10
-        },
-        light_bridge: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        tractor_beam: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        laser_emitter: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        laser_receiver: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        laser_relay: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        pellet_launcher: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        pellet_catcher: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        laser_cube: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: false,
-            ceiling: true,
-            trigger: false
-        },
-        faith_plate: {
-            count: 0,
-            max: 10,
-            instanced: false,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: true,
-            ceiling: false,
-            trigger: false
-        },
-        door: {
-            count: 0,
-            max: 5
-        },
-        light: {
-            count: 0,
-            max: 20,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-
-        },
-        lightEmissive: {
-            count: 0,
-            max: 10,
-            instanced: false,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        stripe: {
-            count: 0,
-            max: 10
-        },
-        gel_blue: {
-            count: 0,
-            max: 10
-        },
-        gel_recharger: {
-            count: 0,
-            max: 10
-        },
-        gel_reflection: {
-            count: 0,
-            max: 10
-        },
-        gel_clear: {
-            count: 0,
-            max: 10
-        },
-        gel_white: {
-            count: 0,
-            max: 10
-        },
-        angled_panel: {
-            count: 0,
-            max: 10,
-            instanced: false,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        gel_orange: {
-            count: 0,
-            max: 10
-        },
-        gel_purple: {
-            count: 0,
-            max: 10
-        },
-        camera: {
-            count: 0,
-            max: 5,
-            instanced: false,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: false,
-            ceiling: false,
-            trigger: false
-        },
-        bed: {
-            count: 0,
-            max: 5,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: true,
-            ceiling: false,
-            trigger: false
-        },
-        trash: {
-            count: 0,
-            max: 5,
-            instanced: true,
-            interactive: true,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        portal_0: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        portal_1: {
-            count: 0,
-            max: 10,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        laser_field: {
-            count: 0,
-            max: 20,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        fizzler: {
-            count: 0,
-            max: 20,
-            instanced: true,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: true,
-            ground: true,
-            ceiling: true,
-            trigger: false
-        },
-        observation_room: {
-            count: 0,
-            max: 10
-        },
-        glass: {
-            count: 0,
-            max: 20
-        },
-        portal_gun: {
-            count: 0,
-            max: 1,
-            instanced: false,
-            interactive: false,
-            roughness: 0.2,
-            envIntensity: 0.5,
-            wall: false,
-            ground: true,
-            ceiling: false,
-            trigger: false
-        },
-        paint_gun: {
-            count: 0,
-            max: 1
-        },
-        trigger_area: {
-            count: 0,
-            max: 10
-        },
-        trigger_voice: {
-            count: 0,
-            max: 10
-        },
-        trigger_audio: {
-            count: 0,
-            max: 10
-        },
-        trigger_save: {
-            count: 0,
-            max: 10
-        },
-        portal: {
-            count: 0,
-            max: 10
-        },
-        spawn: {
-            count: 0,
-            max: 1
-        }
-    };
-    //
+    GLOBALS.ITEMS_COUNT = getItemValues();
     GLOBALS.TRIGGER_BOXES = [];
     GLOBALS.INTERACTIVE = [];
     GLOBALS.SELECTED_ID = [];
