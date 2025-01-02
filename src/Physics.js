@@ -28,7 +28,7 @@ else
     world.solver = solver;
 
 world.gravity.set(0, -9.8, 0);
-world.allowSleep = true;
+world.allowSleep = false;
 world.broadphase = new CANNON.NaiveBroadphase();
 
 //PHYSICS INTERACTIONS
@@ -147,6 +147,7 @@ function updatePhysics() {
 
         var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(property);
 
+
         if (property == "gel_gun_blue" || property == "gel_gun_orange" || property == "gel_gun_white" ||
             property == "pedestal_button" || property == "button_weight" || property == "button_box" ||
             property == "button_sphere" || property == "dispenser" || property == "ramp" ||
@@ -157,14 +158,38 @@ function updatePhysics() {
             property == "portal_0" || property == "portal_1" || property == "pellet_launcher" ||
             property == "gel_recharger" ||
             property == "gel_white" || property == "gel_clear" || property == "gel_reflection" ||
-            property == "pellet_catcher" || property == "faith_plate" || property == "gel_purple" || 
+            property == "pellet_catcher" || property == "faith_plate" || property == "gel_purple" ||
             property == "bed" || property == "toilet" || property == "desk" || property == "cabinet" ||
-            property == "sign")
+            property == "sign" || property == "track_platforms")
             continue;
 
         for (var i = 0; i < GLOBALS.DYMANIC_ITEMS[property].length; i++) {
 
-            if (GLOBALS.DYMANIC_ITEMS[property][i].length != 0) {
+            if (property == "piston_platforms") {
+
+                if (GLOBALS.DYMANIC_ITEMS[property][i].body) {
+                    if (!GLOBALS.DYMANIC_ITEMS[property][i].body.pistonDown) {
+                        GLOBALS.DYMANIC_ITEMS[property][i].body.position.y += 0.005;
+                    } else {
+                        GLOBALS.DYMANIC_ITEMS[property][i].body.position.y -= 0.005;
+                    }
+
+                    if (GLOBALS.DYMANIC_ITEMS[property][i].body.position.y > 2)
+                        GLOBALS.DYMANIC_ITEMS[property][i].body.pistonDown = true;
+                    else if (GLOBALS.DYMANIC_ITEMS[property][i].body.position.y <= 0)
+                        GLOBALS.DYMANIC_ITEMS[property][i].body.pistonDown = false;
+
+                    var item = new Object3D();
+                    item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
+                    item.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
+
+                    item.updateMatrix();
+                    instanced.setMatrixAt(i, item.matrix)
+                    instanced.instanceMatrix.needsUpdate = true;
+                    instanced.computeBoundingSphere();
+                }
+
+            } else if (GLOBALS.DYMANIC_ITEMS[property][i].length != 0) {
 
                 if (GLOBALS.DYMANIC_ITEMS[property][i].body) {
                     if (GLOBALS.DYMANIC_ITEMS[property][i].body.sound) {
@@ -185,9 +210,6 @@ function updatePhysics() {
                     var item = new Object3D();
                     item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
                     item.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
-
-                    //window.ppp = item.position;
-                    //window.qqq = item.quaternion;
 
                     item.updateMatrix();
                     instanced.setMatrixAt(i, item.matrix)

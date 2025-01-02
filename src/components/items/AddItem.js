@@ -335,16 +335,18 @@ function addItem(found, loaded) {
                 false
             );
 
+            item.position.copy(userData.position);
+
             if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
                 if (userData.side == "back" && userData.normal.y == 0)
                     item.rotation.set(userData.normal.x, Math.PI, userData.normal.z)
                 else
                     item.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
-            } else {
+            }  else {
                 item.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
             }
 
-            item.position.copy(userData.position);
+            
 
             item.renderOrder = 2;
             item.name = GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount;

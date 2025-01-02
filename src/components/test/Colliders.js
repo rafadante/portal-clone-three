@@ -62,6 +62,9 @@ function colliderItemManager() {
     addColliderItem(GLOBALS.DYMANIC_ITEMS['cabinet'], "cabinet", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['sign'], "sign", 0)
 
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['track_platforms'], "track_platforms", 0)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['piston_platforms'], "piston_platforms", 0)
+
     addColliderDoorsDefault(GLOBALS.ENTER_DOOR, "enter");
     addColliderDoorsDefault(GLOBALS.EXIT_DOOR, "exit");
 
@@ -222,7 +225,9 @@ function addColliderItem(items, type, mass, offset) {
             objHolder.quaternion.copy(rot);
             GLOBALS.SCENE.add(objHolder);
 
-            if (type == "bed" || type == "toilet" || type == "desk" || type == "cabinet" || type == "sign") {
+            if (type == "bed" || type == "toilet" || type == "desk" || type == "cabinet" || type == "sign" ||
+                type == "track_platforms" || type == "piston_platforms"
+            ) {
                 var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
                 var shape = result.shape;
             } else if (type == "trash") {
@@ -580,25 +585,25 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
             var offsetZ = 0;
 
             if (side == "up") {
-                offsetY = 0.04;
+                offsetY = 0.09;
             } else if (side == "down") {
-                offsetY = -0.04;
+                offsetY = -0.09;
             } else if (side == "front") {
-                offsetZ = -0.04;
+                offsetZ = -0.09;
             } else if (side == "back") {
-                offsetZ = 0.04;
+                offsetZ = 0.09;
             }else if (side == "right") {
-                offsetX = 0.04;
+                offsetX = 0.09;
             } else if (side == "left") {
-                offsetX = -0.04;
+                offsetX = -0.09;
             }
 
             if (side == "up" || side == "down") {
-                shapeDimension = new CANNON.Vec3(columsNew[i][j].length, 0.05, 1)
+                shapeDimension = new CANNON.Vec3(columsNew[i][j].length, 0.1, 1)
             } else if (side == "front" || side == "back") {
-                shapeDimension = new CANNON.Vec3(columsNew[i][j].length, 1, 0.05)
+                shapeDimension = new CANNON.Vec3(columsNew[i][j].length, 1, 0.1)
             } else if (side == "right" || side == "left") {
-                shapeDimension = new CANNON.Vec3(0.01, 1, columsNew[i][j].length)
+                shapeDimension = new CANNON.Vec3(0.1, 1, columsNew[i][j].length)
             }
 
             var shape = new CANNON.Box(shapeDimension);

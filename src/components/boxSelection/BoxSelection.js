@@ -238,6 +238,10 @@ function raycastSelected(found, event, type) {
                         !GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_save")) {
                         $(".trigger-multiple").css("display", "block");
                     }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("piston_platforms")) {
+                        $(".piston_platforms").css("display", "block");
+                    }
                 }
             }
 

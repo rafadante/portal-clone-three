@@ -170,7 +170,7 @@ function levelEnteredFunction(trigger) {
                 
             }, 3000);*/
 
-            GLOBALS.RENDERER.shadowMap.autoUpdate = false;
+            //GLOBALS.RENDERER.shadowMap.autoUpdate = false;
 
             GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
 

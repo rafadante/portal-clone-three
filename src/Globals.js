@@ -604,7 +604,31 @@ function getItemValues(){
         spawn: {
             count: 0,
             max: 1
-        }
+        },
+        piston_platforms: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: false,
+            trigger: true
+        },
+        track_platforms: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: true,
+            ground: true,
+            ceiling: false,
+            trigger: true
+        },
     }
 }
 
@@ -780,7 +804,9 @@ var GLOBALS = {
         toilet: [],
         desk: [],
         cabinet: [],
-        sign: []
+        sign: [],
+        piston_platforms: [],
+        track_platforms: []
     },
 
     TRIGGER_BOXES: [],

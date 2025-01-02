@@ -284,11 +284,11 @@ function portalButton(button, auto, camera, firstToRender) {
 
                     GLOBALS.PORTALS[0].normal = normal;
 
-                    if (!auto) {
+                    //if (!auto) {
                         AUDIO.PORTAL_GUN_ORANGE.pause();
                         AUDIO.PORTAL_GUN_ORANGE.currentTime = 0;
                         play(AUDIO.PORTAL_GUN_ORANGE)
-                    }
+                    //}
 
                 } else if (button == 2) { // left click
 
@@ -323,11 +323,11 @@ function portalButton(button, auto, camera, firstToRender) {
 
                     GLOBALS.PORTALS[1].normal = normal;
 
-                    if (!auto) {
+                    //if (!auto) {
                         AUDIO.PORTAL_GUN_BLUE.pause();
                         AUDIO.PORTAL_GUN_BLUE.currentTime = 0;
                         play(AUDIO.PORTAL_GUN_BLUE)
-                    }
+                    //}
                 }
 
                 setTimeout(() => {

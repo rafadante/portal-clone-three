@@ -388,17 +388,7 @@
             data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false" id="paint_gun" />-->
 
           <!--
-          <img alt="image"
-            data-content="Piston Platforms will move up and down whenever the player stands on it. If it is connected to a trigger then the trigger must be activated before it will begin to move. You can adjust the height of the platform using the arrows that appear when the object is selected."
-            data-title="PISTON PLATFORMS" class="item" data-name="piston_platforms"
-            src="../assets/ui/items/piston_platforms.webp" />
-
-          <img alt="image"
-            data-content="Track Platforms move on rails. You can adjust the pathing using the arrows that appear when the object is selected. The properties menu allow you to set the rail to oscillate and you can set the platform to start active or disabled."
-            data-title="TRACK PLATFORMS" class="item" data-name="track_platforms"
-            src="../assets/ui/items/track_platforms.webp" />
-
-
+          
           <img alt="image"
             data-content="Can either start enabled or disabled through the properties menu. When enabled the player can walk up and down them."
             data-title="STAIRS" class="item" data-name="stairs" src="../assets/ui/items/stairs.webp" />
@@ -486,14 +476,14 @@
             <span>10</span>
           </div>
 
-          <div>
+          <!--<div>
             <img alt="image"
               data-content="An area that plays a sound effect once the players walks into it. You can also change the visibility."
               data-title="TRIGGER SOUND" class="item" data-name="trigger_audio" src="../assets/ui/items/sound.jpg"
               data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="true"
               data-color="rgb(0,0,255)" id="trigger_audio" />
             <span>10</span>
-          </div>
+          </div>-->
 
           <!---->
 
@@ -553,6 +543,18 @@
               data-ceiling="false" data-walls="false" data-color="rgb(0,0,255)" id="sign" />
             <span>5</span>
           </div>
+
+          <img alt="image"
+            data-content="Piston Platforms will move up and down whenever the player stands on it. If it is connected to a trigger then the trigger must be activated before it will begin to move. You can adjust the height of the platform using the arrows that appear when the object is selected."
+            data-title="PISTON PLATFORMS" class="item" data-name="piston_platforms" id="piston_platforms"
+            data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="false" data-walls="false"
+            src="../assets/ui/items/piston_platforms.webp" />
+
+          <img alt="image"
+            data-content="Track Platforms move on rails. You can adjust the pathing using the arrows that appear when the object is selected. The properties menu allow you to set the rail to oscillate and you can set the platform to start active or disabled."
+            data-title="TRACK PLATFORMS" class="item" data-name="track_platforms" id="track_platforms"
+            data-allowconnection="true" data-rotate="false" data-floor="false" data-ceiling="false" data-walls="true"
+            src="../assets/ui/items/track_platforms.webp" />
         </div>
       </div>
     </div>
@@ -1052,6 +1054,13 @@
     <li class="menu-item hasItem trigger_voice trigger_audio">
       <a href="#" class="menu-btn">
         <button id="play-trigger-voice">Play/Save Audio</button>
+      </a>
+    </li>
+
+    <!---->
+    <li class="menu-item hasItem piston_platforms">
+      <a href="#" class="menu-btn">
+        <input type="number" id="piston-max-height" />
       </a>
     </li>
 
