@@ -142,6 +142,11 @@ function targetFaithPlateEnd(item, h) {
 
   GLOBALS.FAITH_PLATE_TARGET.target = clone;
 
+  var height = 2;
+
+  if(h)
+    height = h;
+
   /*if (h) {
     height = h;
   } else {
@@ -157,7 +162,7 @@ function targetFaithPlateEnd(item, h) {
   GLOBALS.FAITH_PLATE_TARGET.userData.targetRot = clone.rotation;
   GLOBALS.FAITH_PLATE_TARGET.userData.target = clone;
 
-  createCurve(GLOBALS.FAITH_PLATE_TARGET.position, clone.position, 2, clone, GLOBALS.FAITH_PLATE_TARGET)
+  createCurve(GLOBALS.FAITH_PLATE_TARGET.position, clone.position, height, clone, GLOBALS.FAITH_PLATE_TARGET)
 
   GLOBALS.FAITH_PLATE_TARGET = null;
 }

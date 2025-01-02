@@ -996,9 +996,12 @@ GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
 
 function reset() {
 
+    GLOBALS.FINISHED = false;
+    window.glass = [];
+    GLOBALS.BOX_BODY= [];
     GLOBALS.ITEMS_COUNT = getItemValues();
     GLOBALS.TRIGGER_BOXES = [];
-    GLOBALS.INTERACTIVE = [];
+    //GLOBALS.INTERACTIVE = [];
     GLOBALS.SELECTED_ID = [];
     GLOBALS.SELECTED_ID_ORANGE = [];
     GLOBALS.SELECTED_COLOR = [];

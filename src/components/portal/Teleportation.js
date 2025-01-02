@@ -105,8 +105,6 @@ function teleportPhysicalObject(object, portal) {
         position = getTeleportedPositionalVector(position, portal)
         object.position.copy(position)
     }
-
-    console.log(velocity)
 }
 
 // apply teleportation to the output portal to the vector

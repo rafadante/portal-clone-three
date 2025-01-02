@@ -5,9 +5,16 @@ import { stateDoor } from '../door/Door.js';
 import { deletePortal } from '../portal/CreatePortal.js';
 import { interactWithItem, resetAll } from '../events/events.js';
 import { Vector3 } from 'three';
+import { removePelletHitInstances } from '../pellet/Pellet.js';
 
 //BACK FROM EDITOR
 $("body").on('click', '#back-editor', function () {
+    backToEditor();
+});
+
+function backToEditor() {
+
+    removePelletHitInstances();
 
     if (GLOBALS.HOLDING_ITEM)
         interactWithItem();
@@ -196,7 +203,7 @@ $("body").on('click', '#back-editor', function () {
         if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area"))
             GLOBALS.CONNECTIONS[i]['from'].item.visible = true;
     }
-});
+}
 
 function resetPositions(item, name) {
     item.position.copy(item.position);
@@ -205,4 +212,8 @@ function resetPositions(item, name) {
     instanced.setMatrixAt(item.userData.idInstanced, item.matrix);
     instanced.instanceMatrix.needsUpdate = true;
     instanced.computeBoundingSphere();
+}
+
+export {
+    backToEditor
 }

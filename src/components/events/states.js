@@ -8,6 +8,8 @@ function laserFieldState(obj) {
     obj.item.userData.state = !obj.item.userData.state;
     obj.item.continuous.visible = !obj.item.continuous.visible;
 
+    GLOBALS.CANNON_BODIES.push(obj.item.bodyLaserField);
+
     if (obj.item.userData.state)
         GLOBALS.CANNON_WORLD.addBody(obj.item.bodyLaserField);
     else
@@ -18,6 +20,8 @@ function lightBridgeState(obj) {
     obj.item.userData.state = !obj.item.userData.state;
     obj.item.continuous.visible = !obj.item.continuous.visible;
 
+    GLOBALS.CANNON_BODIES.push(obj.item.bodyBridge);
+
     if (obj.item.userData.state)
         GLOBALS.CANNON_WORLD.addBody(obj.item.bodyBridge);
     else
@@ -26,6 +30,8 @@ function lightBridgeState(obj) {
     if (obj.item.clone) {
         if (obj.item.clone.bodyBridge) {
             obj.item.clone.visible = obj.item.continuous.visible;
+
+            GLOBALS.CANNON_BODIES.push(obj.item.clone.bodyBridge);
 
             if (obj.item.userData.state)
                 GLOBALS.CANNON_WORLD.addBody(obj.item.clone.bodyBridge);
@@ -155,7 +161,7 @@ function respawn(d) {
 
 function levelEnteredFunction(trigger) {
     if (!GLOBALS.LEVEL_ENTERED) {
-        if (GLOBALS.ENTER_DOOR.box3.containsPoint(GLOBALS.PLAYER.position) || trigger) {
+        if (GLOBALS.ENTER_DOOR.box3.containsPoint(GLOBALS.PLAYER.position) || trigger || GLOBALS.ITEMS_ADDED.getObjectByName("spawn")) {
             GLOBALS.LEVEL_ENTERED = true;
 
             /*setTimeout(() => {
@@ -164,8 +170,9 @@ function levelEnteredFunction(trigger) {
                 
             }, 3000);*/
 
-            GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+            GLOBALS.RENDERER.shadowMap.autoUpdate = false;
 
+            GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
 
             setTimeout(() => {
                 for (var i = 0; i < GLOBALS.BOX_BODY.length; i++) {

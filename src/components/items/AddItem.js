@@ -598,6 +598,7 @@ function addItem(found, loaded) {
                 manageItemVariables(item, userData, instanced);
 
             //Update Connection Lines
+            window.totalItemsLoaded++;
             addConnectionPoints(userData);
             updateLines(userData, true);
         }

@@ -10,6 +10,7 @@ import { laserReceiverTrigger } from '../events/events.js';
 import { cannonToThreeVector3 } from '../../Utils.js';
 import { addPositionalAudio } from '../audio/Audio.js';
 import { play } from "../audio/Audio.js";
+import { InstancedMesh2 } from '@three.ez/instanced-mesh';
 
 var pellets = [];
 var raycaster = new Raycaster();
@@ -59,6 +60,7 @@ function addPelletBall(item) {
     ball.quaternion.copy(energyBall.quaternion);
     ball.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
     ball.collisionFilterMask = GLOBALS.CGROUP_ALL;
+    GLOBALS.CANNON_BODIES.push(ball);
     GLOBALS.CANNON_WORLD.addBody(ball);
     energyBall.body = ball;
 
@@ -78,7 +80,7 @@ function addPelletBall(item) {
         play(event.target.sound.audio);
 
         if (event.body.name == "wall") {
-            addDecalOnHit(cannonToThreeVector3(event.target.position), event.body.wallRotation);
+            addDecalOnHit(cannonToThreeVector3(event.target.position), event.body.wallRotation, event.target.direction);
         }
 
         if (event.body.name == "player") {
@@ -252,7 +254,7 @@ $("body").on('input', '#pellet-timer-value', function () {
 
 const geometryHit = new BoxGeometry(0.6, 0.01, 0.6);
 const map = new TextureLoader().load('./assets/textures/burn01a.webp');
-const instancePelletHit = new InstancedMesh(geometryHit, new MeshBasicMaterial({
+const instancePelletHit = new InstancedMesh2(geometryHit, new MeshBasicMaterial({
     side: 0,
     map: map,
     transparent: true,
@@ -260,10 +262,17 @@ const instancePelletHit = new InstancedMesh(geometryHit, new MeshBasicMaterial({
     color: new Color(0, 0, 0),
     polygonOffset: true,
     polygonOffsetFactor: -10
-}), 100);
+}), { createInstances: true });
 instancePelletHit.current = 0;
+instancePelletHit.addInstances(1000, (obj, index) => {
+    obj.visible = false;
+    obj.position.set(100000, 100000, 100000);
+});
+instancePelletHit.raycastOnlyFrustum = true;
+instancePelletHit.computeBVH();
+instancePelletHit.instanceMatrix.needsUpdate = true;
 
-var dummy = new Object3D();
+/*var dummy = new Object3D();
 for (var i = 0; i < 100; i++) {
     dummy.position.set(100000, 100000, 100000);
     dummy.updateMatrix();
@@ -271,30 +280,61 @@ for (var i = 0; i < 100; i++) {
 }
 
 instancePelletHit.instanceMatrix.needsUpdate = true;
-instancePelletHit.computeBoundingSphere();
+instancePelletHit.computeBoundingSphere();*/
 
-function addDecalOnHit(position, orientation) {
+function addDecalOnHit(position, orientation, direction) {
 
-    if (!instancePelletHit.parent)
+    if (!instancePelletHit.parent){
         GLOBALS.SCENE_FPS.add(instancePelletHit);
+    }
+        
+    raycaster.set(position, direction);
+    var intersects = raycaster.intersectObject(instancePelletHit);
+
+    if (intersects.length > 0)
+        return;
 
     const dummy = new Object3D();
+    dummy.scale.set(1,1,1)
     dummy.position.copy(position);
     dummy.rotation.set(orientation.x, orientation.y, orientation.z);
+    dummy.translateY(-0.01)
     dummy.updateMatrix();
     instancePelletHit.setMatrixAt(instancePelletHit.current, dummy.matrix);
+    instancePelletHit.setVisibilityAt(instancePelletHit.current, true);
     instancePelletHit.instanceMatrix.needsUpdate = true;
     instancePelletHit.computeBoundingSphere();
 
-    if (instancePelletHit.current <= 100)
+    if (instancePelletHit.current <= 1000)
         instancePelletHit.current += 1;
     else
         instancePelletHit.current = 0;
+}
+
+function removePelletHitInstances(){
+
+    GLOBALS.SCENE_FPS.remove(instancePelletHit);
+
+    instancePelletHit.current = 0;
+    for(var i=0; i<instancePelletHit.instances.length;i++){
+        instancePelletHit.instances[i].position.x = 100000;
+        instancePelletHit.instances[i].position.y = 100000;
+        instancePelletHit.instances[i].position.z = 100000;
+        instancePelletHit.instances[i].scale.x = 0;
+        instancePelletHit.instances[i].scale.y = 0;
+        instancePelletHit.instances[i].scale.z = 0;
+        instancePelletHit.instances[i].visible = false;
+        instancePelletHit.instances[i].updateMatrix();
+    }
+
+    instancePelletHit.instanceMatrix.needsUpdate = true;
+    instancePelletHit.computeBoundingSphere();
 }
 
 export {
     pelletUpdate,
     addPelletBall,
     resetBall,
-    addPelletCatcher
+    addPelletCatcher,
+    removePelletHitInstances
 }

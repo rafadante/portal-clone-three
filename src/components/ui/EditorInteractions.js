@@ -223,11 +223,11 @@ $("body").on('input', '#state-dispenser', function () {
 
     var instanced = GLOBALS.ITEMS_ADDED.getObjectByName("dispenser");
     var dummy = new Object3D();
-    dummy.scale.copy(scale);
     dummy.position.copy(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserPosition);
     dummy.rotation.set(0, 0, 0);
     dummy.updateMatrix();
     instanced.setMatrixAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserID, dummy.matrix);
+    instanced.setVisibilityAt(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.dispenserID, this.checked);
     instanced.instanceMatrix.needsUpdate = true;
 });
 
@@ -282,14 +282,16 @@ $("body").on('input', '#tractor-state-input, #light-bridge-state-input, #laser-f
 
     //bodyLaserField
     if ($(this).attr("id") == "light-bridge-state-input") {
-        if (this.checked)
+        if (this.checked){
+            GLOBALS.CANNON_BODIES.push(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
             GLOBALS.CANNON_WORLD.addBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
-        else
+        }else
             GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
     } else if ($(this).attr("id") == "laser-field-state-input" || $(this).attr("id") == "fizzler-state-input") {
-        if (this.checked)
+        if (this.checked){
+            GLOBALS.CANNON_BODIES.push(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField);
             GLOBALS.CANNON_WORLD.addBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField);
-        else
+        }else
             GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField);
     }
 });

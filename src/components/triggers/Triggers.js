@@ -70,14 +70,18 @@ $('#ambient-sound-select').on('change', function () {
 
     AUDIO.AMBIENT = document.getElementById("ambient-" + $(this).val());
     AUDIO.AMBIENT.value = $(this).val();
-    play(AUDIO.AMBIENT);
 
-    clearTimeout(timeoutAudio);
+    if (!GLOBALS.LOADED_LEVEL) {
 
-    timeoutAudio = setTimeout(() => {
-        AUDIO.AMBIENT.pause();
-        AUDIO.AMBIENT.currentTime = 0;
-    }, 5000);
+        play(AUDIO.AMBIENT);
+
+        clearTimeout(timeoutAudio);
+
+        timeoutAudio = setTimeout(() => {
+            AUDIO.AMBIENT.pause();
+            AUDIO.AMBIENT.currentTime = 0;
+        }, 5000);
+    }
 });
 
 $('.trigger_audio-state').on('click', function () {
@@ -110,8 +114,6 @@ $("body").on('input', '#state-trigger-voice-link', function () {
 
     $(this).val(link);
 
-    console.log(link)
-
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.link = link;
 });
 
@@ -133,21 +135,17 @@ async function playVoiceTrigger(userdata, play) {
     audioVoiceTrigger = new Audio(userdata.link);
     //audioVoiceTrigger.type = 'audio/wav';
 
-    console.log(userdata.link)
-
     try {
-        if (play){
+        if (play) {
             await audioVoiceTrigger.play();
 
             setTimeout(() => {
                 audioVoiceTrigger.pause()
             }, 5000);
         }
-            
+
         userdata.voice = audioVoiceTrigger;
-        console.log('Playing...');
     } catch (err) {
-        console.log('Failed to play...' + err);
     }
 
 }

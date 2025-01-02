@@ -6,13 +6,14 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { buildIniCubes } from '../cubeManager/CubeManager.js';
 import $ from 'jquery';
-import { loadLevelJSON } from '../mainMenu/MainMenu.js';
+import { fetchLevel, loadLevelJSON } from '../mainMenu/MainMenu.js';
 import { GLOBALS } from '../../Globals.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import { hex2rgb } from '../../Utils.js';
 import { viewFPS } from '../test/Test.js';
 import { addItem } from '../items/AddItem.js';
 import { InstancedMesh2 } from '@three.ez/instanced-mesh';
+import { manageConnection } from '../boxSelection/Connection.js';
 
 var defaultLoaded = 0;
 var fpsDefaultLoaded = 0;
@@ -59,14 +60,15 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
             defaultLoaded++;
 
             if (defaultLoaded == 3) {
-                if (GLOBALS.LOADED_LEVEL) {
-                    loadLevelJSON();
-                } else {
-                    $("#loading-parent").css("opacity", 0);
-                    $("#loading-parent").css("pointer-events", "none");
-                }
 
                 buildIniCubes();
+
+                if (!GLOBALS.LOADED_LEVEL) {
+                    $("#loading-parent").css("opacity", 0);
+                    $("#loading-parent").css("pointer-events", "none");
+                } else {
+                    fetchLevel();
+                }
             }
         } else if (fpsPropsLoading) {
 
@@ -82,10 +84,41 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
                 GLOBALS.ITEM_HOLDED_NAME = name;
                 GLOBALS.DRAGGED_ITEM_ELEMENT = elem;
                 addItem(found, loaded);
+
+                if (window.totalItemsToLoad == window.totalItemsLoaded) {
+                    //CONNECTIONS
+
+                    for (var g = 0; g < GLOBALS.LOADED_CONNECTIONS.length; g++) {
+                        for (var h = 0; h < GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo.length; h++) {
+
+                            GLOBALS.SELECTED_FOR_CONNECTION = GLOBALS.PLANE_USER_DATA[GLOBALS.LOADED_CONNECTIONS[g]["data"].planeInstancedId];
+
+                            manageConnection(
+                                GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo[h],
+                                GLOBALS.LOADED_CONNECTIONS[g]["item"]
+                            );
+                        }
+                    }
+
+                    if (GLOBALS.LOADED_LEVEL) {
+                        $("#chamberName").css("opacity", 1);
+                        $("#chamberName").text($("#chamber-name-to-save").val() + "_by_" + $("#author-name-to-save").val());
+
+                        $("#loading-parent").css("opacity", 1)
+                        $("#loading-parent").css("pointer-events", "all")
+
+                        if (GLOBALS.PLAYER_MODEL)
+                            viewFPS();
+                        else
+                            loadAvatar();
+                    }
+                }
             }
 
-            $("#loading-parent").css("opacity", 0);
-            $("#loading-parent").css("pointer-events", "none");
+            if(!GLOBALS.LOADED_LEVEL){
+                $("#loading-parent").css("opacity", 0);
+                $("#loading-parent").css("pointer-events", "none");
+            }
         }
     };
 
@@ -155,7 +188,6 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity, m
     item.material.envMapIntensity = envIntensity;
     item.material.roughness = roughness;
     item.frustumCulled = true;
-
     item.instanceMatrix.needsUpdate = true;
 
     if (interactive)
@@ -430,9 +462,8 @@ function loadCorridorEnter(scene) {
             if (child.name == "back")
                 GLOBALS.WALL_CORRIDOR_BACK = child;
 
-            if(child.name == "spawn"){
-                child.name = "spawnElevator"
-                console.log(child)
+            if (child.name == "spawn") {
+                child.name = "spawnElevator";
             }
         }
     });
@@ -686,8 +717,8 @@ GLOBALS.LIGHT_PORTAL_0 = new PointLight(new Color(0, 0.3, 1), 0, 2);
 GLOBALS.FLASH = new PointLight(0xff0000, 10);
 
 if (localStorage.getItem("quality-select") == "epic") {
-    GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
-    GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
+    //GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
+    //GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
     //GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
 }
 

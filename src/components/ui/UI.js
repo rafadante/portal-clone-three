@@ -244,14 +244,6 @@ if (localStorage.getItem("vol-val-range")) {
 
 allowUpdate = true;
 
-$('#next-map-btn').on('click', function () {
-
-    localStorage.setItem("level", window.currentLevel + 1);
-    localStorage.setItem("load", "true");
-
-    window.open("https://" + window.location.host, "_self");
-});
-
 $('#social-youtube').on('click', function () {
     window.open("https://www.youtube.com/@Rafa_dante");
 });

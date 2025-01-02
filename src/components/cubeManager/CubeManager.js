@@ -205,6 +205,7 @@ function trasnlatePlane(id, val, portal, old) {
             var plane = GLOBALS.PLANE_USER_DATA[id];
 
             for (var j = 0; j < GLOBALS.CONNECTIONS.length; j++) {
+
                 if (GLOBALS.CONNECTIONS[j]["from"] == plane) {
 
                     GLOBALS.CONNECTIONS[j]["from"] = plane;
@@ -255,7 +256,12 @@ function trasnlatePlane(id, val, portal, old) {
                     || plane.instancedName == "cube_2" || plane.instancedName == "laser_cube"
                     || plane.instancedName == "scale_cube") {
 
-                    item.translateY(1);
+                    item.translateY(-1);
+
+                    plane.item.initialPosition = item.position.clone();
+                    plane.item.initialRotation = item.rotation.clone();
+
+                    item.translateY(2);
 
                     //UPDATE DISPENSER
                     var item2 = new Object3D();
@@ -266,6 +272,8 @@ function trasnlatePlane(id, val, portal, old) {
 
                     plane.item.dispenserPosition = item2.position.clone();
                 }
+
+
 
                 item.updateMatrix();
                 GLOBALS.ITEMS_ADDED.getObjectByName(plane.instancedName).setMatrixAt(plane.item.userData.id, item.matrix);
@@ -390,44 +398,42 @@ for (var i = 0; i < GLOBALS.BUDGET; i++) {
 
 function buildIniCubes(obj) {
 
-    if (!GLOBALS.LOADED_LEVEL) {
+    const geometry = new PlaneGeometry(2, 2);
+    geometry.computeBoundsTree();
 
-        const geometry = new PlaneGeometry(2, 2);
-        geometry.computeBoundsTree();
+    GLOBALS.PLANE_LEVEL_INSTANCED = new InstancedMesh2(geometry, GLOBALS.MATERIAL_PORTAL_EDITOR);
+    GLOBALS.PLANE_LEVEL_INSTANCED.sortObjects = true;
+    GLOBALS.PLANE_LEVEL_INSTANCED.customSort = createRadixSort(GLOBALS.PLANE_LEVEL_INSTANCED);
 
-        GLOBALS.PLANE_LEVEL_INSTANCED = new InstancedMesh2(geometry, GLOBALS.MATERIAL_PORTAL_EDITOR);
-        GLOBALS.PLANE_LEVEL_INSTANCED.sortObjects = true;
-        GLOBALS.PLANE_LEVEL_INSTANCED.customSort = createRadixSort(GLOBALS.PLANE_LEVEL_INSTANCED);
+    GLOBALS.PLANE_LEVEL_INSTANCED.addInstances(GLOBALS.BUDGET, (obj, index) => {
+        obj.visible = false;
+    });
 
-        GLOBALS.PLANE_LEVEL_INSTANCED.addInstances(GLOBALS.BUDGET, (obj, index) => {
-            obj.visible = false;
-        });
+    GLOBALS.PLANE_LEVEL_INSTANCED.raycastOnlyFrustum = true;
+    GLOBALS.PLANE_LEVEL_INSTANCED.computeBVH();
 
-        GLOBALS.PLANE_LEVEL_INSTANCED.raycastOnlyFrustum = true;
-        GLOBALS.PLANE_LEVEL_INSTANCED.computeBVH();
+    GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = true;
+    GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = false;
+    GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = false;
+    GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
+    GLOBALS.CUBES.add(GLOBALS.PLANE_LEVEL_INSTANCED);
 
-        GLOBALS.PLANE_LEVEL_INSTANCED.frustumCulled = true;
-        GLOBALS.PLANE_LEVEL_INSTANCED.castShadow = false;
-        GLOBALS.PLANE_LEVEL_INSTANCED.receiveShadow = false;
-        GLOBALS.PLANE_LEVEL_INSTANCED.name = "cube-parent";
-        GLOBALS.CUBES.add(GLOBALS.PLANE_LEVEL_INSTANCED);
+    //GROUND
+    buildLayer(-1, -1, 0, 'x', 'z', 'y', 6, 8, "down", new Vector3(-Math.PI / 2, 0, 0), new Vector3(0, 0, 0));
+    //CEILING
+    buildLayer(-1, -1, 8, 'x', 'z', 'y', 6, 8, "up", new Vector3(Math.PI / 2, 0, 0), new Vector3(Math.PI, 0, 0));
+    //WALL FRONT
+    buildLayer(-1, -1, 0, 'x', 'y', 'z', 4, 8, "front", new Vector3(0, 0, 0), new Vector3(Math.PI / 2, 0, 0));
+    //WALL BACK
+    buildLayer(-1, -1, 12, 'x', 'y', 'z', 4, 8, "back", new Vector3(0, Math.PI, 0), new Vector3(-Math.PI / 2, Math.PI, 0));
+    //WALL RIGHT
+    buildLayer(-1, -1, 16, 'z', 'y', 'x', 4, 6, "right", new Vector3(0, -Math.PI / 2, 0), new Vector3(Math.PI / 2, 0, Math.PI / 2));
+    //WALL LEFT
+    buildLayer(-1, -1, 0, 'z', 'y', 'x', 4, 6, "left", new Vector3(0, Math.PI / 2, 0), new Vector3(Math.PI / 2, 0, -Math.PI / 2));
 
-        //GROUND
-        buildLayer(-1, -1, 0, 'x', 'z', 'y', 6, 8, "down", new Vector3(-Math.PI / 2, 0, 0), new Vector3(0, 0, 0));
-        //CEILING
-        buildLayer(-1, -1, 8, 'x', 'z', 'y', 6, 8, "up", new Vector3(Math.PI / 2, 0, 0), new Vector3(Math.PI, 0, 0));
-        //WALL FRONT
-        buildLayer(-1, -1, 0, 'x', 'y', 'z', 4, 8, "front", new Vector3(0, 0, 0), new Vector3(Math.PI / 2, 0, 0));
-        //WALL BACK
-        buildLayer(-1, -1, 12, 'x', 'y', 'z', 4, 8, "back", new Vector3(0, Math.PI, 0), new Vector3(-Math.PI / 2, Math.PI, 0));
-        //WALL RIGHT
-        buildLayer(-1, -1, 16, 'z', 'y', 'x', 4, 6, "right", new Vector3(0, -Math.PI / 2, 0), new Vector3(Math.PI / 2, 0, Math.PI / 2));
-        //WALL LEFT
-        buildLayer(-1, -1, 0, 'z', 'y', 'x', 4, 6, "left", new Vector3(0, Math.PI / 2, 0), new Vector3(Math.PI / 2, 0, -Math.PI / 2));
+    GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
+    GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
 
-        GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
-        GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
-    }
 }
 
 function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {

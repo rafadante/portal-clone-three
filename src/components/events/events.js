@@ -206,8 +206,6 @@ function updateEvents() {
 function doSetTimeout(to, waitFor, idHolder, connection) {
   setTimeout(() => {
 
-    console.log(to.itemName)
-
     if (waitFor > 0) {
       connectionState(connection, idHolder, true, new Color(2, 1.3, 0))
       to.item.userData.buttons += 1;

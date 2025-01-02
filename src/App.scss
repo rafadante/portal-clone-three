@@ -431,31 +431,31 @@ form {
     transition: all 0.5s;
     border: 5px solid black;
 
-    span{
+    span {
       position: absolute;
       bottom: 0px;
       background-color: rgba(0, 0, 0, 0.75);
     }
 
-    .fa-thumbs-up{
+    .fa-thumbs-up {
       right: 10px;
       top: 10px;
       position: absolute;
       transition: all 0.5s;
     }
 
-    .fa-thumbs-down{
+    .fa-thumbs-down {
       right: 60px;
       top: 10px;
       position: absolute;
       transition: all 0.5s;
     }
 
-    .fa-thumbs-up:hover{
+    .fa-thumbs-up:hover {
       color: green;
     }
 
-    .fa-thumbs-down:hover{
+    .fa-thumbs-down:hover {
       color: red;
     }
   }
@@ -466,7 +466,7 @@ form {
   }
 }
 
-#chamberName{
+#chamberName {
   position: absolute;
   right: 10px;
   bottom: 10px;
@@ -477,7 +477,7 @@ form {
   transition: all 10s;
 }
 
-#initial-warning{
+#initial-warning {
   position: absolute;
   z-index: 1000000;
   width: 100%;
@@ -489,17 +489,17 @@ form {
   align-items: center;
   text-align: center;
 
-  a{
+  a {
     color: #00a2ff;
   }
 
-  span{
+  span {
     width: 80%;
     font-size: 30px;
-    color: 	#ff9a00;
+    color: #ff9a00;
   }
 
-  #close-warning{
+  #close-warning {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -508,7 +508,223 @@ form {
     border-radius: 50px;
     font-weight: bolder;
     font-size: 24px;
-    background-color: 	#ff9a00;
+    background-color: #ff9a00;
     color: #00a2ff;
   }
+}
+
+#next-map {
+  width: 100%;
+  height: 100%;
+  background: #000000ad;
+  position: absolute;
+  z-index: 100000;
+  top: 0px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  box-sizing: border-box;
+  flex-direction: column;
+
+  #next-buttons{
+    margin-top: 10px;
+    button {
+      width: 200px;
+      height: 40px;
+      font-size: 16px;
+      font-weight: bolder;
+      filter: drop-shadow(2px 4px 6px black);
+      margin-top: 20px;
+      transition: all 0.5s;
+      border: none;
+      margin: 10px;
+    }
+  
+    button:hover{
+      background-color: #FDB45C;
+    }
+  }
+
+  #congrats {
+    display: none;
+    font-size: 100px;
+    font-weight: bolder;
+  }
+
+  .content {
+    position: relative;
+    min-width: 1000px;
+    width: 60%;
+    max-width: 1200px;
+    height: 440px;
+    background: #222;
+    border-radius: 6px;
+    margin: 0px;
+    padding: 20px;
+  }
+
+  .stats {
+    height: 200px;
+  }
+
+  .col {
+    width: 33.33%;
+    height: 200px;
+    float: left;
+    padding: 0px;
+    position: relative;
+  }
+
+  .middle:before,
+  .middle:after {
+    content: "";
+    height: 80%;
+    border: 1px solid #333;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+  }
+
+  .middle:before {
+    left: 0;
+  }
+
+  .middle:after {
+    right: 0;
+  }
+
+  .matchStats {
+    float: right;
+    width: 300px;
+    height: 240px;
+    position: relative;
+  }
+
+  #gameStats,
+  #roleStats {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 20px;
+    margin: auto;
+  }
+
+  #champData {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -10px;
+    margin: auto;
+  }
+
+  #timeData {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+  }
+
+  .mainInfo {
+    height: 240px;
+    padding: 0px;
+    width: calc(100% - 600px);
+    float: left;
+  }
+
+  .mainInfo span {
+    color: #999;
+  }
+
+  .mainInfo .aboutMe {
+    font-size: 12px;
+    color: #999;
+  }
+
+  h1 {
+    color: #fff;
+    font-size: 40px;
+    margin: 0;
+    padding: 0;
+  }
+
+  h2 {
+    color: #FDB45C;
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+    margin-left: 5px;
+    display: block;
+    position: absolute;
+    top: -5px;
+    left: 10px;
+  }
+
+  h3 {
+    display: block;
+    font-size: 24px;
+    margin: 0;
+    margin-bottom: 10px;
+    padding-top: 10px;
+    border-bottom: 2px solid #333;
+    color: #FDB45C;
+  }
+
+  .clearFix {
+    clear: both;
+  }
+
+  .playerStats {
+    margin: auto;
+    padding: 0;
+    list-style: none;
+    margin: 6px;
+  }
+
+  .playerStats li {
+    display: block;
+    height: 30px;
+    line-height: 30px;
+    color: #fff;
+  }
+
+  .playerStats li span {
+    display: inline-block;
+    width: 60%;
+    color: #999;
+  }
+
+  .backgroundText {
+    width: 100%;
+    height: 100%;
+    font-size: 56px;
+    color: rgba(255, 255, 255, 0.2);
+    transform: rotate(-90deg);
+    text-transform: uppercase;
+    letter-spacing: 0px;
+    text-align: center;
+  }
+
+  .resizing {
+    position: relative;
+    width: 90%;
+    height: 100%;
+    padding: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    bottom: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 5vw;
+  }
+
 }

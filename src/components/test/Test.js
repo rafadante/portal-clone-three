@@ -278,6 +278,7 @@ function viewFPS(firstRender) {
             GLOBALS.PLAYER.spawnPosition = GLOBALS.ITEMS_ADDED.getObjectByName("spawn").position.clone();
             GLOBALS.ENTER_DOOR.visible = false;
             GLOBALS.PLAYER.position.copy(GLOBALS.PLAYER.spawnPosition);
+            
 
             setTimeout(() => {
                 levelEnteredFunction(true);

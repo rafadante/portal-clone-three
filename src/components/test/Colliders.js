@@ -116,6 +116,7 @@ function addColliderDoorsDefault(obj, name) {
     door.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
     door.collisionFilterMask = GLOBALS.CGROUP_ALL;
     obj.body = door;
+    GLOBALS.CANNON_BODIES.push(door);
     GLOBALS.CANNON_WORLD.addBody(door);
 
     var holder = new Object3D()
@@ -134,6 +135,7 @@ function addColliderDoorsDefault(obj, name) {
     fizzler.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
     fizzler.collisionFilterMask = GLOBALS.CGROUP_ALL;
     fizzler.collisionResponse = 0;
+    GLOBALS.CANNON_BODIES.push(fizzler);
     GLOBALS.CANNON_WORLD.addBody(fizzler);
 
 
@@ -149,8 +151,8 @@ function fizzlerTrigger(body) {
 
         if (e.body === GLOBALS.PLAYER) {
 
-            if (e.target.name == "exit" && !GLOBALS.FINISHED) {
-                GLOBALS.FINISHED = true;
+            if (e.target.name == "exit" && !GLOBALS.EXIT_DOOR.finished) {
+                GLOBALS.EXIT_DOOR.finished = true;
                 stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
             }
 
@@ -220,9 +222,7 @@ function addColliderItem(items, type, mass, offset) {
             objHolder.quaternion.copy(rot);
             GLOBALS.SCENE.add(objHolder);
 
-
             if (type == "bed" || type == "toilet" || type == "desk" || type == "cabinet" || type == "sign") {
-                console.log(GLOBALS.ITEMS_ADDED.getObjectByName(type))
                 var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
                 var shape = result.shape;
             } else if (type == "trash") {
@@ -300,6 +300,9 @@ function addColliderItem(items, type, mass, offset) {
                 }
             } else if (type == "dispenser") {
 
+                if (!items[i].userData.hasDispenser)
+                    return;
+
                 objHolder.position.copy(items[i].dispenserPosition);
                 objHolder.rotation.set(0, 0, 0);
 
@@ -344,8 +347,6 @@ function addColliderItem(items, type, mass, offset) {
                 material: PHYSICS_MATERIAL
             });
 
-
-            //console.log(objHolder.position)
             box.position.copy(objHolder.position);
             box.quaternion.copy(rot);
             box.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC
@@ -384,16 +385,15 @@ function addColliderItem(items, type, mass, offset) {
 
                         box.mass = 0;
                         box.allowSleep = false;
-                        box.position.copy(new Vector3(items[i].dispenserPosition.x,
-                            items[i].dispenserPosition.y - 1,
-                            items[i].dispenserPosition.z));
-                        items[i].position.copy(box.position);
-
-
-                        GLOBALS.BOX_BODY.push(box);
                     } else {
                         box.allowSleep = true;
                     }
+
+                    box.position.copy(new Vector3(items[i].dispenserPosition.x,
+                        items[i].dispenserPosition.y - 1,
+                        items[i].dispenserPosition.z));
+                    items[i].position.copy(box.position);
+                    GLOBALS.BOX_BODY.push(box);
                 }
 
                 box.spawnPosition = items[i].position.clone();
@@ -575,12 +575,31 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
 
             var shapeDimension;
 
-            if (side == "up" || side == "down")
+            var offsetX = 0;
+            var offsetY = 0;
+            var offsetZ = 0;
+
+            if (side == "up") {
+                offsetY = 0.04;
+            } else if (side == "down") {
+                offsetY = -0.04;
+            } else if (side == "front") {
+                offsetZ = -0.04;
+            } else if (side == "back") {
+                offsetZ = 0.04;
+            }else if (side == "right") {
+                offsetX = 0.04;
+            } else if (side == "left") {
+                offsetX = -0.04;
+            }
+
+            if (side == "up" || side == "down") {
                 shapeDimension = new CANNON.Vec3(columsNew[i][j].length, 0.05, 1)
-            else if (side == "front" || side == "back")
+            } else if (side == "front" || side == "back") {
                 shapeDimension = new CANNON.Vec3(columsNew[i][j].length, 1, 0.05)
-            else if (side == "right" || side == "left")
+            } else if (side == "right" || side == "left") {
                 shapeDimension = new CANNON.Vec3(0.01, 1, columsNew[i][j].length)
+            }
 
             var shape = new CANNON.Box(shapeDimension);
             var box = new CANNON.Body({
@@ -590,9 +609,11 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
             })
 
             var obj = new Object3D();
-            obj.position.copy(new Vector3(columsNew[i][j][0].x,
-                columsNew[i][j][0].y,
-                columsNew[i][j][0].z));
+            obj.position.copy(new Vector3(
+                columsNew[i][j][0].x + offsetX,
+                columsNew[i][j][0].y + offsetY,
+                columsNew[i][j][0].z + offsetZ
+            ));
 
             box.position.copy(obj.position);
             box.position[a4] += columsNew[i][j].length - 1;
@@ -703,31 +724,33 @@ function addCollidersToCorridor(mesh) {
     wall.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
     wall.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC
     GLOBALS.CANNON_WORLD.addBody(wall);
+    GLOBALS.CANNON_BODIES.push(wall);
     GLOBALS.CORRIDOR_COLLIDERS.push(wall);
 
     if (mesh.name.includes("collider_door")) {
         GLOBALS.BODY_ELEVATOR = wall;
-
         wall.addEventListener("collide", function (event) {
-            if (GLOBALS.LEVEL_ENTERED && !finished && GLOBALS.LOADED_LEVEL) {//
-                finished = true;
+            if (GLOBALS.LEVEL_ENTERED && GLOBALS.LOADED_LEVEL && !GLOBALS.FINISHED) {//
 
-                if (!GLOBALS.MOBILE)
-                    GLOBALS.POINTER_CONTROLS.unlock();
+                GLOBALS.FINISHED = true;
+                window.currentLevel++;
+
+                if (!GLOBALS.MOBILE) {
+                    //GLOBALS.POINTER_CONTROLS.unlock();
+                    document.exitPointerLock();
+                }
 
                 document.getElementById("next-map").style.display = "flex";
 
-                if (window.currentLevel == 7 || window.isCustom) {
+                /*if (window.currentLevel == 7 || window.isCustom) {
                     document.getElementById("next-map-btn").style.display = "none";
                     document.getElementById("congrats").style.display = "block";
 
-                }
+                }*/
             }
         })
     }
 }
-
-var finished = false;;
 
 export {
     colliderItemManager,

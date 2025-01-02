@@ -1,14 +1,13 @@
 import { PlaneGeometry, Mesh, Color, Clock, Object3D, Vector2 } from 'three';
 import $ from 'jquery';
 import { addConnectionPoints, addItem } from '../items/AddItem.js';
-import { AddGoo } from '../goo/Goo.js';
-import { viewFPS } from '../test/Test.js';
 import { GLOBALS, reset } from '../../Globals.js';
 import '../shaders/MainMenuShader.js';
 import { init } from '../../Main.js';
 import { AUDIO, play } from '../audio/Audio.js';
-import { manageConnection } from '../boxSelection/Connection.js';
 import { addTileGel } from '../gels/Gels.js';
+import { loadDefault } from '../loadObj/LoaderOBJ.js';
+import { backToEditor } from '../test/BackToEditor.js';
 
 var plane1, plane2, level;
 var transition = false;
@@ -77,28 +76,51 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
 
 $("body").on('click', '#option-single-load', function () {
 
-    if (!localStorage.getItem("level"))
-        window.currentLevel = 1;
-    else
-        window.currentLevel = parseInt(localStorage.getItem("level"));
+    startLevel();
 
-    fetch("./levels/" + window.currentLevel + ".json")
+    setTimeout(() => {
+        if (!localStorage.getItem("level"))
+            window.currentLevel = 1;
+        else
+            window.currentLevel = parseInt(localStorage.getItem("level"));
+
+        stopMenuLoop = true;
+        GLOBALS.LOADED_LEVEL = true;
+        //loadDefault();
+    }, 2000);
+
+});
+
+$('#next-map-btn').on('click', function () {
+
+    $("#loading-parent").css("opacity", 1);
+    $("#loading-parent").css("pointer-events", "all");
+    $("#next-map").css("display", "none");
+
+    backToEditor();
+
+    setTimeout(() => {
+        fetchLevel()
+    }, 2000);
+
+    /*localStorage.setItem("level", window.currentLevel + 1);
+    localStorage.setItem("load", "true");
+
+    window.open("https://" + window.location.host, "_self");*/
+});
+
+function fetchLevel() {
+    fetch("./levels/tutorial_" + window.currentLevel + "_by_rafadante.json")
         .then(response => response.json())
         .then(json => {
             level = json;
-            GLOBALS.LOADED_LEVEL = true;
 
-            startLevel();
-            /*setTimeout(() => {
-                loadLevel(json[0]);
+            $("#portal-gun-select").val(level[0][0]).change();
+            $("#ambient-sound-select").val(level[0][1]).change();
 
-                for (var i = 0; i < json[1].length; i++) {
-                    AddGoo(json[1][i], true);
-                }
-            }, 3000);*/
-            //Do something with json variable
+            loadLevelJSON();
         });
-});
+}
 
 $("body").on('click', '.load-custom', function () {
     window.isCustom = true;
@@ -146,21 +168,12 @@ if (localStorage.getItem("load") == "true") {
 
 function loadLevelJSON() {
 
-    $("#portal-gun-select").val(level[0]).change();
-    loadLevel(level[1])
-
-    //loadLevel(level[0]);
-
-    /*for (var i = 0; i < level[1].length; i++) {
-        AddGoo(level[1][i], true);
-    }*/
-
-    viewFPS();
-
     $("#option-single").css("display", "none");
     $("#option-community").css("display", "none");
     $("#option-about").css("display", "none");
     $("#back-editor").css("display", "none");
+
+    loadLevel(level[1])
 }
 
 $("body").on('click', '#option-community-build', function () {
@@ -298,20 +311,6 @@ $("body").on('click', '#load-level', function () {
 
 $("body").on('click', '#close-load-level-panel', function () {
     $("#load-level-panel").css("display", "none");
-
-    //CONNECTIONS
-
-    for (var g = 0; g < GLOBALS.LOADED_CONNECTIONS.length; g++) {
-        for (var h = 0; h < GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo.length; h++) {
-
-            GLOBALS.SELECTED_FOR_CONNECTION = GLOBALS.PLANE_USER_DATA[GLOBALS.LOADED_CONNECTIONS[g]["data"].planeInstancedId];
-
-            manageConnection(
-                GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo[h],
-                GLOBALS.LOADED_CONNECTIONS[g]["item"]
-            );
-        }
-    }
 })
 
 $("body").on('click', '#option-community-play', function () {
@@ -319,7 +318,7 @@ $("body").on('click', '#option-community-play', function () {
     $(".sub-option").css("display", "grid")
 });
 
-var chamberName;
+var chamberName = "null";
 
 $("#input-level").on('change', function (e) {
     var file = e.target.files[0];
@@ -349,6 +348,9 @@ function readTextFile(file, callback) {
     }
     rawFile.send(null);
 }
+
+window.totalItemsToLoad = 0;
+window.totalItemsLoaded = 0;
 
 function loadLevel(data) {
 
@@ -449,6 +451,7 @@ function loadLevel(data) {
 
             addConnectionPoints(data[i]);
         } else if (data[i].itemName == "enterDoor") {
+
             GLOBALS.ENTER_DOOR.position.set(data[i].position.x, data[i].position.y, data[i].position.z)
             GLOBALS.ENTER_DOOR.rotation.copy(data[i].rotation)
 
@@ -472,6 +475,9 @@ function loadLevel(data) {
     GLOBALS.PLANE_LEVEL_INSTANCED.instanceMatrix.needsUpdate = true;
     GLOBALS.PLANE_LEVEL_INSTANCED.computeBoundingSphere();
 
+    window.totalItemsToLoad = 0;
+    window.totalItemsLoaded = 0;
+
     for (var i = 0; i < data.length; i++) {
 
         if (data[i].exists) {
@@ -485,6 +491,7 @@ function loadLevel(data) {
 
                     const state = data[i].state;
 
+                    window.totalItemsToLoad++;
                     addItem(data[i], true)
 
                     data[i].state = state;
@@ -507,5 +514,6 @@ function loadLevel(data) {
 }
 
 export {
-    loadLevelJSON
+    loadLevelJSON,
+    fetchLevel
 }

@@ -17,8 +17,6 @@ const Lights = function () {
     spotLight.decay = 1; //2
     spotLight.distance = 0;
 
-    console.log(spotLight)
-
     spotLight.castShadow = true;
 
     if (GLOBALS.MOBILE) {

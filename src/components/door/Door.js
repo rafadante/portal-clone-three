@@ -52,6 +52,9 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
 
     door.timeOutDoor2 = setTimeout(() => {
 
+      if (GLOBALS.LEVEL_ENTERED)
+        GLOBALS.CORRIDOR_ENTER.visible = false;
+
       if (!open)
         doorSpinner(0, door, editor)
       else
@@ -62,16 +65,24 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
         setTimeout(() => {
           GLOBALS.EXIT_DOOR.add(GLOBALS.CORRIDOR_ENTER);
           corridorColliderNames(GLOBALS.CORRIDOR_ENTER, true);
-          GLOBALS.CORRIDOR_ENTER.visible = false;
+          //GLOBALS.CORRIDOR_ENTER.visible = false;
           //GLOBALS.CORRIDOR_ENTER.getObjectByName("elevatorOBJ").visible = false;
           //GLOBALS.CORRIDOR_ENTER.getObjectByName("leftDoor").visible = false;
           //GLOBALS.CORRIDOR_ENTER.getObjectByName("rightDoor").visible = false;
         }, 300);
       }
 
-      if (door == GLOBALS.EXIT_DOOR && GLOBALS.FPS_MODE && !GLOBALS.FINISHED) {
-        GLOBALS.CORRIDOR_ENTER.visible = open;
+
+      if (GLOBALS.LEVEL_ENTERED){
+        if (door == GLOBALS.EXIT_DOOR && GLOBALS.FPS_MODE && !GLOBALS.EXIT_DOOR.finished) {
+          GLOBALS.CORRIDOR_ENTER.visible = open;
+        }
+  
+        if (GLOBALS.EXIT_DOOR.finished)
+          GLOBALS.CORRIDOR_ENTER.visible = true;
       }
+      
+
       /*} else {
         GLOBALS.CORRIDOR_ENTER.visible = false;
         GLOBALS.ENTER_DOOR.add(GLOBALS.CORRIDOR_ENTER);
