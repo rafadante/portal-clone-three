@@ -1,6 +1,7 @@
 import {
     Vector3, Group, MeshBasicMaterial, CircleGeometry, Mesh, TextureLoader,
     BoxGeometry, Color, Object3D, Box3, ConeGeometry, PlaneGeometry,
+    MeshStandardMaterial,
 } from 'three';
 import { AddGoo } from '../goo/Goo.js';
 import { GLOBALS } from '../../Globals.js';
@@ -14,9 +15,12 @@ import { planeInstanceReset } from './Items.js';
 import { laserEmitterRaycast, laserEmitterPosition } from '../lasers/Laser.js';
 import { targetFaithPlateStart, targetFaithPlateEnd, targetFaithPlateUpdate } from '../faithPlate/FaithPlate.js';
 import { gelRecharger } from '../gels/PaintingGun.js';
-import { addLine } from '../boxSelection/Connection.js';
-import { load3D } from '../loadObj/LoaderOBJ.js';
+import { addLine, manageConnection } from '../boxSelection/Connection.js';
+import { load3D, loadAvatar } from '../loadObj/LoaderOBJ.js';
 import { playVoiceTrigger } from '../triggers/Triggers.js';
+import { checkToUpdateContinuous } from '../cubeManager/UpdateRaycast.js';
+import { viewFPS } from '../test/Test.js';
+import { managePlatformRange } from '../platforms/Platform.js';
 
 var itemCount = 0;
 
@@ -81,7 +85,7 @@ const trigger_voice = textureLoader.load('./assets/textures/trigger_voice.png');
 const trigger_audio = textureLoader.load('./assets/textures/trigger_audio.png');
 const falling = textureLoader.load('./assets/textures/falling.png');
 
-function addItem(found, loaded) {
+async function addItem(found, loaded) {
 
     if (loaded) {
         GLOBALS.ITEM_HOLDED_NAME = found.itemName.split('-')[0];
@@ -100,7 +104,7 @@ function addItem(found, loaded) {
 
         $("#follow").css("display", "none");
 
-        load3D(
+        await load3D(
             "/items/" + GLOBALS.ITEM_HOLDED_NAME + ".glb",
             GLOBALS.ITEM_HOLDED_NAME,
             GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["instanced"],
@@ -161,6 +165,7 @@ function addItem(found, loaded) {
         box.add(plane);
 
         AddGoo(userData);
+        window.totalItemsLoaded++;
 
         return;
     }
@@ -318,6 +323,51 @@ function addItem(found, loaded) {
                 return;
             }
 
+            if (GLOBALS.ITEM_HOLDED_NAME == "piston_platforms" || GLOBALS.ITEM_HOLDED_NAME == "track_platforms") {
+
+                const pivot = new Group();
+                pivot.scale.y = 0;
+                GLOBALS.ITEMS_ADDED.add(pivot);
+                pivot.position.copy(userData.position);
+
+                const geometry = new BoxGeometry(2, 2, 2);
+                const box = new Mesh(geometry, new MeshStandardMaterial({
+                    color: new Color(0, 2, 0),
+                    envMap: GLOBALS.ENV_MAP,
+                    emissiveIntensity: 1,
+                    transparent: true,
+                    opacity: 0.5
+                }));
+
+                if (GLOBALS.ITEM_HOLDED_NAME == "track_platforms") {
+                    if (userData.side == "front") {
+                        pivot.rotation.z = -Math.PI / 2;
+                        pivot.translateZ(1);
+                    } else if (userData.side == "back") {
+                        pivot.rotation.z = -Math.PI / 2;
+                        pivot.translateZ(-1);
+                    } else if (userData.side == "left") {
+                        pivot.rotation.x = Math.PI / 2;
+                        pivot.translateX(1);
+                    } else if (userData.side == "right") {
+                        pivot.rotation.x = Math.PI / 2;
+                        pivot.translateX(-1);
+                    }
+                }
+
+                pivot.add(box);
+                box.position.y = 1.01;
+                box.side = userData.side;
+                box.name = GLOBALS.ITEM_HOLDED_NAME;
+                item.platformBox = box;
+                item.initialPosition = userData.position;
+                item.userData.isActive = true;
+            }
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "pellet_launcher") {
+                item.userData.isActive = true;
+            }
+
             //UPDATE INSTANCE DATA
             planeInstanceReset(
                 userData,
@@ -342,11 +392,11 @@ function addItem(found, loaded) {
                     item.rotation.set(userData.normal.x, Math.PI, userData.normal.z)
                 else
                     item.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
-            }  else {
+            } else {
                 item.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
             }
 
-            
+
 
             item.renderOrder = 2;
             item.name = GLOBALS.ITEM_HOLDED_NAME + "-" + itemCount;
@@ -603,6 +653,35 @@ function addItem(found, loaded) {
             window.totalItemsLoaded++;
             addConnectionPoints(userData);
             updateLines(userData, true);
+
+            if (window.totalItemsToLoad == window.totalItemsLoaded) {
+                //CONNECTIONS
+
+                for (var g = 0; g < GLOBALS.LOADED_CONNECTIONS.length; g++) {
+                    for (var h = 0; h < GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo.length; h++) {
+
+                        GLOBALS.SELECTED_FOR_CONNECTION = GLOBALS.PLANE_USER_DATA[GLOBALS.LOADED_CONNECTIONS[g]["data"].planeInstancedId];
+
+                        manageConnection(
+                            GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo[h],
+                            GLOBALS.LOADED_CONNECTIONS[g]["item"]
+                        );
+                    }
+                }
+
+                if (GLOBALS.LOADED_LEVEL) {
+                    $("#chamberName").css("opacity", 1);
+                    $("#chamberName").text($("#chamber-name-to-save").val() + "_by_" + $("#author-name-to-save").val());
+
+                    $("#loading-parent").css("opacity", 1)
+                    $("#loading-parent").css("pointer-events", "all")
+
+                    if (GLOBALS.PLAYER_MODEL)
+                        viewFPS();
+                    else
+                        loadAvatar();
+                }
+            }
         }
     }
 
@@ -612,6 +691,7 @@ function addItem(found, loaded) {
     //}
 
     window.changingPosition = false;
+    checkToUpdateContinuous();
 }
 
 function manageItemVariables(item, userData, instanced) {
@@ -695,10 +775,17 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
     item.userData.rotationY = userDataLoadedItem.rotationY;
     item.userData.angle = userDataLoadedItem.angle;
 
+    item.userData.isActive = userDataLoadedItem.isActive;
+
     if (item.userData.link)
         playVoiceTrigger(item.userData, false);
 
-    if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
+    if (GLOBALS.ITEM_HOLDED_NAME == "track_platforms" || GLOBALS.ITEM_HOLDED_NAME == "piston_platforms") {
+        item.platformBox.parent.scale.y = userDataLoadedItem.scaleY;
+        item.userData.scaleY = userDataLoadedItem.scaleY;
+
+        managePlatformRange(userDataLoadedItem.scaleY, userData);
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
         item.userData.state = userDataLoadedItem.state;
         item.rotation.y = item.userData.rotationY;
     } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
@@ -709,7 +796,8 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
     } else if (GLOBALS.ITEM_HOLDED_NAME == "pedestal_button" || GLOBALS.ITEM_HOLDED_NAME == "light"
         || GLOBALS.ITEM_HOLDED_NAME == "bed" || GLOBALS.ITEM_HOLDED_NAME == "toilet"
         || GLOBALS.ITEM_HOLDED_NAME == "desk" || GLOBALS.ITEM_HOLDED_NAME == "cabinet"
-        || GLOBALS.ITEM_HOLDED_NAME == "sign") {
+        || GLOBALS.ITEM_HOLDED_NAME == "sign" || GLOBALS.ITEM_HOLDED_NAME == "portal_0"
+        || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
 
         item.userData.rotationY = userDataLoadedItem.rotationY;
         var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);

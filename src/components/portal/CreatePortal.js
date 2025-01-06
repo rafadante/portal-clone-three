@@ -150,6 +150,12 @@ function portalButton(button, auto, camera, firstToRender) {
                 // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                 // define playerUpDirection
                 let playerUpDirection = new Vector3(0, 1, 0);
+                var autoDir = new Vector3();
+
+                if(auto){
+                    userData.item.getWorldDirection(autoDir)
+                }
+                
 
                 var normal;
                 if (userData.side == "front")
@@ -163,9 +169,16 @@ function portalButton(button, auto, camera, firstToRender) {
                 else if (userData.side == "up") {
                     playerUpDirection.applyQuaternion(GLOBALS.MAIN_CAMERA.quaternion)
                     normal = new Vector3(0, -1, 0)
+
+                    if(auto)
+                        playerUpDirection = autoDir;
+
                 } else if (userData.side == "down") {
                     playerUpDirection.applyQuaternion(GLOBALS.MAIN_CAMERA.quaternion)
                     normal = new Vector3(0, 1, 0)
+
+                    if(auto)
+                        playerUpDirection = autoDir;
                 }
 
                 // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js

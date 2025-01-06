@@ -5,6 +5,7 @@ import { AUDIO, fadeAudio, play, addPositionalAudio } from '../audio/Audio.js';
 import { faithPlate } from '../faithPlate/FaithPlate.js';
 import { gelTrigger } from '../gels/Gels.js';
 import { tweenCamera } from '../../Utils.js';
+import { platformPostStep } from '../platforms/Platform.js';
 
 var slipperyMaterial = new CANNON.Material();
 slipperyMaterial.friction = 0.00;
@@ -126,6 +127,8 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
 })
 
 GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
+
+    platformPostStep();
 
     GLOBALS.PLAYER.inJump = true;
 

@@ -12,6 +12,7 @@ import { hex2rgb } from '../../Utils.js';
 import { targetFaithPlateStart } from '../faithPlate/FaithPlate';
 import { respawn } from '../events/states';
 import { AUDIO } from '../audio/Audio';
+import { checkToUpdateContinuous } from '../cubeManager/UpdateRaycast';
 
 window.addEventListener("contextmenu", e => e.preventDefault());
 
@@ -208,6 +209,7 @@ $("body").on('click', '#delete', function () {
 
     planeInstanceReset(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false, null, null, null, null, null, null, null, false, null, false, false);
     $(".menu").removeClass("menu-show");
+    checkToUpdateContinuous();
 });
 
 $("body").on('input', '#state-dispenser', function () {
@@ -518,10 +520,17 @@ $("body").on('click', '#save-level', function () {
 
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
 
+        
+
         if (GLOBALS.PLANE_USER_DATA[i].item) {
+
+            //console.log(GLOBALS.PLANE_USER_DATA[i])
+
             userDataHolder.push(GLOBALS.PLANE_USER_DATA[i])
             itemHolder.push(GLOBALS.PLANE_USER_DATA[i].item)
             GLOBALS.PLANE_USER_DATA[i].item = GLOBALS.PLANE_USER_DATA[i].item.userData;
+
+            console.log(GLOBALS.PLANE_USER_DATA[i].item)
         }
 
         GLOBALS.PLANE_USER_DATA[i].body = null;

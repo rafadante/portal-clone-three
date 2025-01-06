@@ -7,6 +7,7 @@ import { updateLaserCubeRaycaster, updateLaserEmitterRaycaster } from './compone
 import { laserReceiverTrigger } from './components/events/events.js';
 import { applyCustomGravity } from './components/gels/Gels.js';
 import { updateGelBlob } from './components/gels/GelDispenser.js';
+import { updatePlatformPosition } from './components/platforms/Platform.js';
 
 // return the cannon world
 // Setup our world
@@ -131,7 +132,6 @@ function updatePhysics() {
 
         if (!getObject) {
             getObject = true;
-
             // Create the constraint between the cube body and the joint body
             addJointConstraint(hitPoint, GLOBALS.CURRENT_ITEM.body)
         }
@@ -147,7 +147,6 @@ function updatePhysics() {
 
         var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(property);
 
-
         if (property == "gel_gun_blue" || property == "gel_gun_orange" || property == "gel_gun_white" ||
             property == "pedestal_button" || property == "button_weight" || property == "button_box" ||
             property == "button_sphere" || property == "dispenser" || property == "ramp" ||
@@ -160,35 +159,14 @@ function updatePhysics() {
             property == "gel_white" || property == "gel_clear" || property == "gel_reflection" ||
             property == "pellet_catcher" || property == "faith_plate" || property == "gel_purple" ||
             property == "bed" || property == "toilet" || property == "desk" || property == "cabinet" ||
-            property == "sign" || property == "track_platforms")
+            property == "sign")
             continue;
 
         for (var i = 0; i < GLOBALS.DYMANIC_ITEMS[property].length; i++) {
 
-            if (property == "piston_platforms") {
-
-                if (GLOBALS.DYMANIC_ITEMS[property][i].body) {
-                    if (!GLOBALS.DYMANIC_ITEMS[property][i].body.pistonDown) {
-                        GLOBALS.DYMANIC_ITEMS[property][i].body.position.y += 0.005;
-                    } else {
-                        GLOBALS.DYMANIC_ITEMS[property][i].body.position.y -= 0.005;
-                    }
-
-                    if (GLOBALS.DYMANIC_ITEMS[property][i].body.position.y > 2)
-                        GLOBALS.DYMANIC_ITEMS[property][i].body.pistonDown = true;
-                    else if (GLOBALS.DYMANIC_ITEMS[property][i].body.position.y <= 0)
-                        GLOBALS.DYMANIC_ITEMS[property][i].body.pistonDown = false;
-
-                    var item = new Object3D();
-                    item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
-                    item.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
-
-                    item.updateMatrix();
-                    instanced.setMatrixAt(i, item.matrix)
-                    instanced.instanceMatrix.needsUpdate = true;
-                    instanced.computeBoundingSphere();
-                }
-
+            if (property == "piston_platforms" || property == "track_platforms") {
+                if (GLOBALS.DYMANIC_ITEMS[property][i].length != 0)
+                    updatePlatformPosition(GLOBALS.DYMANIC_ITEMS[property][i], instanced, i);
             } else if (GLOBALS.DYMANIC_ITEMS[property][i].length != 0) {
 
                 if (GLOBALS.DYMANIC_ITEMS[property][i].body) {
@@ -216,18 +194,16 @@ function updatePhysics() {
                     instanced.instanceMatrix.needsUpdate = true;
                     instanced.computeBoundingSphere();
 
-                    if (property == "laser_cube" && updateLasers) {
+                    if (property == "laser_cube" && updateLasers)
                         updateLaserCubeRaycaster(item, GLOBALS.DYMANIC_ITEMS[property][i].body.laser);
-                    }
                 }
             }
         }
     }
 
     for (var i = 0; i < GLOBALS.LASER_TRIGGERS.length; i++) {
-        if (!GLOBALS.LASER_TRIGGERS[i].emitterState && GLOBALS.LASER_TRIGGERS[i].fromLaserCube) {
+        if (!GLOBALS.LASER_TRIGGERS[i].emitterState && GLOBALS.LASER_TRIGGERS[i].fromLaserCube)
             laserReceiverTrigger(GLOBALS.LASER_TRIGGERS[i], false);
-        }
     }
 
     for (var i = 0; i < GLOBALS.CAMERAS.length; i++) {

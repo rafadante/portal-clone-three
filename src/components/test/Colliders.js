@@ -5,13 +5,14 @@ import { GLOBALS } from '../../Globals.js';
 import { addPositionalAudio } from '../audio/Audio.js';
 import { deletePortal } from '../portal/CreatePortal.js';
 import { tweenCamera, } from '../../Utils.js';
-import { interactWithItem } from '../events/events.js';
+import { interactWithItem } from '../events/interaction.js';
 import { respawn } from '../events/states.js';
 import { addLaserToCube } from '../lasers/Laser.js';
 import { addPelletBall, addPelletCatcher } from '../pellet/Pellet.js';
 import { faithPlate } from '../faithPlate/FaithPlate.js';
 import { gelTrigger } from '../gels/Gels.js';
 import { stateDoor } from '../door/Door.js';
+import { addColliderEvent } from '../platforms/Platform.js';
 
 function colliderItemManager() {
 
@@ -225,12 +226,18 @@ function addColliderItem(items, type, mass, offset) {
             objHolder.quaternion.copy(rot);
             GLOBALS.SCENE.add(objHolder);
 
-            if (type == "bed" || type == "toilet" || type == "desk" || type == "cabinet" || type == "sign" ||
-                type == "track_platforms" || type == "piston_platforms"
-            ) {
+            if (type == "bed" || type == "toilet" || type == "desk" || type == "cabinet" || type == "sign") {
                 var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
                 var shape = result.shape;
-            } else if (type == "trash") {
+            } else if (type == "piston_platforms") {
+                var shape =new CANNON.Box(new CANNON.Vec3(1, 0.1, 1));
+                objHolder.translateY(0.05);
+            } else if (type == "track_platforms") {
+                var shape =new CANNON.Box(new CANNON.Vec3(1, 1, 0.1));
+                objHolder.translateY(1);
+                //objHolder.translateY(1);
+                objHolder.translateZ(-0.275);
+            }else if (type == "trash") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.05, 0.09, 0.05));
                 offset = 0.09;
             } else if (type == "door") {
@@ -368,7 +375,7 @@ function addColliderItem(items, type, mass, offset) {
             GLOBALS.SCENE.remove(objHolder);
 
             if (type == "radio") {
-                addPositionalAudio('audio-radio', box, true, true, false, 8, 'sound')
+                addPositionalAudio('audio-radio', box, true, true, false, 4, 'sound')
             } else if (type == "door") {
                 addPositionalAudio('audio-door', items[i], false, false, true, 8, 'sound')
             } else if (type == "laser_cube") {
@@ -378,6 +385,10 @@ function addColliderItem(items, type, mass, offset) {
             if (type == "faith_plate") {
                 box.collisionResponse = 0;
                 addPositionalAudio('faith_plate_hit', box, false, false, true, 12, 'sound')
+            }
+
+            if (type == "piston_platforms" || type == "track_platforms") {
+                addColliderEvent(box);
             }
 
             if (mass > 0) {
@@ -592,7 +603,7 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
                 offsetZ = -0.09;
             } else if (side == "back") {
                 offsetZ = 0.09;
-            }else if (side == "right") {
+            } else if (side == "right") {
                 offsetX = 0.09;
             } else if (side == "left") {
                 offsetX = -0.09;

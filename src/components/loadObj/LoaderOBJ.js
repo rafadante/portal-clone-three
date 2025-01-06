@@ -84,35 +84,6 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
                 GLOBALS.ITEM_HOLDED_NAME = name;
                 GLOBALS.DRAGGED_ITEM_ELEMENT = elem;
                 addItem(found, loaded);
-
-                if (window.totalItemsToLoad == window.totalItemsLoaded) {
-                    //CONNECTIONS
-
-                    for (var g = 0; g < GLOBALS.LOADED_CONNECTIONS.length; g++) {
-                        for (var h = 0; h < GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo.length; h++) {
-
-                            GLOBALS.SELECTED_FOR_CONNECTION = GLOBALS.PLANE_USER_DATA[GLOBALS.LOADED_CONNECTIONS[g]["data"].planeInstancedId];
-
-                            manageConnection(
-                                GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo[h],
-                                GLOBALS.LOADED_CONNECTIONS[g]["item"]
-                            );
-                        }
-                    }
-
-                    if (GLOBALS.LOADED_LEVEL) {
-                        $("#chamberName").css("opacity", 1);
-                        $("#chamberName").text($("#chamber-name-to-save").val() + "_by_" + $("#author-name-to-save").val());
-
-                        $("#loading-parent").css("opacity", 1)
-                        $("#loading-parent").css("pointer-events", "all")
-
-                        if (GLOBALS.PLAYER_MODEL)
-                            viewFPS();
-                        else
-                            loadAvatar();
-                    }
-                }
             }
 
             if(!GLOBALS.LOADED_LEVEL){

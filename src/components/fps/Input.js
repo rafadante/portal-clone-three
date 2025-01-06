@@ -7,7 +7,7 @@ import { GLOBALS } from '../../Globals.js';
 import { AUDIO, play } from '../audio/Audio.js';
 import { portalButton } from '../portal/CreatePortal.js';
 import { tweenCamera } from '../../Utils.js';
-import { interactWithItem } from '../events/events.js';
+import { interactWithItem } from '../events/interaction.js';
 import { INPUT } from './index.js';
 
 var allowEnterFPS = true;

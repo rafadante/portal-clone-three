@@ -8,8 +8,6 @@ import { AddGoo } from '../goo/Goo.js';
 
 function checkToUpdateContinuous() {
 
-    console.log(GLOBALS.TRACTOR_BEAM_RAYCASTER)
-
     for (var i = 0; i < GLOBALS.TRACTOR_BEAM_RAYCASTER.length; i++) {
         createLightBridges("tractor_beam", GLOBALS.TRACTOR_BEAM_RAYCASTER[i],
             GLOBALS.TRACTOR_BEAM_RAYCASTER[i].item, null, true, i);
@@ -103,24 +101,62 @@ function checkToUpdateContinuous() {
 
     GLOBALS.ENTER_DOOR.getObjectByName("trigger").material.color = new Color(0x00ff00);
     GLOBALS.EXIT_DOOR.getObjectByName("trigger").material.color = new Color(0x00ff00);
+
+    for (var j = 0; j < GLOBALS.BOUNDING_BOX.length; j++) {
+        GLOBALS.BOUNDING_BOX[j].platform.material.color = new Color(0x00ff00);
+    }
+
     window.allowTest = true;
 
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
         if (GLOBALS.PLANE_USER_DATA[i].exists) {
 
+            //ENTER CORRIDOR
             if (GLOBALS.ENTER_DOOR.bb.containsPoint(GLOBALS.PLANE_USER_DATA[i].position)) {
                 GLOBALS.ENTER_DOOR.getObjectByName("trigger").material.color = new Color(0xff0000);
                 window.allowTest = false;
             }
 
+            //EXIT CORRIDOR
             if (GLOBALS.EXIT_DOOR.bb.containsPoint(GLOBALS.PLANE_USER_DATA[i].position)) {
                 GLOBALS.EXIT_DOOR.getObjectByName("trigger").material.color = new Color(0xff0000);
                 window.allowTest = false;
             }
+
+            //PLATFORMS
+            for (var j = 0; j < GLOBALS.BOUNDING_BOX.length; j++) {
+
+                if (GLOBALS.BOUNDING_BOX[j].containsPoint(GLOBALS.PLANE_USER_DATA[i].position)) {
+
+                    if (GLOBALS.BOUNDING_BOX[j].platform.name == "piston_platforms") {
+                        if (GLOBALS.PLANE_USER_DATA[i].hasItem || GLOBALS.PLANE_USER_DATA[i].side == "up") {
+                            GLOBALS.BOUNDING_BOX[j].platform.material.color = new Color(0xff0000);
+                            window.allowTest = false;
+                        }
+                    } else if (GLOBALS.BOUNDING_BOX[j].platform.name == "track_platforms") {
+                        
+                        if (GLOBALS.BOUNDING_BOX[j].platform.side == "front" || GLOBALS.BOUNDING_BOX[j].platform.side == "back") {
+                            if (GLOBALS.PLANE_USER_DATA[i].hasItem || GLOBALS.PLANE_USER_DATA[i].side == "right"
+                                || GLOBALS.PLANE_USER_DATA[i].side == "left"
+                            ) {
+                                GLOBALS.BOUNDING_BOX[j].platform.material.color = new Color(0xff0000);
+                                window.allowTest = false;
+                            }
+                        }else if (GLOBALS.BOUNDING_BOX[j].platform.side == "left" || GLOBALS.BOUNDING_BOX[j].platform.side == "right") {
+                            if (GLOBALS.PLANE_USER_DATA[i].hasItem || GLOBALS.PLANE_USER_DATA[i].side == "front"
+                                || GLOBALS.PLANE_USER_DATA[i].side == "back"
+                            ) {
+                                GLOBALS.BOUNDING_BOX[j].platform.material.color = new Color(0xff0000);
+                                window.allowTest = false;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
-    //uPDATE GOO
+    //UPDATE GOO
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
         if (GLOBALS.PLANE_USER_DATA[i].exists && GLOBALS.PLANE_USER_DATA[i].hasItem && GLOBALS.PLANE_USER_DATA[i].hasGoo) {
 
@@ -150,6 +186,9 @@ function checkToUpdateContinuous() {
             AddGoo(userData);
         }
     }
+
+    //CHECK PLATFORM
+
 
 }
 

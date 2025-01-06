@@ -3,9 +3,11 @@ import { GLOBALS } from '../../Globals.js';
 import { AUDIO, play } from '../audio/Audio.js';
 import { stateDoor } from '../door/Door.js';
 import { deletePortal } from '../portal/CreatePortal.js';
-import { interactWithItem, resetAll } from '../events/events.js';
-import { Vector3 } from 'three';
+import { resetAll } from '../events/events.js';
+import { interactWithItem } from '../events/interaction.js';
+import { Color, Vector3 } from 'three';
 import { removePelletHitInstances } from '../pellet/Pellet.js';
+import { resetPlatforms } from '../platforms/Platform.js';
 
 //BACK FROM EDITOR
 $("body").on('click', '#back-editor', function () {
@@ -18,6 +20,24 @@ function backToEditor() {
 
     if (GLOBALS.HOLDING_ITEM)
         interactWithItem();
+
+    for (var j = 0; j < GLOBALS.BOUNDING_BOX.length; j++) {
+        GLOBALS.BOUNDING_BOX[j].platform.material.color = new Color(0x00ff00);
+        GLOBALS.BOUNDING_BOX[j].platform.material.emissive = null;
+        GLOBALS.BOUNDING_BOX[j].platform.material.transparent = true;
+        GLOBALS.BOUNDING_BOX[j].platform.scale.x = 1;
+        GLOBALS.BOUNDING_BOX[j].platform.scale.z = 1;
+    }
+
+    for (var i = 0; i < GLOBALS.DYMANIC_ITEMS["piston_platforms"].length; i++) {
+        if (GLOBALS.DYMANIC_ITEMS["piston_platforms"][i].length != 0)
+            resetPlatforms(GLOBALS.DYMANIC_ITEMS["piston_platforms"][i], i, "piston_platforms");
+    }
+
+    for (var i = 0; i < GLOBALS.DYMANIC_ITEMS["track_platforms"].length; i++) {
+        if (GLOBALS.DYMANIC_ITEMS["track_platforms"][i].length != 0)
+            resetPlatforms(GLOBALS.DYMANIC_ITEMS["track_platforms"][i], i, "track_platforms");
+    }
 
     for (var i = 0; i < GLOBALS.GOO_PLANES.length; i++) {
         GLOBALS.GOO_PLANES[i].item.visible = true;

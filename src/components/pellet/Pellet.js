@@ -1,6 +1,7 @@
 import {
-    Vector3, Object3D, MeshBasicMaterial, Mesh, Color, SphereGeometry, PointLight, CylinderGeometry,
-    Raycaster, CircleGeometry, BoxGeometry, InstancedMesh, TextureLoader
+    Vector3, Object3D, MeshBasicMaterial, Mesh, Color, SphereGeometry, PointLight, 
+    CylinderGeometry, Raycaster, CircleGeometry, BoxGeometry, TextureLoader,
+    MeshStandardMaterial
 } from 'three';
 import { GLOBALS } from '../../Globals';
 import * as CANNON from 'cannon';
@@ -19,18 +20,17 @@ function addPelletBall(item) {
 
     var color = new Color(0, 5, 0);
 
-    if (!item.userData.pedestalInfinity) {
-        color = new Color(8, 3.5, 0);
-    }
+    if (!item.userData.pedestalInfinity)
+        color = new Color(5, 0, 0);
 
     var origin = new Object3D();
     origin.position.copy(item.position);
     origin.quaternion.copy(item.quaternion);
-    origin.translateY(0.7);
+    origin.translateY(1);
 
     //
     const geometry = new SphereGeometry(0.1, 8, 4);
-    const material = new MeshBasicMaterial({ color: color });
+    const material = new MeshStandardMaterial({ emissive: color, envMap: GLOBALS.envMap });
     const energyBall = new Mesh(geometry, material);
     energyBall.position.copy(origin.position);
     energyBall.rotation.copy(origin.rotation);
@@ -46,7 +46,6 @@ function addPelletBall(item) {
 
     const energyBallClone = energyBall.clone();
     energyBallClone.visible = false;
-    //GLOBALS.SCENE_FPS.add(energyBallClone);
 
     //BODY
     var shape = new CANNON.Sphere(0.05);
@@ -63,6 +62,7 @@ function addPelletBall(item) {
     GLOBALS.CANNON_BODIES.push(ball);
     GLOBALS.CANNON_WORLD.addBody(ball);
     energyBall.body = ball;
+    energyBall.item = item;
 
     var direction = new Vector3(0, 1, 0).applyQuaternion(ball.quaternion);
     ball.direction = direction;
@@ -73,6 +73,9 @@ function addPelletBall(item) {
     ball.previousDirection = new Vector3(0, 0, 0);
 
     ball.addEventListener("collide", function (event) {
+
+        if(!event.target.started)
+            return
 
         if (!event.target.pellet.active || event.body.name == "fizzler")
             return;
@@ -164,24 +167,26 @@ function addPelletCatcher(item) {
     const circle = new Mesh(geometryCircle, materialCircle);
     parentCone.add(circle);
     circle.rotation.x = -Math.PI / 2;
-    circle.translateZ(intersects[0].distance);
+    circle.translateZ(intersects[0].distance - 0.01);
 
     GLOBALS.SCENE_FPS.add(parentCone);
     item.cone = parentCone;
 }
 
-var first = true;
-
 function pelletUpdate() {
 
     if (GLOBALS.LEVEL_ENTERED) {
+        
         for (var i = 0; i < pellets.length; i++) {
+
+            if (!pellets[i].item.userData.isActive)
+                continue;
 
             if (pellets[i].body.inTractor)
                 continue;
 
-            if (first) {
-                resetBall(pellets[i], true)
+            if (!pellets[i].body.started) {
+                resetBall(pellets[i], true);
             }
 
             if (pellets[i].active) {
@@ -198,19 +203,11 @@ function pelletUpdate() {
 
                 pellets[i].body.sound.position.copy(pellets[i].body.position);
                 pellets[i].body.sound.quaternion.copy(pellets[i].body.quaternion);
-            } else {
-
             }
-        }
 
-        first = false;
-    } else {
-        for (var i = 0; i < pellets.length; i++) {
-            pellets[i].body.position.copy(pellets[i].position)
-            pellets[i].body.quaternion.copy(pellets[i].quaternion)
+            pellets[i].body.started = true;
         }
     }
-
 }
 
 function resetBall(ball, translate) {
@@ -224,6 +221,12 @@ function resetBall(ball, translate) {
 
         ball.position.copy(ball.origin.position);
         ball.rotation.copy(ball.origin.rotation);
+
+        //ball.body.position.copy(ball.origin.position);
+        //ball.body.quaternion.copy(ball.quaternion);
+
+        //ball.body.started = false;
+        ball.body.direction = ball.body.originaldirection;
 
         setTimeout(() => {
             ball.visible = true;
@@ -272,22 +275,12 @@ instancePelletHit.raycastOnlyFrustum = true;
 instancePelletHit.computeBVH();
 instancePelletHit.instanceMatrix.needsUpdate = true;
 
-/*var dummy = new Object3D();
-for (var i = 0; i < 100; i++) {
-    dummy.position.set(100000, 100000, 100000);
-    dummy.updateMatrix();
-    instancePelletHit.setMatrixAt(i, dummy.matrix);
-}
-
-instancePelletHit.instanceMatrix.needsUpdate = true;
-instancePelletHit.computeBoundingSphere();*/
-
 function addDecalOnHit(position, orientation, direction) {
 
-    if (!instancePelletHit.parent){
+    if (!instancePelletHit.parent) {
         GLOBALS.SCENE_FPS.add(instancePelletHit);
     }
-        
+
     raycaster.set(position, direction);
     var intersects = raycaster.intersectObject(instancePelletHit);
 
@@ -295,7 +288,7 @@ function addDecalOnHit(position, orientation, direction) {
         return;
 
     const dummy = new Object3D();
-    dummy.scale.set(1,1,1)
+    dummy.scale.set(1, 1, 1)
     dummy.position.copy(position);
     dummy.rotation.set(orientation.x, orientation.y, orientation.z);
     dummy.translateY(-0.01)
@@ -311,12 +304,12 @@ function addDecalOnHit(position, orientation, direction) {
         instancePelletHit.current = 0;
 }
 
-function removePelletHitInstances(){
+function removePelletHitInstances() {
 
     GLOBALS.SCENE_FPS.remove(instancePelletHit);
 
     instancePelletHit.current = 0;
-    for(var i=0; i<instancePelletHit.instances.length;i++){
+    for (var i = 0; i < instancePelletHit.instances.length; i++) {
         instancePelletHit.instances[i].position.x = 100000;
         instancePelletHit.instances[i].position.y = 100000;
         instancePelletHit.instances[i].position.z = 100000;

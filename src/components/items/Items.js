@@ -215,6 +215,13 @@ function deleteItemInstanced(item, moving) {
         }
 
         GLOBALS.DYMANIC_ITEMS["dispenser"][item.item.dispenserID] = [];
+    } else if (item.instancedName == "piston_platforms" || item.instancedName == "track_platforms") {
+        GLOBALS.ITEMS_ADDED.remove(item.item.platformBox.parent);
+
+        const index = GLOBALS.BOUNDING_BOX.indexOf(item.item.platformBox.bb);
+        if (index > -1) { // only splice array when item is found
+            GLOBALS.BOUNDING_BOX.splice(index, 1); // 2nd parameter means remove one item only
+        }
     }
 
     GLOBALS.DYMANIC_ITEMS[item.instancedName][item.item.userData.idInstanced] = [];

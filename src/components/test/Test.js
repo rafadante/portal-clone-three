@@ -1,4 +1,4 @@
-import { Group, Vector3, Quaternion, Box3, Object3D } from 'three';
+import { Group, Vector3, Quaternion, Box3, Object3D, Color } from 'three';
 import $ from 'jquery';
 import { GLOBALS } from '../../Globals.js';
 import { addPositionalAudio, AUDIO, addAudio } from '../audio/Audio.js';
@@ -278,7 +278,7 @@ function viewFPS(firstRender) {
             GLOBALS.PLAYER.spawnPosition = GLOBALS.ITEMS_ADDED.getObjectByName("spawn").position.clone();
             GLOBALS.ENTER_DOOR.visible = false;
             GLOBALS.PLAYER.position.copy(GLOBALS.PLAYER.spawnPosition);
-            
+
 
             setTimeout(() => {
                 levelEnteredFunction(true);
@@ -288,6 +288,20 @@ function viewFPS(firstRender) {
 };
 
 function setup() {
+
+    for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+        if (!GLOBALS.CONNECTIONS[i]["line"].visible) {
+            window.checkers.instances[GLOBALS.CONNECTIONS[i]["checker"]].visible = false;
+        }
+    }
+
+    for (var j = 0; j < GLOBALS.BOUNDING_BOX.length; j++) {
+        GLOBALS.BOUNDING_BOX[j].platform.material.color = new Color(0xffffff);
+        GLOBALS.BOUNDING_BOX[j].platform.material.emissive = new Color(0, 1.5, 0);
+        GLOBALS.BOUNDING_BOX[j].platform.material.transparent = false;
+        GLOBALS.BOUNDING_BOX[j].platform.scale.x = 0.1;
+        GLOBALS.BOUNDING_BOX[j].platform.scale.z = 0.1;
+    }
 
     GLOBALS.ENTER_DOOR.getObjectByName("trigger").visible = false;
     GLOBALS.EXIT_DOOR.getObjectByName("trigger").visible = false;

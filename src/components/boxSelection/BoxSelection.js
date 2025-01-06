@@ -239,8 +239,24 @@ function raycastSelected(found, event, type) {
                         $(".trigger-multiple").css("display", "block");
                     }
 
-                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("piston_platforms")) {
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("piston_platforms") ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("track_platforms")) {
+
                         $(".piston_platforms").css("display", "block");
+
+                        $("#piston-max-height").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.platformBox.parent.scale.y);
+                        $("#state-piston").prop("checked", GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.isActive);
+
+                        if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("track_platforms")) {
+                            $("#piston-max-height").prop("min", -100)
+                        } else {
+                            $("#piston-max-height").prop("min", 0)
+                        }
+                    }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_launcher")) {
+                        $(".piston_platforms").css("display", "block");
+                        $("#state-piston").prop("checked", GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.isActive);
                     }
                 }
             }

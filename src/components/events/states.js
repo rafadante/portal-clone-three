@@ -2,7 +2,7 @@ import { GLOBALS } from "../../Globals.js";
 import { AUDIO, play } from "../audio/Audio.js";
 import { stateDoor } from "../door/Door.js";
 import { deletePortal } from "../portal/CreatePortal.js";
-import { interactWithItem } from "./events.js";
+import { interactWithItem } from "./interaction.js";
 
 function laserFieldState(obj) {
     obj.item.userData.state = !obj.item.userData.state;
@@ -88,7 +88,7 @@ function wakeUpAll() {
 }
 
 function respawn(d) {
-    if (d.name.includes("gel") || d.name.includes("camera")) return;
+    if (d.name.includes("gel") || d.name.includes("camera") || d.name.includes("pellet")) return;
 
     // Velocity
     d.velocity.setZero();

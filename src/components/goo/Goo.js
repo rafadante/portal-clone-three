@@ -96,7 +96,7 @@ const AddGoo = function (userData) {
         envMap: GLOBALS.ENV_MAP,
         roughness: 0.2,
         transparent: true,
-        opacity: 0.9
+        opacity: 0.75
     })); //material
 
     if (geometries.length == 0) {

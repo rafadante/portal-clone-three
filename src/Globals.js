@@ -634,6 +634,9 @@ function getItemValues(){
 
 var GLOBALS = {
 
+    BOUNDING_BOX: [],
+    PLATFORM_BODIES: [],
+
     FINISHED: false,
     PIXEL_RATIO: pixelRatio,
     DEBUGGER_GROUP: new Group(),
@@ -1022,6 +1025,8 @@ GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
 
 function reset() {
 
+    GLOBALS.BOUNDING_BOX = [];
+    GLOBALS.PLATFORM_BODIES = [];
     GLOBALS.FINISHED = false;
     window.glass = [];
     GLOBALS.BOX_BODY= [];
