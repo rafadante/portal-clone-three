@@ -248,9 +248,16 @@ function render(time) {
         //perf.begin();
         //GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         //perf.end();
-        GLOBALS.COMPOSER.render();
+        //GLOBALS.COMPOSER.render();
         //console.log(GLOBALS.RENDERER.info);
         //GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
+
+        GLOBALS.RENDERER.autoClear = false;
+        GLOBALS.RENDERER.clear();
+        GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+        document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
+        GLOBALS.RENDERER.clearDepth()
+        GLOBALS.RENDERER.render(GLOBALS.GUN_GROUP, GLOBALS.PORTAL_GUN_CAMERA);
     } else {
         GLOBALS.RENDERER.autoClear = false;
         GLOBALS.RENDERER.clear();

@@ -31,6 +31,9 @@ function manageConnection(instanceId, from) {
     GLOBALS.MATERIAL_NON_PORTAL_EDITOR.transparent = false;
     GLOBALS.SCENE_CHILDREN.remove(GLOBALS.CURRENT_LINE);
 
+    if(!GLOBALS.PLANE_USER_DATA[instanceId].item.userData)
+        return;
+
     if (GLOBALS.FAITH_PLATE_TARGET) {
         targetFaithPlateEnd(GLOBALS.PLANE_USER_DATA[instanceId])
     } else if (GLOBALS.PLANE_USER_DATA[instanceId].allowconnection &&

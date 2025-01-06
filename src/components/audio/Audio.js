@@ -21,7 +21,7 @@ function play(elem) {
     if (!isPlaying) {//
         // Show loading animation.
 
-        //elem.volume = elem.getAttribute("volume");
+        elem.volume = elem.getAttribute("volume");
         var playPromise = elem.play();
 
         if (playPromise !== undefined) {

@@ -479,6 +479,19 @@ function loadLevel(data) {
     window.totalItemsLoaded = 0;
 
     for (var i = 0; i < data.length; i++) {
+        if (data[i].exists) {
+            if (data[i].hasItem && data[i].itemName != "gel") {
+                if (data[i].itemName.split('-')[0] != "exitDoor" &&
+                    data[i].itemName.split('-')[0] != "enterDoor" &&
+                    data[i].itemName.split('-')[0] != "window" &&
+                    data[i].itemName.split('-')[0] != "dispenser") {
+                    window.totalItemsToLoad++;
+                }
+            }
+        }
+    }
+
+    for (var i = 0; i < data.length; i++) {
 
         if (data[i].exists) {
 
@@ -490,8 +503,6 @@ function loadLevel(data) {
                     data[i].itemName.split('-')[0] != "dispenser") {
 
                     const state = data[i].state;
-
-                    window.totalItemsToLoad++;
                     addItem(data[i], true)
 
                     data[i].state = state;

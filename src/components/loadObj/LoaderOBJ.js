@@ -42,7 +42,7 @@ draco.preload();
 const loader = new GLTFLoader().setPath('./assets/3ds/');
 loader.setDRACOLoader(draco);
 
-function load3D(path, name, instanced, interactive, roughness, envIntensity, wall, ground, ceiling, trigger, found, loaded, elem, max) {
+async function load3D(path, name, instanced, interactive, roughness, envIntensity, wall, ground, ceiling, trigger, found, loaded, elem, max) {
 
     const manager = new LoadingManager();
     const loader2 = new GLTFLoader(manager).setPath('./assets/3ds/medium');
@@ -54,6 +54,8 @@ function load3D(path, name, instanced, interactive, roughness, envIntensity, wal
     };
 
     manager.onLoad = function () {
+
+        
 
         if (defaultLoaded < 3) {
 

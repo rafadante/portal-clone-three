@@ -87,6 +87,8 @@ const falling = textureLoader.load('./assets/textures/falling.png');
 
 async function addItem(found, loaded) {
 
+    
+
     if (loaded) {
         GLOBALS.ITEM_HOLDED_NAME = found.itemName.split('-')[0];
         GLOBALS.DRAGGED_ITEM_ELEMENT = $("#" + GLOBALS.ITEM_HOLDED_NAME)
