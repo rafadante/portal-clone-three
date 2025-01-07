@@ -1,4 +1,4 @@
-import { play } from '../audio/Audio.js';
+import { play, playVoice } from '../audio/Audio.js';
 import { Vector3 } from "three";
 import { tweenCamera } from "../../Utils.js";
 import { GLOBALS } from "../../Globals.js";
@@ -65,6 +65,8 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
         setTimeout(() => {
           GLOBALS.EXIT_DOOR.add(GLOBALS.CORRIDOR_ENTER);
           corridorColliderNames(GLOBALS.CORRIDOR_ENTER, true);
+
+          GLOBALS.CORRIDOR_ENTER.getObjectByName("sign").visible = false;
           //GLOBALS.CORRIDOR_ENTER.visible = false;
           //GLOBALS.CORRIDOR_ENTER.getObjectByName("elevatorOBJ").visible = false;
           //GLOBALS.CORRIDOR_ENTER.getObjectByName("leftDoor").visible = false;
@@ -80,6 +82,10 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
   
         if (GLOBALS.EXIT_DOOR.finished)
           GLOBALS.CORRIDOR_ENTER.visible = true;
+
+        if (door == GLOBALS.EXIT_DOOR && open){
+          playVoice(door.userData);
+        }
       }
       
 

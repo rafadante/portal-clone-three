@@ -123,7 +123,7 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
         play(AUDIO.JUMP)
     }
 
-    addPositionalAudio('audio-repulsion', GLOBALS.PLAYER, false, false, true, 20, 'soundRepulsion');
+    //addPositionalAudio('audio-repulsion', GLOBALS.PLAYER, false, false, true, 20, 'soundRepulsion');
 })
 
 GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {

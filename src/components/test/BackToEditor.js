@@ -16,6 +16,20 @@ $("body").on('click', '#back-editor', function () {
 
 function backToEditor() {
 
+    GLOBALS.MAIN_CAMERA.remove(GLOBALS.MAIN_CAMERA.getObjectByName("listener"));
+    window.listernAdded = false;
+
+    for (var i = 0; i < GLOBALS.SOUNDS_FPS.length; i++) {
+        GLOBALS.SCENE_FPS.remove(GLOBALS.SOUNDS_FPS[i]);
+        GLOBALS.SOUNDS_FPS[i].audio.currentTime = 0;
+        GLOBALS.SOUNDS_FPS[i].audio.pause();
+    }
+
+   /* for (var i = GLOBALS.MAIN_CAMERA.getObjectByName("listener").children.length - 1; i >= 0; i--) {
+        console.log("removed")
+        GLOBALS.MAIN_CAMERA.getObjectByName("listener").remove(GLOBALS.MAIN_CAMERA.getObjectByName("listener").children[i]);
+    }*/
+
     removePelletHitInstances();
 
     if (GLOBALS.HOLDING_ITEM)
@@ -44,10 +58,14 @@ function backToEditor() {
     }
 
     for (var f = 0; f < GLOBALS.TRIGGER_BOXES.length; f++) {
-        GLOBALS.TRIGGER_BOXES[i].item.visible = true;
 
-        GLOBALS.TRIGGER_BOXES[f].item.userData.active = false;
-        GLOBALS.TRIGGER_BOXES[f].item.userData.played = false;
+        if (GLOBALS.TRIGGER_BOXES[i]) {
+            GLOBALS.TRIGGER_BOXES[i].item.visible = true;
+
+            GLOBALS.TRIGGER_BOXES[f].item.userData.active = false;
+            GLOBALS.TRIGGER_BOXES[f].item.userData.played = false;
+        }
+
     }
 
     GLOBALS.ENTER_DOOR.getObjectByName("trigger").visible = true;
@@ -196,10 +214,6 @@ function backToEditor() {
         if (index > -1) {
             GLOBALS.INTERACTIVE.splice(index, 1);
         }
-    }
-
-    for (var i = 0; i < GLOBALS.SOUNDS_FPS.length; i++) {
-        GLOBALS.SOUNDS_FPS[i].audio.pause();
     }
 
     GLOBALS.SCENE_FPS = [];

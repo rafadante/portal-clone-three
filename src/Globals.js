@@ -40,6 +40,10 @@ camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 window.fov = fov;
 
+const listener = new Object3D();
+listener.name = "listener";
+camera.add(listener);
+
 var hFOV = 2 * Math.atan(Math.tan(camera.fov * Math.PI / 180 / 2) * camera.aspect) * 180 / Math.PI; // degrees
 
 //CAMERA THAT ONLY RENDERS THE MAIN PORTAL GUN ON TOP OF THE SCENE

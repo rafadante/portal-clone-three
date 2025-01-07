@@ -1,4 +1,4 @@
-import { PlaneGeometry, Mesh, Color, Clock, Object3D, Vector2 } from 'three';
+import { PlaneGeometry, Mesh, Color, Clock, Object3D, Vector2, TextureLoader, SRGBColorSpace, RepeatWrapping } from 'three';
 import $ from 'jquery';
 import { addConnectionPoints, addItem } from '../items/AddItem.js';
 import { GLOBALS, reset } from '../../Globals.js';
@@ -353,6 +353,19 @@ window.totalItemsToLoad = 0;
 window.totalItemsLoaded = 0;
 
 function loadLevel(data) {
+
+    GLOBALS.EXIT_DOOR.finished = false;
+
+    if (GLOBALS.CORRIDOR_ENTER) {
+        const map = new TextureLoader().load('./levels/signs/' + window.currentLevel + '.webp');
+        map.colorSpace = SRGBColorSpace;
+        map.wrapS = map.wrapT = RepeatWrapping;
+        map.flipY = false;
+        GLOBALS.CORRIDOR_ENTER.getObjectByName("sign").visible = true;
+        GLOBALS.CORRIDOR_ENTER.getObjectByName("sign").material.map = map;
+        GLOBALS.CORRIDOR_ENTER.getObjectByName("sign").material.envMapIntensity = 0;
+        GLOBALS.CORRIDOR_ENTER.getObjectByName("sign").scale.z = -1;
+    }
 
     $("#chamber-name-to-save").val(chamberName.substring(0, chamberName.indexOf("_by_")));
     $("#author-name-to-save").val(chamberName.split('_by_').pop().replace('.json', ''));

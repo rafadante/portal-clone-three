@@ -4,7 +4,7 @@ import { stateDoor } from '../door/Door.js';
 import { tractorBeam } from "../tractorBeam/TractorBeam.js";
 import { pelletUpdate, resetBall } from "../pellet/Pellet.js";
 import { portalButton } from '../portal/CreatePortal.js';
-import { AUDIO } from "../audio/Audio.js";
+import { AUDIO, playVoice } from "../audio/Audio.js";
 import { laserFieldState, tractorStates, lightBridgeState, dispenserSpawn, respawn, levelEnteredFunction, wakeUpAll } from "./states.js";
 
 let clock = new Clock();
@@ -239,6 +239,8 @@ function doSetTimeout(to, waitFor, idHolder, connection) {
       to.itemName.includes("pellet_launcher")) {
       to.item.userData.isActive = !to.item.userData.isActive;
     }
+
+    playVoice(to.item.userData);
   }, waitFor);
 }
 

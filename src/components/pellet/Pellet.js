@@ -9,7 +9,7 @@ import $ from 'jquery';
 import { respawn } from '../events/states';
 import { laserReceiverTrigger } from '../events/events.js';
 import { cannonToThreeVector3 } from '../../Utils.js';
-import { addPositionalAudio } from '../audio/Audio.js';
+import { addPositionalAudio, playVoice } from '../audio/Audio.js';
 import { play } from "../audio/Audio.js";
 import { InstancedMesh2 } from '@three.ez/instanced-mesh';
 
@@ -114,6 +114,9 @@ function addPelletBall(item) {
                 }
 
                 event.target.direction = event.target.originaldirection;
+
+                playVoice(event.body.item.userData);
+
                 return;
             }
         }

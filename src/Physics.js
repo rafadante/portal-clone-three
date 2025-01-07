@@ -164,10 +164,7 @@ function updatePhysics() {
 
         for (var i = 0; i < GLOBALS.DYMANIC_ITEMS[property].length; i++) {
 
-            if (property == "piston_platforms" || property == "track_platforms") {
-                if (GLOBALS.DYMANIC_ITEMS[property][i].length != 0)
-                    updatePlatformPosition(GLOBALS.DYMANIC_ITEMS[property][i], instanced, i);
-            } else if (GLOBALS.DYMANIC_ITEMS[property][i].length != 0) {
+            if (GLOBALS.DYMANIC_ITEMS[property][i].length != 0) {
 
                 if (GLOBALS.DYMANIC_ITEMS[property][i].body) {
                     if (GLOBALS.DYMANIC_ITEMS[property][i].body.sound) {
@@ -176,26 +173,31 @@ function updatePhysics() {
                     }
                 }
 
-                if (property == "tractor_beam" || property == "laser_receiver" || property == "laser_relay") {
-                    if (GLOBALS.DYMANIC_ITEMS[property][i].userData.state) {
-                        if (property == "tractor_beam")
-                            rotateInstanced(instanced, GLOBALS.DYMANIC_ITEMS[property][i], i, 0.05)
-                        else if (property == "laser_receiver" || property == "laser_relay")
-                            rotateInstanced(instanced, GLOBALS.DYMANIC_ITEMS[property][i], i, -0.075)
-                    }
+                if (property == "piston_platforms" || property == "track_platforms") {
+                    updatePlatformPosition(GLOBALS.DYMANIC_ITEMS[property][i], instanced, i);
                 } else {
 
-                    var item = new Object3D();
-                    item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
-                    item.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
+                    if (property == "tractor_beam" || property == "laser_receiver" || property == "laser_relay") {
+                        if (GLOBALS.DYMANIC_ITEMS[property][i].userData.state) {
+                            if (property == "tractor_beam")
+                                rotateInstanced(instanced, GLOBALS.DYMANIC_ITEMS[property][i], i, 0.05)
+                            else if (property == "laser_receiver" || property == "laser_relay")
+                                rotateInstanced(instanced, GLOBALS.DYMANIC_ITEMS[property][i], i, -0.075)
+                        }
+                    } else {
 
-                    item.updateMatrix();
-                    instanced.setMatrixAt(i, item.matrix)
-                    instanced.instanceMatrix.needsUpdate = true;
-                    instanced.computeBoundingSphere();
+                        var item = new Object3D();
+                        item.position.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.position);
+                        item.quaternion.copy(GLOBALS.DYMANIC_ITEMS[property][i].body.quaternion);
 
-                    if (property == "laser_cube" && updateLasers)
-                        updateLaserCubeRaycaster(item, GLOBALS.DYMANIC_ITEMS[property][i].body.laser);
+                        item.updateMatrix();
+                        instanced.setMatrixAt(i, item.matrix)
+                        instanced.instanceMatrix.needsUpdate = true;
+                        instanced.computeBoundingSphere();
+
+                        if (property == "laser_cube" && updateLasers)
+                            updateLaserCubeRaycaster(item, GLOBALS.DYMANIC_ITEMS[property][i].body.laser);
+                    }
                 }
             }
         }

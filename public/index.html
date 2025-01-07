@@ -1045,13 +1045,13 @@
       </a>
     </li>
 
-    <li class="menu-item hasItem trigger_voice trigger_audio">
+    <li class="menu-item hasItem trigger_voice trigger_audio pellet_catcher exitDoor soundPlay"> 
       <a href="#" class="menu-btn">
         <input placeholder="link to audio" type="text" id="state-trigger-voice-link" />
       </a>
     </li>
 
-    <li class="menu-item hasItem trigger_voice trigger_audio">
+    <li class="menu-item hasItem trigger_voice trigger_audio pellet_catcher exitDoor soundPlay">
       <a href="#" class="menu-btn">
         <button id="play-trigger-voice">Play/Save Audio</button>
       </a>
@@ -1904,6 +1904,10 @@
   <div id="panel-top"></div>
 
   <!--AUDIOS-->
+
+  <audio id="AUDIO-PLATFORM" preload="none" style="display: none" volume="0.5" loop>
+    <source src="./audio/platform.wav" type="audio/wav">
+  </audio>
 
   <audio id="AUDIO-EDITOR" preload="none" style="display: none" volume="0.5" loop>
     <source src="./audio/editor.mp3" type="audio/mp3">

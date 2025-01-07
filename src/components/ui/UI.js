@@ -90,7 +90,7 @@ $('#quality-select').on('change', function () {
         $("#recursive-select").val(2).change();
         $("#recursive-render-select").val(1).change();
         $("#resolution-select").val(1).change();
-        $("#shadows-resolution-select").val(4096).change();
+        $("#shadows-resolution-select").val(2048).change();
         localStorage.setItem("antialising", true);
         GLOBALS.RENDERER.shadowMap.autoUpdate = true;
     }

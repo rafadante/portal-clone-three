@@ -121,6 +121,12 @@ function respawn(d) {
         deletePortal(0)
         deletePortal(1)
         GLOBALS.PORTAL_BOX = [];
+
+        for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+            if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger")){
+                GLOBALS.CONNECTIONS[i]['line'].active = false;
+            }
+        }
     }
 
     setTimeout(() => {

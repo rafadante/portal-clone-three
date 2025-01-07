@@ -155,6 +155,12 @@ function fizzlerTrigger(body) {
 
         if (e.body === GLOBALS.PLAYER) {
 
+            for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+                if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger")){
+                    GLOBALS.CONNECTIONS[i]['line'].active = false;
+                }
+            }
+
             if (e.target.name == "exit" && !GLOBALS.EXIT_DOOR.finished) {
                 GLOBALS.EXIT_DOOR.finished = true;
                 stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
@@ -163,6 +169,8 @@ function fizzlerTrigger(body) {
             deletePortal(0)
             deletePortal(1)
             GLOBALS.PORTAL_BOX = [];
+
+            
         } else if (e.body.name == "sphere" || e.body.name == "cube" ||
             e.body.name == "radio" || e.body.name == "cube_2" || e.body.name == "laser_cube" ||
             e.body.name == "scale_cube") {
@@ -178,7 +186,7 @@ function fizzlerTrigger(body) {
             GLOBALS.UNIFORMS_DISSOLVER.diffuseMap.value = clone.material.map;
             clone.material = GLOBALS.MATERIAL_DISSOLVER;
 
-            GLOBALS.SCENE.add(clone);
+            GLOBALS.SCENE_FPS.add(clone);
 
             var posClone = clone.position.clone();
             posClone.y += 2;
@@ -196,7 +204,7 @@ function fizzlerTrigger(body) {
             //GLOBALS.MATERIAL_DISSOLVER
 
             setTimeout(() => {
-                if (GLOBALS.SCENE_FPS) {
+                if (GLOBALS.SCENE_FPS && clone.sound) {
                     GLOBALS.SCENE.remove(clone);
                     GLOBALS.SCENE_FPS.remove(clone.sound);
                 }
@@ -389,6 +397,7 @@ function addColliderItem(items, type, mass, offset) {
 
             if (type == "piston_platforms" || type == "track_platforms") {
                 addColliderEvent(box);
+                addPositionalAudio('AUDIO-PLATFORM', box, true, true, false, 5, 'sound')
             }
 
             if (mass > 0) {

@@ -38,8 +38,7 @@ function raycastSelected(found, event, type) {
 
     if (event.button == 2) {
 
-        if (GLOBALS.PLANE_USER_DATA[instanceId].itemName != "exitDoor" &&
-            GLOBALS.PLANE_USER_DATA[instanceId].itemName != "enterDoor" &&
+        if (GLOBALS.PLANE_USER_DATA[instanceId].itemName != "enterDoor" &&
             GLOBALS.PLANE_USER_DATA[instanceId].itemName != "window") {
 
             if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem &&
@@ -65,6 +64,9 @@ function raycastSelected(found, event, type) {
             if (GLOBALS.SELECTED_ID.length == 1) {
                 if (GLOBALS.PLANE_USER_DATA[instanceId].hasItem) {
                     $("#delete").css("display", "block");
+
+                    if(GLOBALS.PLANE_USER_DATA[instanceId].itemName == "exitDoor")
+                        $("#delete").css("display", "none");
 
                     if ((GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "sphere" ||
                         GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "cube" ||
@@ -229,6 +231,11 @@ function raycastSelected(found, event, type) {
                         $("#state-trigger-multiple").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.multipleTrigger);
                     }
 
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("exitDoor")) {
+                        $(".exitDoor").css("display", "block");
+                        $("#state-trigger-voice-link").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.link);
+                    }
+
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger_audio")) {
                         $(".trigger_audio").css("display", "block");
                         $("#state-trigger-loop").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.soundEffectLoop);
@@ -257,6 +264,13 @@ function raycastSelected(found, event, type) {
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_launcher")) {
                         $(".piston_platforms").css("display", "block");
                         $("#state-piston").prop("checked", GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.isActive);
+                    }
+
+                    //
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_catcher") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("door")) {
+                        $(".soundPlay").css("display", "block");
+                        $("#state-trigger-voice-link").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.link);
                     }
                 }
             }

@@ -113,7 +113,7 @@ function init() {
 
     window.addEventListener('resize', onWindowResize);
     recreateRay();
-    GLOBALS.RENDERER.setAnimationLoop( animate );
+    GLOBALS.RENDERER.setAnimationLoop(animate);
 }
 
 function onWindowResize() {
@@ -186,19 +186,16 @@ function fixedUpdate() { //60 fps always for physics
 }
 
 var statsBegin = false;
-let clock = new Clock();
-let delta = 0;
-// 30 fps
-var interval = 1 / 30;
+let desiredFPS = 60; // Target FPS
 
-if (localStorage.getItem("quality-select") != "very_low")
-    interval = 1 / 30;
-else if (localStorage.getItem("quality-select") != "low")
-    interval = 1 / 40;
-else if (localStorage.getItem("quality-select") != "medium")
-    interval = 1 / 50;
-else if (localStorage.getItem("quality-select") != "high")
-    interval = 1 / 60;
+if (localStorage.getItem("quality-select") == "very_low")
+    desiredFPS = 30;
+else if (localStorage.getItem("quality-select") == "low")
+    desiredFPS = 40;
+else if (localStorage.getItem("quality-select") == "medium")
+    desiredFPS = 50;
+
+console.log(desiredFPS)
 
 function render(time) {
 
@@ -216,7 +213,7 @@ function render(time) {
     updateEvents();
     checkForTriggerContact();
     TWEEN.update();
-    animatePortal();
+    animatePortal(time);
 
     for (var i = 0; i < GLOBALS.CAMERA_OBJ_HORIZONTAL.length; i++) {
         if (GLOBALS.CAMERAS[i].fixed) {
@@ -248,16 +245,16 @@ function render(time) {
         //perf.begin();
         //GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         //perf.end();
-        //GLOBALS.COMPOSER.render();
+        GLOBALS.COMPOSER.render();
         //console.log(GLOBALS.RENDERER.info);
         //GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
 
-        GLOBALS.RENDERER.autoClear = false;
+        /*GLOBALS.RENDERER.autoClear = false;
         GLOBALS.RENDERER.clear();
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
         GLOBALS.RENDERER.clearDepth()
-        GLOBALS.RENDERER.render(GLOBALS.GUN_GROUP, GLOBALS.PORTAL_GUN_CAMERA);
+        GLOBALS.RENDERER.render(GLOBALS.GUN_GROUP, GLOBALS.PORTAL_GUN_CAMERA);*/
     } else {
         GLOBALS.RENDERER.autoClear = false;
         GLOBALS.RENDERER.clear();
@@ -268,7 +265,11 @@ function render(time) {
     }
 }
 
-function animatePortal() {
+let interval = 1000 / desiredFPS; // Interval in milliseconds
+let lastTime = 0;
+
+
+function animatePortal(currentTime) {
 
     // only show player model when rendering portals
     // don't show the clone model when rendering portals
@@ -307,17 +308,14 @@ function animatePortal() {
     //GLOBALS.RENDERER.autoClear = true;
 
     if (GLOBALS.PORTAL_RECURSION_LEVELS > 0) {
-        if (GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic")) {
-            delta += clock.getDelta();
+        // Calculate the elapsed time since the last frame
+        const deltaTime = currentTime - lastTime;
 
-            if (delta > interval) {
-                // The draw or time dependent code are here
-                renderPortal2(0, 1)
-                renderPortal2(1, 0)
+        if (deltaTime >= interval) {
+            // Update the lastTime to the current time
+            lastTime = currentTime - (deltaTime % interval);
 
-                delta = delta % interval;
-            }
-        } else {
+            // Your update and render logic
             renderPortal2(0, 1)
             renderPortal2(1, 0)
         }

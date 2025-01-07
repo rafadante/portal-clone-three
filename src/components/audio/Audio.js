@@ -1,16 +1,50 @@
 import { PositionalAudio, AudioListener } from 'three';
 import { GLOBALS } from '../../Globals.js';
 
-var listernAdded = false;
+window.listernAdded = false;
 var listener;
+var previousAudio;
 
 function playVoice(data) {
 
-    if (!data.link)
+    if (!data.link || data.played)
         return;
 
+    if (previousAudio) {
+        previousAudio.currentTime = 0;
+        previousAudio.pause();
+    }
+
+    data.played = true;
     data.voice.currentTime = 0;
     data.voice.play();
+    previousAudio = data.voice;
+
+    //data.played = true;
+    //playAudioSequentially(data.voice)
+}
+
+const activeAudios = [];
+
+// Play audio and wait for it to finish
+async function playAudioSequentially(audio) {
+    // Wait for currently active audios to finish
+    if (activeAudios.length > 0) {
+        await Promise.all(activeAudios.map((audio) => new Promise((resolve) => {
+            audio.addEventListener('ended', resolve, { once: true });
+        })));
+    }
+
+    // Play the new audio
+    activeAudios.push(audio);
+    audio.currentTime = 0;
+    audio.play();
+
+    // Remove audio from active list when finished
+    audio.addEventListener('ended', () => {
+        const index = activeAudios.indexOf(audio);
+        if (index > -1) activeAudios.splice(index, 1);
+    });
 }
 
 function play(elem) {
@@ -39,14 +73,17 @@ function play(elem) {
 
 function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, nameSound) {
 
-    if (!listernAdded) {
-        listernAdded = true;
+    console.log(path)
+
+    if (!window.listernAdded) {
+        window.listernAdded = true;
         // create an AudioListener and add it to the camera
         listener = new AudioListener();
-        GLOBALS.GUN.add(listener);
-
-        listener.context.resume();
+        listener.name = "listener";
+        GLOBALS.MAIN_CAMERA.add(listener);
     }
+
+    listener.context.resume();
 
     // create the PositionalAudio object (passing in the listener)
     const sound = new PositionalAudio(listener);
@@ -57,6 +94,7 @@ function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, na
     sound.setRefDistance(1);
     sound.setMaxDistance(maxDis);
     sound.setDistanceModel("linear");
+    sound.setVolume(0.5); // Keep volume between 0.0 and 1.0
     sound.volume = 0.5;
     sound.audio = audioClone;
     sound.audio.loop = loop;

@@ -20,7 +20,7 @@ function checkForTriggerContact() {
                 continue;
 
             GLOBALS.TRIGGER_BOXES[f].item.userData.active = true;
-            GLOBALS.TRIGGER_BOXES[f].item.userData.played = true;
+            //GLOBALS.TRIGGER_BOXES[f].item.userData.played = true;
 
             if (GLOBALS.TRIGGER_BOXES[f].instancedName == "trigger_save" &&
                 !GLOBALS.PLAYER.spawnPosition.equals(GLOBALS.TRIGGER_BOXES[f].item.position)

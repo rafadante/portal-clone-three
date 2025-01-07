@@ -710,6 +710,7 @@ function manageItemVariables(item, userData, instanced) {
     item.userData.restitution = 0;
     item.userData.rotationY = 0;
     item.userData.angle = 45;
+    item.userData.link = null;
 
     if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
         item.userData.state = "all";
