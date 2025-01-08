@@ -224,10 +224,10 @@ function playerExitPurpleGel() {
 
 function resetPlayerBody() {
     // Position
-    GLOBALS.PLAYER.position.setZero();
-    GLOBALS.PLAYER.previousPosition.setZero();
-    GLOBALS.PLAYER.interpolatedPosition.setZero();
-    GLOBALS.PLAYER.initPosition.setZero();
+    GLOBALS.PLAYER.position.set(0,0,0);
+    GLOBALS.PLAYER.previousPosition.set(0,0,0);
+    GLOBALS.PLAYER.interpolatedPosition.set(0,0,0);
+    GLOBALS.PLAYER.initPosition.set(0,0,0);
 
     // orientation
     GLOBALS.PLAYER.quaternion.set(0, 0, 0, 1);
@@ -236,14 +236,16 @@ function resetPlayerBody() {
     GLOBALS.PLAYER.interpolatedQuaternion.set(0, 0, 0, 1);
 
     // Velocity
-    GLOBALS.PLAYER.velocity.setZero();
-    GLOBALS.PLAYER.initVelocity.setZero();
-    GLOBALS.PLAYER.angularVelocity.setZero();
-    GLOBALS.PLAYER.initAngularVelocity.setZero();
+    GLOBALS.PLAYER.velocity.set(0,0,0);
+    GLOBALS.PLAYER.initVelocity.set(0,0,0);
+    GLOBALS.PLAYER.angularVelocity.set(0,0,0);
+    GLOBALS.PLAYER.initAngularVelocity.set(0,0,0);
 
     // Force
-    GLOBALS.PLAYER.force.setZero();
-    GLOBALS.PLAYER.torque.setZero();
+    GLOBALS.PLAYER.force.set(0,0,0);
+    GLOBALS.PLAYER.torque.set(0,0,0);
+
+    GLOBALS.PLAYER.inJump = false;
 }
 
 export {

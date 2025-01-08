@@ -3,22 +3,21 @@ import { GLOBALS } from '../../Globals.js';
 
 window.listernAdded = false;
 var listener;
-var previousAudio;
 
 function playVoice(data) {
 
     if (!data.link || data.played)
         return;
 
-    if (previousAudio) {
-        previousAudio.currentTime = 0;
-        previousAudio.pause();
+    if (window.previousAudio) {
+        window.previousAudio.currentTime = 0;
+        window.previousAudio.pause();
     }
 
     data.played = true;
     data.voice.currentTime = 0;
     data.voice.play();
-    previousAudio = data.voice;
+    window.previousAudio = data.voice;
 
     //data.played = true;
     //playAudioSequentially(data.voice)
@@ -72,8 +71,6 @@ function play(elem) {
 }
 
 function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, nameSound) {
-
-    console.log(path)
 
     if (!window.listernAdded) {
         window.listernAdded = true;

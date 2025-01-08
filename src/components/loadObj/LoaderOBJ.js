@@ -478,12 +478,12 @@ function loadAvatar() {
         ANIM_LEFT_STRAFE: loader.loadAsync('/avatar/LeftStrafe.glb'),
         ANIM_FALLING_IDLE: loader.loadAsync('/avatar/FallingIdle.glb'),
         //NO PORTAL GUN
-        /*ANIM_STANDING_IDLE_NO_GUN: loader.loadAsync('./assets/avatar/noGun/StandingIdle.glb'),
-        ANIM_JUMP_NO_GUN: loader.loadAsync('./assets/avatar/noGun/Jump.glb'),
-        ANIM_STATIONARY_RUNNING_NO_GUN: loader.loadAsync('./assets/avatar/noGun/StationaryRunning.glb'),
-        ANIM_BACKWARD_RUNNING_NO_GUN: loader.loadAsync('./assets/avatar/noGun/RunningBackward.glb'),
-        ANIM_RIGHT_STRAFE_NO_GUN: loader.loadAsync('./assets/avatar/noGun/RightStrafe.glb'),
-        ANIM_LEFT_STRAFE_NO_GUN: loader.loadAsync('./assets/avatar/noGun/LeftStrafe.glb'),*/
+        ANIM_STANDING_IDLE_NO_GUN: loader.loadAsync('/avatar/noGun/StandingIdle.glb'),
+        ANIM_JUMP_NO_GUN: loader.loadAsync('/avatar/noGun/Jump.glb'),
+        ANIM_STATIONARY_RUNNING_NO_GUN: loader.loadAsync('/avatar/noGun/StationaryRunning.glb'),
+        ANIM_BACKWARD_RUNNING_NO_GUN: loader.loadAsync('/avatar/noGun/RunningBackward.glb'),
+        ANIM_RIGHT_STRAFE_NO_GUN: loader.loadAsync('/avatar/noGun/RightStrafe.glb'),
+        ANIM_LEFT_STRAFE_NO_GUN: loader.loadAsync('/avatar/noGun/LeftStrafe.glb')
     }
 
     playerModel.then((glb) => {

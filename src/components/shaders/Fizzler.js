@@ -80,5 +80,8 @@ GLOBALS.MATERIAL_FIZZLER = new ShaderMaterial({
     fragmentShader: fshader,
     side: 2,
     transparent: true,
-    opacity: 0.2
+    opacity: 0.2,
+    depthWrite: false
 });
+
+console.log(GLOBALS.MATERIAL_FIZZLER)

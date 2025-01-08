@@ -250,6 +250,14 @@ function viewFPS(firstRender) {
             GLOBALS.GUN_CLONE.children[0].visible = true;
             GLOBALS.GUN_CLONE2.children[0].visible = true;
             document.getElementById("reticle-img").style.filter = "none";
+
+            if(GLOBALS.PORTAL_GUN_INITIATE == "left"){
+                document.getElementById("reticle-img").src = './assets/ui/mobile/portalBlue.png';
+            }else if(GLOBALS.PORTAL_GUN_INITIATE == "right"){
+                document.getElementById("reticle-img").src = './assets/ui/mobile/portalOrange.png';
+            }else{
+                document.getElementById("reticle-img").src = './assets/textures/crosshairNone.png';
+            }
         }
 
         //

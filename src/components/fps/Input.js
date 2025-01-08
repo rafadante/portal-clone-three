@@ -1,4 +1,4 @@
-import { Vector3 } from 'three';
+import { Clock, Vector3 } from 'three';
 import $ from 'jquery';
 import nipplejs from 'nipplejs';
 //import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
@@ -209,6 +209,8 @@ $("body").on('click', '#settings-close', function () {
         document.getElementById('blocker').style.display = 'none';
         GLOBALS.PAUSED = false;
 
+        window.clockTimer = new Clock(); // Create a clock
+
         setTimeout(() => {
             GLOBALS.ALLOW_PLACE_PORTALS = true;
         }, 1000);
@@ -293,9 +295,23 @@ function openFullscreen() {
 }
 
 // Detect pointer lock changes
+var audioStoped = false;
 document.addEventListener('pointerlockchange', () => {
     if (document.pointerLockElement === document.body) {
         // The pointer is locked, you can enable FPS controls or hide the cursor
+
+
+
+        if (!GLOBALS.FINISHED) {
+            if (audioStoped) {
+                audioStoped = false;
+                window.previousAudio.play();
+            }
+
+            for (var i = 0; i < window.timeoutEvent.length; i++) {
+                window.timeoutEvent[i].resume()
+            }
+        }
     } else {
         // The pointer is unlocked, you can restore the cursor or stop FPS controls
         $("#container").css("filter", "blur(2px)")
@@ -304,7 +320,23 @@ document.addEventListener('pointerlockchange', () => {
         allowEnterFPS = false;
         GLOBALS.PAUSED = true;
 
+        window.curentTimeOffset = GLOBALS.STATS_UI.time;
+
         $("#chamberName").css("opacity", 1);
+
+        if (!GLOBALS.FINISHED) {
+            if (window.previousAudio) {
+                if (!window.previousAudio.paused) {
+                    audioStoped = true;
+                    window.previousAudio.pause();
+                }
+            }
+
+            for (var i = 0; i < window.timeoutEvent.length; i++) {
+                window.timeoutEvent[i].pause()
+            }
+        }
+
 
         setTimeout(() => {
             allowEnterFPS = true;

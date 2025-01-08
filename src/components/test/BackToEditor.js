@@ -8,6 +8,7 @@ import { interactWithItem } from '../events/interaction.js';
 import { Color, Vector3 } from 'three';
 import { removePelletHitInstances } from '../pellet/Pellet.js';
 import { resetPlatforms } from '../platforms/Platform.js';
+import { resetPlayerBody } from '../fps/Player.js';
 
 //BACK FROM EDITOR
 $("body").on('click', '#back-editor', function () {
@@ -15,6 +16,13 @@ $("body").on('click', '#back-editor', function () {
 });
 
 function backToEditor() {
+
+    GLOBALS.STATS_UI.time = 0;
+    GLOBALS.STATS_UI.steps = 0;
+    window.curentTimeOffset = 0;
+    window.pellets = [];
+
+    resetPlayerBody();
 
     GLOBALS.MAIN_CAMERA.remove(GLOBALS.MAIN_CAMERA.getObjectByName("listener"));
     window.listernAdded = false;

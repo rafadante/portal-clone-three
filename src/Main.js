@@ -142,8 +142,6 @@ GLOBALS.RENDERER.info.autoReset = true;
 
 function animate(time) {
 
-    GLOBALS.STATS.update();
-
     //if (GLOBALS.FPS_MODE)
     //    requestAnimationFrame(animate);
 
@@ -195,9 +193,15 @@ else if (localStorage.getItem("quality-select") == "low")
 else if (localStorage.getItem("quality-select") == "medium")
     desiredFPS = 50;
 
-console.log(desiredFPS)
+
+window.curentTimeOffset = 0;
+window.clockTimer = new Clock(); // Create a clock
 
 function render(time) {
+
+    GLOBALS.STATS.update();
+
+    GLOBALS.STATS_UI.time = window.clockTimer.getElapsedTime() + window.curentTimeOffset; // Total time since the clock was created or last reset
 
     if (GLOBALS.LEVEL_ENTERED) {
         //

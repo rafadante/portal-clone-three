@@ -1,5 +1,5 @@
 import {
-    Vector3, Object3D, MeshBasicMaterial, Mesh, Color, SphereGeometry, PointLight, 
+    Vector3, Object3D, MeshBasicMaterial, Mesh, Color, SphereGeometry, PointLight,
     CylinderGeometry, Raycaster, CircleGeometry, BoxGeometry, TextureLoader,
     MeshStandardMaterial
 } from 'three';
@@ -13,7 +13,7 @@ import { addPositionalAudio, playVoice } from '../audio/Audio.js';
 import { play } from "../audio/Audio.js";
 import { InstancedMesh2 } from '@three.ez/instanced-mesh';
 
-var pellets = [];
+window.pellets = [];
 var raycaster = new Raycaster();
 
 function addPelletBall(item) {
@@ -70,11 +70,11 @@ function addPelletBall(item) {
     ball.clone = energyBallClone;
     ball.name = "pellet";
     ball.pellet = energyBall;
-    ball.previousDirection = new Vector3(0, 0, 0);
+    ball.previousDirection = direction;
 
     ball.addEventListener("collide", function (event) {
 
-        if(!event.target.started)
+        if (!event.target.started)
             return
 
         if (!event.target.pellet.active || event.body.name == "fizzler")
@@ -127,16 +127,32 @@ function addPelletBall(item) {
         // Convert the normal vector to Three.js format if needed
         const threeNormal = new Vector3(normal.x, normal.y, normal.z).negate();
 
+        const holder = event.target.direction;
+
+        if (event.body.name == "panel") {
+            //console.log(event.target.direction)
+        }
+
         if (threeNormal.equals(event.target.previousDirection.round()))
             event.target.direction = threeNormal.negate();
         else
             event.target.direction = threeNormal;
 
+        if (event.body.name == "panel") {
+            //console.log(event.target.direction)
+
+            if(Math.abs(holder.x) > Math.abs(holder.z)){
+                event.target.direction.x = 0;
+            }else if(Math.abs(holder.x) < Math.abs(holder.z)){
+                event.target.direction.z = 0;
+            }
+        }
+
         event.target.previousDirection = event.target.direction;
     });
 
     GLOBALS.DYNAMIC_OBJECTS.push(ball);
-    pellets.push(energyBall);
+    window.pellets.push(energyBall);
 
     //
     addPositionalAudio('pelletHit', ball, false, false, false, 10, 'sound');
@@ -179,41 +195,44 @@ function addPelletCatcher(item) {
 function pelletUpdate() {
 
     if (GLOBALS.LEVEL_ENTERED) {
-        
-        for (var i = 0; i < pellets.length; i++) {
 
-            if (!pellets[i].item.userData.isActive)
+        for (var i = 0; i < window.pellets.length; i++) {
+
+            if (!window.pellets[i].item.userData.isActive)
                 continue;
 
-            if (pellets[i].body.inTractor)
+            if (window.pellets[i].body.inTractor)
                 continue;
 
-            if (!pellets[i].body.started) {
-                resetBall(pellets[i], true);
+            if (!window.pellets[i].body.started) {
+                resetBall(window.pellets[i], true);
             }
 
-            if (pellets[i].active) {
-                pellets[i].position.add(pellets[i].body.direction.clone().multiplyScalar(0.08)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side
-                pellets[i].body.position.copy(pellets[i].position);
-                pellets[i].body.previousPosition.copy(pellets[i].position)
-                pellets[i].body.angularVelocity.setZero();
-                pellets[i].body.velocity.setZero();
-                pellets[i].body.force.setZero();
+            if (window.pellets[i].active) {
+                window.pellets[i].position.add(window.pellets[i].body.direction.clone().multiplyScalar(0.08)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side
+                window.pellets[i].body.position.copy(window.pellets[i].position);
+                window.pellets[i].body.previousPosition.copy(window.pellets[i].position)
+                window.pellets[i].body.angularVelocity.setZero();
+                window.pellets[i].body.velocity.setZero();
+                window.pellets[i].body.force.setZero();
 
 
-                pellets[i].position.copy(pellets[i].body.position)
-                pellets[i].quaternion.copy(pellets[i].body.quaternion)
+                window.pellets[i].position.copy(window.pellets[i].body.position)
+                window.pellets[i].quaternion.copy(window.pellets[i].body.quaternion)
 
-                pellets[i].body.sound.position.copy(pellets[i].body.position);
-                pellets[i].body.sound.quaternion.copy(pellets[i].body.quaternion);
+                window.pellets[i].body.sound.position.copy(window.pellets[i].body.position);
+                window.pellets[i].body.sound.quaternion.copy(window.pellets[i].body.quaternion);
             }
 
-            pellets[i].body.started = true;
+            window.pellets[i].body.started = true;
         }
     }
 }
 
 function resetBall(ball, translate) {
+
+    if (!GLOBALS.FPS_MODE)
+        return;
 
     if (translate) {
 

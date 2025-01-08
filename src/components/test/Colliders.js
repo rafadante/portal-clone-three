@@ -13,6 +13,7 @@ import { faithPlate } from '../faithPlate/FaithPlate.js';
 import { gelTrigger } from '../gels/Gels.js';
 import { stateDoor } from '../door/Door.js';
 import { addColliderEvent } from '../platforms/Platform.js';
+import $ from 'jquery';
 
 function colliderItemManager() {
 
@@ -81,7 +82,7 @@ function colliderItemManager() {
             var body = new CANNON.Body({
                 shape: shape,
                 mass: 0,
-                material: new CANNON.Material()
+                material: window.materialB
             });
 
             body.name = "panel";
@@ -156,7 +157,7 @@ function fizzlerTrigger(body) {
         if (e.body === GLOBALS.PLAYER) {
 
             for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-                if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger")){
+                if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger")) {
                     GLOBALS.CONNECTIONS[i]['line'].active = false;
                 }
             }
@@ -170,7 +171,7 @@ function fizzlerTrigger(body) {
             deletePortal(1)
             GLOBALS.PORTAL_BOX = [];
 
-            
+
         } else if (e.body.name == "sphere" || e.body.name == "cube" ||
             e.body.name == "radio" || e.body.name == "cube_2" || e.body.name == "laser_cube" ||
             e.body.name == "scale_cube") {
@@ -238,14 +239,14 @@ function addColliderItem(items, type, mass, offset) {
                 var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
                 var shape = result.shape;
             } else if (type == "piston_platforms") {
-                var shape =new CANNON.Box(new CANNON.Vec3(1, 0.1, 1));
+                var shape = new CANNON.Box(new CANNON.Vec3(1, 0.1, 1));
                 objHolder.translateY(0.05);
             } else if (type == "track_platforms") {
-                var shape =new CANNON.Box(new CANNON.Vec3(1, 1, 0.1));
+                var shape = new CANNON.Box(new CANNON.Vec3(1, 1, 0.1));
                 objHolder.translateY(1);
                 //objHolder.translateY(1);
                 objHolder.translateZ(-0.275);
-            }else if (type == "trash") {
+            } else if (type == "trash") {
                 var shape = new CANNON.Box(new CANNON.Vec3(0.05, 0.09, 0.05));
                 offset = 0.09;
             } else if (type == "door") {
@@ -397,7 +398,7 @@ function addColliderItem(items, type, mass, offset) {
 
             if (type == "piston_platforms" || type == "track_platforms") {
                 addColliderEvent(box);
-                addPositionalAudio('AUDIO-PLATFORM', box, true, true, false, 5, 'sound')
+                addPositionalAudio('AUDIO-PLATFORM', box, items[i].userData.isActive, true, false, 5, 'sound')
             }
 
             if (mass > 0) {
@@ -764,6 +765,16 @@ function addCollidersToCorridor(mesh) {
                     //GLOBALS.POINTER_CONTROLS.unlock();
                     document.exitPointerLock();
                 }
+
+
+                $("#test-name").text($("#chamber-name-to-save").val());
+                $("#test-author").text($("#author-name-to-save").val());
+
+                $("#test-portals").text(GLOBALS.STATS_UI.portals);
+                $("#test-time").text((GLOBALS.STATS_UI.time / 60).toFixed(2) + " min");
+                $("#test-steps").text(parseInt(GLOBALS.STATS_UI.steps));
+
+                window.curentTimeOffset = 0;
 
                 document.getElementById("next-map").style.display = "flex";
 

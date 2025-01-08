@@ -276,7 +276,15 @@ function portalButton(button, auto, camera, firstToRender) {
 
                     if (!auto) {
                         document.getElementById("reticle-img").style.filter = "none";
-                        document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
+                        //document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
+
+                        if(GLOBALS.PORTAL_GUN_INITIATE == "left"){
+                            document.getElementById("reticle-img").src = './assets/ui/mobile/portalBlue.png';
+                        }else if(GLOBALS.PORTAL_GUN_INITIATE == "right"){
+                            document.getElementById("reticle-img").src = './assets/ui/mobile/portalOrange.png';
+                        }else{
+                            document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
+                        }
                     }
 
                     // delete the old portal this new one is replacing
@@ -314,7 +322,15 @@ function portalButton(button, auto, camera, firstToRender) {
 
                     if (!auto) {
                         document.getElementById("reticle-img").style.filter = "none";
-                        document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
+                        //document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
+
+                        if(GLOBALS.PORTAL_GUN_INITIATE == "left"){
+                            document.getElementById("reticle-img").src = './assets/ui/mobile/portalBlue.png';
+                        }else if(GLOBALS.PORTAL_GUN_INITIATE == "right"){
+                            document.getElementById("reticle-img").src = './assets/ui/mobile/portalOrange.png';
+                        }else{
+                            document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
+                        }
                     }
 
                     // delete the old portal this new one is replacing
@@ -474,6 +490,8 @@ function deletePortal(portalIndex) {
 
 // creates a new portal and adds it to the scene
 function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject, playerUpDirection, portalPoints, side) {
+
+    GLOBALS.STATS_UI.portals += 1;
 
     for (let body of GLOBALS.DYNAMIC_OBJECTS) {
         body.looping = false;

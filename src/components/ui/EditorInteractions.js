@@ -32,8 +32,16 @@ $("body").on('click', '#rotate-item', function () {
         GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("portal_gun")) {
 
         var door = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName);
-        door.rotation.y += Math.PI / 2;
-        door.userData.rotationY = door.rotation.y;
+
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("angled_panel") && 
+    (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].side == "left" || GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].side == "right")) {
+            door.rotation.x += Math.PI / 2;
+            door.userData.rotationY = door.rotation.x;
+        } else {
+            door.rotation.y += Math.PI / 2;
+            door.userData.rotationY = door.rotation.y;
+        }
+
     } else {
 
         var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName);
@@ -284,16 +292,16 @@ $("body").on('input', '#tractor-state-input, #light-bridge-state-input, #laser-f
 
     //bodyLaserField
     if ($(this).attr("id") == "light-bridge-state-input") {
-        if (this.checked){
+        if (this.checked) {
             GLOBALS.CANNON_BODIES.push(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
             GLOBALS.CANNON_WORLD.addBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
-        }else
+        } else
             GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
     } else if ($(this).attr("id") == "laser-field-state-input" || $(this).attr("id") == "fizzler-state-input") {
-        if (this.checked){
+        if (this.checked) {
             GLOBALS.CANNON_BODIES.push(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField);
             GLOBALS.CANNON_WORLD.addBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField);
-        }else
+        } else
             GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField);
     }
 });
@@ -520,23 +528,15 @@ $("body").on('click', '#save-level', function () {
 
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
 
-        
-
         if (GLOBALS.PLANE_USER_DATA[i].item) {
-
-            //console.log(GLOBALS.PLANE_USER_DATA[i])
 
             userDataHolder.push(GLOBALS.PLANE_USER_DATA[i])
             itemHolder.push(GLOBALS.PLANE_USER_DATA[i].item)
             GLOBALS.PLANE_USER_DATA[i].item = GLOBALS.PLANE_USER_DATA[i].item.userData;
-
-            console.log(GLOBALS.PLANE_USER_DATA[i].item)
         }
 
         GLOBALS.PLANE_USER_DATA[i].body = null;
     }
-
-    console.log(AUDIO.AMBIENT.value)
 
     const settings = [
         GLOBALS.PORTAL_GUN_INITIATE,

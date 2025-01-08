@@ -362,82 +362,98 @@ const updateCamera = function (deltaTime) {
     lastTimeStamp = deltaTime;
 
     if (GLOBALS.PLAYER_MODEL) {
-        let action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
-        let actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_STANDING_IDLE
+
+        var idle = "ANIM_STANDING_IDLE";
+        var walking = "ANIM_STATIONARY_RUNNING";
+        var walkingB = "ANIM_BACKWARD_RUNNING";
+        var jump = "ANIM_JUMP";
+        var strafeL = "ANIM_LEFT_STRAFE";
+        var strafeR = "ANIM_RIGHT_STRAFE";
+
+        if(GLOBALS.PORTAL_GUN_INITIATE == "none"){
+            idle = "ANIM_STANDING_IDLE_NO_GUN";
+            walking = "ANIM_STATIONARY_RUNNING_NO_GUN";
+            walkingB = "ANIM_BACKWARD_RUNNING_NO_GUN";
+            jump = "ANIM_JUMP_NO_GUN";
+            strafeL = "ANIM_LEFT_STRAFE_NO_GUN";
+            strafeR = "ANIM_RIGHT_STRAFE_NO_GUN";
+        }
+
+        let action = GLOBALS.PLAYER_MODEL.animationActions[idle];
+        let actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[idle];
+        
         if (GLOBALS.PLAYER_MODEL.modelReady) {
             if (GLOBALS.PLAYER.inJump && !GLOBALS.PLAYER.inTractor) {
-                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_JUMP
-                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_JUMP
+                action = GLOBALS.PLAYER_MODEL.animationActions[jump]
+                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[jump]
             } else if (INPUT.controller["KeyW"].pressed && INPUT.controller["KeyD"].pressed && INPUT.controller["KeyA"].pressed && INPUT.controller["KeyS"].pressed) {
-                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
-                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_STANDING_IDLE
+                action = GLOBALS.PLAYER_MODEL.animationActions[idle]
+                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[idle]
             } else if (INPUT.controller["KeyW"].pressed && INPUT.controller["KeyS"].pressed) {
-                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
-                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_STANDING_IDLE
+                action = GLOBALS.PLAYER_MODEL.animationActions[idle]
+                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[idle]
                 if (INPUT.controller["KeyD"].pressed) {
-                    action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_RIGHT_STRAFE
-                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_RIGHT_STRAFE
+                    action = GLOBALS.PLAYER_MODEL.animationActions[strafeR]
+                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[strafeR]
                 } else if (INPUT.controller["KeyA"].pressed) {
-                    action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_LEFT_STRAFE
-                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_LEFT_STRAFE
+                    action = GLOBALS.PLAYER_MODEL.animationActions[strafeL]
+                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[strafeL]
                 }
             } else if (INPUT.controller["KeyA"].pressed && INPUT.controller["KeyD"].pressed) {
-                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
-                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_STANDING_IDLE
+                action = GLOBALS.PLAYER_MODEL.animationActions[idle]
+                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[idle]
                 if (INPUT.controller["KeyW"].pressed) {
-                    action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STATIONARY_RUNNING
-                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_STATIONARY_RUNNING
+                    action = GLOBALS.PLAYER_MODEL.animationActions[walking]
+                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[walking]
                 } else if (INPUT.controller["KeyS"].pressed) {
-                    action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_BACKWARD_RUNNING
-                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_BACKWARD_RUNNING
+                    action = GLOBALS.PLAYER_MODEL.animationActions[walkingB]
+                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[walkingB]
                 }
             }
 
             else if (INPUT.fwdValue > 0 && INPUT.rgtValue > 0 && INPUT.lftValue && INPUT.bkdValue > 0) {
-                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
-                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_STANDING_IDLE
+                action = GLOBALS.PLAYER_MODEL.animationActions[idle]
+                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[idle]
             } else if (INPUT.fwdValue > 0 && INPUT.bkdValue > 0) {
-                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
-                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_STANDING_IDLE
+                action = GLOBALS.PLAYER_MODEL.animationActions[idle]
+                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[idle]
                 if (INPUT.rgtValue > 0) {
-                    action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_RIGHT_STRAFE
-                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_RIGHT_STRAFE
+                    action = GLOBALS.PLAYER_MODEL.animationActions[strafeR]
+                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[strafeR]
                 } else if (INPUT.lftValue) {
-                    action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_LEFT_STRAFE
-                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_LEFT_STRAFE
+                    action = GLOBALS.PLAYER_MODEL.animationActions[strafeL]
+                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[strafeL]
                 }
             } else if (INPUT.lftValue && INPUT.rgtValue > 0) {
-                action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STANDING_IDLE
-                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_STANDING_IDLE
+                action = GLOBALS.PLAYER_MODEL.animationActions[idle]
+                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[idle]
                 if (INPUT.fwdValue > 0) {
-                    action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STATIONARY_RUNNING
-                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_STATIONARY_RUNNING
+                    action = GLOBALS.PLAYER_MODEL.animationActions[walking]
+                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[walking]
                 } else if (INPUT.bkdValue > 0) {
-                    action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_BACKWARD_RUNNING
-                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_BACKWARD_RUNNING
+                    action = GLOBALS.PLAYER_MODEL.animationActions[walkingB]
+                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[walkingB]
                 }
             }
 
             else {
                 if (INPUT.controller["KeyW"].pressed || INPUT.fwdValue > 0) {
-                    action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_STATIONARY_RUNNING
-                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_STATIONARY_RUNNING
+                    action = GLOBALS.PLAYER_MODEL.animationActions[walking]
+                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[walking]
                 }
                 if (INPUT.controller["KeyS"].pressed || INPUT.bkdValue > 0) {
-                    action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_BACKWARD_RUNNING
-                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_BACKWARD_RUNNING
+                    action = GLOBALS.PLAYER_MODEL.animationActions[walkingB]
+                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[walkingB]
                 }
                 if (INPUT.controller["KeyD"].pressed || INPUT.rgtValue > 0) {
-                    action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_RIGHT_STRAFE
-                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_RIGHT_STRAFE
+                    action = GLOBALS.PLAYER_MODEL.animationActions[strafeR]
+                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[strafeR]
                 }
                 if (INPUT.controller["KeyA"].pressed || INPUT.lftValue) {
-                    action = GLOBALS.PLAYER_MODEL.animationActions.ANIM_LEFT_STRAFE
-                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions.ANIM_LEFT_STRAFE
+                    action = GLOBALS.PLAYER_MODEL.animationActions[strafeL]
+                    actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[strafeL]
                 }
             }
-
-
 
             setAction(action);
             setActionClone(actionClone);
@@ -501,8 +517,10 @@ function movePlayerKeyboard(direction, posPlayer, f, movementMultiplier, delta) 
     if (GLOBALS.PLAYER.mass == 0) {
         posPlayer.add(direction.clone().multiplyScalar(delta * 1));
         GLOBALS.PLAYER.position.copy(posPlayer);
-    } else
+    } else {
+        GLOBALS.STATS_UI.steps += 0.01;
         GLOBALS.PLAYER.applyForce(direction.clone().multiplyScalar(f * movementMultiplier), GLOBALS.PLAYER.position)
+    }
 }
 
 function movePlayerJoystick(direction, f, movementMultiplier, gamepadPressed) {

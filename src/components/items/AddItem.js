@@ -87,7 +87,7 @@ const falling = textureLoader.load('./assets/textures/falling.png');
 
 async function addItem(found, loaded) {
 
-    
+
 
     if (loaded) {
         GLOBALS.ITEM_HOLDED_NAME = found.itemName.split('-')[0];
@@ -167,7 +167,7 @@ async function addItem(found, loaded) {
         box.add(plane);
 
         AddGoo(userData);
-        window.totalItemsLoaded++;
+        //window.totalItemsLoaded++;
 
         return;
     }
@@ -389,7 +389,7 @@ async function addItem(found, loaded) {
 
             item.position.copy(userData.position);
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "camera") {
+            if (GLOBALS.ITEM_HOLDED_NAME == "camera" || GLOBALS.ITEM_HOLDED_NAME == "track_platforms") {
                 if (userData.side == "back" && userData.normal.y == 0)
                     item.rotation.set(userData.normal.x, Math.PI, userData.normal.z)
                 else
@@ -657,8 +657,13 @@ async function addItem(found, loaded) {
             updateLines(userData, true);
 
             if (window.totalItemsToLoad == window.totalItemsLoaded) {
-                //CONNECTIONS
 
+                //GOO
+                for (var g = 0; g < window.gooToLoad.length; g++) {
+                    addItem(window.gooToLoad[g], true)
+                }
+
+                //CONNECTIONS
                 for (var g = 0; g < GLOBALS.LOADED_CONNECTIONS.length; g++) {
                     for (var h = 0; h < GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo.length; h++) {
 
@@ -794,8 +799,16 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
     } else if (GLOBALS.ITEM_HOLDED_NAME == "door") {
         item.rotation.y = item.userData.rotationY;
     } else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
-        item.rotation.y = item.userData.rotationY;
+
+        if (userData.side == "right" || userData.side == "left") {
+            item.rotation.x = item.userData.rotationY;
+        } else {
+            item.rotation.y = item.userData.rotationY;
+        }
+
         item.getObjectByName("pivot2").rotation.x = Math.PI / 180 * item.userData.angle;
+
+
     } else if (GLOBALS.ITEM_HOLDED_NAME == "pedestal_button" || GLOBALS.ITEM_HOLDED_NAME == "light"
         || GLOBALS.ITEM_HOLDED_NAME == "bed" || GLOBALS.ITEM_HOLDED_NAME == "toilet"
         || GLOBALS.ITEM_HOLDED_NAME == "desk" || GLOBALS.ITEM_HOLDED_NAME == "cabinet"

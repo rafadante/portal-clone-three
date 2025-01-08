@@ -160,7 +160,14 @@ function checkToUpdateContinuous() {
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
         if (GLOBALS.PLANE_USER_DATA[i].exists && GLOBALS.PLANE_USER_DATA[i].hasItem && GLOBALS.PLANE_USER_DATA[i].hasGoo) {
 
+
+            
+
             const item = GLOBALS.PLANE_USER_DATA[i].item;
+
+            if(!item.ids)
+                continue;
+            
             GLOBALS.SCENE_CHILDREN.remove(item.water);
             GLOBALS.SCENE_CHILDREN.remove(item.lava);
 

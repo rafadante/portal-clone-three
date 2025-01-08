@@ -47,7 +47,15 @@ function updateEvents() {
             GLOBALS.GUN_CLONE2.children[0].visible = true;
 
             document.getElementById("reticle-img").style.filter = "none";
-            document.getElementById("reticle-img").src = './assets/textures/crosshairNone.webp';
+            //document.getElementById("reticle-img").src = './assets/textures/crosshairNone.webp';
+
+            if (GLOBALS.PORTAL_GUN_INITIATE == "left") {
+              document.getElementById("reticle-img").src = './assets/ui/mobile/portalBlue.png';
+            } else if (GLOBALS.PORTAL_GUN_INITIATE == "right") {
+              document.getElementById("reticle-img").src = './assets/ui/mobile/portalOrange.png';
+            } else {
+              document.getElementById("reticle-img").src = './assets/textures/crosshairNone.png';
+            }
 
             GLOBALS.GUN.visible = true;
             GLOBALS.GUN_MODE = "portal";
@@ -182,7 +190,17 @@ function updateEvents() {
                 } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("piston_platforms") ||
                   GLOBALS.CONNECTIONS[i]['to'].itemName.includes("track_platforms") ||
                   GLOBALS.CONNECTIONS[i]['to'].itemName.includes("pellet_launcher")) {
+
                   GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive = !GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive;
+
+                  if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("piston_platforms") ||
+                    GLOBALS.CONNECTIONS[i]['to'].itemName.includes("track_platforms")) {
+                    if (GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive)
+                      GLOBALS.CONNECTIONS[i]['to'].item.body.sound.audio.play()
+                    else
+                      GLOBALS.CONNECTIONS[i]['to'].item.body.sound.audio.pause()
+                  }
+
                 }
               }
             }
@@ -194,8 +212,39 @@ function updateEvents() {
   }
 }
 
+var Timer = function(callback, delay) {
+  var timerId, start, remaining = delay;
+
+  this.pause = function() {
+      window.clearTimeout(timerId);
+      timerId = null;
+      remaining -= Date.now() - start;
+  };
+
+  this.resume = function() {
+      if (timerId) {
+          return;
+      }
+
+      start = Date.now();
+      timerId = window.setTimeout(callback, remaining);
+  };
+
+  this.resume();
+};
+
+window.timeoutEvent = [];
+
 function doSetTimeout(to, waitFor, idHolder, connection) {
-  setTimeout(() => {
+
+  var id = window.timeoutEvent.length;
+
+  window.timeoutEvent.push(new Timer(function() {
+
+    window.timeoutEvent.splice(id, 1); 
+
+    console.log(id)
+    console.log(window.timeoutEvent)
 
     if (waitFor > 0) {
       connectionState(connection, idHolder, true, new Color(2, 1.3, 0))
@@ -238,10 +287,17 @@ function doSetTimeout(to, waitFor, idHolder, connection) {
     } else if (to.itemName.includes("piston_platforms") || to.itemName.includes("track_platforms") ||
       to.itemName.includes("pellet_launcher")) {
       to.item.userData.isActive = !to.item.userData.isActive;
+
+      if (to.itemName.includes("piston_platforms") || to.itemName.includes("track_platforms")) {
+        if (to.item.userData.isActive)
+          to.item.body.sound.audio.play()
+        else
+          to.item.body.sound.audio.pause()
+      }
     }
 
     playVoice(to.item.userData);
-  }, waitFor);
+  }, waitFor));
 }
 
 function resetAll() {
@@ -282,6 +338,15 @@ function resetAll() {
           GLOBALS.CONNECTIONS[i]['to'].itemName.includes("track_platforms") ||
           GLOBALS.CONNECTIONS[i]['to'].itemName.includes("pellet_launcher")) {
           GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive = !GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive;
+
+          if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("piston_platforms") ||
+            GLOBALS.CONNECTIONS[i]['to'].itemName.includes("track_platforms")) {
+            if (GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive)
+              GLOBALS.CONNECTIONS[i]['to'].item.body.sound.audio.play()
+            else
+              GLOBALS.CONNECTIONS[i]['to'].item.body.sound.audio.pause()
+          }
+
         }
       }
     }
@@ -349,6 +414,15 @@ function laserReceiverTrigger(obj, state, catcher) {
             GLOBALS.CONNECTIONS[i]['to'].itemName.includes("pellet_launcher")) {
 
             GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive = !GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive;
+
+            if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("piston_platforms") ||
+              GLOBALS.CONNECTIONS[i]['to'].itemName.includes("track_platforms")) {
+              if (GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive)
+                GLOBALS.CONNECTIONS[i]['to'].item.body.sound.audio.play()
+              else
+                GLOBALS.CONNECTIONS[i]['to'].item.body.sound.audio.pause()
+            }
+
           }
         }
       }

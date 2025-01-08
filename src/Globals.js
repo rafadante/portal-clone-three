@@ -94,7 +94,7 @@ renderer.shadowMap.autoUpdate = true;
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.minDistance = 0;
 
-function getItemValues(){
+function getItemValues() {
     return {
         cube: {
             count: 0,
@@ -371,7 +371,7 @@ function getItemValues(){
             ground: true,
             ceiling: true,
             trigger: false
-    
+
         },
         lightEmissive: {
             count: 0,
@@ -637,6 +637,12 @@ function getItemValues(){
 }
 
 var GLOBALS = {
+
+    STATS_UI: {
+        time: 0,
+        portals: 0,
+        steps: 0
+    },
 
     BOUNDING_BOX: [],
     PLATFORM_BODIES: [],
@@ -1029,11 +1035,16 @@ GLOBALS.SCENE.add(GLOBALS.SCENE_CHILDREN)
 
 function reset() {
 
+    GLOBALS.STATS_UI = {
+        time: 0,
+        portals: 0,
+        steps: 0
+    };
     GLOBALS.BOUNDING_BOX = [];
     GLOBALS.PLATFORM_BODIES = [];
     GLOBALS.FINISHED = false;
     window.glass = [];
-    GLOBALS.BOX_BODY= [];
+    GLOBALS.BOX_BODY = [];
     GLOBALS.ITEMS_COUNT = getItemValues();
     GLOBALS.TRIGGER_BOXES = [];
     //GLOBALS.INTERACTIVE = [];

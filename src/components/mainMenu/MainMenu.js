@@ -8,6 +8,7 @@ import { AUDIO, play } from '../audio/Audio.js';
 import { addTileGel } from '../gels/Gels.js';
 import { loadDefault } from '../loadObj/LoaderOBJ.js';
 import { backToEditor } from '../test/BackToEditor.js';
+import { playVoiceTrigger } from '../triggers/Triggers.js';
 
 var plane1, plane2, level;
 var transition = false;
@@ -114,6 +115,8 @@ function fetchLevel() {
         .then(response => response.json())
         .then(json => {
             level = json;
+
+            chamberName = "tutorial_" + window.currentLevel + "_by_rafadante";
 
             $("#portal-gun-select").val(level[0][0]).change();
             $("#ambient-sound-select").val(level[0][1]).change();
@@ -460,7 +463,12 @@ function loadLevel(data) {
 
             GLOBALS.EXIT_DOOR.userData = data[i].item;
             GLOBALS.EXIT_DOOR.userData.connections = 0;
+            GLOBALS.EXIT_DOOR.userData.played = false;
             data[i].item = GLOBALS.EXIT_DOOR;
+
+            console.log(GLOBALS.EXIT_DOOR)
+
+            playVoiceTrigger(data[i].item.userData, false);
 
             addConnectionPoints(data[i]);
         } else if (data[i].itemName == "enterDoor") {
@@ -491,14 +499,19 @@ function loadLevel(data) {
     window.totalItemsToLoad = 0;
     window.totalItemsLoaded = 0;
 
+    window.gooToLoad = [];
+
     for (var i = 0; i < data.length; i++) {
         if (data[i].exists) {
             if (data[i].hasItem && data[i].itemName != "gel") {
                 if (data[i].itemName.split('-')[0] != "exitDoor" &&
                     data[i].itemName.split('-')[0] != "enterDoor" &&
                     data[i].itemName.split('-')[0] != "window" &&
-                    data[i].itemName.split('-')[0] != "dispenser") {
+                    data[i].itemName.split('-')[0] != "dispenser" &&
+                    data[i].itemName.split('-')[0] != "goo") {
                     window.totalItemsToLoad++;
+                }else if (data[i].itemName.split('-')[0] == "goo") {
+                    window.gooToLoad.push(data[i]);
                 }
             }
         }
@@ -513,7 +526,8 @@ function loadLevel(data) {
                 if (data[i].itemName.split('-')[0] != "exitDoor" &&
                     data[i].itemName.split('-')[0] != "enterDoor" &&
                     data[i].itemName.split('-')[0] != "window" &&
-                    data[i].itemName.split('-')[0] != "dispenser") {
+                    data[i].itemName.split('-')[0] != "dispenser" &&
+                    data[i].itemName.split('-')[0] != "goo") {
 
                     const state = data[i].state;
                     addItem(data[i], true)
@@ -523,7 +537,7 @@ function loadLevel(data) {
                     if (data[i].trigger) {
                         triggers.push(data[i]);
                     }
-                }
+                } 
             }
         }
     }
