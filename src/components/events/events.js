@@ -4,8 +4,10 @@ import { stateDoor } from '../door/Door.js';
 import { tractorBeam } from "../tractorBeam/TractorBeam.js";
 import { pelletUpdate, resetBall } from "../pellet/Pellet.js";
 import { portalButton } from '../portal/CreatePortal.js';
-import { AUDIO, playVoice } from "../audio/Audio.js";
+import { addPositionalAudio, AUDIO, playVoice } from "../audio/Audio.js";
 import { laserFieldState, tractorStates, lightBridgeState, dispenserSpawn, respawn, levelEnteredFunction, wakeUpAll } from "./states.js";
+import { tweenCamera } from "../../Utils.js";
+import { interactWithItem } from "./interaction.js";
 
 let clock = new Clock();
 let delta = 0;
@@ -136,6 +138,8 @@ function updateEvents() {
                 AUDIO.POSITIVE.play();
                 connectionState(GLOBALS.CONNECTIONS[i], id, true, new Color(2, 1.3, 0))
                 GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
+
+                console.log("6666666666")
               }
 
               var to = GLOBALS.CONNECTIONS[i]['to'];
@@ -143,13 +147,14 @@ function updateEvents() {
               var idHolder = id;
 
               GLOBALS.CONNECTIONS[i]['line'].active = true;
-              doSetTimeout(to, waitFor, idHolder, connection);
+              doSetTimeout(to, waitFor, idHolder, connection, d);
             }
           }
           break;
         } else {//TRIGER ENDS
 
-          if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger"))
+          if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger") ||
+            GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("incinerator"))
             continue
 
           notInPos++;
@@ -212,22 +217,22 @@ function updateEvents() {
   }
 }
 
-var Timer = function(callback, delay) {
+var Timer = function (callback, delay) {
   var timerId, start, remaining = delay;
 
-  this.pause = function() {
-      window.clearTimeout(timerId);
-      timerId = null;
-      remaining -= Date.now() - start;
+  this.pause = function () {
+    window.clearTimeout(timerId);
+    timerId = null;
+    remaining -= Date.now() - start;
   };
 
-  this.resume = function() {
-      if (timerId) {
-          return;
-      }
+  this.resume = function () {
+    if (timerId) {
+      return;
+    }
 
-      start = Date.now();
-      timerId = window.setTimeout(callback, remaining);
+    start = Date.now();
+    timerId = window.setTimeout(callback, remaining);
   };
 
   this.resume();
@@ -235,21 +240,65 @@ var Timer = function(callback, delay) {
 
 window.timeoutEvent = [];
 
-function doSetTimeout(to, waitFor, idHolder, connection) {
+function doSetTimeout(to, waitFor, idHolder, connection, body) {
 
   var id = window.timeoutEvent.length;
 
-  window.timeoutEvent.push(new Timer(function() {
+  window.timeoutEvent.push(new Timer(function () {
 
-    window.timeoutEvent.splice(id, 1); 
-
-    console.log(id)
-    console.log(window.timeoutEvent)
+    window.timeoutEvent.splice(id, 1);
 
     if (waitFor > 0) {
       connectionState(connection, idHolder, true, new Color(2, 1.3, 0))
       to.item.userData.buttons += 1;
     }
+
+    if (connection['from'].itemName.includes("incinerator")) {
+
+      //
+      const instanced = GLOBALS.ITEMS_ADDED.getObjectByName(body.name);
+      instanced.setVisibilityAt(body.item.userData.idInstanced, false);
+      instanced.instanceMatrix.needsUpdate = true;
+      instanced.computeBoundingSphere();
+
+      //CREATE A CLONE TO APPLY DISSOLVE SHADER
+      const clone = GLOBALS.ITEMS_ADDED.getObjectByName(body.name).scene.clone();
+      clone.position.set(body.position.x, body.position.y, body.position.z);
+      clone.quaternion.copy(body.quaternion);
+      clone.visible = true;
+
+      if (GLOBALS.HOLDING_ITEM)
+        interactWithItem()
+
+      GLOBALS.UNIFORMS_DISSOLVER.diffuseMap.value = clone.material.map;
+      clone.material = GLOBALS.MATERIAL_DISSOLVER;
+
+      GLOBALS.SCENE_FPS.add(clone);
+
+      var posClone = clone.position.clone();
+      posClone.y += 2;
+
+      GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value = posClone;
+
+      var clone2 = clone.clone();
+      clone2.position.y += 0.5;
+
+      addPositionalAudio('audio-dissolve', clone, true, false, true, 2, 'sound')
+
+      tweenCamera(3000, GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value, clone.position)
+      tweenCamera(3000, clone.position, clone2.position)
+
+      //GLOBALS.MATERIAL_DISSOLVER
+
+      setTimeout(() => {
+        if (GLOBALS.SCENE_FPS && clone.sound) {
+          GLOBALS.SCENE.remove(clone);
+          GLOBALS.SCENE_FPS.remove(clone.sound);
+        }
+      }, 3000);
+    }
+
+    console.log(to)
 
     if (to.itemName.includes("door") ||
       to.itemName.includes("exitDoor")) {
@@ -286,6 +335,7 @@ function doSetTimeout(to, waitFor, idHolder, connection) {
         portalButton(2, to.item, GLOBALS.MAIN_CAMERA)
     } else if (to.itemName.includes("piston_platforms") || to.itemName.includes("track_platforms") ||
       to.itemName.includes("pellet_launcher")) {
+        
       to.item.userData.isActive = !to.item.userData.isActive;
 
       if (to.itemName.includes("piston_platforms") || to.itemName.includes("track_platforms")) {

@@ -74,7 +74,7 @@ function addPelletBall(item) {
 
     ball.addEventListener("collide", function (event) {
 
-        if (!event.target.started)
+        if (!event.target.started || event.body.collisionResponse == 0)
             return
 
         if (!event.target.pellet.active || event.body.name == "fizzler")
@@ -141,9 +141,9 @@ function addPelletBall(item) {
         if (event.body.name == "panel") {
             //console.log(event.target.direction)
 
-            if(Math.abs(holder.x) > Math.abs(holder.z)){
+            if (Math.abs(holder.x) > Math.abs(holder.z)) {
                 event.target.direction.x = 0;
-            }else if(Math.abs(holder.x) < Math.abs(holder.z)){
+            } else if (Math.abs(holder.x) < Math.abs(holder.z)) {
                 event.target.direction.z = 0;
             }
         }
@@ -153,6 +153,8 @@ function addPelletBall(item) {
 
     GLOBALS.DYNAMIC_OBJECTS.push(ball);
     window.pellets.push(energyBall);
+
+    console.log(window.pellets)
 
     //
     addPositionalAudio('pelletHit', ball, false, false, false, 10, 'sound');
@@ -198,8 +200,10 @@ function pelletUpdate() {
 
         for (var i = 0; i < window.pellets.length; i++) {
 
-            if (!window.pellets[i].item.userData.isActive)
+            if (!window.pellets[i].item.userData.isActive) {
+                console.log(window.pellets[i].item.userData.isActive)
                 continue;
+            }
 
             if (window.pellets[i].body.inTractor)
                 continue;

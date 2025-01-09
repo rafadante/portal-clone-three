@@ -123,10 +123,13 @@ function respawn(d) {
         GLOBALS.PORTAL_BOX = [];
 
         for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-            if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger") &&
-                GLOBALS.CONNECTIONS[i]['to'].instancedName.includes("portal")) {
-                GLOBALS.CONNECTIONS[i]['line'].active = false;
+            if (GLOBALS.CONNECTIONS[i]['from'].instancedName && GLOBALS.CONNECTIONS[i]['to'].instancedName){
+                if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger") &&
+                    GLOBALS.CONNECTIONS[i]['to'].instancedName.includes("portal")) {
+                    GLOBALS.CONNECTIONS[i]['line'].active = false;
+                }
             }
+
         }
     }
 

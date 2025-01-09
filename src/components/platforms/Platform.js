@@ -31,8 +31,15 @@ $("body").on('change', '#state-piston', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.isActive = this.checked;
 });
 
+$("body").on('change', '#state-piston-loop', function () {
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.loop = this.checked;
+});
+
 function updatePlatformPosition(obj, instanced, i) {
     if (obj.body && obj.userData.isActive && obj.platformBox.parent.scale.y != 0) {
+
+        if(!obj.userData.loop && obj.body.pistonDown)
+            return;
 
         var offset;
 
@@ -66,9 +73,9 @@ function updatePlatformPosition(obj, instanced, i) {
 
         if (obj.platformBox.parent.scale.y > 0) {
 
-            if (obj.body.position[axis] > obj.initialPosition[axis] + (obj.platformBox.parent.scale.y * 2))
+            if (obj.body.position[axis] > obj.initialPosition[axis] + (obj.platformBox.parent.scale.y * 2)){
                 obj.body.pistonDown = true;
-            else if (obj.body.position[axis] <= obj.initialPosition[axis])
+            }else if (obj.body.position[axis] <= obj.initialPosition[axis])
                 obj.body.pistonDown = false;
         } else {
 

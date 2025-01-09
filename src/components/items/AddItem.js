@@ -2,6 +2,7 @@ import {
     Vector3, Group, MeshBasicMaterial, CircleGeometry, Mesh, TextureLoader,
     BoxGeometry, Color, Object3D, Box3, ConeGeometry, PlaneGeometry,
     MeshStandardMaterial,
+    CylinderGeometry,
 } from 'three';
 import { AddGoo } from '../goo/Goo.js';
 import { GLOBALS } from '../../Globals.js';
@@ -355,7 +356,10 @@ async function addItem(found, loaded) {
                         pivot.rotation.x = Math.PI / 2;
                         pivot.translateX(-1);
                     }
+
+                    pivot.position.y += 0.5
                 }
+
 
                 pivot.add(box);
                 box.position.y = 1.01;
@@ -364,6 +368,7 @@ async function addItem(found, loaded) {
                 item.platformBox = box;
                 item.initialPosition = userData.position;
                 item.userData.isActive = true;
+                item.userData.loop = true;
             }
 
             if (GLOBALS.ITEM_HOLDED_NAME == "pellet_launcher") {
@@ -500,12 +505,41 @@ async function addItem(found, loaded) {
             //LASER EMITTER
             if (GLOBALS.ITEM_HOLDED_NAME == "laser_emitter") {
                 laserEmitterRaycast(item, false, GLOBALS.LASER_EMITTER_RAYCASTER)
-            } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_receiver" || GLOBALS.ITEM_HOLDED_NAME == "laser_relay" || GLOBALS.ITEM_HOLDED_NAME == "pellet_catcher") {
+            } else if (GLOBALS.ITEM_HOLDED_NAME == "laser_receiver" ||
+                GLOBALS.ITEM_HOLDED_NAME == "laser_relay" ||
+                GLOBALS.ITEM_HOLDED_NAME == "pellet_catcher") {
                 item.userData.connectedTo = [];
                 GLOBALS.LOADED_CONNECTIONS.push({
                     data: userDataLoadedItem,
                     item: userData
                 });
+            }
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "incinerator") {
+
+                const geometry = new CylinderGeometry(0.7, 0.7, 1, 12);
+                const material = new MeshBasicMaterial({ color: 0xff0000 });
+                const cylinder = new Mesh(geometry, material);
+
+                cylinder.position.copy(userData.position);
+                cylinder.position.y += 0.5;
+
+                GLOBALS.ITEMS_ADDED.add(cylinder);
+                item.trigger = cylinder;
+
+                var bb = new Box3(); // for re-use
+                bb.setFromObject(cylinder);
+                bb.accept = "cube-cube_2-laser_cube-scale_cube";
+
+                userData.box3 = bb;
+                item.userData.connectedTo = [];
+                GLOBALS.LOADED_CONNECTIONS.push({
+                    data: userDataLoadedItem,
+                    item: userData
+                });
+
+                //
+                cylinder.position.y -= 0.4;
             }
 
             item.initialPosition = item.position.clone();
@@ -621,6 +655,10 @@ async function addItem(found, loaded) {
                             break;
                         }
                     }
+                }
+
+                if(GLOBALS.ITEM_HOLDED_NAME == "track_platforms"){
+                    item.translateZ(-0.5)
                 }
 
                 item.userData.id = idInstanced;
@@ -762,7 +800,7 @@ function manageItemVariables(item, userData, instanced) {
 }
 
 function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData) {
-    item.userData.buttons = userDataLoadedItem.buttons;
+    item.userData.buttons = 0;//userDataLoadedItem.buttons
     item.userData.showLines = userDataLoadedItem.showLines;
     item.userData.connections = 0;//userDataLoadedItem.connections
     item.userData.opened = userDataLoadedItem.opened;
@@ -784,6 +822,13 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
     item.userData.angle = userDataLoadedItem.angle;
 
     item.userData.isActive = userDataLoadedItem.isActive;
+    item.userData.loop = userDataLoadedItem.loop;
+
+    if(GLOBALS.ITEM_HOLDED_NAME == "pellet_launcher"){
+        console.log(userDataLoadedItem.isActive)
+    }
+
+    
 
     if (item.userData.link)
         playVoiceTrigger(item.userData, false);
@@ -813,7 +858,7 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         || GLOBALS.ITEM_HOLDED_NAME == "bed" || GLOBALS.ITEM_HOLDED_NAME == "toilet"
         || GLOBALS.ITEM_HOLDED_NAME == "desk" || GLOBALS.ITEM_HOLDED_NAME == "cabinet"
         || GLOBALS.ITEM_HOLDED_NAME == "sign" || GLOBALS.ITEM_HOLDED_NAME == "portal_0"
-        || GLOBALS.ITEM_HOLDED_NAME == "portal_1") {
+        || GLOBALS.ITEM_HOLDED_NAME == "portal_1" || GLOBALS.ITEM_HOLDED_NAME == "incinerator") {
 
         item.userData.rotationY = userDataLoadedItem.rotationY;
         var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);

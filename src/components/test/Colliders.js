@@ -70,6 +70,8 @@ function colliderItemManager() {
     addColliderDoorsDefault(GLOBALS.ENTER_DOOR, "enter");
     addColliderDoorsDefault(GLOBALS.EXIT_DOOR, "exit");
 
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['incinerator'], "incinerator", 0)
+
     for (var i = 0; i < GLOBALS.DYMANIC_ITEMS['angled_panel'].length; i++) {
         if (GLOBALS.DYMANIC_ITEMS['angled_panel'][i].length != 0) {
 
@@ -235,7 +237,12 @@ function addColliderItem(items, type, mass, offset) {
             objHolder.quaternion.copy(rot);
             GLOBALS.SCENE.add(objHolder);
 
-            if (type == "bed" || type == "toilet" || type == "desk" || type == "cabinet" || type == "sign") {
+
+            
+            if (type == "incinerator") {
+                var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
+                var shape = result.shape;
+            }else if (type == "bed" || type == "toilet" || type == "desk" || type == "cabinet" || type == "sign") {
                 var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
                 var shape = result.shape;
             } else if (type == "piston_platforms") {

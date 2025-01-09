@@ -144,8 +144,8 @@
             <span>10</span>
           </div>
 
-          <div>
-            <img alt="image"
+          <div style="display: flex; justify-content: center; align-items: center;">
+            <img alt="image" style="width: 53px;"
               data-content="A dropper will come with it. If the player loses the cube the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
               data-title="SCALE CUBE" class="item" data-name="scale_cube" src="../assets/ui/items/scale_cube.webp"
               data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="false"
@@ -537,11 +537,12 @@
 
           <div>
             <img alt="image" data-content="Purely cosmetic." data-title="DESK" class="item" data-name="desk"
-              src="../assets/ui/items/desk.png" data-allowconnection="false" data-rotate="true" data-floor="true"
+              src="../assets/ui/items/desk.webp" data-allowconnection="false" data-rotate="true" data-floor="true"
               data-ceiling="false" data-walls="false" data-color="rgb(0,0,255)" id="desk" />
             <span>5</span>
           </div>
 
+          <!--
           <div>
             <img alt="image" data-content="Purely cosmetic." data-title="CABINET" class="item" data-name="cabinet"
               src="../assets/ui/items/cabinet.png" data-allowconnection="false" data-rotate="true" data-floor="true"
@@ -554,6 +555,15 @@
               src="../assets/ui/items/sign.png" data-allowconnection="false" data-rotate="true" data-floor="true"
               data-ceiling="false" data-walls="false" data-color="rgb(0,0,255)" id="sign" />
             <span>5</span>
+          </div>-->
+
+          <div>
+            <img alt="image"
+              data-content=""
+              data-title="INCINERATOR" class="item" data-name="incinerator" src="../assets/ui/items/incinerator.png"
+              data-allowconnection="true" data-rotate="true" data-floor="true" data-ceiling="false" data-walls="false"
+              data-instanced="true" id="incinerator" />
+            <span>1</span>
           </div>
         </div>
       </div>
@@ -1064,10 +1074,16 @@
         <label for="piston-input">Range</label>
       </a>
     </li>
-    <li class="menu-item hasItem piston_platforms track_platforms pellet">
+    <li class="menu-item hasItem piston_platforms track_platforms pellet pellet_launcher">
       <a href="#" class="menu-btn">
         <input type="checkbox" id="state-piston" checked />
         <span class="menu-text">Start Active</span>
+      </a>
+    </li>
+    <li class="menu-item hasItem piston_platforms">
+      <a href="#" class="menu-btn">
+        <input type="checkbox" id="state-piston-loop" checked />
+        <span class="menu-text">Loop</span>
       </a>
     </li>
 

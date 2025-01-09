@@ -49,6 +49,7 @@ function raycastSelected(found, event, type) {
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal_button") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("bed") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("incinerator") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("toilet") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("desk") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cabinet") ||
@@ -82,7 +83,8 @@ function raycastSelected(found, event, type) {
 
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("button") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_receiver") ||
                         GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("trigger") || GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_relay") ||
-                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_catcher")) {
+                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_catcher") ||
+                        GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("incinerator")) {
                         $(".buttons").css("display", "block");
                         $("#connections").empty();
 
@@ -253,6 +255,7 @@ function raycastSelected(found, event, type) {
 
                         $("#piston-max-height").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.platformBox.parent.scale.y);
                         $("#state-piston").prop("checked", GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.isActive);
+                        $("#state-piston-loop").prop("checked", GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.loop);
 
                         if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("track_platforms")) {
                             $("#piston-max-height").prop("min", -100)
@@ -262,7 +265,7 @@ function raycastSelected(found, event, type) {
                     }
 
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pellet_launcher")) {
-                        $(".piston_platforms").css("display", "block");
+                        $(".pellet_launcher").css("display", "block");
                         $("#state-piston").prop("checked", GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.isActive);
                     }
 

@@ -212,7 +212,7 @@ const updatePlayer = function (deltaTime) {
                     GLOBALS.PLAYER.applyImpulse(impulse, GLOBALS.PLAYER.position)
                     GLOBALS.PLAYER.jumpVelocity = null;
                 } else {
-                    GLOBALS.PLAYER.applyImpulse(GLOBALS.PLAYER.upVectorThree.clone().multiplyScalar(230), GLOBALS.PLAYER.position)
+                    GLOBALS.PLAYER.applyImpulse(GLOBALS.PLAYER.upVectorThree.clone().multiplyScalar(200), GLOBALS.PLAYER.position)
                 }
 
 

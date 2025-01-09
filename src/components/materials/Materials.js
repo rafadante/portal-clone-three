@@ -167,7 +167,8 @@ function loadMaterials() {
     GLOBALS.MATERIAL_GLASS = new MeshStandardMaterial({
         transparent: true,
         opacity: 0.5,
-        side: 2
+        side: 2,
+        depthWrite: false
     });
     loadMaterial(
         GLOBALS.MATERIAL_GLASS,

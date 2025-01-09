@@ -453,6 +453,18 @@ function getItemValues() {
             ceiling: false,
             trigger: false
         },
+        incinerator: {
+            count: 0,
+            max: 5,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: true
+        },
         trash: {
             count: 0,
             max: 5,
@@ -479,7 +491,7 @@ function getItemValues() {
         },
         desk: {
             count: 0,
-            max: 5,
+            max: 20,
             instanced: true,
             interactive: false,
             roughness: 0.2,
@@ -819,7 +831,8 @@ var GLOBALS = {
         cabinet: [],
         sign: [],
         piston_platforms: [],
-        track_platforms: []
+        track_platforms: [],
+        incinerator: []
     },
 
     TRIGGER_BOXES: [],

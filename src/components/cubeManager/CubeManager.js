@@ -37,7 +37,7 @@ function cubeState(button) {
 
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
 
-            if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == 20 ||
+            /*if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == 20 ||
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.y - 2 == -30) {
                 warning("You can not spawn more cubes on this direction");
                 return;
@@ -49,7 +49,7 @@ function cubeState(button) {
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].position.z == 26) {
                 warning("You can not spawn more cubes on this direction");
                 return;
-            }
+            }*/
 
             trasnlatePlane(GLOBALS.SELECTED_ID[i], -1, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].portal, GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]]);
         }
