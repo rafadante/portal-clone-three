@@ -35,7 +35,8 @@ function teleportPhysicalObject(object, portal) {
     let velocity = cannonToThreeVector3(object.velocity);
 
     //CORRECT VELOCITY WHEN LOPING VERTICALLY TO AVOID INFINITY VELOCITY
-    if (Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) {
+    if ((Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) &&
+    GLOBALS.PORTALS[0].normal.y != GLOBALS.PORTALS[1].normal.y) {
 
         const heightDifference = getHeightDifference(portal.portalShader.position, portal.output.portalShader.position);
 

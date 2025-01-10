@@ -806,6 +806,7 @@ function addCollidersToCorridor(mesh) {
 
                 GLOBALS.FINISHED = true;
                 window.currentLevel++;
+                localStorage.setItem("level", window.currentLevel);
 
                 if (!GLOBALS.MOBILE) {
                     //GLOBALS.POINTER_CONTROLS.unlock();

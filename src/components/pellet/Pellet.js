@@ -129,17 +129,12 @@ function addPelletBall(item) {
 
         const holder = event.target.direction;
 
-        if (event.body.name == "panel") {
-            //console.log(event.target.direction)
-        }
-
         if (threeNormal.equals(event.target.previousDirection.round()))
             event.target.direction = threeNormal.negate();
         else
             event.target.direction = threeNormal;
 
         if (event.body.name == "panel") {
-            //console.log(event.target.direction)
 
             if (Math.abs(holder.x) > Math.abs(holder.z)) {
                 event.target.direction.x = 0;
@@ -153,8 +148,6 @@ function addPelletBall(item) {
 
     GLOBALS.DYNAMIC_OBJECTS.push(ball);
     window.pellets.push(energyBall);
-
-    console.log(window.pellets)
 
     //
     addPositionalAudio('pelletHit', ball, false, false, false, 10, 'sound');
@@ -201,7 +194,6 @@ function pelletUpdate() {
         for (var i = 0; i < window.pellets.length; i++) {
 
             if (!window.pellets[i].item.userData.isActive) {
-                console.log(window.pellets[i].item.userData.isActive)
                 continue;
             }
 

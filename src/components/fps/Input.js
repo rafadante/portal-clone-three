@@ -299,9 +299,6 @@ var audioStoped = false;
 document.addEventListener('pointerlockchange', () => {
     if (document.pointerLockElement === document.body) {
         // The pointer is locked, you can enable FPS controls or hide the cursor
-
-
-
         if (!GLOBALS.FINISHED) {
             if (audioStoped) {
                 audioStoped = false;
@@ -313,36 +310,40 @@ document.addEventListener('pointerlockchange', () => {
             }
         }
     } else {
-        // The pointer is unlocked, you can restore the cursor or stop FPS controls
-        $("#container").css("filter", "blur(2px)")
-        document.getElementById('blocker').style.display = 'block';
-        GLOBALS.ALLOW_PLACE_PORTALS = false;
-        allowEnterFPS = false;
-        GLOBALS.PAUSED = true;
+        openMenu();
+    }
+});
 
-        window.curentTimeOffset = GLOBALS.STATS_UI.time;
+function openMenu() {
+    // The pointer is unlocked, you can restore the cursor or stop FPS controls
+    $("#container").css("filter", "blur(2px)")
+    document.getElementById('blocker').style.display = 'block';
+    GLOBALS.ALLOW_PLACE_PORTALS = false;
+    allowEnterFPS = false;
+    GLOBALS.PAUSED = true;
 
-        $("#chamberName").css("opacity", 1);
+    window.curentTimeOffset = GLOBALS.STATS_UI.time;
 
-        if (!GLOBALS.FINISHED) {
-            if (window.previousAudio) {
-                if (!window.previousAudio.paused) {
-                    audioStoped = true;
-                    window.previousAudio.pause();
-                }
-            }
+    $("#chamberName").css("opacity", 1);
 
-            for (var i = 0; i < window.timeoutEvent.length; i++) {
-                window.timeoutEvent[i].pause()
+    if (!GLOBALS.FINISHED) {
+        if (window.previousAudio) {
+            if (!window.previousAudio.paused) {
+                audioStoped = true;
+                window.previousAudio.pause();
             }
         }
 
-
-        setTimeout(() => {
-            allowEnterFPS = true;
-        }, 1500);
+        for (var i = 0; i < window.timeoutEvent.length; i++) {
+            window.timeoutEvent[i].pause()
+        }
     }
-});
+
+
+    setTimeout(() => {
+        allowEnterFPS = true;
+    }, 1500);
+}
 
 function controlsLock() {
     /*GLOBALS.POINTER_CONTROLS = new PointerLockControls(GLOBALS.MAIN_CAMERA, document.body);
@@ -430,12 +431,19 @@ function portal_r_Touch() {
     portalButton(2, null, GLOBALS.MAIN_CAMERA)
 }
 //JUMP MOBILE
-document.getElementById("jump").addEventListener('pointerdown', jumpTouch, false);
+//document.getElementById("jump").addEventListener('pointerdown', jumpTouch, false);
+
+
+$("body").on('click', '#jump', function () {
+    jumpTouch()
+})
 
 function jumpTouch() {
     // handle jumping when space bar is pressed
-    if (!GLOBALS.PLAYER.inJump)
+    if (!GLOBALS.PLAYER.inJump) {
+        console.log("7777777777777")
         INPUT.shouldJump = true;
+    }
 }
 
 function Crouch(value) {
@@ -445,4 +453,4 @@ function Crouch(value) {
     GLOBALS.PLAYER.updateMassProperties();
 }
 
-export { Crouch }
+export { Crouch, openMenu }

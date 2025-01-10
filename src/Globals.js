@@ -21,6 +21,8 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
     portalsRecursive = 1;
     fov = 63;
     antialias = false;
+
+    document.getElementById("next-map").style.transform = "scale(0.5)"
 } else {
     mobile = false;
     pixelRatio = 0.5;
@@ -34,8 +36,19 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
         antialias = false;
 }
 
+const maxWidth = 1920;  // Set your maximum width resolution
+const maxHeight = 1080; // Set your maximum height resolution
+
+// Get the actual window dimensions
+window.canvasWidth = window.innerWidth;
+window.canvasHeight = window.innerHeight;
+
+// Cap the width and height to your maximum values
+window.canvasWidth = Math.min(window.canvasWidth, maxWidth);
+window.canvasHeight = Math.min(window.canvasHeight, maxHeight);
+
 //MAIN CAMERA
-const camera = new PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 100);
+const camera = new PerspectiveCamera(fov, window.canvasWidth / window.canvasHeight, 0.1, 100);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 window.fov = fov;
@@ -58,17 +71,6 @@ cubeHolder.position.z = -1.25;
 cubeHolder.name = "cubeHolder";
 window.cubeHolder = cubeHolder;
 camera.add(cubeHolder);
-
-const maxWidth = 1920;  // Set your maximum width resolution
-const maxHeight = 1080; // Set your maximum height resolution
-
-// Get the actual window dimensions
-window.canvasWidth = window.innerWidth;
-window.canvasHeight = window.innerHeight;
-
-// Cap the width and height to your maximum values
-window.canvasWidth = Math.min(window.canvasWidth, maxWidth);
-window.canvasHeight = Math.min(window.canvasHeight, maxHeight);
 
 //RENDERER
 const renderer = new WebGLRenderer({

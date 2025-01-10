@@ -246,7 +246,7 @@ module.exports = function (webpackEnv) {
       level: 'none',
     },
     optimization: {
-      /*minimize: true,
+      minimize: true,
       minimizer: [
         new TerserPlugin({
           terserOptions: {
@@ -259,7 +259,7 @@ module.exports = function (webpackEnv) {
           },
         }),
         new CssMinimizerPlugin(),
-      ],*/
+      ],
     },
     resolve: {
       // This allows you to set a fallback for where webpack should look for modules.

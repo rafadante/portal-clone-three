@@ -253,7 +253,7 @@ $('#social-twitter').on('click', function () {
 });
 
 $('#social-discord').on('click', function () {
-    window.open("https://discord.com/invite/CsARjYrc");
+    window.open("https://discord.com/invite/dNj7TPBy2R");
 });
 
 $('#option-download').on('click', function () {

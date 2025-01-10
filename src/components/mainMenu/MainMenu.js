@@ -104,6 +104,8 @@ $('#next-map-btn').on('click', function () {
         fetchLevel()
     }, 2000);
 
+    //localStorage.setItem("level", window.currentLevel + 1);
+
     /*localStorage.setItem("level", window.currentLevel + 1);
     localStorage.setItem("load", "true");
 

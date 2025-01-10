@@ -9,7 +9,7 @@ import {
 import { TWEEN } from './Tween.js';
 import { Lights } from './components/lights/Lights.js';
 import { animateShader } from "./components/shaders/AnimateShaders.js"
-import { updatePlayer, updateCamera } from './components/fps/Fps.js';
+import { updatePlayer, updateCamera, joystickMenu } from './components/fps/Fps.js';
 import { loadDefault } from './components/loadObj/LoaderOBJ.js';
 import { updateRay, recreateRay } from './components/ray/Ray.js';
 import './components/test/Test.js';
@@ -130,6 +130,9 @@ function onWindowResize() {
     GLOBALS.MAIN_CAMERA.aspect = window.canvasWidth / window.canvasHeight;
     GLOBALS.MAIN_CAMERA.updateProjectionMatrix();
 
+    portalCamera.aspect = window.canvasWidth / window.canvasHeight;
+    portalCamera.updateProjectionMatrix();
+
     GLOBALS.PORTAL_GUN_CAMERA.aspect = window.canvasWidth / window.canvasHeight;
     GLOBALS.PORTAL_GUN_CAMERA.updateProjectionMatrix();
 
@@ -150,8 +153,13 @@ function animate(time) {
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         TWEEN.update();
         document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
-    } else if (!GLOBALS.PAUSED)
+    } else if (!GLOBALS.PAUSED){
         render(time);
+    }
+
+    if(GLOBALS.FPS_MODE){
+        joystickMenu();
+    }
 }
 
 function fixedUpdate() { //60 fps always for physics
@@ -187,11 +195,11 @@ var statsBegin = false;
 let desiredFPS = 60; // Target FPS
 
 if (localStorage.getItem("quality-select") == "very_low")
-    desiredFPS = 30;
+    desiredFPS = 20;
 else if (localStorage.getItem("quality-select") == "low")
-    desiredFPS = 40;
+    desiredFPS = 30;
 else if (localStorage.getItem("quality-select") == "medium")
-    desiredFPS = 50;
+    desiredFPS = 40;
 
 
 window.curentTimeOffset = 0;

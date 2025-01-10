@@ -6,10 +6,11 @@ import { AUDIO, play } from '../audio/Audio.js';
 import "./Player.js";
 import "./Input.js";
 import { INPUT } from './index.js';
-import { Crouch } from './Input.js';
+import { Crouch, openMenu } from './Input.js';
 import * as CANNON from "cannon";
 import { playerExitPurpleGel } from './Player.js';
 import { MathUtils } from 'three';
+import $ from 'jquery';
 
 var gamepadButton1 = false;
 var gamepadButton3 = false;
@@ -34,7 +35,7 @@ let targetYaw = 0; // Target rotation around Y-axis
 let targetPitch = 0; // Target rotation around X-axis
 let currentYaw = 0; // Current rotation around Y-axis
 let currentPitch = 0; // Current rotation around X-axis
-const lerpFactor = 1; // Smoothing factor (0 to 1)
+var lerpFactor = 0.1; // Smoothing factor (0 to 1)
 
 var fowardPressed = false;
 var backwardPressed = false;
@@ -147,7 +148,7 @@ const updatePlayer = function (deltaTime) {
             joystickGel(gamepad, 15, gamepadButton15, 2, 0.08)
 
             // Ajuste esses valores conforme necessário para controlar a sensibilidade dos movimentos
-            const sensitivity = 0.02;  // Sensibilidade do controle
+            const sensitivity = 2.5;  // Sensibilidade do controle
 
             /*// Lê os estados dos controles do gamepad
             const xAxis = gamepad.axes[2];  // Movimento horizontal
@@ -167,8 +168,8 @@ const updatePlayer = function (deltaTime) {
                 const rightStickY = gamepad.axes[3]; // Up/Down (Pitch)
 
                 // Update target rotation based on input
-                targetYaw -= rightStickX * sensitivity;
-                targetPitch -= rightStickY * sensitivity;
+                targetYaw -= rightStickX * sensitivity * deltaTime;
+                targetPitch -= rightStickY * sensitivity * deltaTime;
 
                 // Clamp the pitch to prevent over-rotation
                 targetPitch = MathUtils.clamp(targetPitch, -Math.PI / 2, Math.PI / 2);
@@ -226,7 +227,7 @@ const updatePlayer = function (deltaTime) {
 
             if (INPUT.shouldJump) {
                 GLOBALS.PLAYER.inJump = true
-                GLOBALS.PLAYER.applyImpulse(GLOBALS.PLAYER.upVectorThree.clone().multiplyScalar(f * 0.25), GLOBALS.PLAYER.position)
+                GLOBALS.PLAYER.applyImpulse(GLOBALS.PLAYER.upVectorThree.clone().multiplyScalar(200), GLOBALS.PLAYER.position)
             }
 
             INPUT.shouldJump = false;
@@ -244,7 +245,7 @@ const updatePlayer = function (deltaTime) {
                 leftPressed = true;
                 movePlayerKeyboard(left, posPlayer, f, movementMultiplier, deltaTime)
             } if (INPUT.controller["KeyD"].pressed) {
-                rightPressed=true;
+                rightPressed = true;
                 movePlayerKeyboard(right, posPlayer, f, movementMultiplier, deltaTime)
             }
 
@@ -331,11 +332,16 @@ const updateCamera = function (deltaTime) {
 
     if (GLOBALS.TELEPORTING_TARGET_QUATERNION) {
 
+        lerpFactor = 1;
         GLOBALS.MAIN_CAMERA.quaternion.slerp(GLOBALS.TELEPORTING_TARGET_QUATERNION, 0.15);
 
         if (isSlerpComplete(GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.TELEPORTING_TARGET_QUATERNION)) {
             GLOBALS.TELEPORTING_TARGET_QUATERNION = null;
             GLOBALS.MAIN_CAMERA.rotation.z = 0;
+
+            setTimeout(() => {
+                lerpFactor = 0.1;
+            }, 50);
         }
 
         GLOBALS.GUN.position.copy(GLOBALS.MAIN_CAMERA.position);
@@ -351,6 +357,7 @@ const updateCamera = function (deltaTime) {
         targetPitch = GLOBALS.MAIN_CAMERA.rotation.x;
         targetYaw = GLOBALS.MAIN_CAMERA.rotation.y;
     } else {
+
         if (!window.blockCamRotation) {
             GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, 0.075);
 
@@ -633,6 +640,65 @@ function joystickAction(gamepad, index, gamepadButton, button) {
     }
 }
 
+function joystickMenu(gamepad) {
+
+    if (controllerIndex !== null) {
+
+        gamepad = navigator.getGamepads()[controllerIndex];
+
+        /**if (gamepad.buttons[12].value == 1 && !gamepad.buttons[12].pressed2) {//up
+            console.log("up");
+            gamepad.buttons[12].pressed2 = true;
+            setTimeout(() => {
+                gamepad.buttons[12].pressed2 = false;
+            }, 100);
+        } else if (gamepad.buttons[13].value == 1 && !gamepad.buttons[13].pressed2) {//down
+            console.log("down");
+            gamepad.buttons[13].pressed2 = true;
+            setTimeout(() => {
+                gamepad.buttons[13].pressed2 = false;
+            }, 100);
+        } else if (gamepad.buttons[14].value == 1 && !gamepad.buttons[14].pressed2) {//left
+            console.log("left");
+            gamepad.buttons[14].pressed2 = true;
+            setTimeout(() => {
+                gamepad.buttons[14].pressed2 = false;
+            }, 100);
+        } else if (gamepad.buttons[15].value == 1 && !gamepad.buttons[15].pressed2) {//right
+            console.log("right");
+            gamepad.buttons[15].pressed2 = true;
+            setTimeout(() => {
+                gamepad.buttons[15].pressed2 = false;
+            }, 100);
+        } else */
+        if (gamepad.buttons[9].value == 1 && !gamepad.buttons[9].pressed2) {//start
+            console.log("start");
+            gamepad.buttons[9].pressed2 = true;
+            setTimeout(() => {
+                gamepad.buttons[9].pressed2 = false;
+            }, 100);
+
+            document.exitPointerLock();
+            openMenu();
+        } else if (gamepad.buttons[0].value == 1 && !gamepad.buttons[0].pressed2) {//A
+
+            if ($("#blocker").css("display") == "block") {
+                console.log("A");
+                gamepad.buttons[0].pressed2 = true;
+                setTimeout(() => {
+                    gamepad.buttons[0].pressed2 = false;
+                }, 100);
+
+                if (GLOBALS.FINISHED)
+                    $("#next-map-btn").trigger("click");
+                else
+                    $("#settings-close").trigger("click");
+            }
+
+        }
+    }
+}
+
 function joystickGel(gamepad, index, gamepadButton, mode, value) {
     if (gamepad.buttons[index].value == 1 && !gamepadButton) {
         gamepadButton = true;
@@ -661,5 +727,6 @@ window.addEventListener("gamepaddisconnected", (event) => {
 
 export {
     updatePlayer,
-    updateCamera
+    updateCamera,
+    joystickMenu
 };
