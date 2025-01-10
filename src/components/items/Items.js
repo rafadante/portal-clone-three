@@ -233,6 +233,8 @@ function deleteItemInstanced(item, moving) {
     }
 
     $("#" + item.instancedName).parent().children("span").text(GLOBALS.ITEMS_COUNT[item.instancedName]["max"] - GLOBALS.ITEMS_COUNT[item.instancedName]["count"]);
+
+    window.moving=false;
 }
 
 export {

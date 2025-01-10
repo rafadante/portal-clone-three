@@ -17,6 +17,7 @@ $("body").on('click', '#back-editor', function () {
 
 function backToEditor() {
 
+    GLOBALS.EXIT_DOOR.finished = false;
     GLOBALS.STATS_UI.time = 0;
     GLOBALS.STATS_UI.steps = 0;
     window.curentTimeOffset = 0;
@@ -33,10 +34,10 @@ function backToEditor() {
         GLOBALS.SOUNDS_FPS[i].audio.pause();
     }
 
-   /* for (var i = GLOBALS.MAIN_CAMERA.getObjectByName("listener").children.length - 1; i >= 0; i--) {
-        console.log("removed")
-        GLOBALS.MAIN_CAMERA.getObjectByName("listener").remove(GLOBALS.MAIN_CAMERA.getObjectByName("listener").children[i]);
-    }*/
+    /* for (var i = GLOBALS.MAIN_CAMERA.getObjectByName("listener").children.length - 1; i >= 0; i--) {
+         console.log("removed")
+         GLOBALS.MAIN_CAMERA.getObjectByName("listener").remove(GLOBALS.MAIN_CAMERA.getObjectByName("listener").children[i]);
+     }*/
 
     removePelletHitInstances();
 
@@ -242,8 +243,12 @@ function backToEditor() {
 
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
         //GLOBALS.CONNECTIONS[i]['line'].visible = true;
-        if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area"))
+        if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area")) {
             GLOBALS.CONNECTIONS[i]['from'].item.visible = true;
+        }
+
+        GLOBALS.CONNECTIONS[i]['line'].active = false;
+        GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons = 0;
     }
 }
 

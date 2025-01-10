@@ -56,6 +56,7 @@ $("body").on('change', '#state-trigger-multiple', function () {
 })
 
 $("body").on('change', '#state-trigger-visibility', function () {
+    console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]])
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.triggerVisibility = this.checked;
 })
 

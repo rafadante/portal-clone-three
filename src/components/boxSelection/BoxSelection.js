@@ -360,7 +360,9 @@ function raycastSelected(found, event, type) {
                                 GLOBALS.CANNON_WORLD.removeBody(planeInstanceOld.item.bodyLaserField);
                             }
 
-                            deleteItemInstanced(planeInstanceOld, true);
+                            window.moving = true;
+                            $('#delete').trigger('click');
+                            //deleteItemInstanced(planeInstanceOld, true);
                             planeInstanceReset(planeInstanceOld, false, null, null, null, null, null, null, null, false, null, false, false);
                         } else {
                             //CHECK IF THE ITEM CAN BE MOVED ALONG DIRECTIONS

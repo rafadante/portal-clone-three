@@ -48,7 +48,7 @@ function addPelletBall(item) {
     energyBallClone.visible = false;
 
     //BODY
-    var shape = new CANNON.Sphere(0.05);
+    var shape = new CANNON.Sphere(0.1);
     var ball = new CANNON.Body({
         shape: shape,
         mass: 1,
@@ -213,7 +213,7 @@ function pelletUpdate() {
             }
 
             if (window.pellets[i].active) {
-                window.pellets[i].position.add(window.pellets[i].body.direction.clone().multiplyScalar(0.08)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side
+                window.pellets[i].position.add(window.pellets[i].body.direction.clone().multiplyScalar(0.06)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side
                 window.pellets[i].body.position.copy(window.pellets[i].position);
                 window.pellets[i].body.previousPosition.copy(window.pellets[i].position)
                 window.pellets[i].body.angularVelocity.setZero();

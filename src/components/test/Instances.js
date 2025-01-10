@@ -30,6 +30,11 @@ function manageInstances() {
     for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
 
         if (GLOBALS.PLANE_USER_DATA[i].exists) {
+
+            if(GLOBALS.PLANE_USER_DATA[i].item){
+                GLOBALS.PLANE_USER_DATA[i].item.userData.played = false;
+            }
+
             if (GLOBALS.PLANE_USER_DATA[i].itemName != enterDoor &&
                 GLOBALS.PLANE_USER_DATA[i].itemName != "exitDoor" &&
                 GLOBALS.PLANE_USER_DATA[i].itemName != "gel") {

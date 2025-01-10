@@ -352,6 +352,7 @@ function addCameraBody(obj) {
     obj.cube.body = box;
     obj.name = "camera";
     box.name = "camera";
+    box.item = obj;
     GLOBALS.DYNAMIC_OBJECTS.push(box);
     GLOBALS.CANNON_WORLD.addBody(box);
     GLOBALS.INTERACTIVE.push(obj.cube);

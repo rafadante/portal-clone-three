@@ -138,8 +138,6 @@ function updateEvents() {
                 AUDIO.POSITIVE.play();
                 connectionState(GLOBALS.CONNECTIONS[i], id, true, new Color(2, 1.3, 0))
                 GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
-
-                console.log("6666666666")
               }
 
               var to = GLOBALS.CONNECTIONS[i]['to'];
@@ -256,10 +254,10 @@ function doSetTimeout(to, waitFor, idHolder, connection, body) {
     if (connection['from'].itemName.includes("incinerator")) {
 
       //
-      const instanced = GLOBALS.ITEMS_ADDED.getObjectByName(body.name);
-      instanced.setVisibilityAt(body.item.userData.idInstanced, false);
-      instanced.instanceMatrix.needsUpdate = true;
-      instanced.computeBoundingSphere();
+      //const instanced = GLOBALS.ITEMS_ADDED.getObjectByName(body.name);
+      //instanced.setVisibilityAt(body.item.userData.idInstanced, false);
+      //instanced.instanceMatrix.needsUpdate = true;
+      //instanced.computeBoundingSphere();
 
       //CREATE A CLONE TO APPLY DISSOLVE SHADER
       const clone = GLOBALS.ITEMS_ADDED.getObjectByName(body.name).scene.clone();
@@ -296,9 +294,9 @@ function doSetTimeout(to, waitFor, idHolder, connection, body) {
           GLOBALS.SCENE_FPS.remove(clone.sound);
         }
       }, 3000);
-    }
 
-    console.log(to)
+      respawn(body);
+    }
 
     if (to.itemName.includes("door") ||
       to.itemName.includes("exitDoor")) {

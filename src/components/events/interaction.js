@@ -108,11 +108,15 @@ function interactWithItem() {
 
                             if (!GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalInfinity) {
 
-                                const audioTikTok = document.getElementById("tiktok").cloneNode(true);
-                                audioTikTok.play();
-                                setTimeout(() => {
-                                    audioTikTok.pause();
-                                }, GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalValue * 1000);
+                                if (!GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") &&
+                                    !GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
+                                    const audioTikTok = document.getElementById("tiktok").cloneNode(true);
+                                    audioTikTok.play();
+                                    setTimeout(() => {
+                                        audioTikTok.pause();
+                                    }, GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalValue * 1000);
+                                }
+
 
                                 setTimeout(pedestalTimer, GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalValue * 1000, GLOBALS.CONNECTIONS[i]);
                             }

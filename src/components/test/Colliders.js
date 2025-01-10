@@ -176,9 +176,16 @@ function fizzlerTrigger(body) {
 
         } else if (e.body.name == "sphere" || e.body.name == "cube" ||
             e.body.name == "radio" || e.body.name == "cube_2" || e.body.name == "laser_cube" ||
-            e.body.name == "scale_cube") {
+            e.body.name == "scale_cube" || e.body.name == "camera" || e.body.name == "trash") {
             //CREATE A CLONE TO APPLY DISSOLVE SHADER
-            const clone = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.name).scene.clone();
+
+            var clone;
+
+            if (e.body.name == "camera")
+                clone = window.cameraClone.clone();
+            else
+                clone = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.name).scene.clone();
+
             clone.position.set(e.body.position.x, e.body.position.y, e.body.position.z);
             clone.quaternion.copy(e.body.quaternion);
             clone.visible = true;
@@ -199,7 +206,7 @@ function fizzlerTrigger(body) {
             var clone2 = clone.clone();
             clone2.position.y += 1;
 
-            addPositionalAudio('audio-dissolve', clone, true, false, true, 2, 'sound')
+            addPositionalAudio('audio-dissolve', clone, true, false, true, 2, 'dissolve')
 
             tweenCamera(3000, GLOBALS.UNIFORMS_DISSOLVER.u_EffectOrigin.value, clone.position)
             tweenCamera(3000, clone.position, clone2.position)
@@ -207,13 +214,45 @@ function fizzlerTrigger(body) {
             //GLOBALS.MATERIAL_DISSOLVER
 
             setTimeout(() => {
-                if (GLOBALS.SCENE_FPS && clone.sound) {
-                    GLOBALS.SCENE.remove(clone);
-                    GLOBALS.SCENE_FPS.remove(clone.sound);
+                if (GLOBALS.SCENE_FPS) {// && clone.sound
+                    GLOBALS.SCENE_FPS.remove(clone);
+
+                    if (clone.dissolve)
+                        GLOBALS.SCENE_FPS.remove(clone.dissolve);
                 }
             }, 3000);
 
-            respawn(e.body);
+            if (e.body.name == "camera") {
+                GLOBALS.ITEMS_ADDED.remove(e.body.item);
+
+                const body = e.body;
+
+                setTimeout(() => {
+                    GLOBALS.CANNON_WORLD.removeBody(body);
+                }, 100);
+
+            } else if (e.body.name == "radio" || e.body.name == "trash") {
+
+                if (e.body.name == "radio") {
+                    console.log(e.body.sound)
+                    e.body.sound.audio.pause();
+                    GLOBALS.SCENE_FPS.remove(e.body.sound);
+                }
+
+                console.log(e.body);
+
+                var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.item.userData.instancedName);
+                instanced.setVisibilityAt(e.body.item.userData.idInstanced, false);
+                instanced.instanceMatrix.needsUpdate = true;
+                instanced.computeBoundingSphere();
+
+                const body = e.body;
+
+                setTimeout(() => {
+                    GLOBALS.CANNON_WORLD.removeBody(body);
+                }, 100);
+            } else
+                respawn(e.body);
         }
     });
 }
@@ -238,11 +277,11 @@ function addColliderItem(items, type, mass, offset) {
             GLOBALS.SCENE.add(objHolder);
 
 
-            
+
             if (type == "incinerator") {
                 var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
                 var shape = result.shape;
-            }else if (type == "bed" || type == "toilet" || type == "desk" || type == "cabinet" || type == "sign") {
+            } else if (type == "bed" || type == "toilet" || type == "desk" || type == "cabinet" || type == "sign") {
                 var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
                 var shape = result.shape;
             } else if (type == "piston_platforms") {

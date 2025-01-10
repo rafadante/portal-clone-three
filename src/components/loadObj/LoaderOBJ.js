@@ -644,6 +644,11 @@ function loadWindowHalfManager(scene) {
 }
 
 function loadCameraManager(scene) {
+
+    loader.load("/medium/items/camera2.glb", async function (glb) {
+        window.cameraClone = glb.scene.children[0];
+    })
+
     scene.name = "camera";
     scene.visible = false;
     scene.userData.wall = true;

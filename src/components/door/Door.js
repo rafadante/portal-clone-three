@@ -52,8 +52,9 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
 
     door.timeOutDoor2 = setTimeout(() => {
 
-      if (GLOBALS.LEVEL_ENTERED)
+      if (GLOBALS.LEVEL_ENTERED && door == GLOBALS.ENTER_DOOR) {
         GLOBALS.CORRIDOR_ENTER.visible = false;
+      }
 
       if (!open)
         doorSpinner(0, door, editor)
@@ -74,20 +75,19 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
         }, 300);
       }
 
+      if (GLOBALS.LEVEL_ENTERED) {
 
-      if (GLOBALS.LEVEL_ENTERED){
         if (door == GLOBALS.EXIT_DOOR && GLOBALS.FPS_MODE && !GLOBALS.EXIT_DOOR.finished) {
           GLOBALS.CORRIDOR_ENTER.visible = open;
         }
-  
+
         if (GLOBALS.EXIT_DOOR.finished)
           GLOBALS.CORRIDOR_ENTER.visible = true;
 
-        if (door == GLOBALS.EXIT_DOOR && open){
+        if (door == GLOBALS.EXIT_DOOR && open) {
           playVoice(door.userData);
         }
       }
-      
 
       /*} else {
         GLOBALS.CORRIDOR_ENTER.visible = false;

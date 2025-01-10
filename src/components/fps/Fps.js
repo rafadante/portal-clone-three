@@ -9,6 +9,7 @@ import { INPUT } from './index.js';
 import { Crouch } from './Input.js';
 import * as CANNON from "cannon";
 import { playerExitPurpleGel } from './Player.js';
+import { MathUtils } from 'three';
 
 var gamepadButton1 = false;
 var gamepadButton3 = false;
@@ -27,7 +28,28 @@ var lastTimeStamp = 0;
 var activeAction, lastAction;
 const clock = new Clock();
 
+
+// Rotation variables
+let targetYaw = 0; // Target rotation around Y-axis
+let targetPitch = 0; // Target rotation around X-axis
+let currentYaw = 0; // Current rotation around Y-axis
+let currentPitch = 0; // Current rotation around X-axis
+const lerpFactor = 1; // Smoothing factor (0 to 1)
+
+var fowardPressed = false;
+var backwardPressed = false;
+var leftPressed = false;
+var rightPressed = false;
+var spacePressed = false;
+
+
 const updatePlayer = function (deltaTime) {
+
+    fowardPressed = false;
+    backwardPressed = false;
+    leftPressed = false;
+    rightPressed = false;
+    spacePressed = false;
 
     var velocity = 1100;
 
@@ -125,42 +147,82 @@ const updatePlayer = function (deltaTime) {
             joystickGel(gamepad, 15, gamepadButton15, 2, 0.08)
 
             // Ajuste esses valores conforme necessário para controlar a sensibilidade dos movimentos
-            const sensitivity = 0.04;  // Sensibilidade do controle
+            const sensitivity = 0.02;  // Sensibilidade do controle
 
-            // Lê os estados dos controles do gamepad
+            /*// Lê os estados dos controles do gamepad
             const xAxis = gamepad.axes[2];  // Movimento horizontal
             const yAxis = gamepad.axes[3];  // Movimento vertical
 
             // Atualiza a orientação da câmera
-            GLOBALS.MAIN_CAMERA.rotation.y -= xAxis * 0.08;
-            GLOBALS.MAIN_CAMERA.rotation.x -= yAxis * 0.04;
+            GLOBALS.MAIN_CAMERA.rotation.y -= xAxis * 0.02;
+            GLOBALS.MAIN_CAMERA.rotation.x -= yAxis * 0.02;
 
             // Limita o movimento vertical entre -PI/2 e PI/2 para evitar que a câmera dê uma volta completa
-            GLOBALS.MAIN_CAMERA.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, GLOBALS.MAIN_CAMERA.rotation.x));
+            GLOBALS.MAIN_CAMERA.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, GLOBALS.MAIN_CAMERA.rotation.x));*/
+
+
+            if (!GLOBALS.TELEPORTING_TARGET_QUATERNION) {
+                // Right joystick axes for rotation
+                const rightStickX = gamepad.axes[2]; // Left/Right (Yaw)
+                const rightStickY = gamepad.axes[3]; // Up/Down (Pitch)
+
+                // Update target rotation based on input
+                targetYaw -= rightStickX * sensitivity;
+                targetPitch -= rightStickY * sensitivity;
+
+                // Clamp the pitch to prevent over-rotation
+                targetPitch = MathUtils.clamp(targetPitch, -Math.PI / 2, Math.PI / 2);
+
+                // Interpolate yaw and pitch towards their target values
+                currentYaw += (targetYaw - currentYaw) * lerpFactor;
+                currentPitch += (targetPitch - currentPitch) * lerpFactor;
+
+                // Apply the smoothed rotations to the camera
+                //GLOBALS.MAIN_CAMERA.rotation.set(currentPitch, currentYaw, GLOBALS.MAIN_CAMERA.rotation.z);
+
+                // Atualiza a orientação da câmera
+                GLOBALS.MAIN_CAMERA.rotation.x = currentPitch;
+                GLOBALS.MAIN_CAMERA.rotation.y = currentYaw;
+
+                // Limita o movimento vertical entre -PI/2 e PI/2 para evitar que a câmera dê uma volta completa
+                GLOBALS.MAIN_CAMERA.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, GLOBALS.MAIN_CAMERA.rotation.x));
+            }
+
+
 
 
             var gamepadPressed = 0;
 
-            if (gamepad.axes[1] < -0.5)
+            if (gamepad.axes[1] < -0.5) {
+                fowardPressed = true;
                 movePlayerJoystick(forward, f, movementMultiplier, gamepadPressed, deltaTime)
-            if (gamepad.axes[1] > 0.5)
+            } if (gamepad.axes[1] > 0.5) {
+                backwardPressed = true;
                 movePlayerJoystick(backward, f, movementMultiplier, gamepadPressed, deltaTime)
-            if (gamepad.axes[0] < -0.5)
+            } if (gamepad.axes[0] < -0.5) {
+                leftPressed = true;
                 movePlayerJoystick(left, f, movementMultiplier, gamepadPressed, deltaTime)
-            if (gamepad.axes[0] > 0.5)
+            } if (gamepad.axes[0] > 0.5) {
+                rightPressed = true;
                 movePlayerJoystick(right, f, movementMultiplier, gamepadPressed, deltaTime)
+            }
         }
 
         if (GLOBALS.MOBILE && controllerIndex == null) {
 
-            if (INPUT.fwdValue > 0)
+            if (INPUT.fwdValue > 0) {
+                fowardPressed = true;
                 movePlayerTouch(forward, f, INPUT.fwdValue)
-            if (INPUT.bkdValue > 0)
+            } if (INPUT.bkdValue > 0) {
+                backwardPressed = true;
                 movePlayerTouch(backward, f, INPUT.bkdValue)
-            if (INPUT.lftValue > 0)
+            } if (INPUT.lftValue > 0) {
+                leftPressed = true;
                 movePlayerTouch(left, f, INPUT.lftValue)
-            if (INPUT.rgtValue > 0)
+            } if (INPUT.rgtValue > 0) {
+                rightPressed = true;
                 movePlayerTouch(right, f, INPUT.rgtValue)
+            }
 
             if (INPUT.shouldJump) {
                 GLOBALS.PLAYER.inJump = true
@@ -172,14 +234,19 @@ const updatePlayer = function (deltaTime) {
 
             var posPlayer = new Vector3(GLOBALS.PLAYER.position.x, GLOBALS.PLAYER.position.y, GLOBALS.PLAYER.position.z)
 
-            if (INPUT.controller["KeyW"].pressed)
+            if (INPUT.controller["KeyW"].pressed) {
+                fowardPressed = true;
                 movePlayerKeyboard(forward, posPlayer, f, movementMultiplier, deltaTime)
-            if (INPUT.controller["KeyS"].pressed)
+            } if (INPUT.controller["KeyS"].pressed) {
+                backwardPressed = true;
                 movePlayerKeyboard(backward, posPlayer, f, movementMultiplier, deltaTime)
-            if (INPUT.controller["KeyA"].pressed)
+            } if (INPUT.controller["KeyA"].pressed) {
+                leftPressed = true;
                 movePlayerKeyboard(left, posPlayer, f, movementMultiplier, deltaTime)
-            if (INPUT.controller["KeyD"].pressed)
+            } if (INPUT.controller["KeyD"].pressed) {
+                rightPressed=true;
                 movePlayerKeyboard(right, posPlayer, f, movementMultiplier, deltaTime)
+            }
 
             INPUT.shouldJump = false;
             // handle jumping when space bar is pressed
@@ -280,6 +347,9 @@ const updateCamera = function (deltaTime) {
         GLOBALS.TARGET_ROTATION_Y = GLOBALS.MAIN_CAMERA.rotation.x;
         window.targetRotationOnMouseDownX = GLOBALS.TARGET_ROTATION_X;
         window.targetRotationOnMouseDownY = GLOBALS.TARGET_ROTATION_Y;
+
+        targetPitch = GLOBALS.MAIN_CAMERA.rotation.x;
+        targetYaw = GLOBALS.MAIN_CAMERA.rotation.y;
     } else {
         if (!window.blockCamRotation) {
             GLOBALS.GUN.quaternion.slerp(GLOBALS.MAIN_CAMERA.quaternion, 0.075);
@@ -370,7 +440,7 @@ const updateCamera = function (deltaTime) {
         var strafeL = "ANIM_LEFT_STRAFE";
         var strafeR = "ANIM_RIGHT_STRAFE";
 
-        if(GLOBALS.PORTAL_GUN_INITIATE == "none"){
+        if (GLOBALS.PORTAL_GUN_INITIATE == "none") {
             idle = "ANIM_STANDING_IDLE_NO_GUN";
             walking = "ANIM_STATIONARY_RUNNING_NO_GUN";
             walkingB = "ANIM_BACKWARD_RUNNING_NO_GUN";
@@ -381,31 +451,31 @@ const updateCamera = function (deltaTime) {
 
         let action = GLOBALS.PLAYER_MODEL.animationActions[idle];
         let actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[idle];
-        
+
         if (GLOBALS.PLAYER_MODEL.modelReady) {
             if (GLOBALS.PLAYER.inJump && !GLOBALS.PLAYER.inTractor) {
                 action = GLOBALS.PLAYER_MODEL.animationActions[jump]
                 actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[jump]
-            } else if (INPUT.controller["KeyW"].pressed && INPUT.controller["KeyD"].pressed && INPUT.controller["KeyA"].pressed && INPUT.controller["KeyS"].pressed) {
+            } else if (fowardPressed && leftPressed && rightPressed && backwardPressed) {
                 action = GLOBALS.PLAYER_MODEL.animationActions[idle]
                 actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[idle]
-            } else if (INPUT.controller["KeyW"].pressed && INPUT.controller["KeyS"].pressed) {
+            } else if (fowardPressed && backwardPressed) {
                 action = GLOBALS.PLAYER_MODEL.animationActions[idle]
                 actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[idle]
-                if (INPUT.controller["KeyD"].pressed) {
+                if (rightPressed) {
                     action = GLOBALS.PLAYER_MODEL.animationActions[strafeR]
                     actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[strafeR]
-                } else if (INPUT.controller["KeyA"].pressed) {
+                } else if (leftPressed) {
                     action = GLOBALS.PLAYER_MODEL.animationActions[strafeL]
                     actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[strafeL]
                 }
-            } else if (INPUT.controller["KeyA"].pressed && INPUT.controller["KeyD"].pressed) {
+            } else if (leftPressed && rightPressed) {
                 action = GLOBALS.PLAYER_MODEL.animationActions[idle]
                 actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[idle]
-                if (INPUT.controller["KeyW"].pressed) {
+                if (fowardPressed) {
                     action = GLOBALS.PLAYER_MODEL.animationActions[walking]
                     actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[walking]
-                } else if (INPUT.controller["KeyS"].pressed) {
+                } else if (backwardPressed) {
                     action = GLOBALS.PLAYER_MODEL.animationActions[walkingB]
                     actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[walkingB]
                 }
@@ -437,19 +507,19 @@ const updateCamera = function (deltaTime) {
             }
 
             else {
-                if (INPUT.controller["KeyW"].pressed || INPUT.fwdValue > 0) {
+                if (fowardPressed || INPUT.fwdValue > 0) {
                     action = GLOBALS.PLAYER_MODEL.animationActions[walking]
                     actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[walking]
                 }
-                if (INPUT.controller["KeyS"].pressed || INPUT.bkdValue > 0) {
+                if (backwardPressed || INPUT.bkdValue > 0) {
                     action = GLOBALS.PLAYER_MODEL.animationActions[walkingB]
                     actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[walkingB]
                 }
-                if (INPUT.controller["KeyD"].pressed || INPUT.rgtValue > 0) {
+                if (rightPressed || INPUT.rgtValue > 0) {
                     action = GLOBALS.PLAYER_MODEL.animationActions[strafeR]
                     actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[strafeR]
                 }
-                if (INPUT.controller["KeyA"].pressed || INPUT.lftValue) {
+                if (leftPressed || INPUT.lftValue) {
                     action = GLOBALS.PLAYER_MODEL.animationActions[strafeL]
                     actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[strafeL]
                 }

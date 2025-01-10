@@ -613,6 +613,8 @@ async function addItem(found, loaded) {
                 GLOBALS.CAMERAS.push(item);
                 GLOBALS.ITEMS_ADDED.add(item);
 
+                item.initialPosition = item.position.clone();
+
             } else if (GLOBALS.ITEM_HOLDED_NAME == "observation_room") {
                 GLOBALS.ITEMS_ADDED.add(item);
             } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {

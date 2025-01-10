@@ -985,6 +985,7 @@ var GLOBALS = {
     SCENE_FPS: null,
     LISTENER: new AudioListener(),
     CANNON_BODIES: [],
+    CANNON_BODIES_CONTINUOUS: [],
     LEVEL_ENTERED: false,
     DOOR_OPEN_STATE: false,
     AMBIENT_AUDIO: null,
@@ -1090,6 +1091,7 @@ function reset() {
     GLOBALS.RADIO_MUSIC = [];
     GLOBALS.CAMERAS = [];
     GLOBALS.CANNON_BODIES = [];
+    GLOBALS.CANNON_BODIES_CONTINUOUS = [];
     GLOBALS.CONNECTIONS = [];
     GLOBALS.GLASS_PANELS = [];
     GLOBALS.BLOCK_PORTAL = [];

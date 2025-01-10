@@ -158,7 +158,7 @@ $("body").on('click', '#delete', function () {
             }
         }
 
-        deleteItemInstanced(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], false);
+        deleteItemInstanced(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]], window.moving);
     } else {
 
         if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName == "goo") {
@@ -293,13 +293,13 @@ $("body").on('input', '#tractor-state-input, #light-bridge-state-input, #laser-f
     //bodyLaserField
     if ($(this).attr("id") == "light-bridge-state-input") {
         if (this.checked) {
-            GLOBALS.CANNON_BODIES.push(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
+            //GLOBALS.CANNON_BODIES.push(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
             GLOBALS.CANNON_WORLD.addBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
         } else
             GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyBridge);
     } else if ($(this).attr("id") == "laser-field-state-input" || $(this).attr("id") == "fizzler-state-input") {
         if (this.checked) {
-            GLOBALS.CANNON_BODIES.push(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField);
+            //GLOBALS.CANNON_BODIES.push(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField);
             GLOBALS.CANNON_WORLD.addBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField);
         } else
             GLOBALS.CANNON_WORLD.removeBody(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.bodyLaserField);
