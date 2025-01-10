@@ -187,8 +187,10 @@ $("body").on('click', '#option-community-build', function () {
 
 $("body").on('click', '#option-single-reset', function () {
     var check = window.confirm("Are you sure you want to reset your progress?");
-    if (check == true)
+    if (check == true) {
         localStorage.setItem("level", 1);
+        window.location.reload();
+    }
 });
 
 function startLevel() {
@@ -516,7 +518,7 @@ function loadLevel(data) {
                     data[i].itemName.split('-')[0] != "dispenser" &&
                     data[i].itemName.split('-')[0] != "goo") {
                     window.totalItemsToLoad++;
-                }else if (data[i].itemName.split('-')[0] == "goo") {
+                } else if (data[i].itemName.split('-')[0] == "goo") {
                     window.gooToLoad.push(data[i]);
                 }
             }
@@ -543,7 +545,7 @@ function loadLevel(data) {
                     if (data[i].trigger) {
                         triggers.push(data[i]);
                     }
-                } 
+                }
             }
         }
     }

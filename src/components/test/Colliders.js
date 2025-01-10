@@ -806,8 +806,10 @@ function addCollidersToCorridor(mesh) {
     if (mesh.name.includes("collider_door")) {
         GLOBALS.BODY_ELEVATOR = wall;
         wall.addEventListener("collide", function (event) {
-            if (GLOBALS.LEVEL_ENTERED && GLOBALS.LOADED_LEVEL && !GLOBALS.FINISHED) {//
 
+            console.log("11111111111111")
+            if (GLOBALS.LEVEL_ENTERED && GLOBALS.LOADED_LEVEL && !GLOBALS.FINISHED) {//
+                console.log("2222222222222")
                 GLOBALS.FINISHED = true;
                 window.currentLevel++;
                 localStorage.setItem("level", window.currentLevel);
