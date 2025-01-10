@@ -276,14 +276,18 @@ function addColliderItem(items, type, mass, offset) {
             objHolder.quaternion.copy(rot);
             GLOBALS.SCENE.add(objHolder);
 
-
-
             if (type == "incinerator") {
                 var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
                 var shape = result.shape;
-            } else if (type == "bed" || type == "toilet" || type == "desk" || type == "cabinet" || type == "sign") {
+            } else if (type == "desk" || type == "cabinet" || type == "sign") {
                 var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
                 var shape = result.shape;
+            } else if (type == "bed") {
+                var shape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 1));
+                objHolder.translateY(0.25);
+            } else if (type == "toilet") {
+                var shape = new CANNON.Box(new CANNON.Vec3(0.22, 0.5, 0.44));
+                objHolder.translateY(0.25);
             } else if (type == "piston_platforms") {
                 var shape = new CANNON.Box(new CANNON.Vec3(1, 0.1, 1));
                 objHolder.translateY(0.05);
