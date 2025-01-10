@@ -8,7 +8,7 @@ import { tweenCamera } from '../../Utils.js';
 import { platformPostStep } from '../platforms/Platform.js';
 
 var slipperyMaterial = new CANNON.Material();
-slipperyMaterial.friction = 0.025;
+slipperyMaterial.friction = 0;
 
 // define shape
 let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 2, 2 / 3.2, 0.5 / 2));
