@@ -45,11 +45,11 @@ function updatePlatformPosition(obj, instanced, i, deltaTime) {
         var offset;
 
         if (!obj.body.pistonDown)
-            offset = 0.00000015;
+            offset = 0.7;
         else
-            offset = -0.00000015;
+            offset = -0.7;
 
-           // console.log(deltaTime)
+            //console.log(deltaTime)
 
         var axis = "y";
         var dir = new CANNON.Vec3(0, 1, 0);
