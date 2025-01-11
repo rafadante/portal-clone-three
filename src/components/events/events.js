@@ -196,6 +196,9 @@ function updateEvents() {
 
                   GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive = !GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive;
 
+
+                  GLOBALS.CONNECTIONS[i]['to'].item.body.pistonDown = true;
+
                   if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("piston_platforms") ||
                     GLOBALS.CONNECTIONS[i]['to'].itemName.includes("track_platforms")) {
                     if (GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive)
@@ -333,8 +336,11 @@ function doSetTimeout(to, waitFor, idHolder, connection, body) {
         portalButton(2, to.item, GLOBALS.MAIN_CAMERA)
     } else if (to.itemName.includes("piston_platforms") || to.itemName.includes("track_platforms") ||
       to.itemName.includes("pellet_launcher")) {
-        
+
       to.item.userData.isActive = !to.item.userData.isActive;
+
+
+      to.item.body.pistonDown = false;
 
       if (to.itemName.includes("piston_platforms") || to.itemName.includes("track_platforms")) {
         if (to.item.userData.isActive)
@@ -385,7 +391,10 @@ function resetAll() {
         } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("piston_platforms") ||
           GLOBALS.CONNECTIONS[i]['to'].itemName.includes("track_platforms") ||
           GLOBALS.CONNECTIONS[i]['to'].itemName.includes("pellet_launcher")) {
+
           GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive = !GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive;
+
+          GLOBALS.CONNECTIONS[i]['to'].item.body.pistonDown = true;
 
           if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("piston_platforms") ||
             GLOBALS.CONNECTIONS[i]['to'].itemName.includes("track_platforms")) {
@@ -463,6 +472,8 @@ function laserReceiverTrigger(obj, state, catcher) {
 
             GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive = !GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive;
 
+            GLOBALS.CONNECTIONS[i]['to'].item.body.pistonDown = false;
+
             if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("piston_platforms") ||
               GLOBALS.CONNECTIONS[i]['to'].itemName.includes("track_platforms")) {
               if (GLOBALS.CONNECTIONS[i]['to'].item.userData.isActive)
@@ -510,6 +521,23 @@ function laserReceiverTrigger(obj, state, catcher) {
       } else if (holder['to'].itemName.includes("portal_0") ||
         holder['to'].itemName.includes("portal_1")) {
         holder['to'].item.active = false;
+      } else if (holder['to'].itemName.includes("piston_platforms") ||
+        holder['to'].itemName.includes("track_platforms") ||
+        holder['to'].itemName.includes("pellet_launcher")) {
+
+        holder['to'].item.userData.isActive = false;
+
+
+        holder['to'].item.body.pistonDown = true;
+
+        if (holder['to'].itemName.includes("piston_platforms") ||
+          holder['to'].itemName.includes("track_platforms")) {
+          if (holder['to'].item.userData.isActive)
+            holder['to'].item.body.sound.audio.play()
+          else
+            holder['to'].item.body.sound.audio.pause()
+        }
+
       }
     }
   }

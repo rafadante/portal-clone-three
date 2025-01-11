@@ -160,6 +160,13 @@ function backToEditor() {
         GLOBALS.CANNON_WORLD.remove(GLOBALS.CANNON_BODIES[i]);
     }
 
+
+    for (var g = 0; g < GLOBALS.LIGHT_BRIDGE_CLONE.length; g++) {
+        GLOBALS.ITEMS_ADDED.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
+        GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
+        GLOBALS.LIGHT_BRIDGE_CLONE[g].item.clone = null;
+    }
+
     GLOBALS.CANNON_BODIES = [];
     GLOBALS.WALL_BODIES = [];
     GLOBALS.RADIO_MUSIC = [];

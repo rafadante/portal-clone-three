@@ -35,6 +35,7 @@ $("body").on('click', '#back-main-menu', function () {
 
 });
 
+
 if (!stopMenuLoop) {
     setTimeout(() => {
         var planegeometry = new PlaneGeometry(1, 1);
@@ -114,7 +115,13 @@ $('#next-map-btn').on('click', function () {
 });
 
 function fetchLevel() {
-    fetch("./levels/tutorial_" + window.currentLevel + "_by_rafadante.json")
+
+    var path = "./levels/tutorial_" + window.currentLevel + "_by_rafadante.json";
+
+    if (window.isCustom)
+        path = custompath;
+
+    fetch(path)
         .then(response => response.json())
         .then(json => {
             level = json;
@@ -138,6 +145,46 @@ $("body").on('click', '.load-custom', function () {
             GLOBALS.LOADED_LEVEL = true;
             startLevel();
         });
+});
+
+var custompath;
+
+$("body").on('click', '.custom-chamber', function () {
+    /*window.isCustom = true;
+    //init();
+    fetch("./community/The_Return_Chamber_17_by_FlameDogo99.json")
+        .then(response => response.json())
+        .then(json => {
+            level = json;
+            GLOBALS.LOADED_LEVEL = true;
+            startLevel();
+
+            level = json;
+
+            chamberName = "tutorial_" + window.currentLevel + "_by_rafadante";
+
+            $("#portal-gun-select").val(level[0][0]).change();
+            $("#ambient-sound-select").val(level[0][1]).change();
+
+            loadLevelJSON();
+        });*/
+
+    setTimeout(() => {
+        init();
+    }, 2000);
+
+    window.isCustom = true;
+
+    startLevel();
+
+    setTimeout(() => {
+
+        custompath = "./community/The_Return_Chamber_17_by_FlameDogo99.json";
+
+        stopMenuLoop = true;
+        GLOBALS.LOADED_LEVEL = true;
+        //loadDefault();
+    }, 2000);
 });
 
 if (localStorage.getItem("load") == "true") {
@@ -474,8 +521,6 @@ function loadLevel(data) {
             GLOBALS.EXIT_DOOR.userData.connections = 0;
             GLOBALS.EXIT_DOOR.userData.played = false;
             data[i].item = GLOBALS.EXIT_DOOR;
-
-            console.log(GLOBALS.EXIT_DOOR)
 
             playVoiceTrigger(data[i].item.userData, false);
 

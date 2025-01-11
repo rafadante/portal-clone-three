@@ -152,10 +152,10 @@ function portalButton(button, auto, camera, firstToRender) {
                 let playerUpDirection = new Vector3(0, 1, 0);
                 var autoDir = new Vector3();
 
-                if(auto){
+                if (auto) {
                     userData.item.getWorldDirection(autoDir)
                 }
-                
+
 
                 var normal;
                 if (userData.side == "front")
@@ -170,14 +170,14 @@ function portalButton(button, auto, camera, firstToRender) {
                     playerUpDirection.applyQuaternion(GLOBALS.MAIN_CAMERA.quaternion)
                     normal = new Vector3(0, -1, 0)
 
-                    if(auto)
+                    if (auto)
                         playerUpDirection = autoDir;
 
                 } else if (userData.side == "down") {
                     playerUpDirection.applyQuaternion(GLOBALS.MAIN_CAMERA.quaternion)
                     normal = new Vector3(0, 1, 0)
 
-                    if(auto)
+                    if (auto)
                         playerUpDirection = autoDir;
                 }
 
@@ -278,11 +278,11 @@ function portalButton(button, auto, camera, firstToRender) {
                         document.getElementById("reticle-img").style.filter = "none";
                         //document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
 
-                        if(GLOBALS.PORTAL_GUN_INITIATE == "left"){
+                        if (GLOBALS.PORTAL_GUN_INITIATE == "left") {
                             document.getElementById("reticle-img").src = './assets/ui/mobile/portalBlue.png';
-                        }else if(GLOBALS.PORTAL_GUN_INITIATE == "right"){
+                        } else if (GLOBALS.PORTAL_GUN_INITIATE == "right") {
                             document.getElementById("reticle-img").src = './assets/ui/mobile/portalOrange.png';
-                        }else{
+                        } else {
                             document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
                         }
                     }
@@ -306,9 +306,9 @@ function portalButton(button, auto, camera, firstToRender) {
                     GLOBALS.PORTALS[0].normal = normal;
 
                     //if (!auto) {
-                        AUDIO.PORTAL_GUN_ORANGE.pause();
-                        AUDIO.PORTAL_GUN_ORANGE.currentTime = 0;
-                        play(AUDIO.PORTAL_GUN_ORANGE)
+                    AUDIO.PORTAL_GUN_ORANGE.pause();
+                    AUDIO.PORTAL_GUN_ORANGE.currentTime = 0;
+                    play(AUDIO.PORTAL_GUN_ORANGE)
                     //}
 
                 } else if (button == 2) { // left click
@@ -324,11 +324,11 @@ function portalButton(button, auto, camera, firstToRender) {
                         document.getElementById("reticle-img").style.filter = "none";
                         //document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
 
-                        if(GLOBALS.PORTAL_GUN_INITIATE == "left"){
+                        if (GLOBALS.PORTAL_GUN_INITIATE == "left") {
                             document.getElementById("reticle-img").src = './assets/ui/mobile/portalBlue.png';
-                        }else if(GLOBALS.PORTAL_GUN_INITIATE == "right"){
+                        } else if (GLOBALS.PORTAL_GUN_INITIATE == "right") {
                             document.getElementById("reticle-img").src = './assets/ui/mobile/portalOrange.png';
-                        }else{
+                        } else {
                             document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
                         }
                     }
@@ -353,9 +353,9 @@ function portalButton(button, auto, camera, firstToRender) {
                     GLOBALS.PORTALS[1].normal = normal;
 
                     //if (!auto) {
-                        AUDIO.PORTAL_GUN_BLUE.pause();
-                        AUDIO.PORTAL_GUN_BLUE.currentTime = 0;
-                        play(AUDIO.PORTAL_GUN_BLUE)
+                    AUDIO.PORTAL_GUN_BLUE.pause();
+                    AUDIO.PORTAL_GUN_BLUE.currentTime = 0;
+                    play(AUDIO.PORTAL_GUN_BLUE)
                     //}
                 }
 
@@ -457,6 +457,9 @@ function deletePortal(portalIndex) {
                     outOfTheTractor(d, index)
                 }
             }
+
+            GLOBALS.ITEMS_ADDED.remove(GLOBALS.TRACTOR_BEAM[index]);
+            GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[index] = null;
 
             GLOBALS.TRACTOR_BEAM.splice(index, 1);
             GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.splice(index, 1);

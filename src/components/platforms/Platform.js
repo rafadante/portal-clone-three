@@ -38,8 +38,9 @@ $("body").on('change', '#state-piston-loop', function () {
 function updatePlatformPosition(obj, instanced, i) {
     if (obj.body && obj.userData.isActive && obj.platformBox.parent.scale.y != 0) {
 
-        if(!obj.userData.loop && obj.body.pistonDown)
+        if (!obj.userData.loop && obj.body.pistonDown) {
             return;
+        }
 
         var offset;
 
@@ -73,9 +74,70 @@ function updatePlatformPosition(obj, instanced, i) {
 
         if (obj.platformBox.parent.scale.y > 0) {
 
-            if (obj.body.position[axis] > obj.initialPosition[axis] + (obj.platformBox.parent.scale.y * 2)){
+            if (obj.body.position[axis] > obj.initialPosition[axis] + (obj.platformBox.parent.scale.y * 2)) {
                 obj.body.pistonDown = true;
-            }else if (obj.body.position[axis] <= obj.initialPosition[axis])
+            } else if (obj.body.position[axis] <= obj.initialPosition[axis])
+                obj.body.pistonDown = false;
+        } else {
+
+            if (obj.body.position[axis] < obj.initialPosition[axis] + (obj.platformBox.parent.scale.y * 2)) {
+                obj.body.pistonDown = true;
+            } else if (obj.body.position[axis] >= obj.initialPosition[axis]) {
+                obj.body.pistonDown = false;
+            }
+        }
+
+
+        var item = new Object3D();
+        item.quaternion.copy(obj.body.quaternion);
+        item.position.copy(position);
+
+        item.updateMatrix();
+        instanced.setMatrixAt(i, item.matrix)
+        instanced.instanceMatrix.needsUpdate = true;
+        instanced.computeBoundingSphere();
+
+        //
+
+        obj.body.bodiesInContact.forEach(body => {
+            var offset2 = new CANNON.Vec3(offset * dir.x, offset * dir.y, offset * dir.z);
+            body.position.vadd(offset2, body.position);
+        });
+    } else if (obj.body && !obj.userData.isActive && obj.platformBox.parent.scale.y != 0 && obj.body.pistonDown && !obj.userData.loop) {
+
+
+        var offset = -0.005;
+
+        var axis = "y";
+        var dir = new CANNON.Vec3(0, 1, 0);
+        var position;
+
+        if (obj.platformBox.name == "track_platforms") {
+            if (obj.platformBox.side == "front" || obj.platformBox.side == "back") {
+                axis = 'x';
+                dir = new CANNON.Vec3(1, 0, 0);
+                position = new Vector3(obj.body.position.x, obj.initialPosition.y, obj.initialPosition.z);
+            } else {
+                axis = 'z';
+                dir = new CANNON.Vec3(0, 0, 1);
+                position = new Vector3(obj.initialPosition.x, obj.initialPosition.y, obj.body.position.z);
+            }
+
+            if (obj.platformBox.parent.scale.y < 0)
+                offset *= -1;
+        } else {
+            position = obj.body.position;
+        }
+
+        console.log(offset)
+
+        obj.body.position[axis] += offset;
+
+        if (obj.platformBox.parent.scale.y > 0) {
+
+            if (obj.body.position[axis] > obj.initialPosition[axis] + (obj.platformBox.parent.scale.y * 2)) {
+                obj.body.pistonDown = true;
+            } else if (obj.body.position[axis] <= obj.initialPosition[axis])
                 obj.body.pistonDown = false;
         } else {
 

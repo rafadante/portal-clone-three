@@ -223,11 +223,10 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
             GLOBALS.TRACTOR_BEAM.push(plane);
             GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.push(bb);
         }
-
-        console.log(GLOBALS.TRACTOR_BEAM)
-        console.log(GLOBALS.TRACTOR_BEAM_BOUNDING_BOX)
     }
 }
+
+window.tractorClones = [];
 
 function createLightBridgesFromPortal(portal, rayItem) {
 
@@ -252,6 +251,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
                     GLOBALS.LIGHT_BRIDGE_CLONE[g].item.clone = null;
                 }
             } else if (rayItem[g].name == "tractor_beam") {
+                
                 if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
                     GLOBALS.ITEMS_ADDED.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
                     GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
@@ -311,7 +311,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
             }
 
             const plane = new Mesh(geometry, material);
-            GLOBALS.SCENE_FPS.add(plane);
+            GLOBALS.ITEMS_ADDED.add(plane);
 
             if (rayItem[g].name == "tractor_beam") {
                 plane.rotation.x = Math.PI / 2;
