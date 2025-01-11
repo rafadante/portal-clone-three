@@ -444,19 +444,19 @@
             data-rotate="true" data-floor="true" data-ceiling="true" data-walls="true"
             src="../assets/ui/items/angled_panel.webp" id="angled_panel" data-instanced="false" />
 
-            <div>
-              <img alt="image" data-content="Purely cosmetic." data-title="DESK" class="item" data-name="desk"
-                src="../assets/ui/items/desk.webp" data-allowconnection="false" data-rotate="true" data-floor="true"
-                data-ceiling="false" data-walls="false" data-color="rgb(0,0,255)" id="desk" />
-              <span>5</span>
-            </div>
+          <div>
+            <img alt="image" data-content="Purely cosmetic." data-title="DESK" class="item" data-name="desk"
+              src="../assets/ui/items/desk.webp" data-allowconnection="false" data-rotate="true" data-floor="true"
+              data-ceiling="false" data-walls="false" data-color="rgb(0,0,255)" id="desk" />
+            <span>5</span>
+          </div>
 
-            <div>
-              <img alt="image" data-content="Purely cosmetic." data-title="STEP" class="item" data-name="step"
-                src="../assets/ui/items/step.png" data-allowconnection="false" data-rotate="true" data-floor="true"
-                data-ceiling="false" data-walls="false" data-color="rgb(0,0,255)" id="step" />
-              <span>10</span>
-            </div>
+          <div>
+            <img alt="image" data-content="Purely cosmetic." data-title="STEP" class="item" data-name="step"
+              src="../assets/ui/items/step.png" data-allowconnection="false" data-rotate="true" data-floor="true"
+              data-ceiling="false" data-walls="false" data-color="rgb(0,0,255)" id="step" />
+            <span>10</span>
+          </div>
 
           <div>
             <img alt="image"
@@ -565,11 +565,9 @@
           </div>-->
 
           <div>
-            <img alt="image"
-              data-content=""
-              data-title="INCINERATOR" class="item" data-name="incinerator" src="../assets/ui/items/incinerator.png"
-              data-allowconnection="true" data-rotate="true" data-floor="true" data-ceiling="false" data-walls="false"
-              data-instanced="true" id="incinerator" />
+            <img alt="image" data-content="" data-title="INCINERATOR" class="item" data-name="incinerator"
+              src="../assets/ui/items/incinerator.png" data-allowconnection="true" data-rotate="true" data-floor="true"
+              data-ceiling="false" data-walls="false" data-instanced="true" id="incinerator" />
             <span>1</span>
           </div>
         </div>
@@ -1062,7 +1060,7 @@
       </a>
     </li>
 
-    <li class="menu-item hasItem trigger_voice trigger_audio pellet_catcher exitDoor soundPlay"> 
+    <li class="menu-item hasItem trigger_voice trigger_audio pellet_catcher exitDoor soundPlay">
       <a href="#" class="menu-btn">
         <input placeholder="link to audio" type="text" id="state-trigger-voice-link" />
       </a>
@@ -1394,7 +1392,7 @@
 
   <div id="blocker">
 
-    <span id="version">version: 0.1.5</span>
+    <span id="version">version: 0.1.6</span>
 
     <div id="social" style="
     width: 300px;
@@ -1435,8 +1433,51 @@
         <div id="options-single" class="option-main optionMenu">
           <!--<span class="option" id="option-single-continue">CONTINUE</span>
           <span class="option" id="option-single-continue">NEW GAME</span>-->
-          <span class="option" id="option-single-load">PLAY</span>
-          <span class="option" id="option-single-reset">RESET PROGRESS</span>
+          <span class="option" id="option-single-load">PLAY ALL</span>
+          <!--<span class="option" id="option-single-reset">RESET PROGRESS</span>-->
+
+          <div id="list-main-chambers" class="option optionMenu">
+            <div data-id="1" data-name="./levels/tutorial_1_by_rafadante" class="custom-chamber"
+              style="background-image: url(./levels/1.webp)">
+              <span>Chamber 1</span>
+            </div>
+            <div data-id="2" data-name="./levels/tutorial_2_by_rafadante" class="custom-chamber"
+              style="background-image: url(./levels/2.webp)">
+              <span>Chamber 2</span>
+            </div>
+            <div data-id="3" data-name="./levels/tutorial_3_by_rafadante" class="custom-chamber"
+              style="background-image: url(./levels/3.webp)">
+              <span>Chamber 3</span>
+            </div>
+            <div data-id="4" data-name="./levels/tutorial_4_by_rafadante" class="custom-chamber"
+              style="background-image: url(./levels/4.webp)">
+              <span>Chamber 4</span>
+            </div>
+            <div data-id="5" data-name="./levels/tutorial_5_by_rafadante" class="custom-chamber"
+              style="background-image: url(./levels/5.webp)">
+              <span>Chamber 5</span>
+            </div>
+            <div data-id="6" data-name="./levels/tutorial_6_by_rafadante" class="custom-chamber"
+              style="background-image: url(./levels/6.webp)">
+              <span>Chamber 6</span>
+            </div>
+            <div data-id="7" data-name="./levels/tutorial_7_by_rafadante" class="custom-chamber"
+              style="background-image: url(./levels/7.webp)">
+              <span>Chamber 7</span>
+            </div>
+            <div data-id="8" data-name="./levels/tutorial_8_by_rafadante" class="custom-chamber"
+              style="background-image: url(./levels/8.webp)">
+              <span>Chamber 8</span>
+            </div>
+            <div data-id="9" data-name="./levels/tutorial_9_by_rafadante" class="custom-chamber"
+              style="background-image: url(./levels/9.webp)">
+              <span>Chamber 9</span>
+            </div>
+            <div data-id="10" data-name="./levels/tutorial_10_by_rafadante" class="custom-chamber"
+              style="background-image: url(./levels/10.webp)">
+              <span>Chamber 10</span>
+            </div>
+          </div>
         </div>
 
         <div id="options-community" class="option-main optionMenu">
@@ -1450,28 +1491,39 @@
             man</span>-->
 
           <div id="list-custm-chambers" class="option sub-option optionMenu">
-            <div data-name="The_Return_Chamber_17_by_FlameDogo99" class="custom-chamber" style="background-image: url(./community/1.webp)">
+            <div data-name="./community/The_Return_Chamber_17_by_FlameDogo99" class="custom-chamber"
+              style="background-image: url(./community/1.webp)">
               <i class="fas fa-thumbs-up"></i>
               <i class="fas fa-thumbs-down"></i>
               <span>The Return Chamber 17 by FlameDogo99</span>
             </div>
 
-            <div data-name="Cold_Boot_Chamber_6_by_FlamedDogo99" class="custom-chamber" style="background-image: url(./community/2.webp)">
+            <div data-name="./community/Cold_Boot_Chamber_6_by_FlamedDogo99" class="custom-chamber"
+              style="background-image: url(./community/2.webp)">
               <i class="fas fa-thumbs-up"></i>
               <i class="fas fa-thumbs-down"></i>
               <span>Cold Boot Chamber 6 by FlamedDogo99</span>
             </div>
 
-            <div data-name="Cold_Boot_Chamber_8_by_FlamedDogo99" class="custom-chamber" style="background-image: url(./community/3.webp)">
+            <div data-name="./community/Cold_Boot_Chamber_8_by_FlamedDogo99" class="custom-chamber"
+              style="background-image: url(./community/3.webp)">
               <i class="fas fa-thumbs-up"></i>
               <i class="fas fa-thumbs-down"></i>
               <span>Cold Boot Chamber 8 by FlamedDogo99</span>
             </div>
 
-            <div data-name="The_Fall_Chamber_1_by_FlamedDogo99" class="custom-chamber" style="background-image: url(./community/4.webp)">
+            <div data-name="./community/The_Fall_Chamber_1_by_FlamedDogo99" class="custom-chamber"
+              style="background-image: url(./community/4.webp)">
               <i class="fas fa-thumbs-up"></i>
               <i class="fas fa-thumbs-down"></i>
               <span>The Fall Chamber 1 by FlamedDogo99</span>
+            </div>
+
+            <div data-name="./community/The_Courtesy_Call_Chamber_5_by_FlamedDogo99" class="custom-chamber"
+              style="background-image: url(./community/5.webp)">
+              <i class="fas fa-thumbs-up"></i>
+              <i class="fas fa-thumbs-down"></i>
+              <span>The Courtesy Call Chamber 5 by FlamedDogo99</span>
             </div>
           </div>
 

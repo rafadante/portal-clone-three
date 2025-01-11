@@ -184,7 +184,9 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
         box.name = item;
         object.bodyBridge = box;
         GLOBALS.CANNON_BODIES_CONTINUOUS.push(box);
-        GLOBALS.CANNON_WORLD.addBody(box);
+
+        if (object.userData.state)
+            GLOBALS.CANNON_WORLD.addBody(box);
     } else if (item == "laser_field" || item == "fizzler") {
         box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
         box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
@@ -192,7 +194,9 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
         object.bodyLaserField = box;
         box.isItem = true;
         GLOBALS.CANNON_BODIES_CONTINUOUS.push(box);
-        GLOBALS.CANNON_WORLD.addBody(box);
+
+        if (object.userData.state)
+            GLOBALS.CANNON_WORLD.addBody(box);
 
         if (item == "laser_field") {
             box.addEventListener("collide", function (e) {
@@ -251,7 +255,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
                     GLOBALS.LIGHT_BRIDGE_CLONE[g].item.clone = null;
                 }
             } else if (rayItem[g].name == "tractor_beam") {
-                
+
                 if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
                     GLOBALS.ITEMS_ADDED.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
                     GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;

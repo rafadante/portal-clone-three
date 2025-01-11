@@ -69,7 +69,7 @@ var raycaster = new Raycaster();
 var updateLasers = true;
 
 
-function updatePhysics() {
+function updatePhysics(deltatime) {
 
     applyCustomGravity();
     updateGelBlob();
@@ -174,7 +174,7 @@ function updatePhysics() {
                 }
 
                 if (property == "piston_platforms" || property == "track_platforms") {
-                    updatePlatformPosition(GLOBALS.DYMANIC_ITEMS[property][i], instanced, i);
+                    updatePlatformPosition(GLOBALS.DYMANIC_ITEMS[property][i], instanced, i, deltatime);
                 } else {
 
                     if (property == "tractor_beam" || property == "laser_receiver" || property == "laser_relay") {

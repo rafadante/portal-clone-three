@@ -222,7 +222,7 @@ function render(time) {
     fixedUpdate();
     animateShader();
     renderGoo();
-    updatePhysics();
+    updatePhysics(time);
     updateCamera(time);
     teleportationState()
     updateEvents();

@@ -842,7 +842,9 @@ function addCollidersToCorridor(mesh) {
                 console.log("2222222222222")
                 GLOBALS.FINISHED = true;
                 window.currentLevel++;
+                console.log(window.currentLevel)
                 localStorage.setItem("level", window.currentLevel);
+                window.isCustom = false;
 
                 if (!GLOBALS.MOBILE) {
                     //GLOBALS.POINTER_CONTROLS.unlock();

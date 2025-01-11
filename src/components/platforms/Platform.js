@@ -35,7 +35,7 @@ $("body").on('change', '#state-piston-loop', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.loop = this.checked;
 });
 
-function updatePlatformPosition(obj, instanced, i) {
+function updatePlatformPosition(obj, instanced, i, deltaTime) {
     if (obj.body && obj.userData.isActive && obj.platformBox.parent.scale.y != 0) {
 
         if (!obj.userData.loop && obj.body.pistonDown) {
@@ -45,9 +45,11 @@ function updatePlatformPosition(obj, instanced, i) {
         var offset;
 
         if (!obj.body.pistonDown)
-            offset = 0.005;
+            offset = 0.00000015;
         else
-            offset = -0.005;
+            offset = -0.00000015;
+
+           // console.log(deltaTime)
 
         var axis = "y";
         var dir = new CANNON.Vec3(0, 1, 0);
@@ -70,7 +72,7 @@ function updatePlatformPosition(obj, instanced, i) {
             position = obj.body.position;
         }
 
-        obj.body.position[axis] += offset;
+        obj.body.position[axis] += offset * deltaTime;
 
         if (obj.platformBox.parent.scale.y > 0) {
 

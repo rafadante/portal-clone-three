@@ -84,10 +84,12 @@ $("body").on('click', '#option-single-load', function () {
     startLevel();
 
     setTimeout(() => {
-        if (!localStorage.getItem("level"))
-            window.currentLevel = 1;
+        /*if (!localStorage.getItem("level"))
+        window.currentLevel = 1;
         else
-            window.currentLevel = parseInt(localStorage.getItem("level"));
+        window.currentLevel = parseInt(localStorage.getItem("level"));*/
+
+        window.currentLevel = 1;
 
         window.stopMenuLoop = true;
         GLOBALS.LOADED_LEVEL = true;
@@ -171,19 +173,30 @@ $("body").on('click', '.custom-chamber', function () {
             loadLevelJSON();
         });*/
 
-        $("#next-map-btn").css("display", "none");
+    $("#next-map-btn").css("display", "none");
 
     setTimeout(() => {
         init();
     }, 2000);
 
+
     window.isCustom = true;
+
+    if ($(this).parent().attr("id") == "list-custm-chambers")
+        $("#next-map-btn").css("display", "none");
+    else {
+        $("#next-map-btn").css("display", "block");
+        window.currentLevel = $(this).data("id");
+    }
+
+    console.log(window.currentLevel)
+
 
     startLevel();
 
     setTimeout(() => {
 
-        custompath = "./community/"+$(this).data("name")+".json";
+        custompath = $(this).data("name") + ".json";
 
         window.stopMenuLoop = true;
         GLOBALS.LOADED_LEVEL = true;
