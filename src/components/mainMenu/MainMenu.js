@@ -24,6 +24,7 @@ $("#loading-parent").css("opacity", "0");
 $("#loading-parent").css("pointer-events", "none");
 
 $("body").on('click', '#option-community-build, #option-single-load', function () { //
+    alert("The level editor is still very unstable, and things will change a lot in the coming weeks, so maps can break in future updates. Feel free to mess around with it.");
     setTimeout(() => {
         play(AUDIO.EDITOR);
         init();
