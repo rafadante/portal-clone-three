@@ -46,7 +46,7 @@
 
     .settings-menu {
       background: rgba(128, 128, 128, 0.5);
-      width: 50%;
+      width: 80%;
       height: auto;
       display: flex;
       flex-direction: column;
@@ -420,7 +420,7 @@ form {
   grid-template-columns: auto auto;
 
   .custom-chamber {
-    width: 95%;
+    width: 90%;
     height: 300px;
     margin: 3px;
     position: relative;
@@ -430,6 +430,7 @@ form {
     cursor: pointer;
     transition: all 0.5s;
     border: 5px solid black;
+    overflow: hidden;
 
     span {
       position: absolute;

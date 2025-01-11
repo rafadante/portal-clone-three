@@ -179,7 +179,7 @@ $("body").on('click', '.custom-chamber', function () {
 
     setTimeout(() => {
 
-        custompath = "./community/The_Return_Chamber_17_by_FlameDogo99.json";
+        custompath = "./community/"+$(this).data("name")+".json";
 
         stopMenuLoop = true;
         GLOBALS.LOADED_LEVEL = true;

@@ -927,8 +927,10 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         dummy.position.copy(userDataLoadedItem.targetPos);
         dummy.rotation.copy(userDataLoadedItem.targetRot);
 
+        console.log(userDataLoadedItem.heightLine)
+
         targetFaithPlateUpdate(dummy)
-        targetFaithPlateEnd(dummy, userDataLoadedItem.height);
+        targetFaithPlateEnd(dummy, userDataLoadedItem.heightLine);
     } else if (GLOBALS.ITEM_HOLDED_NAME == "gel_recharger") {
         item.userData.gel = userDataLoadedItem.gel;
         gelRecharger(item.userData.gel, item)
