@@ -145,6 +145,9 @@ GLOBALS.RENDERER.info.autoReset = true;
 
 function animate(time) {
 
+    if(!window.stopMenuLoop)
+        return;
+
     //if (GLOBALS.FPS_MODE)
     //    requestAnimationFrame(animate);
 

@@ -13,7 +13,7 @@ import { playVoiceTrigger } from '../triggers/Triggers.js';
 var plane1, plane2, level;
 var transition = false;
 var transition2 = false;
-var stopMenuLoop = false;
+window.stopMenuLoop = false;
 let clock = new Clock();
 window.unlockedFPS = 0;
 window.isCustom = false;
@@ -36,7 +36,7 @@ $("body").on('click', '#back-main-menu', function () {
 });
 
 
-if (!stopMenuLoop) {
+if (!window.stopMenuLoop) {
     setTimeout(() => {
         var planegeometry = new PlaneGeometry(1, 1);
         plane1 = new Mesh(planegeometry, GLOBALS.MATERIAL_MAIN_MENU);
@@ -79,6 +79,8 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
 
 $("body").on('click', '#option-single-load', function () {
 
+    $("#next-map-btn").css("display", "block");
+
     startLevel();
 
     setTimeout(() => {
@@ -87,7 +89,7 @@ $("body").on('click', '#option-single-load', function () {
         else
             window.currentLevel = parseInt(localStorage.getItem("level"));
 
-        stopMenuLoop = true;
+        window.stopMenuLoop = true;
         GLOBALS.LOADED_LEVEL = true;
         //loadDefault();
     }, 2000);
@@ -169,6 +171,8 @@ $("body").on('click', '.custom-chamber', function () {
             loadLevelJSON();
         });*/
 
+        $("#next-map-btn").css("display", "none");
+
     setTimeout(() => {
         init();
     }, 2000);
@@ -181,7 +185,7 @@ $("body").on('click', '.custom-chamber', function () {
 
         custompath = "./community/"+$(this).data("name")+".json";
 
-        stopMenuLoop = true;
+        window.stopMenuLoop = true;
         GLOBALS.LOADED_LEVEL = true;
         //loadDefault();
     }, 2000);
@@ -275,7 +279,9 @@ function startLevel() {
             GLOBALS.SCENE_CHILDREN.remove(plane1);
             GLOBALS.SCENE_CHILDREN.remove(plane2);
             GLOBALS.SCENE.background = null;
-            stopMenuLoop = true;
+            window.stopMenuLoop = true;
+
+            console.log(window.stopMenuLoop)
         }, 1000);
     }, 1000);
 }
@@ -348,7 +354,7 @@ function pointerState(display1, display2, title, titleDisplay, id) {
 }
 
 function animate(time) {
-    if (!stopMenuLoop) {
+    if (!window.stopMenuLoop) {
         if (transition)
             GLOBALS.MATERIAL_MAIN_MENU.uniforms.iTime.value += clock.getDelta();
 
