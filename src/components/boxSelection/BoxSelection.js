@@ -54,6 +54,7 @@ function raycastSelected(found, event, type) {
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("desk") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("cabinet") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("sign") ||
+                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("step") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_gun"))) {
                 $("#rotate-item").css("display", "block");
             } else {

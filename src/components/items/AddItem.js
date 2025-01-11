@@ -860,7 +860,8 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         || GLOBALS.ITEM_HOLDED_NAME == "bed" || GLOBALS.ITEM_HOLDED_NAME == "toilet"
         || GLOBALS.ITEM_HOLDED_NAME == "desk" || GLOBALS.ITEM_HOLDED_NAME == "cabinet"
         || GLOBALS.ITEM_HOLDED_NAME == "sign" || GLOBALS.ITEM_HOLDED_NAME == "portal_0"
-        || GLOBALS.ITEM_HOLDED_NAME == "portal_1" || GLOBALS.ITEM_HOLDED_NAME == "incinerator") {
+        || GLOBALS.ITEM_HOLDED_NAME == "portal_1" || GLOBALS.ITEM_HOLDED_NAME == "incinerator"
+        || GLOBALS.ITEM_HOLDED_NAME == "step") {
 
         item.userData.rotationY = userDataLoadedItem.rotationY;
         var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);

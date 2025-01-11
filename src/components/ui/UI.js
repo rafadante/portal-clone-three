@@ -48,7 +48,13 @@ $("body").on('click', '#done', function () {
 });
 
 //QUALITY
+$("body").on('click', '.optionQuality', function () {
+    alert("You need to reload the page to apply!")
+})
+
 $('#quality-select').on('change', function () {
+
+
 
     localStorage.setItem("quality-select", $(this).val());
     GLOBALS.RENDERER.shadowMap.enabled = false;
@@ -135,8 +141,8 @@ $('#shadows-resolution-select').on('change', function () {
     }
 
     //if (localStorage.getItem("quality-select") == "epic" || localStorage.getItem("quality-select") == "high") {
-        GLOBALS.RENDERER.shadowMap.autoUpdate = true;
-        GLOBALS.RENDERER.shadowMap.autoUpdate = false;
+    GLOBALS.RENDERER.shadowMap.autoUpdate = true;
+    GLOBALS.RENDERER.shadowMap.autoUpdate = false;
     //}
 
     update()

@@ -412,6 +412,7 @@ function resetAll() {
 
 function laserReceiverTrigger(obj, state, catcher) {
 
+
   const item = GLOBALS.PLANE_USER_DATA[obj.userData.planeInstancedId];
 
   if (state) {

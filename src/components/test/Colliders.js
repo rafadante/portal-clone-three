@@ -14,6 +14,7 @@ import { gelTrigger } from '../gels/Gels.js';
 import { stateDoor } from '../door/Door.js';
 import { addColliderEvent } from '../platforms/Platform.js';
 import $ from 'jquery';
+import { laserReceiverTrigger } from '../events/events.js';
 
 function colliderItemManager() {
 
@@ -61,6 +62,9 @@ function colliderItemManager() {
     addColliderItem(GLOBALS.DYMANIC_ITEMS['trash'], "trash", 5)
 
     addColliderItem(GLOBALS.DYMANIC_ITEMS['desk'], "desk", 0)
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['step'], "step", 0, 1)
+    //addColliderItem(GLOBALS.DYMANIC_ITEMS['step'], "step", 0, 2)
+    //addColliderItem(GLOBALS.DYMANIC_ITEMS['step'], "step", 0, 3)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['cabinet'], "cabinet", 0)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['sign'], "sign", 0)
 
@@ -173,6 +177,10 @@ function fizzlerTrigger(body) {
             deletePortal(1)
             GLOBALS.PORTAL_BOX = [];
 
+            for (var i = 0; i < GLOBALS.LASER_TRIGGERS.length; i++) {
+               laserReceiverTrigger(GLOBALS.LASER_TRIGGERS[i], false);
+            }
+
 
         } else if (e.body.name == "sphere" || e.body.name == "cube" ||
             e.body.name == "radio" || e.body.name == "cube_2" || e.body.name == "laser_cube" ||
@@ -279,6 +287,27 @@ function addColliderItem(items, type, mass, offset) {
             if (type == "incinerator") {
                 var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
                 var shape = result.shape;
+            } else if (type == "step") {
+
+                var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
+                var shape = result.shape;
+
+                //PHYSICS_MATERIAL.friction = 0; //0.1
+
+                /*if (offset == 1) {
+                    var shape = new CANNON.Box(new CANNON.Vec3(1, 0.25, 1));
+                    objHolder.translateY(0.25);
+                } else if (offset == 2) {
+                    var shape = new CANNON.Box(new CANNON.Vec3(1, 0.25, 0.6));
+                    objHolder.translateY(0.75);
+                    objHolder.translateZ(-0.4);
+                }else if (offset == 3) {
+                    var shape = new CANNON.Box(new CANNON.Vec3(1, 0.25, 0.3));
+                    objHolder.translateY(1.25);
+                    objHolder.translateZ(-0.7);
+                }*/
+
+
             } else if (type == "desk" || type == "cabinet" || type == "sign") {
                 var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
                 var shape = result.shape;

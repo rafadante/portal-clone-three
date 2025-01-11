@@ -6,6 +6,7 @@ import * as CANNON from 'cannon';
 import "./components/materials/Materials.js"
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh';
+import $ from 'jquery';
 
 // Add the extension functions
 BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
@@ -22,7 +23,9 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(naviga
     fov = 63;
     antialias = false;
 
-    document.getElementById("next-map").style.transform = "scale(0.5)"
+    document.getElementById("next-map").style.transform = "scale(0.5)";
+
+    $(".desktop").css("display", "none")
 } else {
     mobile = false;
     pixelRatio = 0.5;
@@ -503,6 +506,18 @@ function getItemValues() {
             ceiling: false,
             trigger: false
         },
+        step: {
+            count: 0,
+            max: 20,
+            instanced: true,
+            interactive: false,
+            roughness: 0.2,
+            envIntensity: 0.8,
+            wall: false,
+            ground: true,
+            ceiling: false,
+            trigger: false
+        },
         cabinet: {
             count: 0,
             max: 5,
@@ -834,7 +849,8 @@ var GLOBALS = {
         sign: [],
         piston_platforms: [],
         track_platforms: [],
-        incinerator: []
+        incinerator: [],
+        step: []
     },
 
     TRIGGER_BOXES: [],
