@@ -95,6 +95,8 @@ function renderThingsBefore() {
     }, 2000);
 }
 
+GLOBALS.SCENE_FPS = new Group();
+
 function viewFPS(firstRender) {
 
     resetPlayerBody();
@@ -103,8 +105,6 @@ function viewFPS(firstRender) {
     loadingTxt()
 
     AUDIO.EDITOR.pause();
-
-    GLOBALS.SCENE_FPS = new Group();
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.SCENE_FPS);
 
     GLOBALS.ITEM_CUBE.visible = false;

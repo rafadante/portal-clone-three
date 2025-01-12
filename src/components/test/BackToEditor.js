@@ -5,7 +5,7 @@ import { stateDoor } from '../door/Door.js';
 import { deletePortal } from '../portal/CreatePortal.js';
 import { resetAll } from '../events/events.js';
 import { interactWithItem } from '../events/interaction.js';
-import { Color, Vector3 } from 'three';
+import { Color, Group, Vector3 } from 'three';
 import { removePelletHitInstances } from '../pellet/Pellet.js';
 import { resetPlatforms } from '../platforms/Platform.js';
 import { resetPlayerBody } from '../fps/Player.js';
@@ -257,6 +257,8 @@ function backToEditor() {
         GLOBALS.CONNECTIONS[i]['line'].active = false;
         GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons = 0;
     }
+
+    GLOBALS.SCENE_FPS = new Group();
 }
 
 function resetPositions(item, name) {

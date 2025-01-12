@@ -31,8 +31,38 @@ $("body").on('click', '#option-community-build, #option-single-load', function (
     }, 2000);
 });
 
-$("body").on('click', '#back-main-menu', function () {
 
+$("body").on('click', '#back-main-map-btn, #back-main-menu', function () {
+
+    console.log("66666666666666")
+    $("#blocker .body").css("opacity", "1");
+
+    $("#blocker").css("display", "flex");
+    $("#ui").css("display", "none");
+    $("#blocker .body").css("opacity", "1");
+
+
+
+    $(".optionMenu").css("display", "none");
+    $("#options-main").css("display", "block");
+    //$("#container").css("display", "none");
+
+    $("#options-settings").css("display", "none");
+
+
+    $("#settings-close").css("display", "none");
+
+    $("#next-map").css("display", "none");
+
+
+    $("#options-main .option").css("display", "block");
+
+
+
+    window.stopMenuLoop = false;
+    //window.location.reload();
+
+    //animate()
 });
 
 
@@ -78,6 +108,7 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
 }
 
 $("body").on('click', '#option-single-load', function () {
+    
 
     $("#next-map-btn").css("display", "block");
 
@@ -153,6 +184,8 @@ $("body").on('click', '.load-custom', function () {
 
 var custompath;
 
+var first = true;
+
 $("body").on('click', '.custom-chamber', function () {
     /*window.isCustom = true;
     //init();
@@ -175,10 +208,7 @@ $("body").on('click', '.custom-chamber', function () {
 
     $("#next-map-btn").css("display", "none");
 
-    setTimeout(() => {
-        init();
-    }, 2000);
-
+    //
 
     window.isCustom = true;
 
@@ -189,19 +219,48 @@ $("body").on('click', '.custom-chamber', function () {
         window.currentLevel = $(this).data("id");
     }
 
-    console.log(window.currentLevel)
-
-
-    startLevel();
-
     setTimeout(() => {
 
         custompath = $(this).data("name") + ".json";
 
         window.stopMenuLoop = true;
         GLOBALS.LOADED_LEVEL = true;
-        //loadDefault();
     }, 2000);
+
+    //
+
+    if (first) {
+
+        setTimeout(() => {
+            init();
+        }, 2000);
+
+        startLevel();
+
+    } else {
+        $("#loading-parent").css("opacity", 1);
+        $("#loading-parent").css("pointer-events", "all");
+        $("#next-map").css("display", "none");
+
+        $("#options-settings").css("display", "block");
+        $("#options-main").css("display", "none");
+        $("#options-single").css("display", "none");
+        $("#options-community").css("display", "none");
+        $("#container").css("display", "block");
+
+        $("#back-main").css("display", "none");
+        $("#settings-close").css("display", "block");
+
+        backToEditor();
+
+
+        setTimeout(() => {
+            fetchLevel()
+        }, 2100);
+    }
+
+    first = false;
+    
 });
 
 if (localStorage.getItem("load") == "true") {

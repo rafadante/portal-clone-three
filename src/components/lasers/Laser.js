@@ -35,7 +35,7 @@ function laserEmitterRaycast(object, update, rayItem, index) {
         if (rayItem.distance == intersects[0].distance) {
             return;
         } else {
-            GLOBALS.SCENE_CHILDREN.remove(object.continuous);
+            GLOBALS.SCENE_FPS.remove(object.continuous);
         }
 
         GLOBALS.LASER_EMITTER_RAYCASTER[index] = raycaster;
@@ -57,12 +57,12 @@ function laserEmitterRaycast(object, update, rayItem, index) {
     laserParent.rotation.copy(object.rotation)
     laserParent.scale.y = intersects[0].distance;
     laserParent.add(laser);
-    GLOBALS.SCENE_CHILDREN.add(laserParent);
+    GLOBALS.SCENE_FPS.add(laserParent);
 
     const laserParentClone = laserParent.clone();
     laserParentClone.visible = false;
     laserParent.clone = laserParentClone;
-    GLOBALS.SCENE_CHILDREN.add(laserParentClone);
+    GLOBALS.SCENE_FPS.add(laserParentClone);
 
     object.continuous = laserParent;
     object.raycaster = raycaster;

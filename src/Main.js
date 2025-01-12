@@ -39,6 +39,7 @@ var angleHolder = 0;
 let pmremGenerator, currentRenderTarget;
 let timeTarget = 0;
 let clock2 = new Clock();
+let clock3 = new Clock();
 let clockPortal = new Clock();
 let deltaPortal = 0;
 let frames = 0, prevTime = performance.now();
@@ -178,8 +179,6 @@ function fixedUpdate() { //60 fps always for physics
 
     const deltaTime = clock2.getDelta();
 
-    updatePhysics(deltaTime);
-
     if (fps > 15) {//IF FPS IS LOWER THAN 15, AVOID THE PLAYER TO CONTROL THE CHARACTER TO AVOID PHYSICS ERRORS
         updatePlayer(deltaTime);
         updateRay(deltaTime);
@@ -225,6 +224,8 @@ function render(time) {
     fixedUpdate();
     animateShader();
     renderGoo();
+    const deltaTime = clock3.getDelta();
+    updatePhysics(deltaTime);
     updateCamera(time);
     teleportationState()
     updateEvents();

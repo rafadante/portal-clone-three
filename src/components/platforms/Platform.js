@@ -45,9 +45,9 @@ function updatePlatformPosition(obj, instanced, i, deltaTime) {
         var offset;
 
         if (!obj.body.pistonDown)
-            offset = 0.7;
+            offset = 0.7 * deltaTime;
         else
-            offset = -0.7;
+            offset = -0.7 * deltaTime;
 
             //console.log(deltaTime)
 
@@ -72,7 +72,7 @@ function updatePlatformPosition(obj, instanced, i, deltaTime) {
             position = obj.body.position;
         }
 
-        obj.body.position[axis] += offset * deltaTime;
+        obj.body.position[axis] += offset;
 
         if (obj.platformBox.parent.scale.y > 0) {
 

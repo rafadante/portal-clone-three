@@ -52,24 +52,6 @@ $("body").on('click', '.optionQuality', function () {
     alert("You need to reload the page to apply!")
 });
 
-$("body").on('click', '#back-main-map-btn, #back-main-menu', function () {
-    /*console.log("66666666666666")
-    $("#blocker .body").css("opacity", "1");
-
-    $("#blocker").css("display", "flex");
-    $("#ui").css("display", "none");
-    $("#blocker .body").css("opacity", "1");
-
-    
-    
-    $(".optionMenu").css("display", "none");
-    $("#options-main").css("display", "block");
-    $("#container").css("display", "none");
-
-    window.stopMenuLoop = false;*/
-    window.location.reload();
-});
-
 $('#quality-select').on('change', function () {
 
 
