@@ -491,8 +491,8 @@ function loadLevel(data) {
         GLOBALS.CANNON_WORLD.remove(GLOBALS.CANNON_BODIES_CONTINUOUS[i]);
     }
 
-    for (var i = GLOBALS.LASERS.length - 1; i >= 0; i--) {
-        GLOBALS.LASERS.remove(GLOBALS.LASERS[i]);
+    for (var i = GLOBALS.LASERS.children.length - 1; i >= 0; i--) {
+        GLOBALS.LASERS.remove(GLOBALS.LASERS.children[i]);
     }
 
     GLOBALS.EXIT_DOOR.finished = false;
