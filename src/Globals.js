@@ -667,6 +667,7 @@ function getItemValues() {
 
 var GLOBALS = {
 
+    LASERS: new Group(),
     STATS_UI: {
         time: 0,
         portals: 0,

@@ -102,7 +102,7 @@ function respawn(d) {
 
     d.repawning = true;
 
-    var time = 2500;
+    var time = 0;
     var time2 = 0;
 
     if (d.name == "player") {

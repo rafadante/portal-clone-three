@@ -139,6 +139,24 @@ function onWindowResize() {
 
     if (GLOBALS.COMPOSER)
         GLOBALS.COMPOSER.setSize(window.canvasWidth, window.canvasHeight);
+
+    if (GLOBALS.PAUSED && GLOBALS.FPS_MODE) {
+        // finally, render to screen
+        GLOBALS.RENDERER.setRenderTarget(currentRenderTarget);
+        GLOBALS.RENDERER.localClippingEnabled = false;
+        GLOBALS.RENDERER.clippingPlanes = [];
+
+        if (localStorage.getItem("quality-select") == "epic" && GLOBALS.COMPOSER) {
+            GLOBALS.COMPOSER.render();
+        } else {
+            GLOBALS.RENDERER.autoClear = false;
+            GLOBALS.RENDERER.clear();
+            GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+            document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
+            GLOBALS.RENDERER.clearDepth()
+            GLOBALS.RENDERER.render(GLOBALS.GUN_GROUP, GLOBALS.PORTAL_GUN_CAMERA);
+        }
+    }
 }
 
 GLOBALS.RENDERER.info.autoReset = true;
@@ -146,7 +164,7 @@ GLOBALS.RENDERER.info.autoReset = true;
 
 function animate(time) {
 
-    if(!window.stopMenuLoop)
+    if (!window.stopMenuLoop)
         return;
 
     //if (GLOBALS.FPS_MODE)
@@ -157,11 +175,11 @@ function animate(time) {
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         TWEEN.update();
         document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
-    } else if (!GLOBALS.PAUSED){
+    } else if (!GLOBALS.PAUSED) {
         render(time);
     }
 
-    if(GLOBALS.FPS_MODE){
+    if (GLOBALS.FPS_MODE) {
         joystickMenu();
     }
 }
@@ -255,24 +273,7 @@ function render(time) {
     GLOBALS.RENDERER.clippingPlanes = [];
 
     if (localStorage.getItem("quality-select") == "epic" && GLOBALS.COMPOSER) {
-        //GLOBALS.RENDERER.autoClear = false;
-        //GLOBALS.RENDERER.clear();
-        /*GLOBALS.RENDERER.autoClear = false;
-        GLOBALS.RENDERER.clear();
-        GLOBALS.RENDERER.info.reset();*/
-        //perf.begin();
-        //GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
-        //perf.end();
         GLOBALS.COMPOSER.render();
-        //console.log(GLOBALS.RENDERER.info);
-        //GLOBALS.COMPOSER.render(GLOBALS.SCENE, GLOBALS.PORTAL_GUN_CAMERA);
-
-        /*GLOBALS.RENDERER.autoClear = false;
-        GLOBALS.RENDERER.clear();
-        GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
-        document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
-        GLOBALS.RENDERER.clearDepth()
-        GLOBALS.RENDERER.render(GLOBALS.GUN_GROUP, GLOBALS.PORTAL_GUN_CAMERA);*/
     } else {
         GLOBALS.RENDERER.autoClear = false;
         GLOBALS.RENDERER.clear();

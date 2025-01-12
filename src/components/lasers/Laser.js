@@ -10,6 +10,8 @@ if (localStorage.getItem("quality-select") == "epic") {
     red = 10;
 }
 
+GLOBALS.SCENE_CHILDREN.add(GLOBALS.LASERS)
+
 function laserEmitterRaycast(object, update, rayItem, index) {
 
     var obj = new Object3D();
@@ -35,7 +37,7 @@ function laserEmitterRaycast(object, update, rayItem, index) {
         if (rayItem.distance == intersects[0].distance) {
             return;
         } else {
-            GLOBALS.SCENE_FPS.remove(object.continuous);
+            GLOBALS.LASERS.remove(object.continuous);
         }
 
         GLOBALS.LASER_EMITTER_RAYCASTER[index] = raycaster;
@@ -57,12 +59,12 @@ function laserEmitterRaycast(object, update, rayItem, index) {
     laserParent.rotation.copy(object.rotation)
     laserParent.scale.y = intersects[0].distance;
     laserParent.add(laser);
-    GLOBALS.SCENE_FPS.add(laserParent);
+    GLOBALS.LASERS.add(laserParent);
 
     const laserParentClone = laserParent.clone();
     laserParentClone.visible = false;
     laserParent.clone = laserParentClone;
-    GLOBALS.SCENE_FPS.add(laserParentClone);
+    GLOBALS.LASERS.add(laserParentClone);
 
     object.continuous = laserParent;
     object.raycaster = raycaster;

@@ -491,6 +491,10 @@ function loadLevel(data) {
         GLOBALS.CANNON_WORLD.remove(GLOBALS.CANNON_BODIES_CONTINUOUS[i]);
     }
 
+    for (var i = GLOBALS.LASERS.length - 1; i >= 0; i--) {
+        GLOBALS.LASERS.remove(GLOBALS.LASERS[i]);
+    }
+
     GLOBALS.EXIT_DOOR.finished = false;
 
     if (GLOBALS.CORRIDOR_ENTER) {

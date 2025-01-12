@@ -93,6 +93,11 @@ $("body").on('click', '#delete', function () {
 
     if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].isInstanced) {
 
+        if(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "incinerator"){
+            
+            GLOBALS.ITEMS_ADDED.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.trigger);
+        }
+
         if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous) {
             if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide)
                 GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.otherSide.hasItem = false;

@@ -9,6 +9,7 @@ import { Color, Group, Vector3 } from 'three';
 import { removePelletHitInstances } from '../pellet/Pellet.js';
 import { resetPlatforms } from '../platforms/Platform.js';
 import { resetPlayerBody } from '../fps/Player.js';
+import { updateLaserEmitterRaycaster } from '../lasers/Laser.js';
 
 //BACK FROM EDITOR
 $("body").on('click', '#back-editor', function () {
@@ -259,6 +260,12 @@ function backToEditor() {
     }
 
     GLOBALS.SCENE_FPS = new Group();
+
+    for (var i = 0; i < GLOBALS.LASER_EMITTER_RAYCASTER.length; i++) {
+
+        GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.visible = false;
+
+    }
 }
 
 function resetPositions(item, name) {

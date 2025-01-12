@@ -258,9 +258,6 @@ function trasnlatePlane(id, val, portal, old) {
 
                     item.translateY(-1);
 
-                    plane.item.initialPosition = item.position.clone();
-                    plane.item.initialRotation = item.rotation.clone();
-
                     item.translateY(2);
 
                     //UPDATE DISPENSER
@@ -272,6 +269,9 @@ function trasnlatePlane(id, val, portal, old) {
 
                     plane.item.dispenserPosition = item2.position.clone();
                 }
+
+                plane.item.initialPosition = item.position.clone();
+                    plane.item.initialRotation = item.rotation.clone();
 
 
 
