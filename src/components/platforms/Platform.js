@@ -49,8 +49,6 @@ function updatePlatformPosition(obj, instanced, i, deltaTime) {
         else
             offset = -0.7 * deltaTime;
 
-            //console.log(deltaTime)
-
         var axis = "y";
         var dir = new CANNON.Vec3(0, 1, 0);
         var position;
@@ -130,8 +128,6 @@ function updatePlatformPosition(obj, instanced, i, deltaTime) {
         } else {
             position = obj.body.position;
         }
-
-        console.log(offset)
 
         obj.body.position[axis] += offset;
 

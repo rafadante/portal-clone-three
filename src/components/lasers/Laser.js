@@ -118,7 +118,9 @@ function updateLaserCubeRaycaster(item, laser) {
     laser.position.copy(item.position);
     laser.rotation.copy(item.rotation);
     laser.rotateX(-Math.PI / 2)
-    laser.scale.y = laserCubeRayIntersects[0].distance;
+
+    if (laserCubeRayIntersects.length > 0)
+        laser.scale.y = laserCubeRayIntersects[0].distance;
 
     var unfiltered = [
         GLOBALS.ITEMS_ADDED.getObjectByName("laser_cube"),

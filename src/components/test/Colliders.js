@@ -155,6 +155,8 @@ function addColliderDoorsDefault(obj, name) {
 }
 
 function fizzlerTrigger(body) {
+
+
     body.addEventListener("collide", function (e) {
 
         if (e.target.collisionResponse == 1)
@@ -178,7 +180,8 @@ function fizzlerTrigger(body) {
             GLOBALS.PORTAL_BOX = [];
 
             for (var i = 0; i < GLOBALS.LASER_TRIGGERS.length; i++) {
-               laserReceiverTrigger(GLOBALS.LASER_TRIGGERS[i], false);
+                if (!GLOBALS.LASER_TRIGGERS[i].emitterState && GLOBALS.LASER_TRIGGERS[i].fromLaserCube)
+                    laserReceiverTrigger(GLOBALS.LASER_TRIGGERS[i], false);
             }
 
 
