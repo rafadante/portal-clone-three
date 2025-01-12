@@ -858,8 +858,11 @@ function addCollidersToCorridor(mesh) {
                 $("#test-name").text($("#chamber-name-to-save").val());
                 $("#test-author").text($("#author-name-to-save").val());
 
+                const minutes = Math.floor(GLOBALS.STATS_UI.time / 60);
+                const seconds =  Math.floor(GLOBALS.STATS_UI.time - minutes * 60);
+
                 $("#test-portals").text(GLOBALS.STATS_UI.portals);
-                $("#test-time").text((GLOBALS.STATS_UI.time / 60).toFixed(2) + " min");
+                $("#test-time").text(minutes + ":" + seconds);
                 $("#test-steps").text(parseInt(GLOBALS.STATS_UI.steps));
 
                 window.curentTimeOffset = 0;
