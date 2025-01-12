@@ -1,7 +1,7 @@
-import {PlaneGeometry,Object3D,InstancedMesh,Matrix4} from 'three';
-import {GLOBALS} from '../../Globals.js';
-import {shuffle,groupByPercentage} from '../../Utils.js';
-import {colliderRoom} from './Colliders.js';
+import { PlaneGeometry, Object3D, InstancedMesh, Matrix4 } from 'three';
+import { GLOBALS } from '../../Globals.js';
+import { shuffle, groupByPercentage } from '../../Utils.js';
+import { colliderRoom } from './Colliders.js';
 //import { InstancedMesh2 } from '@three.ez/instanced-mesh';
 
 var id = 0;
@@ -22,7 +22,7 @@ function manageInstances() {
     var sideLeft = [];
 
     var enterDoor = "enterDoor";
-    if(GLOBALS.ITEMS_ADDED.getObjectByName("spawn")){
+    if (GLOBALS.ITEMS_ADDED.getObjectByName("spawn")) {
         enterDoor = ".."
     }
 
@@ -31,8 +31,9 @@ function manageInstances() {
 
         if (GLOBALS.PLANE_USER_DATA[i].exists) {
 
-            if(GLOBALS.PLANE_USER_DATA[i].item){
-                GLOBALS.PLANE_USER_DATA[i].item.userData.played = false;
+            if (GLOBALS.PLANE_USER_DATA[i].item) {
+                if (GLOBALS.PLANE_USER_DATA[i].item.userData)
+                    GLOBALS.PLANE_USER_DATA[i].item.userData.played = false;
             }
 
             if (GLOBALS.PLANE_USER_DATA[i].itemName != enterDoor &&
