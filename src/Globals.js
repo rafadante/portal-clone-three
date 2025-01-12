@@ -51,7 +51,7 @@ window.canvasWidth = Math.min(window.canvasWidth, maxWidth);
 window.canvasHeight = Math.min(window.canvasHeight, maxHeight);
 
 //MAIN CAMERA
-const camera = new PerspectiveCamera(fov, window.canvasWidth / window.canvasHeight, 0.1, 100);
+const camera = new PerspectiveCamera(fov, window.canvasWidth / window.canvasHeight, 0.1, 1000);
 camera.rotation.order = 'YXZ';
 camera.position.set(0, 0, 30);
 window.fov = fov;
