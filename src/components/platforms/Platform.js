@@ -108,7 +108,7 @@ function updatePlatformPosition(obj, instanced, i, deltaTime) {
     } else if (obj.body && !obj.userData.isActive && obj.platformBox.parent.scale.y != 0 && obj.body.pistonDown && !obj.userData.loop) {
 
 
-        var offset = -0.005;
+        var offset = -0.7 * deltaTime;
 
         var axis = "y";
         var dir = new CANNON.Vec3(0, 1, 0);
