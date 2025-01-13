@@ -715,7 +715,7 @@ var GLOBALS = {
     //LEVEL EDITOR
     PLANE_USER_DATA: [],
     PLANE_LEVEL_INSTANCED: null,
-    BUDGET: 3000,
+    BUDGET: 5000,
 
     //PORTALS
     PORTALS: [null, null],
