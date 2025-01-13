@@ -418,6 +418,27 @@ form {
 #list-custm-chambers, #list-main-chambers {
   display: grid;
   grid-template-columns: auto auto;
+  margin-top: 70px;
+  overflow: hidden;
+
+  #options-custom{
+    margin-top: -70px;
+    position: fixed;
+    width: auto;
+    display: flex;
+    overflow-x: hidden;
+    z-index: 10000;
+    background-color: #999;
+
+    span{
+      width: auto;
+      padding: 15px;
+    }
+
+    #option-cutom-new{
+      background-color: grey;
+    }
+  }
 
   .custom-chamber {
     width: 90%;
