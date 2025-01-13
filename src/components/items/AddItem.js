@@ -757,7 +757,9 @@ function manageItemVariables(item, userData, instanced) {
     item.userData.angle = 45;
     item.userData.link = null;
 
-    if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
+    if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
+        item.userData.state = true;
+    }else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
         item.userData.state = "all";
     } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
         GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube" ||
@@ -802,6 +804,9 @@ function manageItemVariables(item, userData, instanced) {
 }
 
 function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData) {
+
+    item.userData.state = userDataLoadedItem.state;
+
     item.userData.buttons = 0;//userDataLoadedItem.buttons
     item.userData.showLines = userDataLoadedItem.showLines;
     item.userData.connections = 0;//userDataLoadedItem.connections

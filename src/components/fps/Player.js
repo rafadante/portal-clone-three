@@ -89,7 +89,7 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
 
     GLOBALS.PLAYER.looping = false;
 
-    if (event.body.name == "faith_plate" && !GLOBALS.PLAYER.block) {
+    if (event.body.name == "faith_plate" && !GLOBALS.PLAYER.block && event.body.item.userData.state) {
 
         GLOBALS.PLAYER.block = true;
         setTimeout(() => {

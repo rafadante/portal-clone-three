@@ -369,6 +369,10 @@ $("body").on('input', '#grid-state-input', function () {
     }
 });
 
+$("body").on('input', '#plate-state-input', function () {
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.state = this.checked;
+});
+
 document.getElementById("container").addEventListener('pointerdown', onDocumentMouseDown, false);
 document.getElementById("container").addEventListener('pointermove', onDocumentMouseMove, false);
 document.getElementById("container").addEventListener('pointerup', onDocumentMouseUp, false);

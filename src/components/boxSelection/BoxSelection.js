@@ -213,6 +213,7 @@ function raycastSelected(found, event, type) {
                         $(".faith_plate").css("display", "block");
                         //$("#plate-max-height-value").prop("min", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.height - 2);
                         $("#plate-max-height-value").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.heightLine);
+                        $("#plate-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state);
                     }
 
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("angled_panel")) {

@@ -169,7 +169,11 @@ function updateEvents() {
               connectionState(GLOBALS.CONNECTIONS[i], null, false, new Color(0, 2.0, 5.0));
 
               if (active) {
-                if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
+                if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
+                  //if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections < GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
+                    GLOBALS.CONNECTIONS[i]['to'].item.userData.state = false;
+                  //}
+                } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
                   GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
                   if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons < GLOBALS.CONNECTIONS[i]['to'].item.userData.connections) {
                     stateDoor(0, false, false, GLOBALS.CONNECTIONS[i]['to'].item);
@@ -301,7 +305,11 @@ function doSetTimeout(to, waitFor, idHolder, connection, body) {
       respawn(body);
     }
 
-    if (to.itemName.includes("door") ||
+    if (to.itemName.includes("faith_plate")) {
+      if (to.item.userData.connections == to.item.userData.buttons) {
+        to.item.userData.state = true;
+      }
+    } else if (to.itemName.includes("door") ||
       to.itemName.includes("exitDoor")) {
       if (to.item.userData.connections == to.item.userData.buttons) {
         stateDoor(0, true, false, to.item);
@@ -367,7 +375,11 @@ function resetAll() {
       connectionState(GLOBALS.CONNECTIONS[i], null, false, new Color(0, 2.0, 5.0))
 
       if (active) {
-        if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
+        if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
+          //if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections < GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
+            GLOBALS.CONNECTIONS[i]['to'].item.userData.state = false;
+          //}
+        } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
           GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
           if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons < GLOBALS.CONNECTIONS[i]['to'].item.userData.connections) {
             stateDoor(0, false, false, GLOBALS.CONNECTIONS[i]['to'].item);
@@ -440,7 +452,11 @@ function laserReceiverTrigger(obj, state, catcher) {
           AUDIO.POSITIVE.play();
 
           //Manage Door Trigger
-          if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
+          if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
+            if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
+              GLOBALS.CONNECTIONS[i]['to'].item.userData.state = true;
+            }
+          } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
             GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
             if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
               stateDoor(0, true, false, GLOBALS.CONNECTIONS[i]['to'].item);
@@ -507,7 +523,11 @@ function laserReceiverTrigger(obj, state, catcher) {
     connectionState(holder, "no", false, new Color(0, 2.0, 5.0))
 
     if (active) {
-      if (holder['to'].itemName.includes("door") || holder['to'].itemName.includes("exitDoor")) {
+      if (holder['to'].itemName.includes("faith_plate")) {
+        //if (holder['to'].item.userData.connections < holder['to'].item.userData.buttons) {
+          holder['to'].item.userData.state = false;
+        //}
+      } else if (holder['to'].itemName.includes("door") || holder['to'].itemName.includes("exitDoor")) {
         if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections)
           stateDoor(0, false, false, holder['to'].item);
       } else if (holder['to'].itemName.includes("tractor")) {
