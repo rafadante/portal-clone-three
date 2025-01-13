@@ -102,8 +102,8 @@ function respawn(d) {
 
     d.repawning = true;
 
-    var time = 0;
-    var time2 = 0;
+    var time = 500;
+    var time2 = 500;
 
     if (d.name == "player") {
 
@@ -157,7 +157,9 @@ function respawn(d) {
 
                 if (d.item.userData.connections == 0) {
                     d.mass = 5;
-                } else {
+                } else if (d.item.userData.connections == d.item.userData.buttons) {
+                    d.mass = 5;
+                }else {
                     d.mass = 0;
                 }
 

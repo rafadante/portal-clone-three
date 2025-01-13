@@ -76,6 +76,8 @@ function interactWithItem() {
                             //PLAY AUDIO POSITIVE
                             AUDIO.POSITIVE.play();
 
+                            console.log(GLOBALS.CONNECTIONS[i])
+
                             //Manage Door Trigger
                             if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
                                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
