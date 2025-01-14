@@ -180,7 +180,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
 
     if (item == "light_bridge" || item == "glass") {
         box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
-        box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
+        box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC | GLOBALS.CGROUP_PLAYER;
         box.name = item;
         object.bodyBridge = box;
         GLOBALS.CANNON_BODIES_CONTINUOUS.push(box);
@@ -189,7 +189,7 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
             GLOBALS.CANNON_WORLD.addBody(box);
     } else if (item == "laser_field" || item == "fizzler") {
         box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
-        box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
+        box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC | GLOBALS.CGROUP_PLAYER;
         box.collisionResponse = 0;
         object.bodyLaserField = box;
         box.isItem = true;
@@ -385,7 +385,7 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
             if (rayItem[g].name == "light_bridge") {
                 box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
-                box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
+                box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC | GLOBALS.CGROUP_PLAYER;
                 GLOBALS.CANNON_BODIES_CONTINUOUS.push(box);
                 GLOBALS.CANNON_WORLD.addBody(box);
 

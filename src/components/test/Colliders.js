@@ -726,7 +726,7 @@ function colliderRoom(array, side, a1, a2, a3, a4) {
             box.position.copy(obj.position);
             box.position[a4] += columsNew[i][j].length - 1;
             box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT;
-            box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
+            box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC | GLOBALS.CGROUP_PLAYER;
             box.room = true;
             box.side = side;
             box.name = "wall";
@@ -830,7 +830,7 @@ function addCollidersToCorridor(mesh) {
     wall.position.copy(worldPos);
     wall.quaternion.copy(worldQuat);
     wall.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
-    wall.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC
+    wall.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC | GLOBALS.CGROUP_PLAYER;
     GLOBALS.CANNON_WORLD.addBody(wall);
     GLOBALS.CANNON_BODIES.push(wall);
     GLOBALS.CORRIDOR_COLLIDERS.push(wall);

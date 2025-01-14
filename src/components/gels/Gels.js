@@ -184,7 +184,7 @@ function gelCollider(dummy, type, side, size, instanced, color) {
     //gel.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
     //gel.collisionFilterMask = GLOBALS.CGROUP_ALL;
     gel.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT;
-    gel.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC;
+    gel.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC | GLOBALS.CGROUP_PLAYER;
     gel.side = side;
     gel.color = color;
     gel.room = true;

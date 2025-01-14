@@ -765,9 +765,10 @@ var GLOBALS = {
     //     set new host object group &= CGROUP_PORTAL_HOST_CDISABLE[p]
     //     no change to mask.
     CANNON_WORLD: null,
-    CGROUP_ENVIRONMENT: 1 << 0,
+    CGROUP_ENVIRONMENT: 1,
     CGROUP_PORTAL_HOST_CDISABLE: [1 << 1, 1 << 2],
-    CGROUP_DYNAMIC: 1 << 3,
+    CGROUP_DYNAMIC: 2,
+    CGROUP_PLAYER: 4,
     CGROUP_ALL: 0xFF,
     PHYSICS_UPDATEPERSEC_LIMIT: 75,
     PHYSICS_MATERIAL: new CANNON.Material({

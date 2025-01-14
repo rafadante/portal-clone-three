@@ -171,9 +171,14 @@ GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
 GLOBALS.DYNAMIC_OBJECTS.push(GLOBALS.PLAYER);
 
 for (let d of GLOBALS.DYNAMIC_OBJECTS) {
-    d.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC
-    d.collisionFilterMask = GLOBALS.CGROUP_ALL
+    d.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
+    d.collisionFilterMask = GLOBALS.CGROUP_ALL;
 }
+
+GLOBALS.PLAYER.collisionFilterGroup = GLOBALS.CGROUP_PLAYER;
+
+console.log(GLOBALS.PLAYER)
+console.log(GLOBALS.CGROUP_DYNAMIC)
 
 function playerExitPurpleGel() {
 

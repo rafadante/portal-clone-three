@@ -46,7 +46,7 @@ jointBody = new CANNON.Body({
 })
 jointBody.addShape(jointShape)
 jointBody.collisionFilterGroup = 0;
-jointBody.collisionFilterMask = 0;
+jointBody.collisionFilterMask = GLOBALS.CGROUP_ENVIRONMENT | GLOBALS.CGROUP_DYNAMIC;;
 world.addBody(jointBody)
 
 // Movement plane when dragging

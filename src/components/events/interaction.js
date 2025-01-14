@@ -31,6 +31,7 @@ function interactWithItem() {
             itemHolder.sleeping = false;
         }
 
+        GLOBALS.CURRENT_ITEM.body.collisionFilterMask = GLOBALS.CGROUP_ALL;
         GLOBALS.CURRENT_ITEM.body.sideContact = null;
         GLOBALS.CURRENT_ITEM.body.contactID = null;
         GLOBALS.CURRENT_ITEM.body.holding = false;
@@ -181,6 +182,8 @@ function interactWithItem() {
                     play(AUDIO.PICK_SUCESS)
                     play(AUDIO.HOLD)
                 }
+
+                GLOBALS.CURRENT_ITEM.body.collisionFilterMask = GLOBALS.CGROUP_ENVIRONMENT | GLOBALS.CGROUP_DYNAMIC;
 
                 GLOBALS.CURRENT_ITEM.body.impactVelocity = null;
                 GLOBALS.CURRENT_ITEM.body.customGravity = null;
