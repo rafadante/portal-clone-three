@@ -659,7 +659,7 @@ async function addItem(found, loaded) {
                     }
                 }
 
-                if(GLOBALS.ITEM_HOLDED_NAME == "track_platforms"){
+                if (GLOBALS.ITEM_HOLDED_NAME == "track_platforms") {
                     item.translateZ(-0.5)
                 }
 
@@ -759,7 +759,7 @@ function manageItemVariables(item, userData, instanced) {
 
     if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
         item.userData.state = true;
-    }else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {
         item.userData.state = "all";
     } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
         GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube" ||
@@ -831,11 +831,11 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
     item.userData.isActive = userDataLoadedItem.isActive;
     item.userData.loop = userDataLoadedItem.loop;
 
-    if(GLOBALS.ITEM_HOLDED_NAME == "pellet_launcher"){
+    if (GLOBALS.ITEM_HOLDED_NAME == "pellet_launcher") {
         console.log(userDataLoadedItem.isActive)
     }
 
-    
+
 
     if (item.userData.link)
         playVoiceTrigger(item.userData, false);
@@ -924,7 +924,14 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         item.userData.triggers = userDataLoadedItem.triggers;
         laserEmitterPosition(item, item.userData.triggers, $("#laser_receiver-trigger"), "laser_receiver");
     } else if (GLOBALS.ITEM_HOLDED_NAME == "faith_plate") {
-        item.userData.state = userDataLoadedItem.state;
+
+        if (userDataLoadedItem.state == true || userDataLoadedItem.state == false ||
+            userDataLoadedItem.state == "true" || userDataLoadedItem.state == "false"
+        )
+            item.userData.state = userDataLoadedItem.state;
+        else
+            item.userData.state = true;
+
         item.userData.target = userDataLoadedItem.target;
 
         GLOBALS.FAITH_PLATE_TARGET = item;
