@@ -254,6 +254,10 @@ $('#social-youtube').on('click', function () {
     window.open("https://www.youtube.com/@Rafa_dante");
 });
 
+$('#social-patreon').on('click', function () {
+    window.open("https://patreon.com/portalwebclone?utm_medium=unknown&utm_source=join_link&utm_campaign=creatorshare_creator&utm_content=copyLink");
+});
+
 $('#social-twitter').on('click', function () {
     window.open("https://x.com/RafaTecXR");
 });
