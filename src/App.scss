@@ -769,3 +769,29 @@ form {
   width: 200px;
   height: auto !important;
 }
+
+#tags-menu{
+  position: absolute;
+  right: 0px;
+  top: 10%;
+  background-color: white;
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  color: black;
+  z-index: 10000000000;
+  padding: 5px;
+
+  span{
+
+    margin-bottom: 10px;
+  }
+
+  div{
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    flex-direction: row-reverse;
+  }
+}
