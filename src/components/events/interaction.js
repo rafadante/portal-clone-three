@@ -77,8 +77,6 @@ function interactWithItem() {
                             //PLAY AUDIO POSITIVE
                             AUDIO.POSITIVE.play();
 
-                            console.log(GLOBALS.CONNECTIONS[i])
-
                             //Manage Door Trigger
                             if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
                                 if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
@@ -86,8 +84,14 @@ function interactWithItem() {
                                 }
                             } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
                                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
-                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
+
+                                    console.log(GLOBALS.CONNECTIONS[i])
+                                    
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
                                     stateDoor(0, true, false, GLOBALS.CONNECTIONS[i]['to'].item);
+
+                                    console.log("xxxxxxxxxxx")
+                                }
                             } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("cube") ||
                                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("sphere")) {
                                 if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
@@ -223,7 +227,7 @@ function pedestalTimer(holder) {
     if (active) {
         if (holder['to'].itemName.includes("faith_plate")) {
             //if (holder['to'].item.userData.connections < holder['to'].item.userData.buttons)
-                holder['to'].item.userData.state = false;
+            holder['to'].item.userData.state = false;
         } else if (holder['to'].itemName.includes("door") || holder['to'].itemName.includes("exitDoor")) {
             if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections)
                 stateDoor(0, false, false, holder['to'].item);

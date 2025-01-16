@@ -704,6 +704,7 @@ async function addItem(found, loaded) {
                 }
 
                 //CONNECTIONS
+                console.log(GLOBALS.LOADED_CONNECTIONS)
                 for (var g = 0; g < GLOBALS.LOADED_CONNECTIONS.length; g++) {
                     for (var h = 0; h < GLOBALS.LOADED_CONNECTIONS[g]["data"].connectedTo.length; h++) {
 
@@ -831,12 +832,6 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
     item.userData.isActive = userDataLoadedItem.isActive;
     item.userData.loop = userDataLoadedItem.loop;
 
-    if (GLOBALS.ITEM_HOLDED_NAME == "pellet_launcher") {
-        console.log(userDataLoadedItem.isActive)
-    }
-
-
-
     if (item.userData.link)
         playVoiceTrigger(item.userData, false);
 
@@ -939,8 +934,6 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         const dummy = new Object3D();
         dummy.position.copy(userDataLoadedItem.targetPos);
         dummy.rotation.copy(userDataLoadedItem.targetRot);
-
-        console.log(userDataLoadedItem.heightLine)
 
         targetFaithPlateUpdate(dummy)
         targetFaithPlateEnd(dummy, userDataLoadedItem.heightLine);

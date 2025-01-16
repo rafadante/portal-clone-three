@@ -15,6 +15,8 @@ import { stateDoor } from '../door/Door.js';
 import { addColliderEvent } from '../platforms/Platform.js';
 import $ from 'jquery';
 import { laserReceiverTrigger } from '../events/events.js';
+import { backToEditor } from './BackToEditor.js';
+import { saveChamber } from '../ui/EditorInteractions.js';
 
 function colliderItemManager() {
 
@@ -245,12 +247,9 @@ function fizzlerTrigger(body) {
             } else if (e.body.name == "radio" || e.body.name == "trash") {
 
                 if (e.body.name == "radio") {
-                    console.log(e.body.sound)
                     e.body.sound.audio.pause();
                     GLOBALS.SCENE_FPS.remove(e.body.sound);
                 }
-
-                console.log(e.body);
 
                 var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.item.userData.instancedName);
                 instanced.setVisibilityAt(e.body.item.userData.idInstanced, false);
@@ -837,15 +836,29 @@ function addCollidersToCorridor(mesh) {
 
     if (mesh.name.includes("collider_door")) {
         GLOBALS.BODY_ELEVATOR = wall;
-        console.log(wall)
         wall.addEventListener("collide", function (event) {
 
-            console.log("11111111111111")
-            if (GLOBALS.LEVEL_ENTERED && GLOBALS.LOADED_LEVEL && !GLOBALS.FINISHED) {//
-                console.log("2222222222222")
+            if (GLOBALS.LEVEL_ENTERED && (!GLOBALS.LOADED_LEVEL || window.allowEdit) && !GLOBALS.FINISHED) {
+                GLOBALS.FINISHED = true;
+
+                if (window.confirm("Publish Chamber?") == true) {
+
+                    saveChamber(true);
+                    
+                    $("#loading-parent").css("opacity", 1)
+                    $("#loading-parent").css("pointer-events", "all")
+                } else {
+                    backToEditor();
+                }
+            } else if (GLOBALS.LEVEL_ENTERED && GLOBALS.LOADED_LEVEL && !GLOBALS.FINISHED) {//
+
+                if (window.chamberID) {
+                    if (window.chamberUSERID != window.session.user.id)
+                        window["updateChamberFinishedValue"](window.chamberID, window.chamberFinished+1);
+                }
+
                 GLOBALS.FINISHED = true;
                 window.currentLevel++;
-                console.log(window.currentLevel)
                 localStorage.setItem("level", window.currentLevel);
                 window.isCustom = false;
 
@@ -854,12 +867,11 @@ function addCollidersToCorridor(mesh) {
                     document.exitPointerLock();
                 }
 
-
                 $("#test-name").text($("#chamber-name-to-save").val());
                 $("#test-author").text($("#author-name-to-save").val());
 
                 const minutes = Math.floor(GLOBALS.STATS_UI.time / 60);
-                const seconds =  Math.floor(GLOBALS.STATS_UI.time - minutes * 60);
+                const seconds = Math.floor(GLOBALS.STATS_UI.time - minutes * 60);
 
                 $("#test-portals").text(GLOBALS.STATS_UI.portals);
                 $("#test-time").text(minutes + ":" + seconds);

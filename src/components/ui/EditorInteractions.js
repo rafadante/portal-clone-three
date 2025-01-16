@@ -33,8 +33,8 @@ $("body").on('click', '#rotate-item', function () {
 
         var door = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName);
 
-        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("angled_panel") && 
-    (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].side == "left" || GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].side == "right")) {
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].itemName.includes("angled_panel") &&
+            (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].side == "left" || GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].side == "right")) {
             door.rotation.x += Math.PI / 2;
             door.userData.rotationY = door.rotation.x;
         } else {
@@ -93,8 +93,8 @@ $("body").on('click', '#delete', function () {
 
     if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].isInstanced) {
 
-        if(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "incinerator"){
-            
+        if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "incinerator") {
+
             GLOBALS.ITEMS_ADDED.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.trigger);
         }
 
@@ -530,7 +530,10 @@ $("body").on('click', '#portalable', function () {
 });
 
 $("body").on('click', '#save-level', function () {
+    saveChamber(false)
+});
 
+function saveChamber(publish) {
     var data = [];
     var userDataHolder = [];
     var itemHolder = [];
@@ -556,19 +559,32 @@ $("body").on('click', '#save-level', function () {
     data.push(GLOBALS.PLANE_USER_DATA);
 
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-    var dlAnchorElem = document.createElement('a');
-    dlAnchorElem.setAttribute("href", dataStr);
+    window.dataChamber = JSON.stringify(data);
 
-    if ($("#chamber-name-to-save").val())
-        dlAnchorElem.setAttribute("download", $("#chamber-name-to-save").val() + "_by_" + $("#author-name-to-save").val() + ".json");
-    else
-        dlAnchorElem.setAttribute("download", "chamber.json");
 
-    dlAnchorElem.click();
+    if (publish) {
+        if (GLOBALS.FINISHED) {
+            if (window.chamberID) {
+                window["updateChamber"]($("#chamber-name-to-save").val(), window.chamberID);
+            } else {
+                window["saveChamber"]($("#chamber-name-to-save").val());
+            }
+        }
+    } else {
+        var dlAnchorElem = document.createElement('a');
+        dlAnchorElem.setAttribute("href", dataStr);
+
+        if ($("#chamber-name-to-save").val())
+            dlAnchorElem.setAttribute("download", $("#chamber-name-to-save").val() + "_by_" + $("#author-name-to-save").val() + ".json");
+        else
+            dlAnchorElem.setAttribute("download", "chamber.json");
+
+        dlAnchorElem.click();
+    }
 
     for (var i = 0; i < userDataHolder.length; i++)
         userDataHolder[i].item = itemHolder[i];
-});
+}
 
 $("body").on('input', '#friction', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.friction = this.value;
@@ -644,3 +660,105 @@ $("body").on('click', '#reset-check-point', function () {
     if (GLOBALS.LEVEL_ENTERED)
         respawn(GLOBALS.PLAYER);
 });
+
+//
+var chambers;
+
+$("body").on('click', '#options-custom span', async function () {
+    $("#options-custom span").css("background", "none");
+    $(this).css("background", "grey");
+
+    document.getElementById("loading-parent").style.opacity = "1";
+    document.getElementById("loading-parent").style.pointerEvents = "all";
+
+    if (!chambers)
+        chambers = await window["selectAllChambers"]();
+
+    console.log(chambers)
+    $(".custom-chamber").remove();
+
+    const session = await window["getSession"]();
+
+    if ($(this).data("value") == "all") {
+        for (var i = 0; i < chambers.length; i++) {
+
+            if (!chambers[i].tested)
+                continue;
+
+            const elem = '<div data-finished="' + chambers[i].finished + '"   data-userid="' + chambers[i].user_id + '" data-played="' + chambers[i].played + '"  data-id="' + chambers[i].id + '" class="custom-chamber"' +
+                'style="background-image: url(' + chambers[i].thumb + ')">' +
+                '<div class="chamber-stats">' +
+                '<span>played: ' + chambers[i].played + '</span>' +
+                '<span>finished: ' + chambers[i].finished + '</span>' +
+                '</div>' +
+                '<span data-json=' + chambers[i].json + ' class="span-chamber">' + chambers[i].name + " by " + chambers[i].author + '</span>' +
+                '</div>'
+
+            $("#list-custm-chambers").append(elem);
+        }
+    } else if ($(this).data("value") == "new") {
+        for (var i = 0; i < chambers.length; i++) {
+
+            if (chambers[i].tested)
+                continue;
+
+            const elem = '<div data-finished="' + chambers[i].finished + '"   data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '"  data-id="' + chambers[i].id + '" class="custom-chamber"' +
+                'style="background-image: url(' + chambers[i].thumb + ')">' +
+                '<div class="chamber-stats">' +
+                '<span>played: ' + chambers[i].played + '</span>' +
+                '<span>finished: ' + chambers[i].finished + '</span>' +
+                '</div>' +
+                '<span data-json=' + chambers[i].json + ' class="span-chamber">' + chambers[i].name + " by " + chambers[i].author + '</span>' +
+                '</div>'
+
+            $("#list-custm-chambers").append(elem);
+        }
+    } else if ($(this).data("value") == "mine") {
+        for (var i = 0; i < chambers.length; i++) {
+
+            if (chambers[i].user_id != session.user.id)
+                continue;
+
+            const elem = '<div data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber mine"' +
+                'style="background-image: url(' + chambers[i].thumb + ')">' +
+                '<div class="chamber-stats">' +
+                '<span>played: ' + chambers[i].played + '</span>' +
+                '<span>finished: ' + chambers[i].finished + '</span>' +
+                '</div>' +
+                '<button class="delete-my-chamber">DELETE</button>' +
+                '<span data-json=' + chambers[i].json + ' class="span-chamber">' + chambers[i].name + " by " + chambers[i].author + '</span>' +
+                '</div>'
+
+            $("#list-custm-chambers").append(elem);
+        }
+    }
+
+    document.getElementById("loading-parent").style.opacity = "0";
+    document.getElementById("loading-parent").style.pointerEvents = "none";
+});
+
+$("body").on('click', '.delete-my-chamber', async function () {
+    window["deleteChamber"]($(this).parent().data("id"));
+    chambers = await window["selectAllChambers"]();
+    $(this).parent().remove();
+})
+
+document.onkeypress = function (e) {
+    //e = e || window.event;
+    // use e.keyCode
+    //console.log(e.keyCode)
+    if (GLOBALS.FPS_MODE && e.keyCode == 112) {
+        console.log("print");
+        GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+        window.thumbDataURL = GLOBALS.RENDERER.domElement.toDataURL("image/jpeg", 0.25);
+
+        alert("thumbnail set!")
+
+        var link = document.createElement("a");
+        link.download = "name";
+        link.href = window.thumbDataURL;
+        link.click();
+    }
+};
+
+export { saveChamber }

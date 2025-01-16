@@ -251,6 +251,9 @@ module.exports = function (webpackEnv) {
         new TerserPlugin({
           terserOptions: {
             myCustomOption: true,
+            compress: {
+              drop_console: true
+            }
           },
           minify: (file, sourceMap, minimizerOptions) => {
             const extractedComments = [];

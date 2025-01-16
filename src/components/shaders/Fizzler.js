@@ -83,5 +83,3 @@ GLOBALS.MATERIAL_FIZZLER = new ShaderMaterial({
     opacity: 0.2,
     depthWrite: false
 });
-
-console.log(GLOBALS.MATERIAL_FIZZLER)

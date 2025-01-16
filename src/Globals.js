@@ -93,6 +93,7 @@ renderer.localClippingEnabled = true;
 renderer.physicallyCorrectLights = true;
 renderer.domElement.id = "viewer-3d";
 renderer.shadowMap.autoUpdate = true;
+renderer.domElement.id = "viewer-3d";
 //renderer.info.autoReset = false;
 
 //CONTROLS

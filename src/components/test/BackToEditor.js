@@ -18,6 +18,8 @@ $("body").on('click', '#back-editor', function () {
 
 function backToEditor() {
 
+    GLOBALS.STATS.dom.style.display = "none";
+
     GLOBALS.EXIT_DOOR.finished = false;
     GLOBALS.STATS_UI.time = 0;
     GLOBALS.STATS_UI.steps = 0;
@@ -34,11 +36,6 @@ function backToEditor() {
         GLOBALS.SOUNDS_FPS[i].audio.currentTime = 0;
         GLOBALS.SOUNDS_FPS[i].audio.pause();
     }
-
-    /* for (var i = GLOBALS.MAIN_CAMERA.getObjectByName("listener").children.length - 1; i >= 0; i--) {
-         console.log("removed")
-         GLOBALS.MAIN_CAMERA.getObjectByName("listener").remove(GLOBALS.MAIN_CAMERA.getObjectByName("listener").children[i]);
-     }*/
 
     removePelletHitInstances();
 

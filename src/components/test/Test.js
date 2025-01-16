@@ -297,6 +297,8 @@ function viewFPS(firstRender) {
 
 function setup() {
 
+    GLOBALS.STATS.dom.style.display = "block";
+
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
         if (!GLOBALS.CONNECTIONS[i]["line"].visible) {
             window.checkers.instances[GLOBALS.CONNECTIONS[i]["checker"]].visible = false;

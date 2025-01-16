@@ -249,8 +249,13 @@ function portalButton(button, auto, camera, firstToRender) {
                     normal.negate();
 
                     // define playerUpDirection
-                    playerUpDirection = new Vector3(0, -1, 0)
-                    //playerUpDirection.applyQuaternion(GLOBALS.MAIN_CAMERA.quaternion)
+                    //playerUpDirection = new Vector3(0, -1, 0)
+                    playerUpDirection.applyQuaternion(GLOBALS.MAIN_CAMERA.quaternion)
+
+                    /*if (window.custompath.includes("The_Courtesy_Call_Chamber_5_by_FlamedDogo99")) {
+                        playerUpDirection.negate()
+                    }*/
+
 
                     var worldPos = new Vector3();
                     intersectPanel[0].object.getWorldPosition(worldPos);

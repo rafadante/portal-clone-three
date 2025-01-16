@@ -177,9 +177,6 @@ for (let d of GLOBALS.DYNAMIC_OBJECTS) {
 
 GLOBALS.PLAYER.collisionFilterGroup = GLOBALS.CGROUP_PLAYER;
 
-console.log(GLOBALS.PLAYER)
-console.log(GLOBALS.CGROUP_DYNAMIC)
-
 function playerExitPurpleGel() {
 
     GLOBALS.HEAD_BOB_SPEED = 6;

@@ -34,7 +34,6 @@ $("body").on('click', '#option-community-build, #option-single-load', function (
 
 $("body").on('click', '#back-main-map-btn, #back-main-menu', function () {
 
-    console.log("66666666666666")
     $("#blocker .body").css("opacity", "1");
 
     $("#blocker").css("display", "flex");
@@ -108,7 +107,8 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
 }
 
 $("body").on('click', '#option-single-load', function () {
-    
+
+    window.chamberID=null;
 
     $("#next-map-btn").css("display", "block");
 
@@ -130,6 +130,8 @@ $("body").on('click', '#option-single-load', function () {
 });
 
 $('#next-map-btn').on('click', function () {
+
+    window.chamberID=null;
 
     $("#loading-parent").css("opacity", 1);
     $("#loading-parent").css("pointer-events", "all");
@@ -153,21 +155,36 @@ function fetchLevel() {
 
     var path = "./levels/tutorial_" + window.currentLevel + "_by_rafadante.json";
 
-    if (window.isCustom)
-        path = custompath;
+    if (window.isCustom) {
 
-    fetch(path)
-        .then(response => response.json())
-        .then(json => {
-            level = json;
+        console.log("11111111111111111")
 
-            chamberName = "tutorial_" + window.currentLevel + "_by_rafadante";
+        level = custompath;
 
-            $("#portal-gun-select").val(level[0][0]).change();
-            $("#ambient-sound-select").val(level[0][1]).change();
+        console.log(level)
 
-            loadLevelJSON();
-        });
+        chamberName = "tutorial_" + window.currentLevel + "_by_rafadante";
+
+        $("#portal-gun-select").val(level[0][0]).change();
+        $("#ambient-sound-select").val(level[0][1]).change();
+
+        loadLevelJSON();
+
+    } else {
+        console.log("2222222222222")
+        fetch(path)
+            .then(response => response.json())
+            .then(json => {
+                level = json;
+
+                chamberName = "tutorial_" + window.currentLevel + "_by_rafadante";
+
+                $("#portal-gun-select").val(level[0][0]).change();
+                $("#ambient-sound-select").val(level[0][1]).change();
+
+                loadLevelJSON();
+            });
+    }
 }
 
 $("body").on('click', '.load-custom', function () {
@@ -186,7 +203,10 @@ var custompath;
 
 var first = true;
 
-$("body").on('click', '.custom-chamber', function () {
+window.allowEdit = false;
+
+$("body").on('click', '.span-chamber', async function () {
+    window.allowEdit = false;
     /*window.isCustom = true;
     //init();
     fetch("./community/The_Return_Chamber_17_by_FlameDogo99.json")
@@ -212,16 +232,38 @@ $("body").on('click', '.custom-chamber', function () {
 
     window.isCustom = true;
 
-    if ($(this).parent().attr("id") == "list-custm-chambers")
+    if ($(this).parent().parent().attr("id") == "list-custm-chambers")
         $("#next-map-btn").css("display", "none");
     else {
         $("#next-map-btn").css("display", "block");
-        window.currentLevel = $(this).data("id");
+        window.currentLevel = $(this).parent().data("id");
     }
+
+    if ($(this).parent().hasClass("mine"))
+        window.allowEdit = true;
+
+    const session = await window["getSession"]();
 
     setTimeout(() => {
 
-        custompath = $(this).data("name") + ".json";
+        custompath = $(this).data("json");
+
+        window.chamberID = $(this).parent().data("id");
+        window.chamberUSERID = $(this).parent().data("userid");
+        window.chamberFinished = $(this).parent().data("finished");
+
+        const played = parseInt($(this).parent().data("played")) + 1;
+
+        console.log(played)
+
+        window.session = session;
+
+        if ($(this).parent().data("userid") != session.user.id){
+            window["updateChamberPlayedValue"]($(this).parent().data("id"), played);
+        }
+            
+
+        console.log(custompath)
 
         window.stopMenuLoop = true;
         GLOBALS.LOADED_LEVEL = true;
@@ -260,7 +302,7 @@ $("body").on('click', '.custom-chamber', function () {
     }
 
     first = false;
-    
+
 });
 
 if (localStorage.getItem("load") == "true") {
@@ -300,7 +342,11 @@ function loadLevelJSON() {
     $("#option-single").css("display", "none");
     $("#option-community").css("display", "none");
     $("#option-about").css("display", "none");
-    $("#back-editor").css("display", "none");
+
+    if (!window.allowEdit)
+        $("#back-editor").css("display", "none");
+    else
+        $("#back-editor").css("display", "block");
 
     loadLevel(level[1])
 }
@@ -352,8 +398,6 @@ function startLevel() {
             GLOBALS.SCENE_CHILDREN.remove(plane2);
             GLOBALS.SCENE.background = null;
             window.stopMenuLoop = true;
-
-            console.log(window.stopMenuLoop)
         }, 1000);
     }, 1000);
 }
@@ -601,6 +645,7 @@ function loadLevel(data) {
 
             GLOBALS.EXIT_DOOR.userData = data[i].item;
             GLOBALS.EXIT_DOOR.userData.connections = 0;
+            GLOBALS.EXIT_DOOR.userData.buttons = 0;
             GLOBALS.EXIT_DOOR.userData.played = false;
             data[i].item = GLOBALS.EXIT_DOOR;
 

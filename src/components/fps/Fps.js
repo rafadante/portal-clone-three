@@ -672,7 +672,7 @@ function joystickMenu(gamepad) {
             }, 100);
         } else */
         if (gamepad.buttons[9].value == 1 && !gamepad.buttons[9].pressed2) {//start
-            console.log("start");
+            //console.log("start");
             gamepad.buttons[9].pressed2 = true;
             setTimeout(() => {
                 gamepad.buttons[9].pressed2 = false;
@@ -683,7 +683,7 @@ function joystickMenu(gamepad) {
         } else if (gamepad.buttons[0].value == 1 && !gamepad.buttons[0].pressed2) {//A
 
             if ($("#blocker").css("display") == "block") {
-                console.log("A");
+                //console.log("A");
                 gamepad.buttons[0].pressed2 = true;
                 setTimeout(() => {
                     gamepad.buttons[0].pressed2 = false;
