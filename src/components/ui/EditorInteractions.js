@@ -685,7 +685,7 @@ $("body").on('click', '#options-custom span', async function () {
             if (!chambers[i].tested)
                 continue;
 
-            const elem = '<div data-finished="' + chambers[i].finished + '"   data-userid="' + chambers[i].user_id + '" data-played="' + chambers[i].played + '"  data-id="' + chambers[i].id + '" class="custom-chamber"' +
+            const elem = '<div data-name="' + chambers[i].name  + '"  data-finished="' + chambers[i].finished + '"   data-userid="' + chambers[i].user_id + '" data-played="' + chambers[i].played + '"  data-id="' + chambers[i].id + '" class="custom-chamber"' +
                 'style="background-image: url(' + chambers[i].thumb + ')">' +
                 '<div class="chamber-stats">' +
                 '<span>played: ' + chambers[i].played + '</span>' +
@@ -702,7 +702,7 @@ $("body").on('click', '#options-custom span', async function () {
             if (chambers[i].tested)
                 continue;
 
-            const elem = '<div data-finished="' + chambers[i].finished + '"   data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '"  data-id="' + chambers[i].id + '" class="custom-chamber"' +
+            const elem = '<div data-name="' + chambers[i].name  + '"  data-finished="' + chambers[i].finished + '"   data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '"  data-id="' + chambers[i].id + '" class="custom-chamber"' +
                 'style="background-image: url(' + chambers[i].thumb + ')">' +
                 '<div class="chamber-stats">' +
                 '<span>played: ' + chambers[i].played + '</span>' +
@@ -719,7 +719,7 @@ $("body").on('click', '#options-custom span', async function () {
             if (chambers[i].user_id != session.user.id)
                 continue;
 
-            const elem = '<div data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber mine"' +
+            const elem = '<div data-name="' + chambers[i].name  + '" data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber mine"' +
                 'style="background-image: url(' + chambers[i].thumb + ')">' +
                 '<div class="chamber-stats">' +
                 '<span>played: ' + chambers[i].played + '</span>' +

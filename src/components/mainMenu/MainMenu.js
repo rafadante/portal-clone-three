@@ -271,6 +271,9 @@ $("body").on('click', '.span-chamber', async function () {
 
     //
 
+    
+    $("#chamber-name-to-save").val($(this).parent().data("name"));
+
     if (first) {
 
         setTimeout(() => {
@@ -498,6 +501,8 @@ $("body").on('click', '#option-community-play', function () {
 var chamberName = "null";
 
 $("#input-level").on('change', function (e) {
+    window.chamberID = null;
+    GLOBALS.LOADED_LEVEL = false;
     var file = e.target.files[0];
     chamberName = file.name;
     var path = (window.URL || window.webkitURL).createObjectURL(file);
@@ -552,8 +557,11 @@ function loadLevel(data) {
         GLOBALS.CORRIDOR_ENTER.getObjectByName("sign").scale.z = -1;
     }
 
-    $("#chamber-name-to-save").val(chamberName.substring(0, chamberName.indexOf("_by_")));
-    $("#author-name-to-save").val(chamberName.split('_by_').pop().replace('.json', ''));
+    if(!window.chamberID){
+        $("#chamber-name-to-save").val(chamberName.substring(0, chamberName.indexOf("_by_")));
+        $("#author-name-to-save").val(chamberName.split('_by_').pop().replace('.json', ''));
+    }
+    
 
     var toRemove = [];
     for (var i = 0; i < GLOBALS.ITEMS_ADDED.children.length; i++) {
