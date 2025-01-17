@@ -246,7 +246,7 @@ function render(time) {
     updatePhysics(deltaTime);
     updateCamera(time);
     teleportationState()
-    updateEvents();
+    updateEvents(deltaTime);
     checkForTriggerContact();
     TWEEN.update();
     animatePortal(time);

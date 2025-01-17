@@ -8,26 +8,30 @@ import { addPositionalAudio, AUDIO, playVoice } from "../audio/Audio.js";
 import { laserFieldState, tractorStates, lightBridgeState, dispenserSpawn, respawn, levelEnteredFunction, wakeUpAll } from "./states.js";
 import { tweenCamera } from "../../Utils.js";
 import { interactWithItem } from "./interaction.js";
+import { updateAngledPanel } from "../test/Colliders.js";
 
 let clock = new Clock();
 let delta = 0;
 // 30 fps
 let interval = 1 / 60;
 
-function updateEvents() {
+function updateEvents(deltaTime) {
 
   if (!GLOBALS.ITEMS_ADDED.getObjectByName("spawn"))
     levelEnteredFunction(false);
 
-  delta += clock.getDelta();
+  /*delta += clock.getDelta();
 
   if (delta > interval) {
     // The draw or time dependent code are here
     tractorBeam();
-    pelletUpdate();
+    pelletUpdate(delta);
 
     delta = delta % interval;
-  }
+  }*/
+
+  tractorBeam(deltaTime);
+  pelletUpdate(deltaTime);
 
   var id = 0;
 
@@ -169,9 +173,23 @@ function updateEvents() {
               connectionState(GLOBALS.CONNECTIONS[i], null, false, new Color(0, 2.0, 5.0));
 
               if (active) {
-                if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
+
+                if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("angled_panel")) {
+                  tweenCamera(500, GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation,
+                    new Vector3(
+                      GLOBALS.CONNECTIONS[i]['to'].item.userData.angle * Math.PI / 180,
+                      GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation.y,
+                      GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation.z)
+                  );
+
+                  const holderItem = GLOBALS.CONNECTIONS[i]['to'].item;
+
+                  setTimeout(() => {
+                    updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
+                  }, 500);
+                } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
                   //if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections < GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
-                    GLOBALS.CONNECTIONS[i]['to'].item.userData.state = false;
+                  GLOBALS.CONNECTIONS[i]['to'].item.userData.state = false;
                   //}
                 } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
                   GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
@@ -305,7 +323,23 @@ function doSetTimeout(to, waitFor, idHolder, connection, body) {
       respawn(body);
     }
 
-    if (to.itemName.includes("faith_plate")) {
+    if (to.itemName.includes("angled_panel")) {
+      if (to.item.userData.connections == to.item.userData.buttons) {
+        
+        tweenCamera(500, to.item.getObjectByName("pivot2").rotation,
+          new Vector3(
+            to.item.userData.angleTrigger * Math.PI / 180,
+            to.item.getObjectByName("pivot2").rotation.y,
+            to.item.getObjectByName("pivot2").rotation.z)
+        );
+
+        const holderItem = to.item;
+
+        setTimeout(() => {
+          updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
+        }, 500);
+      }
+    } else if (to.itemName.includes("faith_plate")) {
       if (to.item.userData.connections == to.item.userData.buttons) {
         to.item.userData.state = true;
       }
@@ -375,9 +409,22 @@ function resetAll() {
       connectionState(GLOBALS.CONNECTIONS[i], null, false, new Color(0, 2.0, 5.0))
 
       if (active) {
-        if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
+        if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("angled_panel")) {
+          tweenCamera(500, GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation,
+            new Vector3(
+              GLOBALS.CONNECTIONS[i]['to'].item.userData.angle * Math.PI / 180,
+              GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation.y,
+              GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation.z)
+          );
+
+          const holderItem = GLOBALS.CONNECTIONS[i]['to'].item;
+
+          setTimeout(() => {
+            updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
+          }, 500);
+        } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
           //if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections < GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
-            GLOBALS.CONNECTIONS[i]['to'].item.userData.state = false;
+          GLOBALS.CONNECTIONS[i]['to'].item.userData.state = false;
           //}
         } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
           GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
@@ -452,7 +499,22 @@ function laserReceiverTrigger(obj, state, catcher) {
           AUDIO.POSITIVE.play();
 
           //Manage Door Trigger
-          if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
+          if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("angled_panel")) {
+            if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
+              tweenCamera(500, GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation,
+                new Vector3(
+                  GLOBALS.CONNECTIONS[i]['to'].item.userData.angleTrigger * Math.PI / 180,
+                  GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation.y,
+                  GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation.z)
+              );
+
+              const holderItem = GLOBALS.CONNECTIONS[i]['to'].item;
+
+              setTimeout(() => {
+                updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
+              }, 500);
+            }
+          } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
             if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
               GLOBALS.CONNECTIONS[i]['to'].item.userData.state = true;
             }
@@ -523,9 +585,22 @@ function laserReceiverTrigger(obj, state, catcher) {
     connectionState(holder, "no", false, new Color(0, 2.0, 5.0))
 
     if (active) {
-      if (holder['to'].itemName.includes("faith_plate")) {
+      if (holder['to'].itemName.includes("angled_panel")) {
+        tweenCamera(500, holder['to'].item.getObjectByName("pivot2").rotation,
+          new Vector3(
+            holder['to'].item.userData.angle * Math.PI / 180,
+            holder['to'].item.getObjectByName("pivot2").rotation.y,
+            holder['to'].item.getObjectByName("pivot2").rotation.z)
+        );
+
+        const holderItem = holder['to'].item;
+
+        setTimeout(() => {
+          updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
+        }, 500);
+      } else if (holder['to'].itemName.includes("faith_plate")) {
         //if (holder['to'].item.userData.connections < holder['to'].item.userData.buttons) {
-          holder['to'].item.userData.state = false;
+        holder['to'].item.userData.state = false;
         //}
       } else if (holder['to'].itemName.includes("door") || holder['to'].itemName.includes("exitDoor")) {
         if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections)

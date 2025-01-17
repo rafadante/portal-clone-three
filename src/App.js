@@ -1114,7 +1114,7 @@ function App() {
           {/**/}
           <li className="menu-item hasItem piston_platforms track_platforms">
             <a href="#" className="menu-btn">
-              <input style={{ width: "30px" }} name="piston-input" type="number" id="piston-max-height" min="0" value="0" />
+              <input style={{ width: "30px" }} name="piston-input" type="number" id="piston-max-height" min="0" defaultValue="0" />
               <label htmlFor="piston-input">Range</label>
             </a>
           </li>
@@ -1161,7 +1161,7 @@ function App() {
           </li>
           <li id="pedestal-timer" className="menu-item hasItem pedestal disabled">
             <a href="#" className="menu-btn">
-              <input type="number" style={{ width: "30px" }} max="30" min="3" value="3" id="pedestal-timer-value" />
+              <input type="number" style={{ width: "30px" }} max="30" min="3" defaultValue="3" id="pedestal-timer-value" />
               <span className="menu-text">Timer</span>
             </a>
           </li>
@@ -1175,7 +1175,7 @@ function App() {
           </li>
           <li id="pellet-timer" className="menu-item hasItem pellet disabled">
             <a href="#" className="menu-btn">
-              <input type="number" style={{ width: "30px" }} max="30" min="3" value="3" id="pellet-timer-value" />
+              <input type="number" style={{ width: "30px" }} max="30" min="3" defaultValue="3" id="pellet-timer-value" />
               <span className="menu-text">Timer</span>
             </a>
           </li>
@@ -1189,7 +1189,7 @@ function App() {
           </li>
           <li id="plate-max-height" className="menu-item hasItem faith_plate">
             <a href="#" className="menu-btn">
-              <input type="number" style={{ width: "50px" }} max="100" min="0" value="2" id="plate-max-height-value" step="1" />
+              <input type="number" style={{ width: "50px" }} max="100" min="0" defaultValue="2" id="plate-max-height-value" step="1" />
               <span className="menu-text">Max Height</span>
             </a>
           </li>
@@ -1198,19 +1198,19 @@ function App() {
           <li className="menu-item menu-item-submenu angled_panel hasItem" id="angled_panel_option" data-angle="60">
             <button type="button" className="menu-btn">
               <i className="fa fa-pallete"></i>
-              <span className="menu-text title">Angle: 60</span>
+              <span className="menu-text title">Angle on Start: 60</span>
             </button>
             <ul className="menu">
-              <li data-angle="90" data-real="0" className="menu-item angled_panel_option">
+              <li data-angle="0" data-real="0" className="menu-item angled_panel_option">
                 <button type="button" className="menu-btn">
                   <i className="fa fa-pallete"></i>
-                  <span className="menu-text">90</span>
+                  <span className="menu-text">0</span>
                 </button>
               </li>
-              <li data-angle="60" data-real="30" className="menu-item angled_panel_option">
+              <li data-angle="30" data-real="30" className="menu-item angled_panel_option">
                 <button type="button" className="menu-btn">
                   <i className="fa fa-pallete"></i>
-                  <span className="menu-text">60</span>
+                  <span className="menu-text">30</span>
                 </button>
               </li>
               <li data-angle="45" data-real="45" className="menu-item angled_panel_option">
@@ -1219,10 +1219,43 @@ function App() {
                   <span className="menu-text">45</span>
                 </button>
               </li>
-              <li data-angle="30" data-real="60" className="menu-item angled_panel_option">
+              <li data-angle="60" data-real="60" className="menu-item angled_panel_option">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-pallete"></i>
+                  <span className="menu-text">60</span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <li className="menu-item menu-item-submenu angled_panel hasItem" id="angled_panel_trigger" data-angle="60">
+            <button type="button" className="menu-btn">
+              <i className="fa fa-pallete"></i>
+              <span className="menu-text title">Angle on Trigger: 60</span>
+            </button>
+            <ul className="menu">
+              <li data-angle="0" data-real="0" className="menu-item angled_panel_trigger">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-pallete"></i>
+                  <span className="menu-text">0</span>
+                </button>
+              </li>
+              <li data-angle="30" data-real="30" className="menu-item angled_panel_trigger">
                 <button type="button" className="menu-btn">
                   <i className="fa fa-pallete"></i>
                   <span className="menu-text">30</span>
+                </button>
+              </li>
+              <li data-angle="45" data-real="45" className="menu-item angled_panel_trigger">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-pallete"></i>
+                  <span className="menu-text">45</span>
+                </button>
+              </li>
+              <li data-angle="60" data-real="60" className="menu-item angled_panel_trigger">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-pallete"></i>
+                  <span className="menu-text">60</span>
                 </button>
               </li>
             </ul>
@@ -1268,7 +1301,7 @@ function App() {
           </li>
 
           {/*RECHARGER*/}
-          <li className="menu-item menu-item-submenu gel_recharger" id="gel_recharger-type" data-gel="blue"
+          {/**<li className="menu-item menu-item-submenu gel_recharger" id="gel_recharger-type" data-gel="blue"
             style={{ display: "none !important" }}>
             <button type="button" className="menu-btn">
               <i className="fa fa-pallete"></i>
@@ -1312,14 +1345,14 @@ function App() {
                 </button>
               </li>
             </ul>
-          </li>
+          </li> */}
 
 
         </ul>
 
         <div id="blocker">
 
-          <span id="version">version: 0.2.0</span>
+          <span id="version">version: 0.2.1</span>
 
           <div id="social" style={{
             width: "auto",
@@ -1365,43 +1398,43 @@ function App() {
                 <span className="option" id="option-single-load">PLAY ALL</span>
 
                 <div id="list-main-chambers" className="option optionMenu">
-                  <div data-id="1" data-name="./levels/tutorial_1_by_rafadante" className="custom-chamber"
+                  <div data-id="1" data-name="./levels/tutorial_1_by_rafadante" className="custom-chamber custom-chamber1"
                     style={{ backgroundImage: "url(./levels/1.webp)" }}>
                     <span>Chamber 1</span>
                   </div>
-                  <div data-id="2" data-name="./levels/tutorial_2_by_rafadante" className="custom-chamber"
+                  <div data-id="2" data-name="./levels/tutorial_2_by_rafadante" className="custom-chamber custom-chamber1"
                     style={{ backgroundImage: "url(./levels/2.webp)" }}>
                     <span>Chamber 2</span>
                   </div>
-                  <div data-id="3" data-name="./levels/tutorial_3_by_rafadante" className="custom-chamber"
+                  <div data-id="3" data-name="./levels/tutorial_3_by_rafadante" className="custom-chamber custom-chamber1"
                     style={{ backgroundImage: "url(./levels/3.webp)" }}>
                     <span>Chamber 3</span>
                   </div>
-                  <div data-id="4" data-name="./levels/tutorial_4_by_rafadante" className="custom-chamber"
+                  <div data-id="4" data-name="./levels/tutorial_4_by_rafadante" className="custom-chamber custom-chamber1"
                     style={{ backgroundImage: "url(./levels/4.webp)" }}>
                     <span>Chamber 4</span>
                   </div>
-                  <div data-id="5" data-name="./levels/tutorial_5_by_rafadante" className="custom-chamber"
+                  <div data-id="5" data-name="./levels/tutorial_5_by_rafadante" className="custom-chamber custom-chamber1"
                     style={{ backgroundImage: "url(./levels/5.webp)" }}>
                     <span>Chamber 5</span>
                   </div>
-                  <div data-id="6" data-name="./levels/tutorial_6_by_rafadante" className="custom-chamber"
+                  <div data-id="6" data-name="./levels/tutorial_6_by_rafadante" className="custom-chamber custom-chamber1"
                     style={{ backgroundImage: "url(./levels/6.webp)" }}>
                     <span>Chamber 6</span>
                   </div>
-                  <div data-id="7" data-name="./levels/tutorial_7_by_rafadante" className="custom-chamber"
+                  <div data-id="7" data-name="./levels/tutorial_7_by_rafadante" className="custom-chamber custom-chamber1"
                     style={{ backgroundImage: "url(./levels/7.webp)" }}>
                     <span>Chamber 7</span>
                   </div>
-                  <div data-id="8" data-name="./levels/tutorial_8_by_rafadante" className="custom-chamber"
+                  <div data-id="8" data-name="./levels/tutorial_8_by_rafadante" className="custom-chamber custom-chamber1"
                     style={{ backgroundImage: "url(./levels/8.webp)" }}>
                     <span>Chamber 8</span>
                   </div>
-                  <div data-id="9" data-name="./levels/tutorial_9_by_rafadante" className="custom-chamber"
+                  <div data-id="9" data-name="./levels/tutorial_9_by_rafadante" className="custom-chamber custom-chamber1"
                     style={{ backgroundImage: "url(./levels/9.webp)" }}>
                     <span>Chamber 9</span>
                   </div>
-                  <div data-id="10" data-name="./levels/tutorial_10_by_rafadante" className="custom-chamber"
+                  <div data-id="10" data-name="./levels/tutorial_10_by_rafadante" className="custom-chamber custom-chamber1"
                     style={{ backgroundImage: "url(./levels/10.webp)" }}>
                     <span>Chamber 10</span>
                   </div>
@@ -1635,8 +1668,8 @@ function App() {
                 <div className="options-row">
                   <span className="option-name" id="">VOLUME</span>
                   <div className="option-value">
-                    <input step="0.1" id="vol-val-range" type="range" min="0" max="1" value="0.5" />
-                    <input step="0.1" id="vol-val-number" type="number" min="0" max="1" value="0.5" />
+                    <input step="0.1" id="vol-val-range" type="range" min="0" max="1" defaultValue="0.5" />
+                    <input step="0.1" id="vol-val-number" type="number" min="0" max="1" defaultValue="0.5" />
                   </div>
                 </div>
               </div>
@@ -1646,16 +1679,16 @@ function App() {
                 <div className="options-row">
                   <span className="option-name" id="">Camera Rotation Speed</span>
                   <div className="option-value">
-                    <input step="0.1" id="mouse-val-range" type="range" min="0.2" max="1" value="0.5" />
-                    <input step="0.1" id="mouse-val-number" type="number" min="0.2" max="1" value="0.5" />
+                    <input step="0.1" id="mouse-val-range" type="range" min="0.2" max="1" defaultValue="0.5" />
+                    <input step="0.1" id="mouse-val-number" type="number" min="0.2" max="1" defaultValue="0.5" />
                   </div>
                 </div>
                 {/*CAMERA FOV*/}
                 <div className="options-row">
                   <span className="option-name" id="">Field ov View</span>
                   <div className="option-value">
-                    <input id="fov-val-range" type="range" min="45" max="90" value="60" />
-                    <input id="fov-val-number" type="number" min="45" max="90" value="60" />
+                    <input id="fov-val-range" type="range" min="45" max="90" defaultValue="60" />
+                    <input id="fov-val-number" type="number" min="45" max="90" defaultValue="60" />
                   </div>
                 </div>
                 {/*RESET*/}
@@ -1667,8 +1700,8 @@ function App() {
                 <div className="options-row mobile">
                   <span className="option-name" id="">Button Opacity</span>
                   <div className="option-value">
-                    <input id="opacity-val-range" type="range" min="0.1" max="1" value="0.8" step="0.1" />
-                    <input id="opacity-val-number" min="0.1" max="1" value="0.8" type="number" />
+                    <input id="opacity-val-range" type="range" min="0.1" max="1" defaultValue="0.8" step="0.1" />
+                    <input id="opacity-val-number" min="0.1" max="1" defaultValue="0.8" type="number" />
                   </div>
                 </div>
                 {/*GYRO*/}
@@ -1792,14 +1825,14 @@ function App() {
                 <div className="options-row">
                   <span className="option-name" id="">Portal gun Roughness</span>
                   <div className="option-value">
-                    <input id="portal-gun-roughness" value="1" type="number" min="0" max="1" step="0.1"
+                    <input id="portal-gun-roughness" defaultValue="1" type="number" min="0" max="1" step="0.1"
                       style={{ pointerEvents: "all !important" }} />
                   </div>
                 </div>
                 <div className="options-row">
                   <span className="option-name" id="">Portal gun Metalness</span>
                   <div className="option-value">
-                    <input id="portal-gun-metalness" value="0" type="number" min="0" max="1" step="0.1"
+                    <input id="portal-gun-metalness" defaultValue="0" type="number" min="0" max="1" step="0.1"
                       style={{ pointerEvents: "all !important" }} />
                   </div>
                 </div>

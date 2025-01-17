@@ -155,7 +155,10 @@ function fetchLevel() {
 
     var path = "./levels/tutorial_" + window.currentLevel + "_by_rafadante.json";
 
-    if (window.isCustom) {
+    if (single)
+        path = custompath;
+
+    if (window.isCustom && !single) {
 
         level = custompath;
 
@@ -200,7 +203,90 @@ var first = true;
 
 window.allowEdit = false;
 
+var single = false;
+
+
+$("body").on('click', '.custom-chamber1', function () {
+    single = true;
+    /*window.isCustom = true;
+    //init();
+    fetch("./community/The_Return_Chamber_17_by_FlameDogo99.json")
+        .then(response => response.json())
+        .then(json => {
+            level = json;
+            GLOBALS.LOADED_LEVEL = true;
+            startLevel();
+
+            level = json;
+
+            chamberName = "tutorial_" + window.currentLevel + "_by_rafadante";
+
+            $("#portal-gun-select").val(level[0][0]).change();
+            $("#ambient-sound-select").val(level[0][1]).change();
+
+            loadLevelJSON();
+        });*/
+
+    $("#next-map-btn").css("display", "none");
+
+    //
+
+    window.isCustom = true;
+
+    if ($(this).parent().attr("id") == "list-custm-chambers")
+        $("#next-map-btn").css("display", "none");
+    else {
+        $("#next-map-btn").css("display", "block");
+        window.currentLevel = $(this).data("id");
+    }
+
+    setTimeout(() => {
+
+        custompath = $(this).data("name") + ".json";
+
+        window.stopMenuLoop = true;
+        GLOBALS.LOADED_LEVEL = true;
+    }, 2000);
+
+    //
+
+    if (first) {
+
+        setTimeout(() => {
+            init();
+        }, 2000);
+
+        startLevel();
+
+    } else {
+        $("#loading-parent").css("opacity", 1);
+        $("#loading-parent").css("pointer-events", "all");
+        $("#next-map").css("display", "none");
+
+        $("#options-settings").css("display", "block");
+        $("#options-main").css("display", "none");
+        $("#options-single").css("display", "none");
+        $("#options-community").css("display", "none");
+        $("#container").css("display", "block");
+
+        $("#back-main").css("display", "none");
+        $("#settings-close").css("display", "block");
+
+        backToEditor();
+
+
+        setTimeout(() => {
+            fetchLevel()
+        }, 2100);
+    }
+
+    first = false;
+    
+});
+
+
 $("body").on('click', '.span-chamber', async function () {
+    single = false;
     window.allowEdit = false;
     /*window.isCustom = true;
     //init();

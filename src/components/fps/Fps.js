@@ -91,7 +91,7 @@ const updatePlayer = function (deltaTime) {
     // physics changes while jumping
     let jumpMultiplier = 1
     if (GLOBALS.PLAYER.inJump)
-        jumpMultiplier = 0.05
+        jumpMultiplier = 0.05;
 
     if (!GLOBALS.PLAYER.inJump)
         GLOBALS.PLAYER.linearDamping = 0.999

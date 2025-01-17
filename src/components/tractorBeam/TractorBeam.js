@@ -3,7 +3,7 @@ import { tweenCamera } from "../../Utils.js";
 import { GLOBALS } from "../../Globals.js";
 import { AUDIO, play } from "../audio/Audio.js";
 
-function tractorBeam() {
+function tractorBeam(deltaTime) {
 
     for (let d of GLOBALS.DYNAMIC_OBJECTS) {
 
@@ -88,11 +88,11 @@ function tractorBeam() {
                         }
                     } else {
 
-                        var val = 0.03;
+                        var val = 1.5;
                         if (GLOBALS.TRACTOR_BEAM[j].item.userData.reversed)
-                            val = -0.03;
+                            val = -1.5;
 
-                        pos.add(vec.clone().multiplyScalar(val)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side
+                        pos.add(vec.clone().multiplyScalar(val * deltaTime)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side
                         d.position.copy(pos);
                         d.angularVelocity.setZero();
                         d.velocity.setZero();

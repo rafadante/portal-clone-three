@@ -452,4 +452,4 @@ function Crouch(value) {
     GLOBALS.PLAYER.updateMassProperties();
 }
 
-export { Crouch, openMenu }
+export { Crouch, openMenu, openFullscreen }

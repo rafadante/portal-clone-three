@@ -218,6 +218,9 @@ function raycastSelected(found, event, type) {
 
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("angled_panel")) {
                         $(".angled_panel").css("display", "block");
+
+                        $("#angled_panel_option").find(".title").text("Angle on Start: " + GLOBALS.PLANE_USER_DATA[instanceId].item.userData.angle);
+                        $("#angled_panel_trigger").find(".title").text("Angle on Trigger: " + GLOBALS.PLANE_USER_DATA[instanceId].item.userData.angleTrigger);
                     }
 
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("gel_recharger")) {

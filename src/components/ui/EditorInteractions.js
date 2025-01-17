@@ -650,10 +650,16 @@ if (localStorage.getItem("goo_reflections")) {
 
 $("body").on('click', '.angled_panel_option', function () {
 
-    $("#angled_panel_option").find(".title").text("Angle: " + $(this).data("angle"));
+    $("#angled_panel_option").find(".title").text("Angle on Start: " + $(this).data("angle"));
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.angle = $(this).data("real");
 
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.getObjectByName("pivot2").rotation.x = Math.PI / 180 * $(this).data("real");
+});
+
+$("body").on('click', '.angled_panel_trigger', function () {
+
+    $("#angled_panel_trigger").find(".title").text("Angle on Trigger: " + $(this).data("angle"));
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.angleTrigger = $(this).data("real");
 });
 
 $("body").on('click', '#reset-check-point', function () {
@@ -766,7 +772,7 @@ $("body").on('click', '.delete-my-chamber', async function () {
 document.onkeypress = function (e) {
     //e = e || window.event;
     // use e.keyCode
-    console.log(e.key)
+    //console.log(e.key)
     if (GLOBALS.FPS_MODE && e.key == "p") {
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         window.thumbDataURL = GLOBALS.RENDERER.domElement.toDataURL("image/jpeg", 0.25);

@@ -312,6 +312,7 @@ async function addItem(found, loaded) {
             } else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
                 var item = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME).clone();
                 item.visible = true;
+                item.userData.angleTrigger = 45;
             } else {
                 var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);
                 var item = new Object3D();
@@ -853,7 +854,7 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         }
 
         item.getObjectByName("pivot2").rotation.x = Math.PI / 180 * item.userData.angle;
-
+        item.userData.angleTrigger = userDataLoadedItem.angleTrigger;
 
     } else if (GLOBALS.ITEM_HOLDED_NAME == "pedestal_button" || GLOBALS.ITEM_HOLDED_NAME == "light"
         || GLOBALS.ITEM_HOLDED_NAME == "bed" || GLOBALS.ITEM_HOLDED_NAME == "toilet"

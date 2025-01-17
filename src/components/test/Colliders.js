@@ -115,6 +115,17 @@ function colliderItemManager() {
     }
 }
 
+function updateAngledPanel(body, cube) {
+
+    var worldPos = new Vector3();
+    cube.getWorldPosition(worldPos)
+    body.position.copy(worldPos);
+
+    var worldQua = new Quaternion();
+    cube.getWorldQuaternion(worldQua)
+    body.quaternion.copy(worldQua);
+}
+
 function addColliderDoorsDefault(obj, name) {
     var shape = new CANNON.Box(new CANNON.Vec3(1, 1, 0.01));
     var door = new CANNON.Body({
@@ -478,6 +489,7 @@ function addColliderItem(items, type, mass, offset) {
             }
 
             if (type == "piston_platforms" || type == "track_platforms") {
+                box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT;
                 addColliderEvent(box);
                 addPositionalAudio('AUDIO-PLATFORM', box, items[i].userData.isActive, true, false, 5, 'sound')
             }
@@ -844,7 +856,7 @@ function addCollidersToCorridor(mesh) {
                 if (window.confirm("Publish Chamber?") == true) {
 
                     saveChamber(true);
-                    
+
                     $("#loading-parent").css("opacity", 1)
                     $("#loading-parent").css("pointer-events", "all")
                 } else {
@@ -854,7 +866,7 @@ function addCollidersToCorridor(mesh) {
 
                 if (window.chamberID) {
                     if (window.chamberUSERID != window.session.user.id)
-                        window["updateChamberFinishedValue"](window.chamberID, window.chamberFinished+1);
+                        window["updateChamberFinishedValue"](window.chamberID, window.chamberFinished + 1);
                 }
 
                 GLOBALS.FINISHED = true;
@@ -895,5 +907,6 @@ export {
     colliderItemManager,
     colliderRoom,
     corridorColliderNames,
-    fizzlerTrigger
+    fizzlerTrigger,
+    updateAngledPanel
 }

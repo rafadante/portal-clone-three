@@ -2,6 +2,7 @@ import $ from 'jquery';
 import { GLOBALS } from '../../Globals.js';
 import { volume } from '../audio/Audio.js';
 import "./Custom.js";
+import { openFullscreen } from '../fps/Input.js';
 
 if (!GLOBALS.MOBILE)
     $(".mobile").css("display", "none");
@@ -9,6 +10,9 @@ if (!GLOBALS.MOBILE)
 
 $("body").on('click', '#close-warning', function () {
     $("#initial-warning").css("display", "none");
+
+    if (GLOBALS.MOBILE)
+        openFullscreen();
 });
 
 $("body").on('click', '.settings-audio', function () {
