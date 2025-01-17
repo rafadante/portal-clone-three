@@ -47,8 +47,6 @@ function App() {
 
   window["saveChamber"] = async (name) => {
 
-    console.log(session)
-
     const { data, error } = await supabase
       .from('chambers')
       .insert([
@@ -64,10 +62,10 @@ function App() {
       ])
 
     if (error) {
-      console.log(error);
+      //console.log(error);
       alert("error when saving!")
     } else {
-      console.log(data);
+      //console.log(data);
       alert("chamber saved with success!")
     }
 
@@ -79,8 +77,6 @@ function App() {
     let { data: chambers, error } = await supabase
       .from('chambers')
       .select('*')
-
-    console.log(chambers)
     return chambers;
   }
 
@@ -118,16 +114,16 @@ function App() {
       .eq('id', id)
       .select()
 
-      if (error) {
-        console.log(error);
-        alert("error when saving!")
-      } else {
-        console.log(data);
-        alert("chamber saved with success!")
-      }
-  
-      document.getElementById("loading-parent").style.opacity = "0";
-      document.getElementById("loading-parent").style.pointerEvents = "none";
+    if (error) {
+      //console.log(error);
+      alert("error when saving!")
+    } else {
+      //console.log(data);
+      alert("chamber saved with success!")
+    }
+
+    document.getElementById("loading-parent").style.opacity = "0";
+    document.getElementById("loading-parent").style.pointerEvents = "none";
   }
 
   window["updateChamberFinishedValue"] = async function (id, value) {
@@ -136,9 +132,6 @@ function App() {
       .update({ finished: value })
       .eq('id', id)
       .select()
-
-    console.log(error)
-    console.log(data)
   }
 
   if (!session) {

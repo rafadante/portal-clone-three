@@ -157,11 +157,7 @@ function fetchLevel() {
 
     if (window.isCustom) {
 
-        console.log("11111111111111111")
-
         level = custompath;
-
-        console.log(level)
 
         chamberName = "tutorial_" + window.currentLevel + "_by_rafadante";
 
@@ -171,7 +167,6 @@ function fetchLevel() {
         loadLevelJSON();
 
     } else {
-        console.log("2222222222222")
         fetch(path)
             .then(response => response.json())
             .then(json => {
@@ -254,16 +249,11 @@ $("body").on('click', '.span-chamber', async function () {
 
         const played = parseInt($(this).parent().data("played")) + 1;
 
-        console.log(played)
-
         window.session = session;
 
         if ($(this).parent().data("userid") != session.user.id){
             window["updateChamberPlayedValue"]($(this).parent().data("id"), played);
         }
-            
-
-        console.log(custompath)
 
         window.stopMenuLoop = true;
         GLOBALS.LOADED_LEVEL = true;

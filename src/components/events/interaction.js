@@ -84,13 +84,9 @@ function interactWithItem() {
                                 }
                             } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
                                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
-
-                                    console.log(GLOBALS.CONNECTIONS[i])
                                     
                                 if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
                                     stateDoor(0, true, false, GLOBALS.CONNECTIONS[i]['to'].item);
-
-                                    console.log("xxxxxxxxxxx")
                                 }
                             } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("cube") ||
                                 GLOBALS.CONNECTIONS[i]['to'].itemName.includes("sphere")) {

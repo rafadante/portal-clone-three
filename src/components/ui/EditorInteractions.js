@@ -674,7 +674,6 @@ $("body").on('click', '#options-custom span', async function () {
     if (!chambers)
         chambers = await window["selectAllChambers"]();
 
-    console.log(chambers)
     $(".custom-chamber").remove();
 
     const session = await window["getSession"]();
@@ -748,7 +747,6 @@ document.onkeypress = function (e) {
     // use e.keyCode
     //console.log(e.keyCode)
     if (GLOBALS.FPS_MODE && e.keyCode == 112) {
-        console.log("print");
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         window.thumbDataURL = GLOBALS.RENDERER.domElement.toDataURL("image/jpeg", 0.25);
 
