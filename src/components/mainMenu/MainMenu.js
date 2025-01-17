@@ -24,7 +24,16 @@ $("#loading-parent").css("opacity", "0");
 $("#loading-parent").css("pointer-events", "none");
 
 $("body").on('click', '#option-community-build, #option-single-load', function () { //
-    alert("The level editor is still very unstable, and things will change a lot in the coming weeks, so maps can break in future updates. Feel free to mess around with it.");
+    //alert("The level editor is still very unstable, and things will change a lot in the coming weeks, so maps can break in future updates. Feel free to mess around with it.");
+
+
+    $("#alert").css("opacity", "1");
+    $("#alert span").text("The level editor is still very unstable, and things will change a lot in the coming weeks, so maps can break in future updates. Feel free to mess around with it.");
+
+    setTimeout(() => {
+        $("#alert").css("opacity", "0");
+    }, 10000);
+
     setTimeout(() => {
         play(AUDIO.EDITOR);
         init();
@@ -108,7 +117,7 @@ function planeFitPerspectiveCamera(plane, camera, relativeZ = null) {
 
 $("body").on('click', '#option-single-load', function () {
 
-    window.chamberID=null;
+    window.chamberID = null;
 
     $("#next-map-btn").css("display", "block");
 
@@ -131,7 +140,7 @@ $("body").on('click', '#option-single-load', function () {
 
 $('#next-map-btn').on('click', function () {
 
-    window.chamberID=null;
+    window.chamberID = null;
 
     $("#loading-parent").css("opacity", 1);
     $("#loading-parent").css("pointer-events", "all");
@@ -281,7 +290,7 @@ $("body").on('click', '.custom-chamber1', function () {
     }
 
     first = false;
-    
+
 });
 
 
@@ -340,7 +349,7 @@ $("body").on('click', '.span-chamber', async function () {
 
         window.session = session;
 
-        if ($(this).parent().data("userid") != session.user.id){
+        if ($(this).parent().data("userid") != session.user.id) {
             window["updateChamberPlayedValue"]($(this).parent().data("id"), played);
         }
 
@@ -350,7 +359,7 @@ $("body").on('click', '.span-chamber', async function () {
 
     //
 
-    
+
     $("#chamber-name-to-save").val($(this).parent().data("name"));
 
     if (first) {
@@ -434,7 +443,7 @@ function loadLevelJSON() {
 }
 
 $("body").on('click', '#option-community-build', function () {
-    window.allowEdit=true;
+    window.allowEdit = true;
     startLevel()
 });
 
@@ -637,11 +646,11 @@ function loadLevel(data) {
         GLOBALS.CORRIDOR_ENTER.getObjectByName("sign").scale.z = -1;
     }
 
-    if(!window.chamberID){
+    if (!window.chamberID) {
         $("#chamber-name-to-save").val(chamberName.substring(0, chamberName.indexOf("_by_")));
         $("#author-name-to-save").val(chamberName.split('_by_').pop().replace('.json', ''));
     }
-    
+
 
     var toRemove = [];
     for (var i = 0; i < GLOBALS.ITEMS_ADDED.children.length; i++) {

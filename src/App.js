@@ -178,6 +178,10 @@ function App() {
         <Analytics />
         <SpeedInsights />
 
+        <div id='alert'>
+          <span>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</span>
+        </div>
+
         <div style={{
           backgroundImage: "url(./assets//Captura\ de\ tela\ 2024-12-20\ 165453.png)",
           backgroundSize: "contain",

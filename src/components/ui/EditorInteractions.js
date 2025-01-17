@@ -777,7 +777,14 @@ document.onkeypress = function (e) {
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         window.thumbDataURL = GLOBALS.RENDERER.domElement.toDataURL("image/jpeg", 0.25);
 
-        alert("thumbnail set!")
+        //alert("thumbnail set!");
+
+        $("#alert").css("opacity", "1");
+        $("#alert span").text("thumbnail set!");
+
+        setTimeout(() => {
+            $("#alert").css("opacity", "0");
+        }, 5000);
 
         /*var link = document.createElement("a");
         link.download = "name";

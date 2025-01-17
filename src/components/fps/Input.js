@@ -207,7 +207,14 @@ $("body").on('click', '#settings-close', function () {
 
         if (!msg && window.allowEdit) {
             msg = true;
-            alert("To take a snapshot, press the P key on your keyboard!")
+            //alert("To take a snapshot, press the P key on your keyboard!")
+
+            $("#alert").css("opacity", "1");
+            $("#alert span").text("To take a snapshot, press the P key on your keyboard!");
+
+            setTimeout(() => {
+                $("#alert").css("opacity", "0");
+            }, 5000);
         }
 
         AUDIO.AMBIENT.currentTime = 0;

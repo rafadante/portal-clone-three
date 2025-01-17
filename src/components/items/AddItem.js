@@ -134,7 +134,14 @@ async function addItem(found, loaded) {
             userData = GLOBALS.PLANE_USER_DATA[found[0].instanceId];
 
         if (userData.hasGoo) {
-            alert("Already has goo!")
+            //alert("Already has goo!")
+
+            $("#alert").css("opacity", "1");
+            $("#alert span").text("Already has goo!");
+
+            setTimeout(() => {
+                $("#alert").css("opacity", "0");
+            }, 5000);
             return;
         }
 
@@ -323,7 +330,14 @@ async function addItem(found, loaded) {
                 GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["count"] += 1;
                 $("#" + GLOBALS.ITEM_HOLDED_NAME).parent().children("span").text(GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["max"] - GLOBALS.ITEMS_COUNT[GLOBALS.ITEM_HOLDED_NAME]["count"])
             } else {
-                alert("Max Number of this item on the scene reached!");
+                //alert("Max Number of this item on the scene reached!");
+
+                $("#alert").css("opacity", "1");
+                $("#alert span").text("Max Number of this item on the scene reached!");
+
+                setTimeout(() => {
+                    $("#alert").css("opacity", "0");
+                }, 5000);
                 return;
             }
 

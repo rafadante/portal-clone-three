@@ -53,7 +53,14 @@ $("body").on('click', '#done', function () {
 
 //QUALITY
 $("body").on('click', '.optionQuality', function () {
-    alert("You need to reload the page to apply!")
+    //alert("You need to reload the page to apply!");
+
+    $("#alert").css("opacity", "1");
+    $("#alert span").text("You need to reload the page to apply!");
+
+    setTimeout(() => {
+        $("#alert").css("opacity", "0");
+    }, 5000);
 });
 
 $('#quality-select').on('change', function () {
