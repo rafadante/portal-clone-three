@@ -766,8 +766,8 @@ $("body").on('click', '.delete-my-chamber', async function () {
 document.onkeypress = function (e) {
     //e = e || window.event;
     // use e.keyCode
-    //console.log(e.keyCode)
-    if (GLOBALS.FPS_MODE && e.keyCode == 112) {
+    console.log(e.key)
+    if (GLOBALS.FPS_MODE && e.key == "p") {
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         window.thumbDataURL = GLOBALS.RENDERER.domElement.toDataURL("image/jpeg", 0.25);
 
