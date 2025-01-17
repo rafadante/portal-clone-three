@@ -3,7 +3,7 @@ import { GLOBALS } from "../../Globals.js";
 import { stateDoor } from '../door/Door.js';
 import { tractorBeam } from "../tractorBeam/TractorBeam.js";
 import { pelletUpdate, resetBall } from "../pellet/Pellet.js";
-import { portalButton } from '../portal/CreatePortal.js';
+import { deletePortal, portalButton } from '../portal/CreatePortal.js';
 import { addPositionalAudio, AUDIO, playVoice } from "../audio/Audio.js";
 import { laserFieldState, tractorStates, lightBridgeState, dispenserSpawn, respawn, levelEnteredFunction, wakeUpAll } from "./states.js";
 import { tweenCamera } from "../../Utils.js";
@@ -184,6 +184,12 @@ function updateEvents(deltaTime) {
 
                   const holderItem = GLOBALS.CONNECTIONS[i]['to'].item;
 
+                  if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+                    deletePortal(holderItem.getObjectByName("panel").hasPortal)
+                  }
+
+                  holderItem.getObjectByName("panel").hasPortal = 100;
+
                   setTimeout(() => {
                     updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
                   }, 500);
@@ -325,7 +331,7 @@ function doSetTimeout(to, waitFor, idHolder, connection, body) {
 
     if (to.itemName.includes("angled_panel")) {
       if (to.item.userData.connections == to.item.userData.buttons) {
-        
+
         tweenCamera(500, to.item.getObjectByName("pivot2").rotation,
           new Vector3(
             to.item.userData.angleTrigger * Math.PI / 180,
@@ -334,6 +340,12 @@ function doSetTimeout(to, waitFor, idHolder, connection, body) {
         );
 
         const holderItem = to.item;
+
+        if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+          deletePortal(holderItem.getObjectByName("panel").hasPortal)
+        }
+
+        holderItem.getObjectByName("panel").hasPortal = 100;
 
         setTimeout(() => {
           updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
@@ -418,6 +430,12 @@ function resetAll() {
           );
 
           const holderItem = GLOBALS.CONNECTIONS[i]['to'].item;
+
+          if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+            deletePortal(holderItem.getObjectByName("panel").hasPortal)
+          }
+
+          holderItem.getObjectByName("panel").hasPortal = 100;
 
           setTimeout(() => {
             updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
@@ -510,6 +528,12 @@ function laserReceiverTrigger(obj, state, catcher) {
 
               const holderItem = GLOBALS.CONNECTIONS[i]['to'].item;
 
+              if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+                deletePortal(holderItem.getObjectByName("panel").hasPortal)
+              }
+
+              holderItem.getObjectByName("panel").hasPortal = 100;
+
               setTimeout(() => {
                 updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
               }, 500);
@@ -594,6 +618,12 @@ function laserReceiverTrigger(obj, state, catcher) {
         );
 
         const holderItem = holder['to'].item;
+
+        if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+          deletePortal(holderItem.getObjectByName("panel").hasPortal)
+        }
+
+        holderItem.getObjectByName("panel").hasPortal = 100;
 
         setTimeout(() => {
           updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));

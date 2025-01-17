@@ -1,7 +1,7 @@
 import { Vector3, Color, Raycaster } from "three";
 import { GLOBALS } from "../../Globals.js";
 import { stateDoor } from '../door/Door.js';
-import { portalButton } from '../portal/CreatePortal.js';
+import { deletePortal, portalButton } from '../portal/CreatePortal.js';
 import { AUDIO, play, } from "../audio/Audio.js";
 import { removeJointConstraint } from '../../Physics.js';
 import { tweenCamera } from '../../Utils.js';
@@ -90,9 +90,15 @@ function interactWithItem() {
 
                                     const holderItem = GLOBALS.CONNECTIONS[i]['to'].item;
 
+                                    if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+                                        deletePortal(holderItem.getObjectByName("panel").hasPortal)
+                                    }
+
+                                    holderItem.getObjectByName("panel").hasPortal = 100;
+
                                     setTimeout(() => {
                                         updateAngledPanel(holderItem.getObjectByName("panel").body,
-                                        holderItem.getObjectByName("Cube"));
+                                            holderItem.getObjectByName("Cube"));
                                     }, 500);
                                 }
                             } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
@@ -247,6 +253,12 @@ function pedestalTimer(holder) {
             );
 
             const holderItem = holder['to'].item;
+
+            if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+                deletePortal(holderItem.getObjectByName("panel").hasPortal)
+            }
+
+            holderItem.getObjectByName("panel").hasPortal = 100;
 
             setTimeout(() => {
                 updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));

@@ -146,6 +146,15 @@ function portalButton(button, auto, camera, firstToRender) {
 
             if (intersectPanel.length > 0 || (((userData.portal) || intersectsGelWhite.length > 0 || paintMode)
                 && (!userData.hasItem || auto || userData.itemName.includes("camera") || userData.itemName.includes("radio") || userData.itemName.includes("trigger")))) {//!userData.hasItem || (userData.itemName.includes("camera"))
+
+                if (intersectPanel.length > 0) {
+                    console.log(intersectPanel[0].object.hasPortal)
+                    if (intersectPanel[0].object.hasPortal == 0 || intersectPanel[0].object.hasPortal == 1) {
+                        console.log("returned")
+                        return;
+                    }
+                }
+
                 var point = new Vector3(x, y, z);
                 // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                 // define playerUpDirection
@@ -364,6 +373,14 @@ function portalButton(button, auto, camera, firstToRender) {
                     //}
                 }
 
+                if (intersectPanel.length > 0) {
+                    if (button == 0)
+                        intersectPanel[0].object.hasPortal = 0;
+                    else
+                        intersectPanel[0].object.hasPortal = 1;
+
+                }
+
                 setTimeout(() => {
                     if (button == 0) {
                         createLightBridgesFromPortal(1, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
@@ -424,6 +441,13 @@ function validPortalPoint(point, normal, object) {
 
 // deletes the portal with index portalIndex from the scene
 function deletePortal(portalIndex) {
+
+    for(var i=0; i<GLOBALS.ANGLED_PANELS.length;i++){
+        if(GLOBALS.ANGLED_PANELS[i].hasPortal == portalIndex){
+            GLOBALS.ANGLED_PANELS[i].hasPortal = 100;
+            break;
+        }
+    }
 
     if (GLOBALS.PORTALS[0] === null && GLOBALS.PORTALS[1] === null)
         AUDIO.PORTAL_GUN_LOOP.pause();

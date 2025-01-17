@@ -558,6 +558,8 @@ async function addItem(found, loaded) {
             } else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
                 GLOBALS.DYMANIC_ITEMS['angled_panel'].push(item)
                 GLOBALS.ITEMS_ADDED.add(item);
+                item.getObjectByName("panel").hasPortal = 100;
+                item.translateY(0.02)
             } else if (GLOBALS.ITEM_HOLDED_NAME.includes("trigger")) {
 
                 GLOBALS.ITEMS_ADDED.add(item);

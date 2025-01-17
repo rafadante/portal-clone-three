@@ -146,7 +146,7 @@ function App() {
           <div id="login-back"></div>
 
           <img src="./assets/ui/logo2.png"></img>
-          <span>Registration is needed to have acess to the project!</span>
+          <span>Registration is required to access the project!!</span>
 
           <button type="button" class="login-with-google-btn" onClick={signIn}>
             Sign in with Google
@@ -1201,16 +1201,16 @@ function App() {
               <span className="menu-text title">Angle on Start: 60</span>
             </button>
             <ul className="menu">
-              <li data-angle="0" data-real="0" className="menu-item angled_panel_option">
+              <li data-angle="90" data-real="0" className="menu-item angled_panel_option">
                 <button type="button" className="menu-btn">
                   <i className="fa fa-pallete"></i>
-                  <span className="menu-text">0</span>
+                  <span className="menu-text">90</span>
                 </button>
               </li>
-              <li data-angle="30" data-real="30" className="menu-item angled_panel_option">
+              <li data-angle="60" data-real="30" className="menu-item angled_panel_option">
                 <button type="button" className="menu-btn">
                   <i className="fa fa-pallete"></i>
-                  <span className="menu-text">30</span>
+                  <span className="menu-text">60</span>
                 </button>
               </li>
               <li data-angle="45" data-real="45" className="menu-item angled_panel_option">
@@ -1219,10 +1219,16 @@ function App() {
                   <span className="menu-text">45</span>
                 </button>
               </li>
-              <li data-angle="60" data-real="60" className="menu-item angled_panel_option">
+              <li data-angle="30" data-real="60" className="menu-item angled_panel_option">
                 <button type="button" className="menu-btn">
                   <i className="fa fa-pallete"></i>
-                  <span className="menu-text">60</span>
+                  <span className="menu-text">30</span>
+                </button>
+              </li>
+              <li data-angle="0" data-real="90" className="menu-item angled_panel_option">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-pallete"></i>
+                  <span className="menu-text">0</span>
                 </button>
               </li>
             </ul>
@@ -1234,16 +1240,16 @@ function App() {
               <span className="menu-text title">Angle on Trigger: 60</span>
             </button>
             <ul className="menu">
-              <li data-angle="0" data-real="0" className="menu-item angled_panel_trigger">
+              <li data-angle="90" data-real="0" className="menu-item angled_panel_trigger">
                 <button type="button" className="menu-btn">
                   <i className="fa fa-pallete"></i>
-                  <span className="menu-text">0</span>
+                  <span className="menu-text">90</span>
                 </button>
               </li>
-              <li data-angle="30" data-real="30" className="menu-item angled_panel_trigger">
+              <li data-angle="60" data-real="30" className="menu-item angled_panel_trigger">
                 <button type="button" className="menu-btn">
                   <i className="fa fa-pallete"></i>
-                  <span className="menu-text">30</span>
+                  <span className="menu-text">60</span>
                 </button>
               </li>
               <li data-angle="45" data-real="45" className="menu-item angled_panel_trigger">
@@ -1252,10 +1258,16 @@ function App() {
                   <span className="menu-text">45</span>
                 </button>
               </li>
-              <li data-angle="60" data-real="60" className="menu-item angled_panel_trigger">
+              <li data-angle="30" data-real="60" className="menu-item angled_panel_trigger">
                 <button type="button" className="menu-btn">
                   <i className="fa fa-pallete"></i>
-                  <span className="menu-text">60</span>
+                  <span className="menu-text">30</span>
+                </button>
+              </li>
+              <li data-angle="0" data-real="90" className="menu-item angled_panel_trigger">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-pallete"></i>
+                  <span className="menu-text">0</span>
                 </button>
               </li>
             </ul>
