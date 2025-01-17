@@ -773,10 +773,10 @@ document.onkeypress = function (e) {
 
         alert("thumbnail set!")
 
-        var link = document.createElement("a");
+        /*var link = document.createElement("a");
         link.download = "name";
         link.href = window.thumbDataURL;
-        link.click();
+        link.click();*/
     }
 };
 
