@@ -241,7 +241,10 @@ $("body").on('click', '.span-chamber', async function () {
 
     setTimeout(() => {
 
-        custompath = $(this).data("json");
+        //custompath = $(this).data("json");
+        var tt = window.arrayJSON[$(this).parent().data("jsonid")];
+
+        custompath = JSON.parse(tt)
 
         window.chamberID = $(this).parent().data("id");
         window.chamberUSERID = $(this).parent().data("userid");

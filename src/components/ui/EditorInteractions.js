@@ -664,7 +664,12 @@ $("body").on('click', '#reset-check-point', function () {
 //
 var chambers;
 
+window.arrayJSON = [];
+
 $("body").on('click', '#options-custom span', async function () {
+
+    window.arrayJSON = [];
+
     $("#options-custom span").css("background", "none");
     $(this).css("background", "grey");
 
@@ -679,54 +684,68 @@ $("body").on('click', '#options-custom span', async function () {
     const session = await window["getSession"]();
 
     if ($(this).data("value") == "all") {
-        for (var i = 0; i < chambers.length; i++) {
+        for (var i = 0, j = 0; i < chambers.length; i++) {
 
             if (!chambers[i].tested)
                 continue;
 
-            const elem = '<div data-name="' + chambers[i].name  + '"  data-finished="' + chambers[i].finished + '"   data-userid="' + chambers[i].user_id + '" data-played="' + chambers[i].played + '"  data-id="' + chambers[i].id + '" class="custom-chamber"' +
+            const elem = '<div data-jsonid="' + j + '"  data-name="' + chambers[i].name + '"  data-finished="' + chambers[i].finished + '"   data-userid="' + chambers[i].user_id + '" data-played="' + chambers[i].played + '"  data-id="' + chambers[i].id + '" class="custom-chamber"' +
                 'style="background-image: url(' + chambers[i].thumb + ')">' +
                 '<div class="chamber-stats">' +
                 '<span>played: ' + chambers[i].played + '</span>' +
                 '<span>finished: ' + chambers[i].finished + '</span>' +
                 '</div>' +
-                '<span data-json=' + chambers[i].json + ' class="span-chamber">' + chambers[i].name + " by " + chambers[i].author + '</span>' +
+                '<span class="span-chamber">' + chambers[i].name + " by " + chambers[i].author + '</span>' +
                 '</div>'
+
+            window.arrayJSON.push(chambers[i].json);
+
+            j++;
 
             $("#list-custm-chambers").append(elem);
         }
     } else if ($(this).data("value") == "new") {
-        for (var i = 0; i < chambers.length; i++) {
+        for (var i = 0, j = 0; i < chambers.length; i++) {
 
             if (chambers[i].tested)
                 continue;
 
-            const elem = '<div data-name="' + chambers[i].name  + '"  data-finished="' + chambers[i].finished + '"   data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '"  data-id="' + chambers[i].id + '" class="custom-chamber"' +
+
+            const elem = '<div data-jsonid="' + j + '" data-name="' + chambers[i].name + '"  data-finished="' + chambers[i].finished + '"   data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '"  data-id="' + chambers[i].id + '" class="custom-chamber"' +
                 'style="background-image: url(' + chambers[i].thumb + ')">' +
                 '<div class="chamber-stats">' +
                 '<span>played: ' + chambers[i].played + '</span>' +
                 '<span>finished: ' + chambers[i].finished + '</span>' +
                 '</div>' +
-                '<span data-json=' + chambers[i].json + ' class="span-chamber">' + chambers[i].name + " by " + chambers[i].author + '</span>' +
-                '</div>'
+                '<span class="span-chamber">' + chambers[i].name + " by " + chambers[i].author + '</span>' +
+                '</div>';
+
+            window.arrayJSON.push(chambers[i].json);
+
+            j++;
+
 
             $("#list-custm-chambers").append(elem);
         }
     } else if ($(this).data("value") == "mine") {
-        for (var i = 0; i < chambers.length; i++) {
+        for (var i = 0, j = 0; i < chambers.length; i++) {
 
             if (chambers[i].user_id != session.user.id)
                 continue;
 
-            const elem = '<div data-name="' + chambers[i].name  + '" data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber mine"' +
+            const elem = '<div data-jsonid="' + j + '"  data-name="' + chambers[i].name + '" data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber mine"' +
                 'style="background-image: url(' + chambers[i].thumb + ')">' +
                 '<div class="chamber-stats">' +
                 '<span>played: ' + chambers[i].played + '</span>' +
                 '<span>finished: ' + chambers[i].finished + '</span>' +
                 '</div>' +
                 '<button class="delete-my-chamber">DELETE</button>' +
-                '<span data-json=' + chambers[i].json + ' class="span-chamber">' + chambers[i].name + " by " + chambers[i].author + '</span>' +
+                '<span class="span-chamber">' + chambers[i].name + " by " + chambers[i].author + '</span>' +
                 '</div>'
+
+            window.arrayJSON.push(chambers[i].json);
+
+            j++;
 
             $("#list-custm-chambers").append(elem);
         }
@@ -740,6 +759,8 @@ $("body").on('click', '.delete-my-chamber', async function () {
     window["deleteChamber"]($(this).parent().data("id"));
     chambers = await window["selectAllChambers"]();
     $(this).parent().remove();
+
+    window.location.reload();
 })
 
 document.onkeypress = function (e) {
