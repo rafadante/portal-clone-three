@@ -853,15 +853,21 @@ function addCollidersToCorridor(mesh) {
             if (GLOBALS.LEVEL_ENTERED && (!GLOBALS.LOADED_LEVEL || window.allowEdit) && !GLOBALS.FINISHED) {
                 GLOBALS.FINISHED = true;
 
-                if (window.confirm("Publish Chamber?") == true) {
+                //
 
-                    saveChamber(true);
-
-                    $("#loading-parent").css("opacity", 1)
-                    $("#loading-parent").css("pointer-events", "all")
-                } else {
+                setTimeout(() => {
                     backToEditor();
-                }
+                }, 100);
+
+
+                $("#loading-parent").css("opacity", 1)
+                $("#loading-parent").css("pointer-events", "all")
+
+                setTimeout(() => {
+                    if (window.confirm("Publish Chamber?") == true)
+                        saveChamber(true);
+                }, 1000);
+
             } else if (GLOBALS.LEVEL_ENTERED && GLOBALS.LOADED_LEVEL && !GLOBALS.FINISHED) {//
 
                 if (window.chamberID) {

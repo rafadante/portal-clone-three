@@ -563,12 +563,10 @@ function saveChamber(publish) {
 
 
     if (publish) {
-        if (GLOBALS.FINISHED) {
-            if (window.chamberID) {
-                window["updateChamber"]($("#chamber-name-to-save").val(), window.chamberID);
-            } else {
-                window["saveChamber"]($("#chamber-name-to-save").val());
-            }
+        if (window.chamberID) {
+            window["updateChamber"]($("#chamber-name-to-save").val(), window.chamberID);
+        } else {
+            window["saveChamber"]($("#chamber-name-to-save").val());
         }
     } else {
         var dlAnchorElem = document.createElement('a');
@@ -756,6 +754,8 @@ $("body").on('click', '#options-custom span', async function () {
             $("#list-custm-chambers").append(elem);
         }
     }
+
+    console.log(window.arrayJSON)
 
     document.getElementById("loading-parent").style.opacity = "0";
     document.getElementById("loading-parent").style.pointerEvents = "none";

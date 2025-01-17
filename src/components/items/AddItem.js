@@ -897,6 +897,7 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         createLightBridges("fizzler", GLOBALS.FIZZLER_RAYCASTER, item, instanced, false);
         ContinuousTrigger(item, item.userData.triggers, $("#laser-field-trigger"), "fizzler");
     } else if (GLOBALS.ITEM_HOLDED_NAME == "light_bridge") {
+        console.log(userDataLoadedItem.state)
         item.userData.state = userDataLoadedItem.state;
         item.userData.triggers = userDataLoadedItem.triggers;
         createLightBridges("light_bridge", GLOBALS.LIGHT_BRIDGE_RAYCASTER, item, null, false);

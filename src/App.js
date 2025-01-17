@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
+import $ from 'jquery';
 
 /*window.addEventListener('load', function () {
   import('./Main.js')
@@ -71,6 +72,15 @@ function App() {
 
     document.getElementById("loading-parent").style.opacity = "0";
     document.getElementById("loading-parent").style.pointerEvents = "none";
+
+    $("#ui").css("display", "block");
+    $(".img").removeClass("image");
+    $("#mobile-controls").css("display", "none");
+    $("#container").css("filter", "none");
+
+    $("#blocker").css("display", "none");
+    $("#blocker").css("pointer-events", "none");
+    $("#reticle").css("display", "none");
   }
 
   window["selectAllChambers"] = async function () {

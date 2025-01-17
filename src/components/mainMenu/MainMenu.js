@@ -434,6 +434,7 @@ function loadLevelJSON() {
 }
 
 $("body").on('click', '#option-community-build', function () {
+    window.allowEdit=true;
     startLevel()
 });
 

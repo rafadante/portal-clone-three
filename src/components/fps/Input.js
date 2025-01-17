@@ -200,8 +200,15 @@ document.body.addEventListener('mousemove', (event) => {
 
 });
 
+var msg = false;
+
 $("body").on('click', '#settings-close', function () {
     if (GLOBALS.FPS_MODE && allowEnterFPS) {
+
+        if (!msg && window.allowEdit) {
+            msg = true;
+            alert("To take a snapshot, press the P key on your keyboard!")
+        }
 
         AUDIO.AMBIENT.currentTime = 0;
         play(AUDIO.AMBIENT);
