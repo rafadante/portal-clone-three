@@ -107,7 +107,7 @@ function App() {
   window["updateChamberPlayedValue"] = async function (id, value) {
     const { data, error } = await supabase
       .from('chambers')
-      .update({ played: value, tested: false })
+      .update({ played: value})
       .eq('id', id)
       .select()
 
@@ -139,7 +139,7 @@ function App() {
   }
 
   window["updateChamberFinishedValue"] = async function (id, value) {
-    console.log("tested true")
+
     const { data, error } = await supabase
       .from('chambers')
       .update({ finished: value, tested: true })
