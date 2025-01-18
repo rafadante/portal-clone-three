@@ -313,7 +313,7 @@ function App() {
               <span id="header-items">ITEMS</span>
               <span id="header-settings">SETTINGS</span>
             </div>
-            <div className="body">
+            <div className="body bodyEditor">
               <div id="settings">
                 <div className="options-row">
                   <span className="option-name" id="">Portal Gun Initiate:</span>
