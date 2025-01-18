@@ -366,7 +366,7 @@ $("body").on('click', '.span-chamber', async function () {
 
         setTimeout(() => {
             init();
-        }, 2000);
+        }, 2100);
 
         startLevel();
 

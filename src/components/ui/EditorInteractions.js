@@ -755,8 +755,6 @@ $("body").on('click', '#options-custom span', async function () {
         }
     }
 
-    console.log(window.arrayJSON)
-
     document.getElementById("loading-parent").style.opacity = "0";
     document.getElementById("loading-parent").style.pointerEvents = "none";
 });
