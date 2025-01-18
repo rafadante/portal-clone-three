@@ -107,11 +107,11 @@ function App() {
   window["updateChamberPlayedValue"] = async function (id, value) {
     const { data, error } = await supabase
       .from('chambers')
-      .update({ played: value})
+      .update({ played: value })
       .eq('id', id)
       .select()
 
-      //console.log(data)
+    //console.log(data)
   }
 
   window["updateChamber"] = async function (name, id) {
@@ -1378,7 +1378,7 @@ function App() {
 
         <div id="blocker">
 
-          <span id="version">version: 0.2.2</span>
+          <span id="version">version: 0.2.3</span>
 
           <div id="social" style={{
             width: "auto",
@@ -2100,7 +2100,7 @@ function App() {
 
         <div id="initial-warning">
           <button id="close-warning">X</button>
-          <span>
+          <span id='left-warning'>
             This project is currently in beta state, join the discord server to help with feedback.
             <br></br>
             For a stable experience please play the official games, they are amazing:
@@ -2113,6 +2113,109 @@ function App() {
             own the original design work and it is only intended htmlFor education under "Fair Use"
             defined in Section 107 of the Copyright Act (1976).
           </span>
+          <div id='right-warning'>
+            <div id="warning-bugs">
+              <span>BUGS</span>
+              <div>
+                <label>Audio: Weird noise issue</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Fix mobile controls</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Gamepad drifting issue</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Moving items causes some bugs in the editor</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Update background image on the menu</label>
+                <input type='checkbox' />
+              </div>
+            </div>
+            <div id="warning-pending">
+              <span>PENDING</span>
+              <div>
+                <label>Allow the player more control in the air</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Add language options via JSON</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Enable navigation without needing to reload the page</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Custom chambers: Add like/dislike functionality</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Custom chambers: Allow custom thumbnails</label>
+                <input type='checkbox' />
+              </div>
+
+              <div>
+                <label>Custom chambers: Add filters for maps (e.g., like ratio, most played, etc.)</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Custom chambers: Show creator icons</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Custom chambers: Add tags</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Custom chambers: Add descriptions</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Custom chambers: Allow updates to thumbnail, name, description, and tags without replaying the map</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Custom chambers: Show chambers I’ve played</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Custom chambers: Show chambers I’ve finished</label>
+                <input type='checkbox' />
+              </div>
+
+              <div>
+                <label>Add center-rotating angled panels</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Add turrets</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Add rocket turrets</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Add basic gel dispensers (blue, orange, clear, portal)</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Add purple gel dispensers</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>Stair trigger</label>
+                <input type='checkbox' />
+              </div>
+              
+            </div>
+          </div>
         </div>
       </div>
 

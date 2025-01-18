@@ -456,7 +456,7 @@ form {
     border: 5px solid black;
     overflow: hidden;
 
-    .delete-my-chamber{
+    .delete-my-chamber {
       background-color: red;
       border: none;
       padding: 10px;
@@ -469,12 +469,12 @@ form {
       color: white;
     }
 
-    .delete-my-chamber:hover{
+    .delete-my-chamber:hover {
       transform: scale(1.1);
       color: black;
     }
 
-    .chamber-stats{
+    .chamber-stats {
       position: absolute;
       top: 0px;
       left: 0px;
@@ -486,7 +486,7 @@ form {
       pointer-events: none;
       padding-right: 40px;
 
-      span{
+      span {
         font-size: 15px;
       }
     }
@@ -542,25 +542,15 @@ form {
   z-index: 1000000;
   width: 100%;
   height: calc(100% - 70px);
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.8);
   top: 0px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   text-align: center;
-  overflow-y: scroll;
+  overflow-y: none;
   padding-top: 50px;
   padding-bottom: 20px;
-
-  a {
-    color: #00a2ff;
-  }
-
-  span {
-    width: 80%;
-    font-size: 30px;
-    color: #ff9a00;
-  }
 
   #close-warning {
     position: absolute;
@@ -573,6 +563,66 @@ form {
     font-size: 24px;
     background-color: #ff9a00;
     color: #00a2ff;
+  }
+
+  #left-warning {
+
+    width: 30%;
+    height: 100%;
+    font-size: 3vh !important;
+    color: #ff9a00;
+    padding-left: 20px;
+    padding-right: 20px;
+
+    a {
+      color: #00a2ff;
+    }
+  }
+
+  #right-warning {
+    border: 3px solid white;
+    width: 70%;
+    height: 100%;
+    display: flex;
+    color: #00a2ff;
+
+    #warning-bugs, #warning-pending{
+      display: flex;
+      flex-direction: column;
+      width: 50%;
+      height: 100%;
+      overflow-y: scroll;
+
+      span{
+        width: 100%;
+        font-size: 5vh;
+        margin-bottom: 20px;
+      }
+
+      div{
+        width: 100%;
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: start;
+        align-items: flex-start;
+        pointer-events: none;
+        height: auto;
+        margin-bottom: 10px;
+
+        label{
+          font-size: 2.5vh;
+          width: 100%;
+          text-align: left;
+          margin-left: 10px;
+        }
+        
+        input{
+          width: 3vh;
+          height: 3vh;
+          pointer-events: none;
+        }
+      }
+    }
   }
 }
 
@@ -1927,7 +1977,7 @@ button:focus {
   }
 }
 
-#alert{
+#alert {
   position: fixed;
   width: 100%;
   height: 100px;
@@ -1942,7 +1992,7 @@ button:focus {
   transition: all 3s;
   opacity: 0;
 
-  span{
+  span {
     width: 60%;
     text-align: center;
     font-size: 20px;
