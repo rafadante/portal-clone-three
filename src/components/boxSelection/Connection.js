@@ -35,6 +35,11 @@ function manageConnection(instanceId, from) {
         if(!GLOBALS.PLANE_USER_DATA[instanceId].item.userData)
             return;
     }
+
+    //console.log(GLOBALS.SELECTED_FOR_CONNECTION.item.userData.connectedTo)
+
+    if(!GLOBALS.SELECTED_FOR_CONNECTION.item.userData.connectedTo)
+        return;
     
 
     if (GLOBALS.FAITH_PLATE_TARGET) {
