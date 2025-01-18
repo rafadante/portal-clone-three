@@ -32,7 +32,6 @@ function loadDefault() {
     load3D("/items/open.glb", "door", false);
     load3D("/items/hd_portal_gun3.glb", "gun", false);
     load3D("/items/cube_dispenser.glb", "dispenser", true, false, 0.2, 0.5, false, false, true, false, null, null, null, 100);
-    loadWindowIMG();
 }
 
 var draco = new DRACOLoader();
@@ -181,6 +180,7 @@ function instancedTransform(scene, name, interactive, roughness, envIntensity, m
     return item;
 }
 
+loadWindowIMG()
 function loadWindowIMG() {
     loader.load('/medium/items/WINDOW_IMG.glb', (gltf) => {
 
@@ -206,6 +206,7 @@ function loadWindowIMG() {
         gltf.scene.name = "window";
         GLOBALS.SCENE_CHILDREN.add(gltf.scene);
         GLOBALS.OBSERVATION_ROOM_IMG = gltf.scene;
+        GLOBALS.OBSERVATION_ROOM_IMG.visible = false;
     });
 }
 

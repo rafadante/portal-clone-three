@@ -80,6 +80,7 @@ GLOBALS.ITEM_CUBE.name = "ITEM_CUBE";
 document.getElementById("container").appendChild(GLOBALS.RENDERER.domElement);
 //
 function init() {
+    GLOBALS.OBSERVATION_ROOM_IMG.visible = true;
     // SCENE
     GLOBALS.ROOM.name = "ROOM";
     GLOBALS.ITEMS_ADDED.name = "ITEMS";
