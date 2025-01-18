@@ -289,7 +289,7 @@ function raycastSelected(found, event, type) {
             $(".gel").css("display", "block");
 
             for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
-                if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].hasItem) {
+                if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].hasItem && !GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[i]].itemName.includes("gel")) {
                     $(".gel").css("display", "none");
                     break
                 }

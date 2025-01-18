@@ -20,8 +20,10 @@ import { saveChamber } from '../ui/EditorInteractions.js';
 
 function colliderItemManager() {
 
-    for (var i = 0; i < GLOBALS.GOO_PLANES.length; i++)
-        GLOBALS.GOO_PLANES[i].item.visible = false;
+    for (var i = 0; i < GLOBALS.GOO_PLANES.length; i++) {
+        if (GLOBALS.GOO_PLANES[i].item)
+            GLOBALS.GOO_PLANES[i].item.visible = false;
+    }
 
     //CORRIDOR ENTER COLLIDERS
     corridorColliderNames(GLOBALS.CORRIDOR_ENTER, false);
@@ -193,9 +195,9 @@ function fizzlerTrigger(body) {
             GLOBALS.PORTAL_BOX = [];
 
             for (var i = 0; i < GLOBALS.LASER_TRIGGERS.length; i++) {
-                
-                if (GLOBALS.LASER_TRIGGERS[i].emitterState && !GLOBALS.LASER_TRIGGERS[i].fromLaserCube){
-                    
+
+                if (GLOBALS.LASER_TRIGGERS[i].emitterState && !GLOBALS.LASER_TRIGGERS[i].fromLaserCube) {
+
                     laserReceiverTrigger(GLOBALS.LASER_TRIGGERS[i], false);
                 }
             }

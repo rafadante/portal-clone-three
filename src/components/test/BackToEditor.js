@@ -61,7 +61,8 @@ function backToEditor() {
     }
 
     for (var i = 0; i < GLOBALS.GOO_PLANES.length; i++) {
-        GLOBALS.GOO_PLANES[i].item.visible = true;
+        if (GLOBALS.GOO_PLANES[i].item)
+            GLOBALS.GOO_PLANES[i].item.visible = true;
     }
 
     for (var f = 0; f < GLOBALS.TRIGGER_BOXES.length; f++) {
