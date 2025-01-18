@@ -705,7 +705,7 @@ $("body").on('click', '#options-custom span', async function () {
     } else if ($(this).data("value") == "new") {
         for (var i = 0; i < chambers.length; i++) {
 
-            if (chambers[i].tested || chambersPlayed.includes(chambers[i].id) || chambersFinished.includes(chambers[i].id))
+            if (chambers[i].tested)
                 continue;
 
             manageChmaberCustom(i, j)
@@ -721,7 +721,7 @@ $("body").on('click', '#options-custom span', async function () {
     } else if ($(this).data("value") == "played") {
         for (var i = 0; i < chambers.length; i++) {
 
-            if (!chambersPlayed.includes(chambers[i].id))
+            if (!chambersPlayed.includes(chambers[i].id) || !chambers[i].tested)
                 continue;
 
             manageChmaberCustom(i, j)
@@ -729,7 +729,7 @@ $("body").on('click', '#options-custom span', async function () {
     } else if ($(this).data("value") == "finished") {
         for (var i = 0; i < chambers.length; i++) {
 
-            if (!chambersFinished.includes(chambers[i].id))
+            if (!chambersFinished.includes(chambers[i].id) || !chambers[i].tested)
                 continue;
 
             manageChmaberCustom(i, j);

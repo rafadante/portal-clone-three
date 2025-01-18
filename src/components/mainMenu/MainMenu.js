@@ -457,6 +457,16 @@ $("body").on('click', '#option-single-reset', function () {
 
 function startLevel() {
 
+    $(".settings-menu").css("width", "80%");
+    $(".settings-menu").css("max-height", "60%");
+    $(".settings-menu").css("height", "auto");
+
+    $("#settings-menu-title").css("display", "block");
+
+    $(".body").css("z-index", "10000000");
+    $(".body").css("margin-left", "15vh");
+    $(".body").css("background-color", "transparent");
+
     $("#blocker .body").css("opacity", "0");
     $("#logo").css("opacity", "0");
 
