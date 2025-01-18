@@ -339,7 +339,16 @@ $("body").on('click', '.span-chamber', async function () {
         //custompath = $(this).data("json");
         var tt = window.arrayJSON[$(this).parent().data("jsonid")];
 
-        custompath = JSON.parse(tt)
+        custompath = JSON.parse(tt);
+
+        /*console.log(custompath)
+        console.log(JSON.stringify(custompath))
+
+        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(custompath));
+        var dlAnchorElem = document.createElement('a');
+        dlAnchorElem.setAttribute("href", dataStr);
+        dlAnchorElem.setAttribute("download", "chamber.json");
+        dlAnchorElem.click();*/
 
         window.chamberID = $(this).parent().data("id");
         window.chamberUSERID = $(this).parent().data("userid");

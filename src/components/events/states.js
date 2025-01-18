@@ -10,10 +10,13 @@ function laserFieldState(obj) {
 
     GLOBALS.CANNON_BODIES.push(obj.item.bodyLaserField);
 
-    if (obj.item.userData.state)
-        GLOBALS.CANNON_WORLD.addBody(obj.item.bodyLaserField);
-    else
-        GLOBALS.CANNON_WORLD.removeBody(obj.item.bodyLaserField);
+    setTimeout(() => {
+        if (obj.item.userData.state)
+            GLOBALS.CANNON_WORLD.addBody(obj.item.bodyLaserField);
+        else
+            GLOBALS.CANNON_WORLD.removeBody(obj.item.bodyLaserField);
+    }, 100);
+
 }
 
 function lightBridgeState(obj) {
@@ -22,23 +25,26 @@ function lightBridgeState(obj) {
 
     GLOBALS.CANNON_BODIES.push(obj.item.bodyBridge);
 
-    if (obj.item.userData.state)
-        GLOBALS.CANNON_WORLD.addBody(obj.item.bodyBridge);
-    else
-        GLOBALS.CANNON_WORLD.removeBody(obj.item.bodyBridge);
+    setTimeout(() => {
+        if (obj.item.userData.state)
+            GLOBALS.CANNON_WORLD.addBody(obj.item.bodyBridge);
+        else
+            GLOBALS.CANNON_WORLD.removeBody(obj.item.bodyBridge);
 
-    if (obj.item.clone) {
-        if (obj.item.clone.bodyBridge) {
-            obj.item.clone.visible = obj.item.continuous.visible;
 
-            GLOBALS.CANNON_BODIES.push(obj.item.clone.bodyBridge);
+        if (obj.item.clone) {
+            if (obj.item.clone.bodyBridge) {
+                obj.item.clone.visible = obj.item.continuous.visible;
 
-            if (obj.item.userData.state)
-                GLOBALS.CANNON_WORLD.addBody(obj.item.clone.bodyBridge);
-            else
-                GLOBALS.CANNON_WORLD.removeBody(obj.item.clone.bodyBridge);
+                GLOBALS.CANNON_BODIES.push(obj.item.clone.bodyBridge);
+
+                if (obj.item.userData.state)
+                    GLOBALS.CANNON_WORLD.addBody(obj.item.clone.bodyBridge);
+                else
+                    GLOBALS.CANNON_WORLD.removeBody(obj.item.clone.bodyBridge);
+            }
         }
-    }
+    }, 100);
 }
 
 function tractorStates(obj) {
@@ -123,7 +129,7 @@ function respawn(d) {
         GLOBALS.PORTAL_BOX = [];
 
         for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-            if (GLOBALS.CONNECTIONS[i]['from'].instancedName && GLOBALS.CONNECTIONS[i]['to'].instancedName){
+            if (GLOBALS.CONNECTIONS[i]['from'].instancedName && GLOBALS.CONNECTIONS[i]['to'].instancedName) {
                 if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger") &&
                     GLOBALS.CONNECTIONS[i]['to'].instancedName.includes("portal")) {
                     GLOBALS.CONNECTIONS[i]['line'].active = false;
@@ -159,7 +165,7 @@ function respawn(d) {
                     d.mass = 5;
                 } else if (d.item.userData.connections == d.item.userData.buttons) {
                     d.mass = 5;
-                }else {
+                } else {
                     d.mass = 0;
                 }
 
