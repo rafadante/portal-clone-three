@@ -229,6 +229,15 @@ else if (localStorage.getItem("quality-select") == "medium")
 window.curentTimeOffset = 0;
 window.clockTimer = new Clock(); // Create a clock
 
+//let clock = new THREE.Clock(); // Optional, but useful for built-in deltaTime
+//let isPaused = false;
+let lastTime2 = performance.now();
+let deltaTime33 = 0;
+
+function togglePause(){
+    lastTime2 = performance.now();
+}
+
 function render(time) {
 
     GLOBALS.STATS.update();
@@ -240,14 +249,19 @@ function render(time) {
         statsBegin = true;
     }
 
+    const currentTime = performance.now();
+    deltaTime33 = (currentTime - lastTime2) / 1000; // Convert to seconds//
+    lastTime2 = currentTime;
+
+
     fixedUpdate();
     animateShader();
     renderGoo();
-    const deltaTime = clock3.getDelta();
-    updatePhysics(deltaTime);
-    updateCamera(time);
+    //const deltaTime = clock3.getDelta();
+    updatePhysics(deltaTime33);
+    updateCamera(deltaTime33);
     teleportationState()
-    updateEvents(deltaTime);
+    updateEvents(deltaTime33);
     checkForTriggerContact();
     TWEEN.update();
     animatePortal(time);
@@ -502,5 +516,6 @@ function portalIsVisibleInCamera(camera, portal, clippingPlane) {
 }
 
 export {
-    init
+    init,
+    togglePause
 };

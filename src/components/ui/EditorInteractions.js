@@ -667,7 +667,9 @@ $("body").on('click', '#reset-check-point', function () {
 
 //
 var chambers;
-
+var chambersPlayed = [];
+var chambersFinished = [];
+var j = 0;
 window.arrayJSON = [];
 
 $("body").on('click', '#options-custom span', async function () {
@@ -680,84 +682,87 @@ $("body").on('click', '#options-custom span', async function () {
     document.getElementById("loading-parent").style.opacity = "1";
     document.getElementById("loading-parent").style.pointerEvents = "all";
 
-    if (!chambers)
+    if (!chambers) {
         chambers = await window["selectAllChambers"]();
+        chambersPlayed = await window["selectAllChambersPlayed"](false);
+        chambersFinished = await window["selectAllChambersPlayed"](true);
+    }
 
     $(".custom-chamber").remove();
 
     const session = await window["getSession"]();
 
-    if ($(this).data("value") == "all") {
-        for (var i = 0, j = 0; i < chambers.length; i++) {
+    j = 0;
 
-            if (!chambers[i].tested)
+    if ($(this).data("value") == "all") {
+        for (var i = 0; i < chambers.length; i++) {
+
+            if (!chambers[i].tested || chambersPlayed.includes(chambers[i].id) || chambersFinished.includes(chambers[i].id))
                 continue;
 
-            const elem = '<div data-jsonid="' + j + '"  data-name="' + chambers[i].name + '"  data-finished="' + chambers[i].finished + '"   data-userid="' + chambers[i].user_id + '" data-played="' + chambers[i].played + '"  data-id="' + chambers[i].id + '" class="custom-chamber"' +
-                'style="background-image: url(' + chambers[i].thumb + ')">' +
-                '<div class="chamber-stats">' +
-                '<span>played: ' + chambers[i].played + '</span>' +
-                '<span>finished: ' + chambers[i].finished + '</span>' +
-                '</div>' +
-                '<span class="span-chamber">' + chambers[i].name + " by " + chambers[i].author + '</span>' +
-                '</div>'
-
-            window.arrayJSON.push(chambers[i].json);
-
-            j++;
-
-            $("#list-custm-chambers").append(elem);
+            manageChmaberCustom(i, j)
         }
     } else if ($(this).data("value") == "new") {
-        for (var i = 0, j = 0; i < chambers.length; i++) {
+        for (var i = 0; i < chambers.length; i++) {
 
-            if (chambers[i].tested)
+            if (chambers[i].tested || chambersPlayed.includes(chambers[i].id) || chambersFinished.includes(chambers[i].id))
                 continue;
 
-
-            const elem = '<div data-jsonid="' + j + '" data-name="' + chambers[i].name + '"  data-finished="' + chambers[i].finished + '"   data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '"  data-id="' + chambers[i].id + '" class="custom-chamber"' +
-                'style="background-image: url(' + chambers[i].thumb + ')">' +
-                '<div class="chamber-stats">' +
-                '<span>played: ' + chambers[i].played + '</span>' +
-                '<span>finished: ' + chambers[i].finished + '</span>' +
-                '</div>' +
-                '<span class="span-chamber">' + chambers[i].name + " by " + chambers[i].author + '</span>' +
-                '</div>';
-
-            window.arrayJSON.push(chambers[i].json);
-
-            j++;
-
-
-            $("#list-custm-chambers").append(elem);
+            manageChmaberCustom(i, j)
         }
     } else if ($(this).data("value") == "mine") {
-        for (var i = 0, j = 0; i < chambers.length; i++) {
+        for (var i = 0; i < chambers.length; i++) {
 
             if (chambers[i].user_id != session.user.id)
                 continue;
 
-            const elem = '<div data-jsonid="' + j + '"  data-name="' + chambers[i].name + '" data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber mine"' +
-                'style="background-image: url(' + chambers[i].thumb + ')">' +
-                '<div class="chamber-stats">' +
-                '<span>played: ' + chambers[i].played + '</span>' +
-                '<span>finished: ' + chambers[i].finished + '</span>' +
-                '</div>' +
-                '<button class="delete-my-chamber">DELETE</button>' +
-                '<span class="span-chamber">' + chambers[i].name + " by " + chambers[i].author + '</span>' +
-                '</div>'
+            manageChmaberCustom(i, j, true)
+        }
+    } else if ($(this).data("value") == "played") {
+        for (var i = 0; i < chambers.length; i++) {
 
-            window.arrayJSON.push(chambers[i].json);
+            if (!chambersPlayed.includes(chambers[i].id))
+                continue;
 
-            j++;
+            manageChmaberCustom(i, j)
+        }
+    } else if ($(this).data("value") == "finished") {
+        for (var i = 0; i < chambers.length; i++) {
 
-            $("#list-custm-chambers").append(elem);
+            if (!chambersFinished.includes(chambers[i].id))
+                continue;
+
+            manageChmaberCustom(i, j);
         }
     }
 
     document.getElementById("loading-parent").style.opacity = "0";
     document.getElementById("loading-parent").style.pointerEvents = "none";
 });
+
+function manageChmaberCustom(i, j, canDelete) {
+
+    var elemDel = '';
+
+    if (canDelete)
+        elemDel = '<button class="delete-my-chamber">DELETE</button>';
+
+    const elem = '<div data-jsonid="' + j + '"  data-name="' + chambers[i].name + '" data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber mine"' +
+        'style="background-image: url(' + chambers[i].thumb + ')">' +
+        '<div class="chamber-stats">' +
+        '<span>played: ' + chambers[i].played + '</span>' +
+        '<span>finished: ' + chambers[i].finished + '</span>' +
+        '</div>' +
+        elemDel +
+        '<span class="span-chamber">' + chambers[i].name + '</span>' +
+        '</div>'
+
+    window.arrayJSON.push(chambers[i].json);
+
+    j++;
+
+    $("#list-custm-chambers").append(elem);
+}
 
 $("body").on('click', '.delete-my-chamber', async function () {
     window["deleteChamber"]($(this).parent().data("id"));

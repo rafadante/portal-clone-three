@@ -9,6 +9,7 @@ import { portalButton } from '../portal/CreatePortal.js';
 import { tweenCamera } from '../../Utils.js';
 import { interactWithItem } from '../events/interaction.js';
 import { INPUT } from './index.js';
+import { togglePause } from '../../Main.js';
 
 var allowEnterFPS = true;
 
@@ -204,6 +205,8 @@ var msg = false;
 
 $("body").on('click', '#settings-close', function () {
     if (GLOBALS.FPS_MODE && allowEnterFPS) {
+
+        togglePause()
 
         if (!msg && window.allowEdit) {
             msg = true;

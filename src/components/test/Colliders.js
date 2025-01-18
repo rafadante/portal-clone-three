@@ -193,8 +193,11 @@ function fizzlerTrigger(body) {
             GLOBALS.PORTAL_BOX = [];
 
             for (var i = 0; i < GLOBALS.LASER_TRIGGERS.length; i++) {
-                if (!GLOBALS.LASER_TRIGGERS[i].emitterState && GLOBALS.LASER_TRIGGERS[i].fromLaserCube)
+                
+                if (GLOBALS.LASER_TRIGGERS[i].emitterState && !GLOBALS.LASER_TRIGGERS[i].fromLaserCube){
+                    
                     laserReceiverTrigger(GLOBALS.LASER_TRIGGERS[i], false);
+                }
             }
 
 

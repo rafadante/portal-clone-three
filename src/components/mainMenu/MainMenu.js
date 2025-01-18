@@ -541,6 +541,16 @@ $("body").on('click', '#back-main', function () {
     GLOBALS.SCENE_CHILDREN.add(plane2);
 
     pointerState("none", "block", "", "none", ".option-main");
+
+    $(".settings-menu").css("width", "80%");
+    $(".settings-menu").css("max-height", "60%");
+    $(".settings-menu").css("height", "auto");
+
+    $("#settings-menu-title").css("display", "block");
+
+    $(".body").css("z-index", "10000000");
+    $(".body").css("margin-left", "15vh");
+    $(".body").css("background-color", "transparent");
 });
 
 function pointerState(display1, display2, title, titleDisplay, id) {
@@ -585,6 +595,16 @@ $("body").on('click', '#close-load-level-panel', function () {
 $("body").on('click', '#option-community-play', function () {
     $(".main-option").css("display", "none")
     $(".sub-option").css("display", "grid")
+
+    $(".settings-menu").css("width", "100%");
+    $(".settings-menu").css("max-height", "100%");
+    $(".settings-menu").css("height", "100%");
+
+    $("#settings-menu-title").css("display", "none");
+
+    $(".body").css("z-index", "10000000");
+    $(".body").css("margin-left", "0px");
+    $(".body").css("background-color", "black");
 });
 
 var chamberName = "null";

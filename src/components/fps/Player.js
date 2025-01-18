@@ -47,6 +47,8 @@ let contactNormal = new CANNON.Vec3(0, 0, 0);
 
 GLOBALS.PLAYER.addEventListener("collide", function (event) {
 
+    GLOBALS.BLOCK_PLAYER_MOVE = false;
+
     if (event.body.name == "gel") {
         gelTrigger(event);
     }

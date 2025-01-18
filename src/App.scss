@@ -420,7 +420,7 @@ form {
 #list-custm-chambers,
 #list-main-chambers {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: auto auto auto auto;
   margin-top: 70px;
   overflow: hidden;
 
@@ -445,7 +445,7 @@ form {
 
   .custom-chamber {
     width: 90%;
-    height: 20vw;
+    height: 15vw;
     margin: 3px;
     position: relative;
     background-position: center;
@@ -455,6 +455,10 @@ form {
     transition: all 0.5s;
     border: 5px solid black;
     overflow: hidden;
+
+    background-size: contain;
+    background-position: top;
+    background-color: rgba(0, 0, 0, 0.75);
 
     .delete-my-chamber {
       background-color: red;
@@ -482,7 +486,6 @@ form {
       height: auto;
       display: flex;
       flex-direction: column;
-      background-color: rgba(0, 0, 0, 0.5);
       pointer-events: none;
       padding-right: 40px;
 
@@ -494,7 +497,11 @@ form {
     .span-chamber {
       position: absolute;
       bottom: 0px;
-      background-color: rgba(0, 0, 0, 0.75);
+      overflow: hidden;
+    white-space: nowrap;
+    /*animation: marquee 15s linear infinite;*/
+    font-size: 1.2vw !important;
+    width: auto !important;
     }
 
     .fa-thumbs-up {
@@ -517,6 +524,15 @@ form {
 
     .fa-thumbs-down:hover {
       color: red;
+    }
+
+    @keyframes marquee {
+      0% {
+        transform: translate(0, 0);
+      }
+      100% {
+        transform: translate(-100%, 0);
+      }
     }
   }
 

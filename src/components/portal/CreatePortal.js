@@ -148,9 +148,11 @@ function portalButton(button, auto, camera, firstToRender) {
                 && (!userData.hasItem || auto || userData.itemName.includes("camera") || userData.itemName.includes("radio") || userData.itemName.includes("trigger")))) {//!userData.hasItem || (userData.itemName.includes("camera"))
 
                 if (intersectPanel.length > 0) {
-                    console.log(intersectPanel[0].object.hasPortal)
-                    if (intersectPanel[0].object.hasPortal == 0 || intersectPanel[0].object.hasPortal == 1) {
-                        console.log("returned")
+                    if ((intersectPanel[0].object.hasPortal == 0 && button == 2) || (intersectPanel[0].object.hasPortal == 1 && button == 0)) {
+                        //NONPORTABLE WALL
+                        AUDIO.PORTAL_INVALID.pause();
+                        AUDIO.PORTAL_INVALID.currentTime = 0;
+                        play(AUDIO.PORTAL_INVALID)
                         return;
                     }
                 }
@@ -442,8 +444,8 @@ function validPortalPoint(point, normal, object) {
 // deletes the portal with index portalIndex from the scene
 function deletePortal(portalIndex) {
 
-    for(var i=0; i<GLOBALS.ANGLED_PANELS.length;i++){
-        if(GLOBALS.ANGLED_PANELS[i].hasPortal == portalIndex){
+    for (var i = 0; i < GLOBALS.ANGLED_PANELS.length; i++) {
+        if (GLOBALS.ANGLED_PANELS[i].hasPortal == portalIndex) {
             GLOBALS.ANGLED_PANELS[i].hasPortal = 100;
             break;
         }

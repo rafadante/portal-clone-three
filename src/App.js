@@ -90,6 +90,24 @@ function App() {
     return chambers;
   }
 
+  window["selectAllChambersPlayed"] = async function (state) {
+
+    let { data: chambers, error } = await supabase
+      .from('chambers_played')
+      .select("*")
+      // Filters
+      .eq('user_id', session.user.id)
+      .eq('finished', state)
+
+    var array = [];
+
+    for(var i=0; i<chambers.length;i++){
+      array.push(chambers[i].chamber_id)
+    }
+
+    return array;
+  }
+
   window["deleteChamber"] = async function (id) {
 
     document.getElementById("loading-parent").style.opacity = "1";
@@ -105,6 +123,11 @@ function App() {
   }
 
   window["updateChamberPlayedValue"] = async function (id, value) {
+
+    console.log(id)
+
+    window["checkIfuserHasPlayedThisChamber"](id);
+
     const { data, error } = await supabase
       .from('chambers')
       .update({ played: value })
@@ -145,6 +168,38 @@ function App() {
       .update({ finished: value, tested: true })
       .eq('id', id)
       .select()
+
+    const { data2, error2 } = await supabase
+      .from('chambers_played')
+      .update({ finished: true })
+      .eq('chamber_id', id)
+      .select()
+  }
+
+  window["checkIfuserHasPlayedThisChamber"] = async function (chamber_id) {
+
+    let { data, error } = await supabase
+      .from('chambers_played')
+      .select("*")
+      // Filters
+      .eq('user_id', session.user.id)
+      .eq('chamber_id', chamber_id)
+
+    if (data) {
+      if (data.length == 0) {
+
+        const { data2, error } = await supabase
+          .from('chambers_played')
+          .insert([
+            {
+              chamber_id: chamber_id,
+              user_id: session.user.id,
+              finished: false,
+              email: session.user.email
+            },
+          ])
+      }
+    }
   }
 
   if (!session) {
@@ -1378,7 +1433,7 @@ function App() {
 
         <div id="blocker">
 
-          <span id="version">version: 0.2.3</span>
+          <span id="version">version: 0.2.4</span>
 
           <div id="social" style={{
             width: "auto",
@@ -1477,9 +1532,9 @@ function App() {
                     <span data-value="all" id="option-cutom-all">NEW</span>
                     {/**<span data-value="most-played" id="option-cutom-popular">MOST PLAYED</span>
                     <span data-value="most-finished" id="option-cutom-popular">MOST FINISHED</span> */}
-                    <span data-value="new" id="option-cutom-new">NOT TESTED</span>
-                    <span data-value="played" id="option-cutom-played">UNFINISHED</span>
-                    <span data-value="finished" id="option-cutom-finished">FINISHED</span>
+                    <span data-value="new" id="option-cutom-new">NEEDS VALIDATION</span>
+                    <span data-value="played" id="option-cutom-played">I STARTED</span>
+                    <span data-value="finished" id="option-cutom-finished">I FINISHED</span>
                     <span data-value="mine" id="option-cutom-mine">MY CHAMBERS</span>
                   </div>
                   {/**<div data-name="./community/The_Return_Chamber_17_by_FlameDogo99" className="custom-chamber"
@@ -2117,7 +2172,24 @@ function App() {
             <div id="warning-bugs">
               <span>BUGS</span>
               <div>
+                <label>Aerial faith plates with an obstacle between them and their target make the player unable to move after interaction temporarily</label>
+                <input defaultChecked type='checkbox' />
+              </div>
+              <div>
+                <label>Lasers + light bridges + tractor beams act funky when entering through a portal placed on a angled platform
+                  Examples:</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>the pause menu doesn't actually pause gameplay</label>
+                <input defaultChecked type='checkbox' />
+              </div>
+              <div>
                 <label>Audio: Weird noise issue</label>
+                <input type='checkbox' />
+              </div>
+              <div>
+                <label>window resize can stretch portals</label>
                 <input type='checkbox' />
               </div>
               <div>
@@ -2140,6 +2212,22 @@ function App() {
             <div id="warning-pending">
               <span>PENDING</span>
               <div>
+                <label>Custom chambers: Show chambers I’ve played</label>
+                <input defaultChecked type='checkbox' />
+              </div>
+              <div>
+                <label>Custom chambers: Show chambers I’ve finished</label>
+                <input defaultChecked type='checkbox' />
+              </div>
+              <div>
+                <label>Custom chambers UI whole screen</label>
+                <input defaultChecked type='checkbox' />
+              </div>
+              <div>
+                <label>Custom chambers: Add like/dislike functionality</label>
+                <input type='checkbox' />
+              </div>
+              <div>
                 <label>Allow the player more control in the air</label>
                 <input type='checkbox' />
               </div>
@@ -2152,14 +2240,9 @@ function App() {
                 <input type='checkbox' />
               </div>
               <div>
-                <label>Custom chambers: Add like/dislike functionality</label>
-                <input type='checkbox' />
-              </div>
-              <div>
                 <label>Custom chambers: Allow custom thumbnails</label>
                 <input type='checkbox' />
               </div>
-
               <div>
                 <label>Custom chambers: Add filters for maps (e.g., like ratio, most played, etc.)</label>
                 <input type='checkbox' />
@@ -2180,15 +2263,6 @@ function App() {
                 <label>Custom chambers: Allow updates to thumbnail, name, description, and tags without replaying the map</label>
                 <input type='checkbox' />
               </div>
-              <div>
-                <label>Custom chambers: Show chambers I’ve played</label>
-                <input type='checkbox' />
-              </div>
-              <div>
-                <label>Custom chambers: Show chambers I’ve finished</label>
-                <input type='checkbox' />
-              </div>
-
               <div>
                 <label>Add center-rotating angled panels</label>
                 <input type='checkbox' />
@@ -2213,7 +2287,7 @@ function App() {
                 <label>Stair trigger</label>
                 <input type='checkbox' />
               </div>
-              
+
             </div>
           </div>
         </div>
