@@ -752,6 +752,7 @@ function manageChmaberCustom(i, j, canDelete) {
         '<div class="chamber-stats">' +
         '<span>played: ' + chambers[i].played + '</span>' +
         '<span>finished: ' + chambers[i].finished + '</span>' +
+        '<span>author: ' + chambers[i].author + '</span>' +
         '</div>' +
         elemDel +
         '<span class="span-chamber">' + chambers[i].name + '</span>' +
