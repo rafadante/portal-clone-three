@@ -700,7 +700,7 @@ $("body").on('click', '#options-custom span', async function () {
             if (!chambers[i].tested || chambersPlayed.includes(chambers[i].id) || chambersFinished.includes(chambers[i].id))
                 continue;
 
-            manageChmaberCustom(i, j)
+            manageChmaberCustom(i)
         }
     } else if ($(this).data("value") == "new") {
         for (var i = 0; i < chambers.length; i++) {
@@ -708,7 +708,7 @@ $("body").on('click', '#options-custom span', async function () {
             if (chambers[i].tested)
                 continue;
 
-            manageChmaberCustom(i, j)
+            manageChmaberCustom(i)
         }
     } else if ($(this).data("value") == "mine") {
         for (var i = 0; i < chambers.length; i++) {
@@ -716,7 +716,7 @@ $("body").on('click', '#options-custom span', async function () {
             if (chambers[i].user_id != session.user.id)
                 continue;
 
-            manageChmaberCustom(i, j, true)
+            manageChmaberCustom(i, true)
         }
     } else if ($(this).data("value") == "played") {
         for (var i = 0; i < chambers.length; i++) {
@@ -724,7 +724,7 @@ $("body").on('click', '#options-custom span', async function () {
             if (!chambersPlayed.includes(chambers[i].id) || !chambers[i].tested)
                 continue;
 
-            manageChmaberCustom(i, j)
+            manageChmaberCustom(i)
         }
     } else if ($(this).data("value") == "finished") {
         for (var i = 0; i < chambers.length; i++) {
@@ -732,7 +732,7 @@ $("body").on('click', '#options-custom span', async function () {
             if (!chambersFinished.includes(chambers[i].id) || !chambers[i].tested)
                 continue;
 
-            manageChmaberCustom(i, j);
+            manageChmaberCustom(i);
         }
     }
 
@@ -740,14 +740,17 @@ $("body").on('click', '#options-custom span', async function () {
     document.getElementById("loading-parent").style.pointerEvents = "none";
 });
 
-function manageChmaberCustom(i, j, canDelete) {
+function manageChmaberCustom(i, canDelete) {
 
     var elemDel = '';
+    var elemMine = '';
 
-    if (canDelete)
+    if (canDelete) {
         elemDel = '<button class="delete-my-chamber">DELETE</button>';
+        elemMine = "mine"
+    }
 
-    const elem = '<div data-jsonid="' + j + '"  data-name="' + chambers[i].name + '" data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber mine"' +
+    const elem = '<div data-jsonid="' + j + '"  data-name="' + chambers[i].name + '" data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber ' + elemMine + '"' +
         'style="background-image: url(' + chambers[i].thumb + ')">' +
         '<div class="chamber-stats">' +
         '<span>played: ' + chambers[i].played + '</span>' +
