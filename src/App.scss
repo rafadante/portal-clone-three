@@ -488,9 +488,10 @@ form {
       flex-direction: column;
       pointer-events: none;
       padding-right: 40px;
+      filter: drop-shadow(2px 4px 6px black);
 
       span {
-        font-size: 15px;
+        font-size: 1vw;
         padding-bottom: 5px !important;
         padding-top: 5px !important;
       }
@@ -504,6 +505,10 @@ form {
     /*animation: marquee 15s linear infinite;*/
     font-size: 1.2vw !important;
     width: 100% !important;
+    height: 100%;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    padding-left: 0px !important;
     }
 
     .fa-thumbs-up {

@@ -192,8 +192,8 @@ $('#mouse-val-range').on('input', function () {
     localStorage.setItem("mouse-val-range", $(this).val());
     $("#mouse-val-number").val($(this).val());
 
-    if (!GLOBALS.MOBILE)
-        GLOBALS.POINTER_CONTROLS.pointerSpeed = $(this).val();
+    //if (!GLOBALS.MOBILE)
+    //    GLOBALS.POINTER_CONTROLS.pointerSpeed = $(this).val();
 
     update();
 });
