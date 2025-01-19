@@ -281,6 +281,10 @@ $('#option-download').on('click', function () {
     window.open("https://drive.google.com/drive/folders/1V4JBopiETzoDdxIogca9_7XqLjbSaHTd?usp=sharing", "_blank");
 });
 
+$('#social-github').on('click', function () {
+    window.open("https://github.com/rafadante/portal-clone-threejs-build");
+});
+
 window.addEventListener("orientationchange", (event) => {
     if (GLOBALS.MOBILE)
         checkOrientation()

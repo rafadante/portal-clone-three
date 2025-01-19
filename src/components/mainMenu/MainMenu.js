@@ -472,7 +472,7 @@ function startLevel() {
 
     $("#settings-menu-title").css("display", "block");
 
-    $(".body").css("z-index", "10000000");
+    $(".body").css("z-index", "1");
     $(".body").css("margin-left", "15vh");
     $(".body").css("background-color", "transparent");
 
@@ -567,9 +567,11 @@ $("body").on('click', '#back-main', function () {
 
     $("#settings-menu-title").css("display", "block");
 
-    $(".body").css("z-index", "10000000");
+    $(".body").css("z-index", "1");
     $(".body").css("margin-left", "15vh");
     $(".body").css("background-color", "transparent");
+
+    console.log("7777777777777")
 });
 
 function pointerState(display1, display2, title, titleDisplay, id) {

@@ -1443,7 +1443,8 @@ function App() {
             position: "absolute",
             display: "flex",
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
+            zIndex: "2"
           }}>
 
 
