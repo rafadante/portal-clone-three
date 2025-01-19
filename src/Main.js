@@ -141,7 +141,7 @@ function onWindowResize() {
     if (GLOBALS.COMPOSER)
         GLOBALS.COMPOSER.setSize(window.canvasWidth, window.canvasHeight);
 
-    if (GLOBALS.PAUSED && GLOBALS.FPS_MODE) {
+    /*if (GLOBALS.PAUSED && GLOBALS.FPS_MODE) {
         // finally, render to screen
         GLOBALS.RENDERER.setRenderTarget(currentRenderTarget);
         GLOBALS.RENDERER.localClippingEnabled = false;
@@ -157,7 +157,9 @@ function onWindowResize() {
             GLOBALS.RENDERER.clearDepth()
             GLOBALS.RENDERER.render(GLOBALS.GUN_GROUP, GLOBALS.PORTAL_GUN_CAMERA);
         }
-    }
+    }*/
+
+        console.log("resized")
 }
 
 GLOBALS.RENDERER.info.autoReset = true;
@@ -517,5 +519,6 @@ function portalIsVisibleInCamera(camera, portal, clippingPlane) {
 
 export {
     init,
-    togglePause
+    togglePause,
+    onWindowResize
 };

@@ -357,6 +357,7 @@ function doSetTimeout(to, waitFor, idHolder, connection, body) {
       }
     } else if (to.itemName.includes("door") ||
       to.itemName.includes("exitDoor")) {
+        console.log(to)
       if (to.item.userData.connections == to.item.userData.buttons) {
         stateDoor(0, true, false, to.item);
       }
@@ -676,6 +677,8 @@ function connectionState(connection, id, active, color) {
 
   connection['line'].active = active;
   connection['line'].material.color = color;
+
+  connection['line2'].material.color = color;
 
   window.checkers.setColorAt(connection['checker'], color);
 }

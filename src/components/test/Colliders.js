@@ -855,6 +855,8 @@ function addCollidersToCorridor(mesh) {
         GLOBALS.BODY_ELEVATOR = wall;
         wall.addEventListener("collide", function (event) {
 
+            console.log("exitCorridor")
+
             if (GLOBALS.LEVEL_ENTERED && (!GLOBALS.LOADED_LEVEL || window.allowEdit) && !GLOBALS.FINISHED) {
                 GLOBALS.FINISHED = true;
 

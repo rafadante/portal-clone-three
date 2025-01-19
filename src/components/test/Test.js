@@ -10,11 +10,12 @@ import { manageInstances } from './Instances.js';
 import './BackToEditor.js';
 //import { stateDoor } from '../door/Door.js';
 import { addGel } from '../gels/Gels.js';
-//import { findPath } from '../findPath/FindPath.js';
+import { findPath } from '../findPath/FindPath.js';
 import { levelEnteredFunction } from '../events/states.js';
 import { loadAvatar } from '../loadObj/LoaderOBJ.js';
 import { deletePortal, portalButton } from '../portal/CreatePortal.js';
 import { resetPlayerBody } from '../fps/Player.js';
+import { onWindowResize } from '../../Main.js';
 
 $("body").on('click', '#view-fps', function () {
     if (window.allowTest) {
@@ -278,6 +279,17 @@ function viewFPS(firstRender) {
         if (GLOBALS.MOBILE || (localStorage.getItem("quality-select") != "epic" && localStorage.getItem("quality-select") != "high"))
             GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;
 
+        for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+            GLOBALS.CONNECTIONS[i]["line"].visible = false;
+            findPath(
+                GLOBALS.CONNECTIONS[i]["from"].position,
+                GLOBALS.CONNECTIONS[i]["to"].position,
+                GLOBALS.CONNECTIONS[i]["to"],
+                GLOBALS.CONNECTIONS[i]["from"],
+                GLOBALS.CONNECTIONS[i]
+            )
+        }
+
         window.checkers.material.envMap = GLOBALS.ENV_MAP;
 
         if (GLOBALS.ITEMS_ADDED.getObjectByName("spawn")) {
@@ -296,6 +308,8 @@ function viewFPS(firstRender) {
 };
 
 function setup() {
+
+    onWindowResize();
 
     GLOBALS.STATS.dom.style.display = "block";
 

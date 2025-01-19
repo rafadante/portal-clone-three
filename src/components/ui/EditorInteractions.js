@@ -751,14 +751,14 @@ function manageChmaberCustom(i, canDelete) {
     }
 
     const elem = '<div data-jsonid="' + j + '"  data-name="' + chambers[i].name + '" data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber ' + elemMine + '"' +
-        'style="background-image: url(' + chambers[i].thumb + ')">' +
+        '>' +
         '<div class="chamber-stats">' +
         '<span>played: ' + chambers[i].played + '</span>' +
         '<span>finished: ' + chambers[i].finished + '</span>' +
         '<span>author: ' + chambers[i].author + '</span>' +
         '</div>' +
         elemDel +
-        '<span class="span-chamber">' + chambers[i].name + '</span>' +
+        '<div class="span-chamber" style="background-image: url(' + chambers[i].thumb + ')">' + chambers[i].name + '</div>' +
         '</div>'
 
     window.arrayJSON.push(chambers[i].json);

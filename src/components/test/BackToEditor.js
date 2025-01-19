@@ -248,7 +248,7 @@ function backToEditor() {
     }
 
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-        //GLOBALS.CONNECTIONS[i]['line'].visible = true;
+        GLOBALS.CONNECTIONS[i]['line'].visible = true;
         if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger_area")) {
             GLOBALS.CONNECTIONS[i]['from'].item.visible = true;
         }
