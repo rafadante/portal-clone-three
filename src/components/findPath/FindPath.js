@@ -103,13 +103,13 @@ function manageOffSet(pos, rot) {
 
     var newPos = pos;
 
-    var obj = new Object3D;
+    /*var obj = new Object3D;
     obj.position.copy(pos);
     obj.rotation.copy(rot);
     obj.translateY(0.2 * getOccurrence(pointCollection, pos));
     newPos = obj.position.clone();
 
-    pointCollection.push(pos.clone());
+    pointCollection.push(pos.clone());*/
 
     return newPos;
 }

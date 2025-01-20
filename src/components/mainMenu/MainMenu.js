@@ -9,6 +9,8 @@ import { addTileGel } from '../gels/Gels.js';
 import { loadDefault } from '../loadObj/LoaderOBJ.js';
 import { backToEditor } from '../test/BackToEditor.js';
 import { playVoiceTrigger } from '../triggers/Triggers.js';
+import JSZip, { file } from 'jszip';
+import { v4 as uuidv4 } from 'uuid';
 
 var plane1, plane2, level;
 var transition = false;
@@ -216,6 +218,7 @@ var single = false;
 
 
 $("body").on('click', '.custom-chamber1', function () {
+
     single = true;
     /*window.isCustom = true;
     //init();
@@ -295,41 +298,55 @@ $("body").on('click', '.custom-chamber1', function () {
 
 
 $("body").on('click', '.span-chamber', async function () {
+
+    $("#loading-parent").css("opacity", 1);
+    $("#loading-parent").css("pointer-events", "all");
+
+    const zipURL = await window["getZipPath"]($(this).data("path"));
+
+    const elem = $(this);
+
+    await fetch(zipURL + "?" + uuidv4())
+        .then(res => res.blob()) // Gets the response and returns it as a blob
+        .then(blob => {
+            // Here's where you get access to the blob
+            // And you can use it for whatever you want
+            // Like calling ref().put(blob)
+
+            // Here, I use it to make an image appear on the page
+            let objectURL = URL.createObjectURL(blob);
+
+            var zip = new JSZip();
+            zip.loadAsync(blob /* = file blob */)
+                .then(function (zip) {
+                    // process ZIP file content here
+
+                    zip.file("data.json").async("string").then(function (data) {
+                        // data is a string
+                        // TODO Your code goes here!
+
+                        manageLoadCustom(JSON.parse(data), elem)
+                    })
+                }, function () { alert("Not a valid zip file") });
+        });
+});
+
+async function manageLoadCustom(json, elem) {
     single = false;
     window.allowEdit = false;
-    /*window.isCustom = true;
-    //init();
-    fetch("./community/The_Return_Chamber_17_by_FlameDogo99.json")
-        .then(response => response.json())
-        .then(json => {
-            level = json;
-            GLOBALS.LOADED_LEVEL = true;
-            startLevel();
-
-            level = json;
-
-            chamberName = "tutorial_" + window.currentLevel + "_by_rafadante";
-
-            $("#portal-gun-select").val(level[0][0]).change();
-            $("#ambient-sound-select").val(level[0][1]).change();
-
-            loadLevelJSON();
-        });*/
 
     $("#next-map-btn").css("display", "none");
 
-    //
-
     window.isCustom = true;
 
-    if ($(this).parent().parent().attr("id") == "list-custm-chambers")
+    if (elem.parent().parent().attr("id") == "list-custm-chambers")
         $("#next-map-btn").css("display", "none");
     else {
         $("#next-map-btn").css("display", "block");
-        window.currentLevel = $(this).parent().data("id");
+        window.currentLevel = elem.parent().data("id");
     }
 
-    if ($(this).parent().hasClass("mine"))
+    if (elem.parent().hasClass("mine"))
         window.allowEdit = true;
 
     const session = await window["getSession"]();
@@ -337,9 +354,9 @@ $("body").on('click', '.span-chamber', async function () {
     setTimeout(() => {
 
         //custompath = $(this).data("json");
-        var tt = window.arrayJSON[$(this).parent().data("jsonid")];
+        //var tt = window.arrayJSON[$(this).parent().data("jsonid")];
 
-        custompath = JSON.parse(tt);
+        custompath = json;
 
         /*console.log(custompath)
         console.log(JSON.stringify(custompath))
@@ -350,16 +367,16 @@ $("body").on('click', '.span-chamber', async function () {
         dlAnchorElem.setAttribute("download", "chamber.json");
         dlAnchorElem.click();*/
 
-        window.chamberID = $(this).parent().data("id");
-        window.chamberUSERID = $(this).parent().data("userid");
-        window.chamberFinished = $(this).parent().data("finished");
+        window.chamberID = elem.parent().data("id");
+        window.chamberUSERID = elem.parent().data("userid");
+        window.chamberFinished = elem.parent().data("finished");
 
-        const played = parseInt($(this).parent().data("played")) + 1;
+        const played = parseInt(elem.parent().data("played")) + 1;
 
         window.session = session;
 
-        if ($(this).parent().data("userid") != session.user.id) {
-            window["updateChamberPlayedValue"]($(this).parent().data("id"), played);
+        if (elem.parent().data("userid") != session.user.id) {
+            window["updateChamberPlayedValue"](elem.parent().data("id"), played);
         }
 
         window.stopMenuLoop = true;
@@ -369,7 +386,7 @@ $("body").on('click', '.span-chamber', async function () {
     //
 
 
-    $("#chamber-name-to-save").val($(this).parent().data("name"));
+    $("#chamber-name-to-save").val(elem.parent().data("name"));
 
     if (first) {
 
@@ -380,8 +397,6 @@ $("body").on('click', '.span-chamber', async function () {
         startLevel();
 
     } else {
-        $("#loading-parent").css("opacity", 1);
-        $("#loading-parent").css("pointer-events", "all");
         $("#next-map").css("display", "none");
 
         $("#options-settings").css("display", "block");
@@ -402,8 +417,7 @@ $("body").on('click', '.span-chamber', async function () {
     }
 
     first = false;
-
-});
+}
 
 if (localStorage.getItem("load") == "true") {
 

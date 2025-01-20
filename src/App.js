@@ -4,6 +4,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import $ from 'jquery';
+import { v4 as uuidv4 } from 'uuid';
 
 /*window.addEventListener('load', function () {
   import('./Main.js')
@@ -46,13 +47,24 @@ function App() {
     return session;
   }
 
-  window["saveChamber"] = async (name) => {
+  window["saveChamber"] = async (name, json) => {
+
+    const filePath = session.user.id + "/" + uuidv4(); // Path in the bucket
+
+    // Step 1: Upload the file to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("json")
+      .upload(filePath, json, {
+        upsert: false, // Prevent overwriting existing files
+      });
+
+    //console.log(filePath)
 
     const { data, error } = await supabase
       .from('chambers')
       .insert([
         {
-          json: window.dataChamber,
+          path: filePath,
           user_id: session.user.id,
           email: session.user.email,
           thumb: window.thumbDataURL,
@@ -90,6 +102,15 @@ function App() {
     return chambers;
   }
 
+  window["getZipPath"] = async function (path) {
+    const { data } = supabase
+      .storage
+      .from('json')
+      .getPublicUrl(path)
+
+    return data.publicUrl;
+  }
+
   window["selectAllChambersPlayed"] = async function (state) {
 
     let { data: chambers, error } = await supabase
@@ -101,17 +122,23 @@ function App() {
 
     var array = [];
 
-    for(var i=0; i<chambers.length;i++){
+    for (var i = 0; i < chambers.length; i++) {
       array.push(chambers[i].chamber_id)
     }
 
     return array;
   }
 
-  window["deleteChamber"] = async function (id) {
+  window["deleteChamber"] = async function (id, path) {
 
     document.getElementById("loading-parent").style.opacity = "1";
     document.getElementById("loading-parent").style.pointerEvents = "all";
+
+    const { data0, error0 } = await supabase
+      .storage
+      .from('json')
+      .remove([path])
+
 
     const { error } = await supabase
       .from('chambers')
@@ -124,7 +151,7 @@ function App() {
 
   window["updateChamberPlayedValue"] = async function (id, value) {
 
-    console.log(id)
+    //console.log(id)
 
     window["checkIfuserHasPlayedThisChamber"](id);
 
@@ -137,17 +164,27 @@ function App() {
     //console.log(data)
   }
 
-  window["updateChamber"] = async function (name, id) {
+  window["updateChamber"] = async function (name, id, json) {
+
     const { data, error } = await supabase
       .from('chambers')
       .update({
-        json: window.dataChamber,
         thumb: window.thumbDataURL,
         tested: false,
         name: name,
       })
       .eq('id', id)
       .select()
+
+    //console.log(data)
+
+    const { data1, error1 } = await supabase
+      .storage
+      .from('json')
+      .update(data[0].path, json, {
+        cacheControl: '3600',
+        upsert: true
+      })
 
     if (error) {
       //console.log(error);
@@ -225,7 +262,7 @@ function App() {
 
     import('./Main.js')
       .then((module) => {
-        console.log("loaded")
+        //console.log("loaded")
       });
 
     return (
@@ -1439,7 +1476,7 @@ function App() {
 
         <div id="blocker">
 
-          <span id="version">version: 0.2.6</span>
+          <span id="version">version: 0.2.7</span>
 
           <div id="social" style={{
             width: "auto",

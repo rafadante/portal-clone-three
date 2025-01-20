@@ -280,7 +280,12 @@ function viewFPS(firstRender) {
             GLOBALS.SCENE.environment = GLOBALS.ENV_MAP;
 
         for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-            GLOBALS.CONNECTIONS[i]["line"].visible = false;
+
+            if (!GLOBALS.CONNECTIONS[i]["line"].visible) {
+                //window.checkers.instances[GLOBALS.CONNECTIONS[i]["checker"]].visible = false;
+            }
+
+            
             findPath(
                 GLOBALS.CONNECTIONS[i]["from"].position,
                 GLOBALS.CONNECTIONS[i]["to"].position,
@@ -288,6 +293,12 @@ function viewFPS(firstRender) {
                 GLOBALS.CONNECTIONS[i]["from"],
                 GLOBALS.CONNECTIONS[i]
             )
+
+            if (!GLOBALS.CONNECTIONS[i]["line"].visible) {
+                GLOBALS.CONNECTIONS[i]["line2"].visible = false;
+            }
+
+            GLOBALS.CONNECTIONS[i]["line"].visible = false;
         }
 
         window.checkers.material.envMap = GLOBALS.ENV_MAP;
@@ -313,12 +324,6 @@ function setup() {
 
     GLOBALS.STATS.dom.style.display = "block";
     GLOBALS.MATERIAL_FIZZLER.depthWrite = false;
-
-    for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-        if (!GLOBALS.CONNECTIONS[i]["line"].visible) {
-            window.checkers.instances[GLOBALS.CONNECTIONS[i]["checker"]].visible = false;
-        }
-    }
 
     for (var j = 0; j < GLOBALS.BOUNDING_BOX.length; j++) {
         GLOBALS.BOUNDING_BOX[j].platform.material.color = new Color(0xffffff);

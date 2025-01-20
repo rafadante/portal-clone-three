@@ -13,6 +13,8 @@ import { targetFaithPlateStart } from '../faithPlate/FaithPlate';
 import { respawn } from '../events/states';
 import { AUDIO } from '../audio/Audio';
 import { checkToUpdateContinuous } from '../cubeManager/UpdateRaycast';
+import JSZip from "jszip";
+import { updateAngledPanel } from '../test/Colliders';
 
 window.addEventListener("contextmenu", e => e.preventDefault());
 
@@ -559,15 +561,10 @@ function saveChamber(publish) {
     data.push(GLOBALS.PLANE_USER_DATA);
 
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-    window.dataChamber = JSON.stringify(data);
 
 
     if (publish) {
-        if (window.chamberID) {
-            window["updateChamber"]($("#chamber-name-to-save").val(), window.chamberID);
-        } else {
-            window["saveChamber"]($("#chamber-name-to-save").val());
-        }
+        zipJson(JSON.stringify(data), window.chamberID)
     } else {
         var dlAnchorElem = document.createElement('a');
         dlAnchorElem.setAttribute("href", dataStr);
@@ -582,6 +579,49 @@ function saveChamber(publish) {
 
     for (var i = 0; i < userDataHolder.length; i++)
         userDataHolder[i].item = itemHolder[i];
+}
+
+// Function to zip a JSON object
+async function zipJson(jsonObject, update) {
+    const zip = new JSZip();
+    const zipFileName = "data.zip";
+
+    // Convert JSON object to string
+    //const jsonString = JSON.stringify(jsonObject, null, 2);
+
+    // Add the JSON string as a file in the zip archive
+    zip.file("data.json", jsonObject);
+
+    // Generate the zip file as a Blob
+    //const zipBlob = await zip.generateAsync({ type: "blob" });
+
+    zip.generateAsync({
+        type: "blob",
+        /* NOTE THESE ADDED COMPRESSION OPTIONS */
+        /* deflate is the name of the compression algorithm used */
+        compression: "DEFLATE",
+        compressionOptions: {
+            /* compression level ranges from 1 (best speed) to 9 (best compression) */
+            level: 9
+        }
+    })
+        .then(function (content) {
+            // see FileSaver.js
+            //saveAs(content, "example.zip");
+
+            // Create a download link for the zip file
+            /*const link = document.createElement("a");
+            link.href = URL.createObjectURL(content);
+            link.download = zipFileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);*/
+
+            if (update)
+                window["updateChamber"]($("#chamber-name-to-save").val(), window.chamberID, content);
+            else
+                window["saveChamber"]($("#chamber-name-to-save").val(), content);
+        });
 }
 
 $("body").on('input', '#friction', function () {
@@ -750,7 +790,7 @@ function manageChmaberCustom(i, canDelete) {
         elemMine = "mine"
     }
 
-    const elem = '<div data-jsonid="' + j + '"  data-name="' + chambers[i].name + '" data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber ' + elemMine + '"' +
+    const elem = '<div data-path="'+chambers[i].path+'" data-jsonid="' + j + '"  data-name="' + chambers[i].name + '" data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber ' + elemMine + '"' +
         '>' +
         '<div class="chamber-stats">' +
         '<span>played: ' + chambers[i].played + '</span>' +
@@ -758,7 +798,7 @@ function manageChmaberCustom(i, canDelete) {
         '<span>author: ' + chambers[i].author + '</span>' +
         '</div>' +
         elemDel +
-        '<div class="span-chamber" style="background-image: url(' + chambers[i].thumb + ')">' + chambers[i].name + '</div>' +
+        '<div data-path="'+chambers[i].path+'" class="span-chamber" style="background-image: url(' + chambers[i].thumb + ')">' + chambers[i].name + '</div>' +
         '</div>'
 
     window.arrayJSON.push(chambers[i].json);
@@ -769,7 +809,7 @@ function manageChmaberCustom(i, canDelete) {
 }
 
 $("body").on('click', '.delete-my-chamber', async function () {
-    window["deleteChamber"]($(this).parent().data("id"));
+    window["deleteChamber"]($(this).parent().data("id"), $(this).parent().data("path"));
     chambers = await window["selectAllChambers"]();
     $(this).parent().remove();
 

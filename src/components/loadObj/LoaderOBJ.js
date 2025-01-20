@@ -54,7 +54,7 @@ async function load3D(path, name, instanced, interactive, roughness, envIntensit
 
     manager.onLoad = function () {
 
-        
+
 
         if (defaultLoaded < 3) {
 
@@ -87,9 +87,16 @@ async function load3D(path, name, instanced, interactive, roughness, envIntensit
                 addItem(found, loaded);
             }
 
-            if(!GLOBALS.LOADED_LEVEL){
+            if (!GLOBALS.LOADED_LEVEL) {
                 $("#loading-parent").css("opacity", 0);
                 $("#loading-parent").css("pointer-events", "none");
+            }
+
+            if (window.allowEdit) {
+                setTimeout(() => {
+                    $("#loading-parent").css("opacity", 0);
+                    $("#loading-parent").css("pointer-events", "none");
+                }, 1500);
             }
         }
     };
