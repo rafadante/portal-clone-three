@@ -253,6 +253,8 @@ function portalButton(button, auto, camera, firstToRender) {
 
                 var body;
 
+                var angled = false;
+
                 if (intersectPanel.length > 0) {
                     // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                     const objectMatrix = new Matrix3().getNormalMatrix(intersectPanel[0].object.matrixWorld)
@@ -274,6 +276,8 @@ function portalButton(button, auto, camera, firstToRender) {
                     point = worldPos;
 
                     body = intersectPanel[0].object.body;
+
+                    angled = true;
                 } else if (intersectsGelWhite.length > 0) {
                     point = cannonToThreeVector3(GLOBALS.INSTANCED_WHITE_GEL.array[intersectsGelWhite[0].instanceId].position);
                     body = userData.body;
@@ -307,7 +311,7 @@ function portalButton(button, auto, camera, firstToRender) {
                     if (GLOBALS.PORTALS[0] !== null)
                         deletePortal(0);
 
-                    newPortal(0, 1, point, normal, body, playerUpDirection, portalPoints, userData.side)
+                    newPortal(0, 1, point, normal, body, playerUpDirection, portalPoints, userData.side, angled)
 
                     GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(0.0, 1.25, 2.5);
 
@@ -353,7 +357,7 @@ function portalButton(button, auto, camera, firstToRender) {
                     if (GLOBALS.PORTALS[1] !== null)
                         deletePortal(1);
 
-                    newPortal(1, 0, point, normal, body, playerUpDirection, userData.rotation, userData.side)
+                    newPortal(1, 0, point, normal, body, playerUpDirection, userData.rotation, userData.side, angled)
 
 
                     GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(2.5, 0.7, 0.0);
@@ -523,7 +527,7 @@ function deletePortal(portalIndex) {
 }
 
 // creates a new portal and adds it to the scene
-function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject, playerUpDirection, portalPoints, side) {
+function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject, playerUpDirection, portalPoints, side, angled) {
 
     GLOBALS.STATS_UI.portals += 1;
 
@@ -549,6 +553,7 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
     GLOBALS.PORTALS[thisPortalIndex].portalShader.scale.set(0, 0, 0);
     GLOBALS.PORTALS[thisPortalIndex].side = side;
     GLOBALS.PORTALS[thisPortalIndex].normal = normal;
+    GLOBALS.PORTALS[thisPortalIndex].angled = angled;
 
     GLOBALS.PORTALS[thisPortalIndex].hostObjects.portal = true;
 

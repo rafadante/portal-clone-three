@@ -1,4 +1,4 @@
-import { Object3D, Vector3, Raycaster, BoxGeometry, CylinderGeometry, BufferAttribute, Mesh, Box3, PlaneGeometry, Color } from 'three';
+import { Object3D, Vector3, Raycaster, BoxGeometry, CylinderGeometry, BufferAttribute, Mesh, Box3, PlaneGeometry, Color, Box3Helper } from 'three';
 import * as CANNON from 'cannon';
 import { threeToCannon, ShapeType } from 'three-to-cannon';
 import { GLOBALS } from '../../Globals.js';
@@ -243,10 +243,15 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
         if (intersects.length > 0) {
 
-            if (intersects[0].object.name == "portal-0")
+            var otherPortal;
+
+            if (intersects[0].object.name == "portal-0") {
                 portal = 1;
-            else
+                otherPortal = 0;
+            } else {
                 portal = 0;
+                otherPortal = 1;
+            }
 
             if (rayItem[g].name == "light_bridge") {
                 if (GLOBALS.LIGHT_BRIDGE_CLONE[g]) {
@@ -328,27 +333,40 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
             var vertical = false;
 
-            if (rayItem[g].name == "light_bridge") {
 
-                var dummy = new Object3D();
-                dummy.rotation.copy(plane.rotation);
-                dummy.position.copy(plane.position);
 
-                if (rayItem[g].item.userData.triggers == "Middle Vertical") {
-                    dummy.rotateZ(Math.PI / 2);
-                    vertical = true;
-                } else if (rayItem[g].item.userData.triggers == "Left") {
-                    dummy.rotateZ(Math.PI / 2);
-                    vertical = true;
-                } else if (rayItem[g].item.userData.triggers == "Right") {
-                    dummy.rotateZ(Math.PI / 2);
-                    vertical = true;
+            if (GLOBALS.PORTALS[otherPortal].angled) {
+                console.log("sssssssss")
+                var angle = GLOBALS.PORTALS[otherPortal].mesh.rotation.x + Math.PI;
+                plane.rotateX(angle)
+                plane.translateZ(intersectsInstance[0].distance / 2);
+            } else {
+
+                if (rayItem[g].name == "light_bridge") {
+
+                    var dummy = new Object3D();
+                    dummy.rotation.copy(plane.rotation);
+                    dummy.position.copy(plane.position);
+
+                    if (rayItem[g].item.userData.triggers == "Middle Vertical") {
+                        dummy.rotateZ(Math.PI / 2);
+                        vertical = true;
+                    } else if (rayItem[g].item.userData.triggers == "Left") {
+                        dummy.rotateZ(Math.PI / 2);
+                        vertical = true;
+                    } else if (rayItem[g].item.userData.triggers == "Right") {
+                        dummy.rotateZ(Math.PI / 2);
+                        vertical = true;
+                    }
+
+                    plane.rotation.copy(dummy.rotation);
                 }
 
-                plane.rotation.copy(dummy.rotation);
+                plane.translateZ(intersectsInstance[0].distance / 2);
             }
 
-            plane.translateZ(intersectsInstance[0].distance / 2);
+
+
 
             if (vertical) {
                 plane.translateX((((intersects[0].uv.y) - 0.5) * 1.8));
@@ -398,9 +416,15 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 GLOBALS.PORTALS[portal].fieldBodyClone = rayItem[g].item.clone;
             } else if (rayItem[g].name == "tractor_beam") {
 
+                plane.updateMatrix();
+                plane.geometry.applyMatrix4(plane.matrix);
+
                 var bb = new Box3(); // for re-use
-                bb.setFromObject(plane);
+                bb.setFromObject(plane, true);
                 bb.side = 1;
+
+                const helper = new Box3Helper(bb, 0xffff00);
+                GLOBALS.ITEMS_ADDED.add(helper);
 
                 plane.inTractor = false;
                 plane.dir = dir;

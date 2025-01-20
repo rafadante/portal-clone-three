@@ -219,7 +219,7 @@ function fizzlerTrigger(body) {
             clone.quaternion.copy(e.body.quaternion);
             clone.visible = true;
 
-            if (GLOBALS.HOLDING_ITEM)
+            if (GLOBALS.HOLDING_ITEM && e.body == GLOBALS.CURRENT_ITEM.body)
                 interactWithItem()
 
             GLOBALS.UNIFORMS_DISSOLVER.diffuseMap.value = clone.material.map;

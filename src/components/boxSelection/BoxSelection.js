@@ -266,6 +266,7 @@ function raycastSelected(found, event, type) {
                             $("#piston-max-height").prop("min", -100)
                         } else {
                             $("#piston-max-height").prop("min", 0)
+                            $("#state-piston-top").prop("checked", GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.stayOnTop);
                         }
                     }
 

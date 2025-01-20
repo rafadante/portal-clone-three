@@ -384,6 +384,7 @@ async function addItem(found, loaded) {
                 item.initialPosition = userData.position;
                 item.userData.isActive = true;
                 item.userData.loop = true;
+                item.userData.stayOnTop = false;
             }
 
             if (GLOBALS.ITEM_HOLDED_NAME == "pellet_launcher") {
@@ -704,7 +705,7 @@ async function addItem(found, loaded) {
             itemCount++;
 
             if (loaded)
-                manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData);
+                manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData, idInstanced);
             else
                 manageItemVariables(item, userData, instanced);
 
@@ -820,7 +821,7 @@ function manageItemVariables(item, userData, instanced) {
     }
 }
 
-function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData) {
+function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData, id) {
 
     item.userData.state = userDataLoadedItem.state;
 
@@ -854,6 +855,18 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
     if (GLOBALS.ITEM_HOLDED_NAME == "track_platforms" || GLOBALS.ITEM_HOLDED_NAME == "piston_platforms") {
         item.platformBox.parent.scale.y = userDataLoadedItem.scaleY;
         item.userData.scaleY = userDataLoadedItem.scaleY;
+
+        if (GLOBALS.ITEM_HOLDED_NAME == "piston_platforms") {
+            item.userData.stayOnTop = userDataLoadedItem.stayOnTop;
+
+            if(item.userData.stayOnTop){
+                instanced.instances[id].position.y += userDataLoadedItem.scaleY * 2;
+                instanced.instances[id].updateMatrix();
+    
+                item.position.y = instanced.instances[id].position.y;
+            }
+            
+        }
 
         managePlatformRange(userDataLoadedItem.scaleY, userData);
     } else if (GLOBALS.ITEM_HOLDED_NAME == "portal_gun") {

@@ -285,6 +285,12 @@ function updateLaserCubeRaycaster(item, laser) {
     }
 }
 
+function angleDifference(angle1, angle2) {
+    let diff = angle2 - angle1;
+    diff = ((diff + Math.PI) % (2 * Math.PI)) - Math.PI;
+    return diff;
+  }
+
 function updateLaserEmitterRaycaster() {
 
     if (!GLOBALS.LEVEL_ENTERED)
@@ -308,6 +314,12 @@ function updateLaserEmitterRaycaster() {
         var intersectsWall = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
         if (intersectsWall.length > 0) {
             GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.scale.y = intersectsWall[0].distance;
+        }
+
+        //CHECK FOR PANELS INTERSECTION
+        var intersectPanel = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObjects(GLOBALS.ANGLED_PANELS);
+        if (intersectPanel.length > 0) {
+            GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.scale.y = intersectPanel[0].distance;
         }
 
         var unfiltered = [
@@ -361,11 +373,14 @@ function updateLaserEmitterRaycaster() {
         //CHECK FOR PORTAL INTERSECTION
         var intersectsWithPortals = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObjects(GLOBALS.PORTAL_SHADER);
         if (intersectsWithPortals.length > 0) {
-            var portal;
-            if (intersectsWithPortals[0].object.name == "portal-0")
+            var portal, otherPortal;
+            if (intersectsWithPortals[0].object.name == "portal-0") {
                 portal = 1;
-            else
+                otherPortal = 0
+            } else {
                 portal = 0;
+                otherPortal = 1;
+            }
 
             let dir = new Vector3()
             GLOBALS.PORTAL_SHADER[portal].getWorldDirection(dir)
@@ -379,7 +394,10 @@ function updateLaserEmitterRaycaster() {
                 GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.rotation.copy(GLOBALS.PORTAL_SHADER[portal].rotation)
                 GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.translateY((((intersectsWithPortals[0].uv.y) - 0.5) * 1.8));
                 GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.translateX(-(((intersectsWithPortals[0].uv.x) - 0.5) * 0.9));
-                GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.rotateX(Math.PI / 2)
+                
+                var angle = GLOBALS.PORTALS[otherPortal].mesh.rotation.x + Math.PI;
+
+                GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.rotateX(angle)
                 GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.visible = true;
             }
 

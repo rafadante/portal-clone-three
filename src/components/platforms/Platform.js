@@ -35,7 +35,27 @@ $("body").on('change', '#state-piston-loop', function () {
     GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.loop = this.checked;
 });
 
+$("body").on('change', '#state-piston-top', function () {
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.stayOnTop = this.checked;
+
+    const instanced = GLOBALS.ITEMS_ADDED.getObjectByName("piston_platforms");
+
+    var mult = 1;
+    if (!this.checked)
+        mult = -1;
+
+    instanced.instances[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.idInstanced].position.y += mult * GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.scaleY * 2;
+    instanced.instances[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.idInstanced].updateMatrix();
+
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.position.y = instanced.instances[GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.idInstanced].position.y;
+});
+
 function updatePlatformPosition(obj, instanced, i, deltaTime) {
+
+    if (Math.abs(deltaTime) > 1) {
+        return
+    }
+
     if (obj.body && obj.userData.isActive && obj.platformBox.parent.scale.y != 0) {
 
         if (!obj.userData.loop && obj.body.pistonDown) {
@@ -48,6 +68,9 @@ function updatePlatformPosition(obj, instanced, i, deltaTime) {
             offset = 0.7 * deltaTime;
         else
             offset = -0.7 * deltaTime;
+
+        if (obj.userData.stayOnTop)
+            offset *= -1;
 
         var axis = "y";
         var dir = new CANNON.Vec3(0, 1, 0);
@@ -74,10 +97,18 @@ function updatePlatformPosition(obj, instanced, i, deltaTime) {
 
         if (obj.platformBox.parent.scale.y > 0) {
 
-            if (obj.body.position[axis] > obj.initialPosition[axis] + (obj.platformBox.parent.scale.y * 2)) {
-                obj.body.pistonDown = true;
-            } else if (obj.body.position[axis] <= obj.initialPosition[axis])
-                obj.body.pistonDown = false;
+            if (obj.userData.stayOnTop) {
+                if (obj.body.position[axis] <= obj.initialPosition[axis])
+                    obj.body.pistonDown = true;
+                else if (obj.body.position[axis] > obj.initialPosition[axis])
+                    obj.body.pistonDown = false;
+            } else {
+                if (obj.body.position[axis] > obj.initialPosition[axis] + (obj.platformBox.parent.scale.y * 2)) {
+                    obj.body.pistonDown = true;
+                } else if (obj.body.position[axis] <= obj.initialPosition[axis])
+                    obj.body.pistonDown = false;
+            }
+
         } else {
 
             if (obj.body.position[axis] < obj.initialPosition[axis] + (obj.platformBox.parent.scale.y * 2)) {
@@ -86,7 +117,6 @@ function updatePlatformPosition(obj, instanced, i, deltaTime) {
                 obj.body.pistonDown = false;
             }
         }
-
 
         var item = new Object3D();
         item.quaternion.copy(obj.body.quaternion);
@@ -103,10 +133,15 @@ function updatePlatformPosition(obj, instanced, i, deltaTime) {
             var offset2 = new CANNON.Vec3(offset * dir.x, offset * dir.y, offset * dir.z);
             body.position.vadd(offset2, body.position);
         });
-    } else if (obj.body && !obj.userData.isActive && obj.platformBox.parent.scale.y != 0 && obj.body.pistonDown && !obj.userData.loop) {
+    } else if (obj.body && !obj.userData.isActive && obj.platformBox.parent.scale.y != 0 &&
+        obj.body.pistonDown &&
+        !obj.userData.loop) {
 
 
         var offset = -0.7 * deltaTime;
+
+        if (obj.userData.stayOnTop)
+            offset *= -1;
 
         var axis = "y";
         var dir = new CANNON.Vec3(0, 1, 0);
@@ -133,10 +168,18 @@ function updatePlatformPosition(obj, instanced, i, deltaTime) {
 
         if (obj.platformBox.parent.scale.y > 0) {
 
-            if (obj.body.position[axis] > obj.initialPosition[axis] + (obj.platformBox.parent.scale.y * 2)) {
-                obj.body.pistonDown = true;
-            } else if (obj.body.position[axis] <= obj.initialPosition[axis])
-                obj.body.pistonDown = false;
+            if (obj.userData.stayOnTop) {
+                if (obj.body.position[axis] > obj.initialPosition[axis] + (obj.platformBox.parent.scale.y * 2))
+                    obj.body.pistonDown = false;
+                else if (obj.body.position[axis] <= obj.initialPosition[axis])
+                    obj.body.pistonDown = true;
+            } else {
+                if (obj.body.position[axis] > obj.initialPosition[axis] + (obj.platformBox.parent.scale.y * 2)) {
+                    obj.body.pistonDown = true;
+                } else if (obj.body.position[axis] <= obj.initialPosition[axis])
+                    obj.body.pistonDown = false;
+            }
+
         } else {
 
             if (obj.body.position[axis] < obj.initialPosition[axis] + (obj.platformBox.parent.scale.y * 2)) {
@@ -145,7 +188,6 @@ function updatePlatformPosition(obj, instanced, i, deltaTime) {
                 obj.body.pistonDown = false;
             }
         }
-
 
         var item = new Object3D();
         item.quaternion.copy(obj.body.quaternion);

@@ -1195,6 +1195,12 @@ function App() {
           </li>
           <li className="menu-item hasItem piston_platforms">
             <a href="#" className="menu-btn">
+              <input type="checkbox" id="state-piston-top" />
+              <span className="menu-text">Start on Top</span>
+            </a>
+          </li>
+          <li className="menu-item hasItem piston_platforms">
+            <a href="#" className="menu-btn">
               <input type="checkbox" id="state-piston-loop" defaultChecked />
               <span className="menu-text">Loop</span>
             </a>
@@ -1433,7 +1439,7 @@ function App() {
 
         <div id="blocker">
 
-          <span id="version">version: 0.2.5</span>
+          <span id="version">version: 0.2.6</span>
 
           <div id="social" style={{
             width: "auto",
