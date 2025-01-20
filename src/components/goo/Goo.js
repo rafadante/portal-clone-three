@@ -99,6 +99,8 @@ const AddGoo = function (userData) {
         opacity: 0.8
     })); //material
 
+    console.log(lava)
+
     if (geometries.length == 0) {
         var bb = new Box3(); // for re-use
         bb.setFromObject(lava);

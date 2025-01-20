@@ -19,6 +19,7 @@ $("body").on('click', '#back-editor', function () {
 function backToEditor() {
 
     GLOBALS.STATS.dom.style.display = "none";
+    GLOBALS.MATERIAL_FIZZLER.depthWrite = true;
 
     GLOBALS.EXIT_DOOR.finished = false;
     GLOBALS.STATS_UI.time = 0;

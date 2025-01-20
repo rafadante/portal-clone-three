@@ -700,11 +700,11 @@ function joystickMenu(gamepad) {
 }
 
 function joystickGel(gamepad, index, gamepadButton, mode, value) {
-    if (gamepad.buttons[index].value == 1 && !gamepadButton) {
+    /*if (gamepad.buttons[index].value == 1 && !gamepadButton) {
         gamepadButton = true;
     } else if (gamepad.buttons[index].value == 0) {
         gamepadButton = false;
-    }
+    }*/
 }
 
 const updateHeadBob = function (deltaTime) {

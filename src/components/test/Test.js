@@ -312,6 +312,7 @@ function setup() {
     onWindowResize();
 
     GLOBALS.STATS.dom.style.display = "block";
+    GLOBALS.MATERIAL_FIZZLER.depthWrite = false;
 
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
         if (!GLOBALS.CONNECTIONS[i]["line"].visible) {

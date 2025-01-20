@@ -336,7 +336,6 @@ function createLightBridgesFromPortal(portal, rayItem) {
 
 
             if (GLOBALS.PORTALS[otherPortal].angled) {
-                console.log("sssssssss")
                 var angle = GLOBALS.PORTALS[otherPortal].mesh.rotation.x + Math.PI;
                 plane.rotateX(angle)
                 plane.translateZ(intersectsInstance[0].distance / 2);
@@ -416,15 +415,15 @@ function createLightBridgesFromPortal(portal, rayItem) {
                 GLOBALS.PORTALS[portal].fieldBodyClone = rayItem[g].item.clone;
             } else if (rayItem[g].name == "tractor_beam") {
 
-                plane.updateMatrix();
-                plane.geometry.applyMatrix4(plane.matrix);
+                //plane.updateMatrix();
+                //plane.geometry.applyMatrix4(plane.matrix);
 
                 var bb = new Box3(); // for re-use
                 bb.setFromObject(plane, true);
                 bb.side = 1;
 
                 const helper = new Box3Helper(bb, 0xffff00);
-                GLOBALS.ITEMS_ADDED.add(helper);
+                //GLOBALS.ITEMS_ADDED.add(helper);
 
                 plane.inTractor = false;
                 plane.dir = dir;
