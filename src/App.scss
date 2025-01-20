@@ -471,6 +471,7 @@ form {
       transition: all 0.2s;
       font-weight: bolder;
       color: white;
+      z-index: 10000;
     }
 
     .delete-my-chamber:hover {
