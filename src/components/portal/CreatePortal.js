@@ -467,7 +467,7 @@ function deletePortal(portalIndex) {
 
     //REMOVE FIELDS THAT ARE GOING THROUGH THIS PORTAL
     if (GLOBALS.PORTALS[portalIndex].field) {
-        GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PORTALS[portalIndex].field);
+        GLOBALS.ITEMS_ADDED.remove(GLOBALS.PORTALS[portalIndex].field);
         GLOBALS.PORTALS[portalIndex].field = null;
     }
 
