@@ -911,10 +911,34 @@ function App() {
                   <span className="menu-text">Top</span>
                 </button>
               </li>
+              <li data-trigger="TopRight" className="menu-item laser_receiver-triggers">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-crosshairs"></i>
+                  <span className="menu-text">Top Left</span>
+                </button>
+              </li>
+              <li data-trigger="TopLeft" className="menu-item laser_receiver-triggers">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-crosshairs"></i>
+                  <span className="menu-text">Top Right</span>
+                </button>
+              </li>
               <li data-trigger="Bottom" className="menu-item laser_receiver-triggers">
                 <button type="button" className="menu-btn">
                   <i className="fa fa-crosshairs"></i>
                   <span className="menu-text">Bottom</span>
+                </button>
+              </li>
+              <li data-trigger="BottomRight" className="menu-item laser_receiver-triggers">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-crosshairs"></i>
+                  <span className="menu-text">Bottom Left</span>
+                </button>
+              </li>
+              <li data-trigger="BottomLeft" className="menu-item laser_receiver-triggers">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-crosshairs"></i>
+                  <span className="menu-text">Bottom Right</span>
                 </button>
               </li>
               <li data-trigger="Left" className="menu-item laser_receiver-triggers">
@@ -1476,7 +1500,7 @@ function App() {
 
         <div id="blocker">
 
-          <span id="version">version: 0.2.7</span>
+          <span id="version">version: 0.2.8</span>
 
           <div id="social" style={{
             width: "auto",

@@ -160,7 +160,7 @@ async function addItem(found, loaded) {
 
         box.position.copy(userData.position);
         box.translateY(1)
-        GLOBALS.SCENE.add(box);
+        GLOBALS.ITEMS_ADDED.add(box);
         userData.item = box;
 
         const geometryPlane = new PlaneGeometry(2, 2);

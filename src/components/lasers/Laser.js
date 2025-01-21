@@ -3,6 +3,7 @@ import { GLOBALS } from '../../Globals.js';
 //import { animate } from '../../Main.js';
 import $ from 'jquery';
 import { laserReceiverTrigger } from '../events/events.js';
+import { MAX } from 'uuid';
 
 var red = 1;
 
@@ -211,7 +212,7 @@ function updateLaserCubeRaycaster(item, laser) {
 
         angle *= sign;
 
-        if (angle == 0 || Math.abs(angle) == Math.PI) {
+        /*if (angle == 0 || Math.abs(angle) == Math.PI) {
             laser.clone.rotation.copy(GLOBALS.PORTALS[portal].mesh.rotation)
 
             laser.clone.translateZ(-(((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
@@ -236,7 +237,55 @@ function updateLaserCubeRaycaster(item, laser) {
             laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 0.9));
         }
 
+        laser.clone.visible = true;*/
+
         laser.clone.visible = true;
+
+        
+
+        if (GLOBALS.PORTALS[portal2].angled) {
+
+            laser.clone.position.copy(GLOBALS.PORTAL_SHADER[portal].position)
+        laser.clone.rotation.copy(GLOBALS.PORTAL_SHADER[portal].rotation)
+        laser.clone.translateY((((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
+        laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 0.9));
+
+        var angle1 = GLOBALS.PORTALS[portal2].mesh.rotation.x + Math.PI;
+        var angle2 = Math.PI - GLOBALS.PORTALS[portal2].mesh.rotation.z;
+        var angle3 = Math.PI + item.rotation.y;
+
+            laser.clone.rotateX(angle1)
+            laser.clone.rotateZ(angle2 + item.rotation.y)
+        } else {
+            //laser.clone.rotateX(Math.PI / 2)
+            //laser.clone.rotateZ(angle3)
+            //laser.clone.rotation.y = Math.PI + item.rotation.y;
+
+            if (angle == 0 || Math.abs(angle) == Math.PI) {
+                laser.clone.rotation.copy(GLOBALS.PORTALS[portal].mesh.rotation)
+    
+                laser.clone.translateZ(-(((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
+                laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 1.1));
+    
+                laser.clone.rotation.copy(laser.rotation)
+                laser.clone.rotateZ(angle - Math.PI)
+            } else if (Math.abs(angle).toFixed(2) == (Math.PI / 2).toFixed(2) ||
+                Math.abs(angle).toFixed(2) == (Math.PI + (Math.PI / 2)).toFixed(2)) {
+                laser.clone.rotation.copy(GLOBALS.PORTALS[portal].mesh.rotation)
+    
+                laser.clone.translateZ(-(((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
+                laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 1.1));
+    
+                laser.clone.rotation.copy(laser.rotation)
+                laser.clone.rotateZ(angle)
+            } else {
+                laser.clone.rotation.copy(GLOBALS.PORTALS[portal].mesh.rotation)
+                //laser.clone.rotateZ(angle + (Math.PI * 2))
+    
+                laser.clone.translateZ(-(((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
+                laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 0.9));
+            }
+        }
 
         //
         var direction = new Vector3(0, 1, 0).applyQuaternion(laser.clone.quaternion);
@@ -289,7 +338,7 @@ function angleDifference(angle1, angle2) {
     let diff = angle2 - angle1;
     diff = ((diff + Math.PI) % (2 * Math.PI)) - Math.PI;
     return diff;
-  }
+}
 
 function updateLaserEmitterRaycaster() {
 
@@ -368,7 +417,7 @@ function updateLaserEmitterRaycaster() {
             continue
 
         if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null)
-            return
+            continue
 
         //CHECK FOR PORTAL INTERSECTION
         var intersectsWithPortals = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObjects(GLOBALS.PORTAL_SHADER);
@@ -389,19 +438,29 @@ function updateLaserEmitterRaycaster() {
 
             var intersectsInstanceOtherPortalWall = raycasterLaserOtherPortal.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
             if (intersectsInstanceOtherPortalWall.length > 0) {
-                GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.scale.y = intersectsInstanceOtherPortalWall[0].distance;
+                GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.scale.y = intersectsInstanceOtherPortalWall[0].distance * 1.1;
                 GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.position.copy(GLOBALS.PORTAL_SHADER[portal].position)
                 GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.rotation.copy(GLOBALS.PORTAL_SHADER[portal].rotation)
                 GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.translateY((((intersectsWithPortals[0].uv.y) - 0.5) * 1.8));
                 GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.translateX(-(((intersectsWithPortals[0].uv.x) - 0.5) * 0.9));
-                
-                var angle = GLOBALS.PORTALS[otherPortal].mesh.rotation.x + Math.PI;
 
-                GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.rotateX(angle)
+                var angle = GLOBALS.PORTALS[otherPortal].mesh.rotation.x + Math.PI;
+                var angle2 = Math.PI - GLOBALS.PORTALS[otherPortal].mesh.rotation.z;
+
+                if (GLOBALS.PORTALS[otherPortal].angled) {
+                    GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.rotateX(angle)
+                    GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.rotateZ(angle2)
+                } else {
+                    GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.rotateX(Math.PI / 2)
+                }
+
                 GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.visible = true;
             }
 
-            raycasterLaserOtherPortal.set(GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.position, dir);
+            const dir2 = new Vector3(0, 1, 0); // Local Y-axis
+            dir2.applyQuaternion(GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.quaternion); // Transform to world space
+
+            raycasterLaserOtherPortal.set(GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.position, dir2);
             var intersectsInstanceOtherPortalObj = raycasterLaserOtherPortal.intersectObjects(array);
 
             for (var j = 0; j < intersectsInstanceOtherPortalObj.length; j++) {
@@ -431,7 +490,7 @@ function updateLaserEmitterRaycaster() {
                 GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.visible = true;
 
                 if (intersectsInstanceOtherPortalObj[j].object.name != "laser_relay") {
-                    GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.scale.y = intersectsInstanceOtherPortalObj[j].distance;
+                    GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.scale.y = intersectsInstanceOtherPortalObj[j].distance * 1.1;
                     break;
                 }
             }
@@ -487,6 +546,18 @@ function laserEmitterPosition(item, trigger, elem, name) {
     } else if (trigger == "Right") {
         dummy.rotateY(Math.PI / 2);
         dummy.translateZ(valOffset);
+    } else if (trigger == "BottomLeft") {
+        dummy.translateZ(valOffset);
+        dummy.translateX(valOffset);
+    } else if (trigger == "BottomRight") {
+        dummy.translateZ(valOffset);
+        dummy.translateX(-valOffset);
+    } else if (trigger == "TopLeft") {
+        dummy.translateZ(-valOffset);
+        dummy.translateX(valOffset);
+    } else if (trigger == "TopRight") {
+        dummy.translateZ(-valOffset);
+        dummy.translateX(-valOffset);
     }
 
     item.position.copy(dummy.position)

@@ -17,7 +17,7 @@ const material = new MeshBasicMaterial({
 });
 const target = new Mesh(geometry, material);
 
-GLOBALS.SCENE.add(GLOBALS.GROUP_LINE_TRAGECTORY);
+GLOBALS.ITEMS_ADDED.add(GLOBALS.GROUP_LINE_TRAGECTORY);
 
 function faithPlate(plate, body) {
 
@@ -138,7 +138,7 @@ function targetFaithPlateEnd(item, h) {
   const clone = target.clone();
   clone.position.copy(item.position);
   clone.rotation.copy(item.rotation);
-  GLOBALS.SCENE.add(clone);
+  GLOBALS.ITEMS_ADDED.add(clone);
 
   GLOBALS.FAITH_PLATE_TARGET.target = clone;
 

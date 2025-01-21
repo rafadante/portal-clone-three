@@ -140,8 +140,8 @@ const AddGoo = function (userData) {
     water.updateMatrixWorld();
     water.material.transparent = true;
 
-    GLOBALS.SCENE_CHILDREN.add(water);
-    GLOBALS.SCENE_CHILDREN.add(lava);
+    GLOBALS.ITEMS_ADDED.add(water);
+    GLOBALS.ITEMS_ADDED.add(lava);
 
     userData.item.lava = lava;
     userData.item.water = water;
