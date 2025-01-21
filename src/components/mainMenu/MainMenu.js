@@ -178,6 +178,9 @@ function fetchLevel() {
         $("#portal-gun-select").val(level[0][0]).change();
         $("#ambient-sound-select").val(level[0][1]).change();
 
+        if (level[0][2])
+            $("#color-wall-portal").val(level[0][2]).change();
+
         loadLevelJSON();
 
     } else {
@@ -190,6 +193,9 @@ function fetchLevel() {
 
                 $("#portal-gun-select").val(level[0][0]).change();
                 $("#ambient-sound-select").val(level[0][1]).change();
+
+                if (level[0][2])
+                    $("#color-wall-portal").val(level[0][2]).change();
 
                 loadLevelJSON();
             });
@@ -653,6 +659,10 @@ $("#input-level").on('change', function (e) {
 
         $("#portal-gun-select").val(data[0][0]).change();
         $("#ambient-sound-select").val(data[0][1]).change();
+
+        if (data[0][2])
+            $("#color-wall-portal").val(data[0][2]).change();
+
         loadLevel(data[1])
 
         /*for (var i = 0; i < data[1].length; i++) {

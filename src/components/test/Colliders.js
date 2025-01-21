@@ -92,7 +92,7 @@ function colliderItemManager() {
             var body = new CANNON.Body({
                 shape: shape,
                 mass: 0,
-                material: window.materialB
+                material: GLOBALS.PHYSICS_MATERIAL
             });
 
             body.name = "panel";
@@ -106,8 +106,12 @@ function colliderItemManager() {
             cube.getWorldQuaternion(worldQua)
             body.quaternion.copy(worldQua);
 
-            body.collisionFilterGroup = GLOBALS.CGROUP_DYNAMIC;
-            body.collisionFilterMask = GLOBALS.CGROUP_ALL;
+            body.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT;
+            body.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC | GLOBALS.CGROUP_PLAYER;
+
+
+            //box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT;
+            //box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC | GLOBALS.CGROUP_PLAYER;
 
             GLOBALS.CANNON_BODIES.push(body);
             GLOBALS.CANNON_WORLD.addBody(body);
@@ -464,6 +468,10 @@ function addColliderItem(items, type, mass, offset) {
                 mass: mass,
                 material: PHYSICS_MATERIAL
             });
+
+            if(type == "step"){
+                box.Material = GLOBALS.PHYSICS_MATERIAL;
+            }
 
             box.position.copy(objHolder.position);
             box.quaternion.copy(rot);

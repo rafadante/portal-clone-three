@@ -1,4 +1,4 @@
-import { PlaneGeometry, Object3D, InstancedMesh, Matrix4 } from 'three';
+import { PlaneGeometry, Object3D, InstancedMesh, Matrix4, Color } from 'three';
 import { GLOBALS } from '../../Globals.js';
 import { shuffle, groupByPercentage } from '../../Utils.js';
 import { colliderRoom } from './Colliders.js';
@@ -167,6 +167,8 @@ function createInstances(meshes, material, index) {
         dummy.position.copy(meshes[i].position);
         dummy.rotation.copy(meshes[i].rotation);
         dummy.updateMatrix();
+
+        mesh.setColorAt(i, new Color(document.getElementById("color-wall-portal").value)); // if instances array is created
 
         mesh.setMatrixAt(i, dummy.matrix);
         //mesh.setVisibilityAt(i, true);

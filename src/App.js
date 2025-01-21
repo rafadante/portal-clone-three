@@ -381,6 +381,12 @@ function App() {
                     </select>
                   </div>
                 </div>
+                <div className="options-row">
+                  <span className="option-name" id="">Portal Wall Color:</span>
+                  <div className="option-value">
+                    <input id='color-wall-portal' type='color' defaultValue={"#ffffff"}></input>
+                  </div>
+                </div>
               </div>
               <div id="items">
 
