@@ -468,6 +468,8 @@ function Crouch(value) {
     GLOBALS.PLAYER.computeAABB();
     GLOBALS.PLAYER.updateMassProperties();
 
+
+    //if(GLOBALS.PLAYER.inJump){
     GLOBALS.PLAYER.gelJumping = true;
 
     if (GLOBALS.PLAYER.waiting)
@@ -476,10 +478,15 @@ function Crouch(value) {
     GLOBALS.PLAYER.waiting = true;
 
     setTimeout(() => {
-        GLOBALS.PLAYER.jumpVelocity = -7;
+        GLOBALS.PLAYER.jumpVelocity = null;
+        GLOBALS.PLAYER.impactSide = null;
+        GLOBALS.PLAYER.impactVelocity = null;
+
         GLOBALS.PLAYER.waiting = false;
         GLOBALS.PLAYER.gelJumping = false;
     }, 1000);
+    //}
+
 }
 
 export { Crouch, openMenu, openFullscreen }

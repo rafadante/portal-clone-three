@@ -1,7 +1,9 @@
 import { MeshStandardMaterial, TextureLoader, SRGBColorSpace, Vector2, Color, MeshBasicMaterial, RepeatWrapping } from 'three';
 import { GLOBALS } from '../../Globals.js';
+import $ from 'jquery';
 
 function loadMaterials() {
+
     //MATERIAL FLOOR NON PORTAL
     GLOBALS.MATERIAL_FLOOR_NON_PORTAL = new MeshStandardMaterial();
     loadMaterial(
@@ -197,6 +199,7 @@ function loadMaterial(material, base, normal, ao, rough, metal, alpha, roughValu
         map = new TextureLoader().load('./assets/textures/' + base);
         map.colorSpace = SRGBColorSpace;
         material.map = map;
+        material.apertureNew = map;
 
         if (repeatX)
             applyRepeat(map, repeatX, repeatY);
@@ -359,7 +362,71 @@ GLOBALS.MATERIAL_CONE = new MeshStandardMaterial({
     side: 2
 });
 
+function loadOldAperture() {
+    var texture = new TextureLoader().load("./assets/textures/metal0/floor.png");
+    texture.colorSpace = SRGBColorSpace;
+    GLOBALS.MATERIAL_FLOOR_NON_PORTAL.apertureOld = texture;
+
+    var texture = new TextureLoader().load("./assets/textures/metal0/wall1.png");
+    texture.colorSpace = SRGBColorSpace;
+    GLOBALS.MATERIAL_WALL_NON_PORTAL.apertureOld = texture;
+
+    var texture = new TextureLoader().load("./assets/textures/metal0/wall2.png");
+    texture.colorSpace = SRGBColorSpace;
+    GLOBALS.MATERIAL_WALL_NON_PORTAL2.apertureOld = texture;
+
+    //
+    var texture = new TextureLoader().load("./assets/textures/portal0/floor.png");
+    texture.colorSpace = SRGBColorSpace;
+    GLOBALS.MATERIAL_FLOOR_PORTAL.apertureOld = texture;
+
+    var texture = new TextureLoader().load("./assets/textures/portal0/wall1.png");
+    texture.colorSpace = SRGBColorSpace;
+    GLOBALS.MATERIAL_WALL_PORTAL.apertureOld = texture;
+
+    var texture = new TextureLoader().load("./assets/textures/portal0/wall2.png");
+    texture.colorSpace = SRGBColorSpace;
+    GLOBALS.MATERIAL_WALL_PORTAL2.apertureOld = texture;
+}
+
+$('#chamber_style-select').on('change', function () {
+    apertureStyle($(this).val())
+});
+
+var loadadeOld = false;
+
+function apertureStyle(style) {
+
+    if(!loadadeOld){
+        loadOldAperture();
+        loadadeOld=true;
+    }
+
+    window.oldAperture = style;
+
+    if (style == "old") {
+
+        GLOBALS.MATERIAL_FLOOR_NON_PORTAL.map =  GLOBALS.MATERIAL_FLOOR_NON_PORTAL.apertureOld;
+        GLOBALS.MATERIAL_WALL_NON_PORTAL.map = GLOBALS.MATERIAL_WALL_NON_PORTAL.apertureOld;
+        GLOBALS.MATERIAL_WALL_NON_PORTAL2.map = GLOBALS.MATERIAL_WALL_NON_PORTAL2.apertureOld;
+
+        GLOBALS.MATERIAL_FLOOR_PORTAL.map = GLOBALS.MATERIAL_FLOOR_PORTAL.apertureOld;
+        GLOBALS.MATERIAL_WALL_PORTAL.map = GLOBALS.MATERIAL_WALL_PORTAL.apertureOld;
+        GLOBALS.MATERIAL_WALL_PORTAL2.map = GLOBALS.MATERIAL_WALL_PORTAL2.apertureOld;
+    } else {
+
+        GLOBALS.MATERIAL_FLOOR_NON_PORTAL.map =  GLOBALS.MATERIAL_FLOOR_NON_PORTAL.apertureNew;
+        GLOBALS.MATERIAL_WALL_NON_PORTAL.map = GLOBALS.MATERIAL_WALL_NON_PORTAL.apertureNew;
+        GLOBALS.MATERIAL_WALL_NON_PORTAL2.map = GLOBALS.MATERIAL_WALL_NON_PORTAL2.apertureNew;
+
+        GLOBALS.MATERIAL_FLOOR_PORTAL.map = GLOBALS.MATERIAL_FLOOR_PORTAL.apertureNew;
+        GLOBALS.MATERIAL_WALL_PORTAL.map = GLOBALS.MATERIAL_WALL_PORTAL.apertureNew;
+        GLOBALS.MATERIAL_WALL_PORTAL2.map = GLOBALS.MATERIAL_WALL_PORTAL2.apertureNew;
+    }
+}
+
 export {
     loadMaterials,
-    updateMaterialRepeat
+    updateMaterialRepeat,
+    apertureStyle
 }

@@ -387,6 +387,15 @@ function App() {
                     <input id='color-wall-portal' type='color' defaultValue={"#ffffff"}></input>
                   </div>
                 </div>
+                <div className="options-row">
+                  <span className="option-name" id="">Chamber Style:</span>
+                  <div className="option-value">
+                    <select name="chamber_style" id="chamber_style-select">
+                      <option value="standard">Standard aperture</option>
+                      <option value="old">Old Aperture</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               <div id="items">
 
@@ -1506,7 +1515,7 @@ function App() {
 
         <div id="blocker">
 
-          <span id="version">version: 0.2.9</span>
+          <span id="version">version: 0.2.10</span>
 
           <div id="social" style={{
             width: "auto",

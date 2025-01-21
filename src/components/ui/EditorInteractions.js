@@ -555,7 +555,8 @@ function saveChamber(publish) {
     const settings = [
         GLOBALS.PORTAL_GUN_INITIATE,
         AUDIO.AMBIENT.value,
-        document.getElementById("color-wall-portal").value
+        document.getElementById("color-wall-portal").value,
+        window.oldAperture
     ]
 
     data.push(settings);

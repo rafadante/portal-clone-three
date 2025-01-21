@@ -11,6 +11,7 @@ import { backToEditor } from '../test/BackToEditor.js';
 import { playVoiceTrigger } from '../triggers/Triggers.js';
 import JSZip, { file } from 'jszip';
 import { v4 as uuidv4 } from 'uuid';
+import { apertureStyle } from '../materials/Materials.js';
 
 var plane1, plane2, level;
 var transition = false;
@@ -181,6 +182,9 @@ function fetchLevel() {
         if (level[0][2])
             $("#color-wall-portal").val(level[0][2]).change();
 
+        if (level[0][3])
+            $("#chamber_style-select").val(level[0][3]).change();
+
         loadLevelJSON();
 
     } else {
@@ -196,6 +200,9 @@ function fetchLevel() {
 
                 if (level[0][2])
                     $("#color-wall-portal").val(level[0][2]).change();
+
+                if (level[0][3])
+                    $("#chamber_style-select").val(level[0][3]).change();
 
                 loadLevelJSON();
             });
@@ -662,6 +669,9 @@ $("#input-level").on('change', function (e) {
 
         if (data[0][2])
             $("#color-wall-portal").val(data[0][2]).change();
+
+        if (data[0][3])
+            $("#chamber_style-select").val(data[0][3]).change();
 
         loadLevel(data[1])
 

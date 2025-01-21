@@ -80,22 +80,41 @@ function manageInstances() {
     colliderRoom(sideRight, "right", "y", "z", "x", "z");
     colliderRoom(sideLeft, "left", "y", "z", "x", "z");
 
-    let percentages = [5, 85, 5, 5];
-    var arr = shuffle(meshesWallPortal);
-    let result = groupByPercentage(arr, percentages);
-    createInstances(result[0], GLOBALS.MATERIAL_WALL_PORTAL, 0);
-    createInstances(result[1], GLOBALS.MATERIAL_WALL_PORTAL2, 1);
-    createInstances(result[2], GLOBALS.MATERIAL_WALL_PORTAL3, 2);
-    createInstances(result[3], GLOBALS.MATERIAL_WALL_PORTAL4, 3);
-    //
-    percentages = [50, 50];
-    arr = shuffle(meshesWallNonPortal);
-    result = groupByPercentage(arr, percentages);
-    createInstances(result[0], GLOBALS.MATERIAL_WALL_NON_PORTAL, 4);
-    createInstances(result[1], GLOBALS.MATERIAL_WALL_NON_PORTAL2, 5);
-    //
-    createInstances(meshesFloorPortal, GLOBALS.MATERIAL_FLOOR_PORTAL, 6);
-    createInstances(meshesFloorNonPortal, GLOBALS.MATERIAL_FLOOR_NON_PORTAL, 7);
+
+    if(window.oldAperture == "old"){
+        let percentages = [100, 0];
+        var arr = shuffle(meshesWallPortal);
+        let result = groupByPercentage(arr, percentages);
+        createInstances(result[0], GLOBALS.MATERIAL_WALL_PORTAL, 0);
+        createInstances(result[1], GLOBALS.MATERIAL_WALL_PORTAL2, 1);
+        //
+        percentages = [70, 30];
+        arr = shuffle(meshesWallNonPortal);
+        result = groupByPercentage(arr, percentages);
+        createInstances(result[0], GLOBALS.MATERIAL_WALL_NON_PORTAL, 2);
+        createInstances(result[1], GLOBALS.MATERIAL_WALL_NON_PORTAL2, 3);
+        //
+        createInstances(meshesFloorPortal, GLOBALS.MATERIAL_FLOOR_PORTAL, 4);
+        createInstances(meshesFloorNonPortal, GLOBALS.MATERIAL_FLOOR_NON_PORTAL, 5);
+    }else{
+        let percentages = [5, 85, 5, 5];
+        var arr = shuffle(meshesWallPortal);
+        let result = groupByPercentage(arr, percentages);
+        createInstances(result[0], GLOBALS.MATERIAL_WALL_PORTAL, 0);
+        createInstances(result[1], GLOBALS.MATERIAL_WALL_PORTAL2, 1);
+        createInstances(result[2], GLOBALS.MATERIAL_WALL_PORTAL3, 2);
+        createInstances(result[3], GLOBALS.MATERIAL_WALL_PORTAL4, 3);
+        //
+        percentages = [50, 50];
+        arr = shuffle(meshesWallNonPortal);
+        result = groupByPercentage(arr, percentages);
+        createInstances(result[0], GLOBALS.MATERIAL_WALL_NON_PORTAL, 4);
+        createInstances(result[1], GLOBALS.MATERIAL_WALL_NON_PORTAL2, 5);
+        //
+        createInstances(meshesFloorPortal, GLOBALS.MATERIAL_FLOOR_PORTAL, 6);
+        createInstances(meshesFloorNonPortal, GLOBALS.MATERIAL_FLOOR_NON_PORTAL, 7);
+    }
+    
 }
 
 window.instances = [];
