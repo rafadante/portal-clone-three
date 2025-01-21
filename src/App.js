@@ -865,6 +865,53 @@ function App() {
             </ul>
           </li>
 
+          {/** */}
+          <li className="menu-item menu-item-submenu hasItem light" id="light-position"
+            data-trigger="Middle Horizontal">
+            <button type="button" className="menu-btn">
+              <i className="fa fa-crosshairs"></i>
+              <span className="menu-text title">Middle Horizontal</span>
+            </button>
+            <ul className="menu">
+              <li data-trigger="Middle Horizontal" className="menu-item light-position">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-crosshairs"></i>
+                  <span className="menu-text">Middle Horizontal</span>
+                </button>
+              </li>
+              <li data-trigger="Middle Vertical" className="menu-item light-position">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-crosshairs"></i>
+                  <span className="menu-text">Middle Vertical</span>
+                </button>
+              </li>
+              <li data-trigger="Top" className="menu-item light-position">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-crosshairs"></i>
+                  <span className="menu-text">Top</span>
+                </button>
+              </li>
+              <li data-trigger="Bottom" className="menu-item light-position">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-crosshairs"></i>
+                  <span className="menu-text">Bottom</span>
+                </button>
+              </li>
+              <li data-trigger="Left" className="menu-item light-position">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-crosshairs"></i>
+                  <span className="menu-text">Left</span>
+                </button>
+              </li>
+              <li data-trigger="Right" className="menu-item light-position">
+                <button type="button" className="menu-btn">
+                  <i className="fa fa-crosshairs"></i>
+                  <span className="menu-text">Right</span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
           {/**/}
           <li className="menu-item menu-item-submenu hasItem laser_emitter" id="laser_emitter-trigger"
             data-trigger="Middle Horizontal">

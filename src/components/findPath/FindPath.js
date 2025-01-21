@@ -55,7 +55,7 @@ function findPath(ini, target, found, found2, line2) {
     //GLOBALS.SELECTED_FOR_CONNECTION.check = plane;
 
     for (var j = 0; j < GLOBALS.PLANE_USER_DATA.length; j++) {
-        if (GLOBALS.PLANE_USER_DATA[j].exists && !GLOBALS.PLANE_USER_DATA[j].hasItem) {//
+        if (GLOBALS.PLANE_USER_DATA[j].exists && !GLOBALS.PLANE_USER_DATA[j].hasItem && !GLOBALS.PLANE_USER_DATA[j].hasGoo) {//
             nodes.push(GLOBALS.PLANE_USER_DATA[j]);
         }
     }

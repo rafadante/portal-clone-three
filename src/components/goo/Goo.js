@@ -172,6 +172,14 @@ function checkSides(userData) {
             if (!ids.includes(userData2[0].id_instanced))
                 checkSides(userData2[0])
         }
+    }else{
+
+        box1[0].hasGoo = true;
+
+        if (!goo.includes(box1[0].position)) {
+            //goo.push(box1[0].position)
+            ids.push(box1[0].id_instanced)
+        }
     }
 
     var box2 = getPlaneByName((userData.position.x - 1) + "/" + (userData.position.y + 1) + "/" + userData.position.z);
@@ -187,6 +195,14 @@ function checkSides(userData) {
         if (userData2.length > 0) {
             if (!ids.includes(userData2[0].id_instanced))
                 checkSides(userData2[0])
+        }
+    }else{
+
+        box2[0].hasGoo = true;
+
+        if (!goo.includes(box2[0].position)) {
+            //goo.push(box2[0].position)
+            ids.push(box2[0].id_instanced)
         }
     }
 
@@ -204,6 +220,14 @@ function checkSides(userData) {
             if (!ids.includes(userData2[0].id_instanced))
                 checkSides(userData2[0])
         }
+    }else{
+
+        box3[0].hasGoo = true;
+
+        if (!goo.includes(box3[0].position)) {
+            //goo.push(box3[0].position)
+            ids.push(box3[0].id_instanced)
+        }
     }
 
     var box4 = getPlaneByName(userData.position.x + "/" + (userData.position.y + 1) + "/" + (userData.position.z - 1));
@@ -219,6 +243,14 @@ function checkSides(userData) {
         if (userData2.length > 0) {
             if (!ids.includes(userData2[0].id_instanced))
                 checkSides(userData2[0])
+        }
+    }else{
+
+        box4[0].hasGoo = true;
+
+        if (!goo.includes(box4[0].position)) {
+            //goo.push(box4[0].position)
+            ids.push(box4[0].id_instanced)
         }
     }
 }

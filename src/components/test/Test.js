@@ -364,8 +364,8 @@ function blockPortal() {
     for (var i = 0; i < GLOBALS.LIGHT_BRIDGE_RAYCASTER.length; i++)
         GLOBALS.BLOCK_PORTAL.push(GLOBALS.LIGHT_BRIDGE_RAYCASTER[i].item.continuous)
 
-    for (var i = 0; i < GLOBALS.LASER_FIELD_RAYCASTER.length; i++)
-        GLOBALS.BLOCK_PORTAL.push(GLOBALS.LASER_FIELD_RAYCASTER[i].item.continuous)
+    //for (var i = 0; i < GLOBALS.LASER_FIELD_RAYCASTER.length; i++)
+    //    GLOBALS.BLOCK_PORTAL.push(GLOBALS.LASER_FIELD_RAYCASTER[i].item.continuous)
 
     for (var i = 0; i < GLOBALS.FIZZLER_RAYCASTER.length; i++)
         GLOBALS.BLOCK_PORTAL.push(GLOBALS.FIZZLER_RAYCASTER[i].item.continuous)

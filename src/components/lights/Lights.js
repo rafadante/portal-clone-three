@@ -60,6 +60,10 @@ function testLightsManager() {
             plane.position.copy(GLOBALS.DYMANIC_ITEMS['light'][i].position);
             plane.rotation.copy(GLOBALS.DYMANIC_ITEMS['light'][i].rotation);
             plane.rotateX(-Math.PI / 2)
+
+            if (GLOBALS.DYMANIC_ITEMS['light'][i].userData.triggers)
+                plane.rotateZ(-Math.PI / 2)
+
             plane.scale.set(0.2, 2, 2)
             plane.translateZ(0.025);
             GLOBALS.SCENE_FPS.add(plane);

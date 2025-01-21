@@ -339,6 +339,12 @@ $("body").on('click', '.light-bridge-triggers', function () {
         $(this).data("trigger"), $("#light-bridge-trigger"), "light_bridge")
 });
 
+$("body").on('click', '.light-position', function () {
+    GLOBALS.LIGHT_TRIGGER = $(this).data("trigger");
+    ContinuousTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item,
+        $(this).data("trigger"), $("#light-position"), "light")
+});
+
 $("body").on('click', '.laser-field-triggers', function () {
     GLOBALS.LASER_FIELD_TRIGGER = $(this).data("trigger");
     ContinuousTrigger(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item,

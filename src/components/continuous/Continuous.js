@@ -487,19 +487,34 @@ function ContinuousTrigger(item, trigger, elem, name) {
         dummy.translateZ(valOffset);
     }
 
-    item.raycaster.ray.origin = dummy.position;
-    item.continuous.position.copy(dummy.position)
-    item.continuous.rotation.copy(dummy.rotation)
-    item.continuous.translateY(item.continuous.distance);
 
-    if (name == "light_bridge" || name == "glass") {
-        item.bodyBridge.position.copy(item.continuous.position);
-        item.bodyBridge.quaternion.copy(dummy.quaternion);
+    if (name != "light") {
+        item.raycaster.ray.origin = dummy.position;
+        item.continuous.position.copy(dummy.position)
+        item.continuous.rotation.copy(dummy.rotation)
+        item.continuous.translateY(item.continuous.distance);
+
+        if (name == "light_bridge" || name == "glass") {
+            item.bodyBridge.position.copy(item.continuous.position);
+            item.bodyBridge.quaternion.copy(dummy.quaternion);
+        }
+
+        if (name == "glass") {
+            return;
+        }
+    }else{
+        item.position.copy(new Vector3(
+            dummy.position.x,
+            dummy.position.y,
+            dummy.position.z
+        ));
+        item.rotation.set(
+            dummy.rotation.x,
+            dummy.rotation.y,
+            dummy.rotation.z
+        );
     }
 
-    if (name == "glass") {
-        return;
-    }
 
     dummy.updateMatrix();
     var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(name);

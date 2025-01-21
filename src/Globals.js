@@ -903,6 +903,7 @@ var GLOBALS = {
     LIGHT_BRIDGE_CLONE: [],
     LIGHT_BRIDGE_COLLIDER_CLONE: [],
     LIGHT_BRIDGE_TRIGGER: "Middle Horizontal",
+    LIGHT_TRIGGER: "Middle Horizontal",
     GLASS_TRIGGER: "Middle Vertical",
     LASER_FIELD_TRIGGER: "Middle Vertical",
     FIZZLER_TRIGGER: "Middle Vertical",

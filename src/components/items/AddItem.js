@@ -794,6 +794,9 @@ function manageItemVariables(item, userData, instanced) {
         item.userData.triggers = GLOBALS.FIZZLER_TRIGGER;
         createLightBridges("fizzler", GLOBALS.FIZZLER_RAYCASTER, item, instanced, false);
         ContinuousTrigger(item, item.userData.triggers, $("#laser-field-trigger"), "fizzler");
+    } else if (GLOBALS.ITEM_HOLDED_NAME == "light") {
+        item.userData.triggers = GLOBALS.LIGHT_TRIGGER;
+        ContinuousTrigger(item, item.userData.triggers, $("#light-position"), "light");
     } else if (GLOBALS.ITEM_HOLDED_NAME == "light_bridge") {
         item.userData.state = true;
         item.userData.triggers = GLOBALS.LIGHT_BRIDGE_TRIGGER;
@@ -859,13 +862,13 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         if (GLOBALS.ITEM_HOLDED_NAME == "piston_platforms") {
             item.userData.stayOnTop = userDataLoadedItem.stayOnTop;
 
-            if(item.userData.stayOnTop){
+            if (item.userData.stayOnTop) {
                 instanced.instances[id].position.y += userDataLoadedItem.scaleY * 2;
                 instanced.instances[id].updateMatrix();
-    
+
                 item.position.y = instanced.instances[id].position.y;
             }
-            
+
         }
 
         managePlatformRange(userDataLoadedItem.scaleY, userData);
@@ -892,22 +895,28 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         || GLOBALS.ITEM_HOLDED_NAME == "portal_1" || GLOBALS.ITEM_HOLDED_NAME == "incinerator"
         || GLOBALS.ITEM_HOLDED_NAME == "step") {
 
-        item.userData.rotationY = userDataLoadedItem.rotationY;
-        var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);
-
-        var dummy = new Object3D();
-        dummy.position.copy(item.position);
-        dummy.rotation.copy(item.rotation);
-
-        dummy.rotation.y = item.userData.rotationY;
-
-        dummy.updateMatrix();
-        instanced2.setMatrixAt(item.userData.id, dummy.matrix)
-
-        instanced2.instanceMatrix.needsUpdate = true;
-        instanced2.computeBoundingSphere();
-
-        item.rotation.copy(dummy.rotation);
+        if (GLOBALS.ITEM_HOLDED_NAME == "light" && userDataLoadedItem.triggers) {
+            item.userData.triggers = userDataLoadedItem.triggers;
+            ContinuousTrigger(item, item.userData.triggers, $("#light-position"), "light");
+        }else{
+            item.userData.rotationY = userDataLoadedItem.rotationY;
+            var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);
+    
+            var dummy = new Object3D();
+            dummy.position.copy(item.position);
+            dummy.rotation.copy(item.rotation);
+    
+            dummy.rotation.y = item.userData.rotationY;
+    
+            dummy.updateMatrix();
+            instanced2.setMatrixAt(item.userData.id, dummy.matrix)
+    
+            instanced2.instanceMatrix.needsUpdate = true;
+            instanced2.computeBoundingSphere();
+    
+            item.rotation.copy(dummy.rotation);
+        }
+        
     } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
         GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube" ||
         GLOBALS.ITEM_HOLDED_NAME == "scale_cube") {
@@ -924,7 +933,6 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         createLightBridges("fizzler", GLOBALS.FIZZLER_RAYCASTER, item, instanced, false);
         ContinuousTrigger(item, item.userData.triggers, $("#laser-field-trigger"), "fizzler");
     } else if (GLOBALS.ITEM_HOLDED_NAME == "light_bridge") {
-        console.log(userDataLoadedItem.state)
         item.userData.state = userDataLoadedItem.state;
         item.userData.triggers = userDataLoadedItem.triggers;
         createLightBridges("light_bridge", GLOBALS.LIGHT_BRIDGE_RAYCASTER, item, null, false);

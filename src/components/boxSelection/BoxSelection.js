@@ -47,7 +47,6 @@ function raycastSelected(found, event, type) {
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("portal_1") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("angled_panel") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("pedestal_button") ||
-                    GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("bed") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("incinerator") ||
                     GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("toilet") ||
@@ -163,6 +162,13 @@ function raycastSelected(found, event, type) {
 
                         $("#ligh-color-input").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.lightColor)
                     }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light")) {
+                        $(".light").css("display", "block");
+                        $("#light-position").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
+                    }
+
+                    
 
                     if ((GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "sphere" ||
                         GLOBALS.PLANE_USER_DATA[instanceId].instancedName == "cube" ||
