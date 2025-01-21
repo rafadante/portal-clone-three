@@ -36,7 +36,7 @@ function teleportPhysicalObject(object, portal) {
 
     //CORRECT VELOCITY WHEN LOPING VERTICALLY TO AVOID INFINITY VELOCITY
     if ((Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) &&
-    GLOBALS.PORTALS[0].normal.y != GLOBALS.PORTALS[1].normal.y) {
+        GLOBALS.PORTALS[0].normal.y != GLOBALS.PORTALS[1].normal.y) {
 
         const heightDifference = getHeightDifference(portal.portalShader.position, portal.output.portalShader.position);
 
@@ -189,7 +189,11 @@ function teleportationState() {
             }
         }
 
-        d.collisionFilterMask = GLOBALS.CGROUP_ALL;
+        if (dd == 0 || !GLOBALS.HOLDING_ITEM)
+            d.collisionFilterMask = GLOBALS.CGROUP_ALL;
+        else if (GLOBALS.HOLDING_ITEM)
+            d.collisionFilterMask = GLOBALS.CGROUP_ENVIRONMENT | GLOBALS.CGROUP_DYNAMIC;
+
         d.inArea = false;
 
         if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null) continue;
