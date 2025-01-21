@@ -221,6 +221,11 @@ function gelTrigger(event) {
 
     if (event.body.type == "blue" && !event.target.gelJumping) {
 
+        if (event.target.name == "player"){
+            if(event.target.waiting)
+                return;
+        }
+
         clearTimeout(event.target.timeout)
 
         event.target.firstCollisionHandled = true;

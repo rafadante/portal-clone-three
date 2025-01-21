@@ -467,6 +467,19 @@ function Crouch(value) {
     GLOBALS.PLAYER.shapes[0].updateConvexPolyhedronRepresentation();
     GLOBALS.PLAYER.computeAABB();
     GLOBALS.PLAYER.updateMassProperties();
+
+    GLOBALS.PLAYER.gelJumping = true;
+
+    if (GLOBALS.PLAYER.waiting)
+        return;
+
+    GLOBALS.PLAYER.waiting = true;
+
+    setTimeout(() => {
+        GLOBALS.PLAYER.jumpVelocity = -7;
+        GLOBALS.PLAYER.waiting = false;
+        GLOBALS.PLAYER.gelJumping = false;
+    }, 1000);
 }
 
 export { Crouch, openMenu, openFullscreen }

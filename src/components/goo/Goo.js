@@ -20,6 +20,12 @@ const AddGoo = function (userData) {
     const geometry = new PlaneGeometry(2, 2);
     const geometries = [];
 
+    window.ooo = new Mesh(geometry, new MeshBasicMaterial())
+    window.ooo.position.copy(goo[0])
+    window.ooo.rotation.x = -Math.PI / 2;
+    window.ooo.translateZ(1.79);
+    window.ooo.updateMatrixWorld();
+
     for (let i = 0; i < goo.length; i++) {
 
         const matrix = new Matrix4();

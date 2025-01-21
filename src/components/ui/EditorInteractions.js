@@ -172,9 +172,9 @@ $("body").on('click', '#delete', function () {
 
             const item = GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item;
 
-            GLOBALS.SCENE_CHILDREN.remove(item.water);
-            GLOBALS.SCENE_CHILDREN.remove(item.lava);
-            GLOBALS.SCENE.remove(item);
+            GLOBALS.ITEMS_ADDED.remove(item.water);
+            GLOBALS.ITEMS_ADDED.remove(item.lava);
+            GLOBALS.ITEMS_ADDED.remove(item);
 
             for (var j = 0; j < item.ids.length; j++)
                 GLOBALS.PLANE_USER_DATA[item.ids[j]].hasGoo = false;

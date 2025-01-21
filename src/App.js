@@ -1500,7 +1500,7 @@ function App() {
 
         <div id="blocker">
 
-          <span id="version">version: 0.2.8</span>
+          <span id="version">version: 0.2.9</span>
 
           <div id="social" style={{
             width: "auto",

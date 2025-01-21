@@ -36,10 +36,13 @@ function manageConnection(instanceId, from) {
             return;
     }
 
-    //console.log(GLOBALS.SELECTED_FOR_CONNECTION.item.userData.connectedTo)
+    console.log(GLOBALS.SELECTED_FOR_CONNECTION)
 
-    if(!GLOBALS.SELECTED_FOR_CONNECTION.item.userData.connectedTo)
-        return;
+    if (!GLOBALS.FAITH_PLATE_TARGET){
+        if(!GLOBALS.SELECTED_FOR_CONNECTION.item.userData.connectedTo)
+            return;
+    }
+    
     
 
     if (GLOBALS.FAITH_PLATE_TARGET) {

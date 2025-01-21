@@ -222,7 +222,7 @@ class Water extends Mesh {
 				return;
 			}
 
-			return;
+			//return;
 
 			if (!GLOBALS.GOO_REFLECTIONS) {
 				if(first){
