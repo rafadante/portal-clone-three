@@ -25,6 +25,12 @@ function colliderItemManager() {
             GLOBALS.GOO_PLANES[i].item.visible = false;
     }
 
+    for(var i=0; i<window.glass.length;i++){
+        if(window.glass[i].cloneTexture){
+            window.glass[i].material.alphaMap = window.glass[i].cloneTexture;
+        }
+    }
+
     //CORRIDOR ENTER COLLIDERS
     corridorColliderNames(GLOBALS.CORRIDOR_ENTER, false);
 

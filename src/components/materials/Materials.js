@@ -346,9 +346,10 @@ function updateMaterialRepeat(mesh, newMaterial, distance) {
 
     if (mesh.material.alphaMap) {
         var cloneTexture = mesh.material.alphaMap.clone();
-        mesh.material.alphaMap = cloneTexture;
+        mesh.material.alphaMap = null;
         cloneTexture.repeat.set(x, distance);
         cloneTexture.needsUpdate = true;
+        mesh.cloneTexture = cloneTexture;
     }
 
     if (mesh.material.roughnessMap) {

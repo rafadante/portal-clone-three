@@ -18,6 +18,12 @@ $("body").on('click', '#back-editor', function () {
 
 function backToEditor() {
 
+    for(var i=0; i<window.glass.length;i++){
+        if(window.glass[i].cloneTexture){
+            window.glass[i].material.alphaMap = null;
+        }
+    }
+
     GLOBALS.STATS.dom.style.display = "none";
     GLOBALS.MATERIAL_FIZZLER.depthWrite = true;
 
