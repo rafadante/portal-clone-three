@@ -163,7 +163,8 @@ function raycastSelected(found, event, type) {
                         $("#ligh-color-input").val(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.lightColor)
                     }
 
-                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light")) {
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light") &&
+                !GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("light_bridge")) {
                         $(".light").css("display", "block");
                         $("#light-position").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
                     }
