@@ -88,7 +88,23 @@ function manageInstances() {
         createInstances(result[0], GLOBALS.MATERIAL_WALL_PORTAL, 0);
         createInstances(result[1], GLOBALS.MATERIAL_WALL_PORTAL2, 1);
         //
-        percentages = [70, 30];
+        percentages = [60, 30, 10];
+        arr = shuffle(meshesWallNonPortal);
+        result = groupByPercentage(arr, percentages);
+        createInstances(result[0], GLOBALS.MATERIAL_WALL_NON_PORTAL, 2);
+        createInstances(result[1], GLOBALS.MATERIAL_WALL_NON_PORTAL2, 3);
+        createInstances(result[2], GLOBALS.MATERIAL_WALL_NON_PORTAL3, 4);
+        //
+        createInstances(meshesFloorPortal, GLOBALS.MATERIAL_FLOOR_PORTAL, 5);
+        createInstances(meshesFloorNonPortal, GLOBALS.MATERIAL_FLOOR_NON_PORTAL, 6);
+    }else if(window.oldAperture == "1979"){
+        let percentages = [100, 0];
+        var arr = shuffle(meshesWallPortal);
+        let result = groupByPercentage(arr, percentages);
+        createInstances(result[0], GLOBALS.MATERIAL_WALL_PORTAL, 0);
+        createInstances(result[1], GLOBALS.MATERIAL_WALL_PORTAL2, 1);
+        //
+        percentages = [80,20];
         arr = shuffle(meshesWallNonPortal);
         result = groupByPercentage(arr, percentages);
         createInstances(result[0], GLOBALS.MATERIAL_WALL_NON_PORTAL, 2);

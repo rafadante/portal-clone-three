@@ -393,6 +393,7 @@ function App() {
                     <select name="chamber_style" id="chamber_style-select">
                       <option value="standard">Standard aperture</option>
                       <option value="old">Old Aperture</option>
+                      <option value="1979">1970s</option>
                     </select>
                   </div>
                 </div>

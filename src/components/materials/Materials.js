@@ -144,6 +144,23 @@ function loadMaterials() {
         null
     );
 
+    GLOBALS.MATERIAL_WALL_NON_PORTAL3 = GLOBALS.MATERIAL_WALL_PORTAL.clone();
+    loadMaterial(
+        GLOBALS.MATERIAL_WALL_NON_PORTAL3,
+        'metal/wall2.jpg',
+        'metal/wall2_normal.jpg',
+        null,
+        null,
+        null,
+        null,
+        1,
+        0,
+        0.2,
+        0,
+        null,
+        null
+    );
+
     //GRID
     GLOBALS.MATERIAL_GRID = new MeshStandardMaterial({
         side: 2
@@ -375,6 +392,10 @@ function loadOldAperture() {
     texture.colorSpace = SRGBColorSpace;
     GLOBALS.MATERIAL_WALL_NON_PORTAL2.apertureOld = texture;
 
+    var texture = new TextureLoader().load("./assets/textures/metal0/wall3.png");
+    texture.colorSpace = SRGBColorSpace;
+    GLOBALS.MATERIAL_WALL_NON_PORTAL3.apertureOld = texture;
+
     //
     var texture = new TextureLoader().load("./assets/textures/portal0/floor.png");
     texture.colorSpace = SRGBColorSpace;
@@ -387,6 +408,31 @@ function loadOldAperture() {
     var texture = new TextureLoader().load("./assets/textures/portal0/wall2.png");
     texture.colorSpace = SRGBColorSpace;
     GLOBALS.MATERIAL_WALL_PORTAL2.apertureOld = texture;
+
+    //
+    var texture = new TextureLoader().load("./assets/textures/portal1/floor.jpg");
+    texture.colorSpace = SRGBColorSpace;
+    GLOBALS.MATERIAL_FLOOR_PORTAL.aperture1979 = texture;
+
+    var texture = new TextureLoader().load("./assets/textures/portal1/wall1.jpg");
+    texture.colorSpace = SRGBColorSpace;
+    GLOBALS.MATERIAL_WALL_PORTAL.aperture1979 = texture;
+
+    var texture = new TextureLoader().load("./assets/textures/portal1/wall2.jpg");
+    texture.colorSpace = SRGBColorSpace;
+    GLOBALS.MATERIAL_WALL_PORTAL2.aperture1979 = texture;
+
+    var texture = new TextureLoader().load("./assets/textures/metal1/floor.jpg");
+    texture.colorSpace = SRGBColorSpace;
+    GLOBALS.MATERIAL_FLOOR_NON_PORTAL.aperture1979 = texture;
+
+    var texture = new TextureLoader().load("./assets/textures/metal1/wall1.jpg");
+    texture.colorSpace = SRGBColorSpace;
+    GLOBALS.MATERIAL_WALL_NON_PORTAL.aperture1979 = texture;
+
+    var texture = new TextureLoader().load("./assets/textures/metal1/wall2.jpg");
+    texture.colorSpace = SRGBColorSpace;
+    GLOBALS.MATERIAL_WALL_NON_PORTAL2.aperture1979 = texture;
 }
 
 $('#chamber_style-select').on('change', function () {
@@ -409,15 +455,26 @@ function apertureStyle(style) {
         GLOBALS.MATERIAL_FLOOR_NON_PORTAL.map =  GLOBALS.MATERIAL_FLOOR_NON_PORTAL.apertureOld;
         GLOBALS.MATERIAL_WALL_NON_PORTAL.map = GLOBALS.MATERIAL_WALL_NON_PORTAL.apertureOld;
         GLOBALS.MATERIAL_WALL_NON_PORTAL2.map = GLOBALS.MATERIAL_WALL_NON_PORTAL2.apertureOld;
+        GLOBALS.MATERIAL_WALL_NON_PORTAL3.map = GLOBALS.MATERIAL_WALL_NON_PORTAL3.apertureOld;
 
         GLOBALS.MATERIAL_FLOOR_PORTAL.map = GLOBALS.MATERIAL_FLOOR_PORTAL.apertureOld;
         GLOBALS.MATERIAL_WALL_PORTAL.map = GLOBALS.MATERIAL_WALL_PORTAL.apertureOld;
         GLOBALS.MATERIAL_WALL_PORTAL2.map = GLOBALS.MATERIAL_WALL_PORTAL2.apertureOld;
-    } else {
+    } else if (style == "1979") {
+
+        GLOBALS.MATERIAL_FLOOR_NON_PORTAL.map =  GLOBALS.MATERIAL_FLOOR_NON_PORTAL.aperture1979;
+        GLOBALS.MATERIAL_WALL_NON_PORTAL.map = GLOBALS.MATERIAL_WALL_NON_PORTAL.aperture1979;
+        GLOBALS.MATERIAL_WALL_NON_PORTAL2.map = GLOBALS.MATERIAL_WALL_NON_PORTAL2.aperture1979;
+
+        GLOBALS.MATERIAL_FLOOR_PORTAL.map = GLOBALS.MATERIAL_FLOOR_PORTAL.aperture1979;
+        GLOBALS.MATERIAL_WALL_PORTAL.map = GLOBALS.MATERIAL_WALL_PORTAL.aperture1979;
+        GLOBALS.MATERIAL_WALL_PORTAL2.map = GLOBALS.MATERIAL_WALL_PORTAL2.aperture1979;
+    }else {
 
         GLOBALS.MATERIAL_FLOOR_NON_PORTAL.map =  GLOBALS.MATERIAL_FLOOR_NON_PORTAL.apertureNew;
         GLOBALS.MATERIAL_WALL_NON_PORTAL.map = GLOBALS.MATERIAL_WALL_NON_PORTAL.apertureNew;
         GLOBALS.MATERIAL_WALL_NON_PORTAL2.map = GLOBALS.MATERIAL_WALL_NON_PORTAL2.apertureNew;
+        GLOBALS.MATERIAL_WALL_NON_PORTAL3.map = GLOBALS.MATERIAL_WALL_NON_PORTAL3.apertureNew;
 
         GLOBALS.MATERIAL_FLOOR_PORTAL.map = GLOBALS.MATERIAL_FLOOR_PORTAL.apertureNew;
         GLOBALS.MATERIAL_WALL_PORTAL.map = GLOBALS.MATERIAL_WALL_PORTAL.apertureNew;
