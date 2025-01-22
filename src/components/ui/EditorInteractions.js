@@ -769,7 +769,7 @@ $("body").on('click', '#options-custom span', async function () {
     } else if ($(this).data("value") == "played") {
         for (var i = 0; i < chambers.length; i++) {
 
-            if (!chambersPlayed.includes(chambers[i].id) || !chambers[i].tested)
+            if (!chambersPlayed.includes(chambers[i].id) )//|| !chambers[i].tested
                 continue;
 
             manageChmaberCustom(i)
