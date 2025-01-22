@@ -8,6 +8,8 @@ var playing = true;
 
 function stateDoor(timeToTrigger, open, enter, door, editor) {
 
+  door.open = open;
+
   if (enter || editor) {
     door.getObjectByName("portal_door_right_04").position.z = 10;
     door.getObjectByName("portal_door_left_06").position.z = 10;
@@ -16,10 +18,10 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
     door.getObjectByName("portal_door_left_06").position.z = -10;
   }
 
-  if (door.timeOutDoor1) {
+  /*if (door.timeOutDoor1) {
     clearTimeout(door.timeOutDoor1);
     clearTimeout(door.timeOutDoor2);
-  }
+  }*/
 
   door.timeOutDoor1 = setTimeout(() => {
 
@@ -52,7 +54,7 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
 
     door.timeOutDoor2 = setTimeout(() => {
 
-      if (GLOBALS.LEVEL_ENTERED && door == GLOBALS.ENTER_DOOR) {
+      if (GLOBALS.LEVEL_ENTERED && door == GLOBALS.ENTER_DOOR && !GLOBALS.EXIT_DOOR.open) {
         GLOBALS.CORRIDOR_ENTER.visible = false;
       }
 
