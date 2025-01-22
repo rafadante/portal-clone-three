@@ -897,10 +897,14 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
         || GLOBALS.ITEM_HOLDED_NAME == "portal_1" || GLOBALS.ITEM_HOLDED_NAME == "incinerator"
         || GLOBALS.ITEM_HOLDED_NAME == "step") {
 
-        if (GLOBALS.ITEM_HOLDED_NAME == "light" && userDataLoadedItem.triggers) {
-            item.userData.triggers = userDataLoadedItem.triggers;
+        if (GLOBALS.ITEM_HOLDED_NAME == "light") {
             item.positionLight = item.position.clone();
             item.rotationLight = item.rotation.clone();
+        }
+
+        if (GLOBALS.ITEM_HOLDED_NAME == "light" && userDataLoadedItem.triggers) {
+            item.userData.triggers = userDataLoadedItem.triggers;
+
             ContinuousTrigger(item, item.userData.triggers, $("#light-position"), "light");
         } else {
             item.userData.rotationY = userDataLoadedItem.rotationY;
