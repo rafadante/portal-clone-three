@@ -163,7 +163,8 @@ function loadMaterials() {
 
     //GRID
     GLOBALS.MATERIAL_GRID = new MeshStandardMaterial({
-        side: 2
+        side: 2, 
+        depthWrite: true
     });
 
     loadMaterial(
@@ -187,7 +188,7 @@ function loadMaterials() {
         transparent: true,
         opacity: 0.5,
         side: 2,
-        depthWrite: false
+        depthWrite: true
     });
     loadMaterial(
         GLOBALS.MATERIAL_GLASS,
@@ -204,6 +205,9 @@ function loadMaterials() {
         null,
         null
     );
+
+    console.log(GLOBALS.MATERIAL_GLASS)
+    console.log(GLOBALS.MATERIAL_GRID)
 }
 
 function loadMaterial(material, base, normal, ao, rough, metal, alpha, roughValue, metalValue, envIntensity, alphaTest, repeatX, repeatY) {
