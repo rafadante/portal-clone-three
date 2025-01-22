@@ -57,8 +57,8 @@ function testLightsManager() {
                 emissiveIntensity: 2
             });
             const plane = new Mesh(geometry, material);
-            plane.position.copy(GLOBALS.DYMANIC_ITEMS['light'][i].position);
-            plane.rotation.copy(GLOBALS.DYMANIC_ITEMS['light'][i].rotation);
+            plane.position.copy(GLOBALS.DYMANIC_ITEMS['light'][i].positionLight);
+            plane.rotation.copy(GLOBALS.DYMANIC_ITEMS['light'][i].rotationLight);
             plane.rotateX(-Math.PI / 2)
 
             if (GLOBALS.DYMANIC_ITEMS['light'][i].userData.triggers)

@@ -1108,12 +1108,12 @@ function App() {
           </li>
 
           {/**/}
-          <li id="ligh-color" className="menu-item hasItem light-color">
+          {/**<li id="ligh-color" className="menu-item hasItem light-color">
             <a href="#" className="menu-btn">
               <input type="color" id="ligh-color-input" />
               <span className="menu-text">Light Color</span>
             </a>
-          </li>
+          </li> */}
 
           {/**/}
           <li id="laser-field-state" className="menu-item hasItem laser-field">

@@ -796,6 +796,8 @@ function manageItemVariables(item, userData, instanced) {
         ContinuousTrigger(item, item.userData.triggers, $("#laser-field-trigger"), "fizzler");
     } else if (GLOBALS.ITEM_HOLDED_NAME == "light") {
         item.userData.triggers = GLOBALS.LIGHT_TRIGGER;
+        item.positionLight = item.position.clone();
+        item.rotationLight = item.rotation.clone();
         ContinuousTrigger(item, item.userData.triggers, $("#light-position"), "light");
     } else if (GLOBALS.ITEM_HOLDED_NAME == "light_bridge") {
         item.userData.state = true;
@@ -897,26 +899,28 @@ function manageItemVariablesLoaded(item, userDataLoadedItem, instanced, userData
 
         if (GLOBALS.ITEM_HOLDED_NAME == "light" && userDataLoadedItem.triggers) {
             item.userData.triggers = userDataLoadedItem.triggers;
+            item.positionLight = item.position.clone();
+            item.rotationLight = item.rotation.clone();
             ContinuousTrigger(item, item.userData.triggers, $("#light-position"), "light");
-        }else{
+        } else {
             item.userData.rotationY = userDataLoadedItem.rotationY;
             var instanced2 = GLOBALS.ITEMS_ADDED.getObjectByName(GLOBALS.ITEM_HOLDED_NAME);
-    
+
             var dummy = new Object3D();
             dummy.position.copy(item.position);
             dummy.rotation.copy(item.rotation);
-    
+
             dummy.rotation.y = item.userData.rotationY;
-    
+
             dummy.updateMatrix();
             instanced2.setMatrixAt(item.userData.id, dummy.matrix)
-    
+
             instanced2.instanceMatrix.needsUpdate = true;
             instanced2.computeBoundingSphere();
-    
+
             item.rotation.copy(dummy.rotation);
         }
-        
+
     } else if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
         GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube" ||
         GLOBALS.ITEM_HOLDED_NAME == "scale_cube") {

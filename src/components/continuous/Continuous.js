@@ -502,13 +502,13 @@ function ContinuousTrigger(item, trigger, elem, name) {
         if (name == "glass") {
             return;
         }
-    }else{
-        item.position.copy(new Vector3(
+    } else {
+        item.positionLight.copy(new Vector3(
             dummy.position.x,
             dummy.position.y,
             dummy.position.z
         ));
-        item.rotation.set(
+        item.rotationLight.set(
             dummy.rotation.x,
             dummy.rotation.y,
             dummy.rotation.z
