@@ -1502,12 +1502,12 @@ function App() {
                   <span className="menu-text">Orange</span>
                 </button>
               </li>
-              {/*<li data-gel="purple" data-color="rgb(75,0,130)" className="menu-item gel-type">
+              <li data-gel="purple" data-color="rgb(75,0,130)" className="menu-item gel-type">
             <button type="purple" className="menu-btn">
               <i className="fa fa-pallete"></i>
               <span className="menu-text">Purple</span>
             </button>
-          </li>*/}
+          </li>
             </ul>
           </li>
 
@@ -1563,7 +1563,7 @@ function App() {
 
         <div id="blocker">
 
-          <span id="version">version: 0.2.10</span>
+          <span id="version">version: 0.2.11</span>
 
           <div id="social" style={{
             width: "auto",

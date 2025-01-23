@@ -3,12 +3,12 @@ import * as CANNON from 'cannon';
 import { GLOBALS } from '../../Globals.js';
 import { AUDIO, fadeAudio, play, addPositionalAudio } from '../audio/Audio.js';
 import { faithPlate } from '../faithPlate/FaithPlate.js';
-import { gelTrigger } from '../gels/Gels.js';
+import { applyCustomGravity, gelTrigger } from '../gels/Gels.js';
 import { tweenCamera } from '../../Utils.js';
 import { platformPostStep } from '../platforms/Platform.js';
 
 var slipperyMaterial = new CANNON.Material();
-slipperyMaterial.friction = 0;
+slipperyMaterial.friction = 0.0;
 
 // define shape
 let physicsShape = new CANNON.Box(new CANNON.Vec3(0.5 / 2, 2 / 3.2, 0.5 / 2));
@@ -131,6 +131,7 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
 GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
 
     platformPostStep();
+    applyCustomGravity()
 
     GLOBALS.PLAYER.inJump = true;
 
@@ -191,7 +192,7 @@ function playerExitPurpleGel() {
     GLOBALS.SPEED = 1;
     if (index > -1) {
 
-        AUDIO.WALK_PAINT.pause();
+        //AUDIO.WALK_PAINT.pause();
         AUDIO.WALK = AUDIO.WALK_NORMAL;
 
         GLOBALS.PLAYER.EULER = null;
@@ -201,8 +202,8 @@ function playerExitPurpleGel() {
         GLOBALS.PLAYER.upVectorThree = new Vector3(0, 1, 0);
         window.nnn = false;
 
-        GLOBALS.POINTER_CONTROLS.maxPolarAngle = Math.PI;
-        GLOBALS.POINTER_CONTROLS._euler = new Euler(0, 0, 0, 'YXZ');
+        //GLOBALS.POINTER_CONTROLS.maxPolarAngle = Math.PI;
+        //GLOBALS.POINTER_CONTROLS._euler = new Euler(0, 0, 0, 'YXZ');
 
         // Velocity
         GLOBALS.PLAYER.velocity.setZero();

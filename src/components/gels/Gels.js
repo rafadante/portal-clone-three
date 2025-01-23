@@ -330,6 +330,9 @@ function gelTrigger(event) {
                     GLOBALS.MAIN_CAMERA.position.set(0, 0, 0);
                     GLOBALS.PIVOT = GLOBALS.MAIN_CAMERA_GROUP;
                     GLOBALS.CUSTOM_GRAVITY.push(event.target);
+
+                    //GLOBALS.GUN_GROUP.position.copy(GLOBALS.MAIN_CAMERA.position);
+                    //GLOBALS.PORTAL_GUN_CAMERA.position.set(0, 0, 0);
                 }
 
                 window.direction = 1;
@@ -357,7 +360,7 @@ function gelTrigger(event) {
 
                 window.nnn = true;
                 GLOBALS.SPEED = 0.75;
-                AUDIO.WALK_NORMAL.pause();
+                AUDIO.WALK.pause();
                 AUDIO.WALK = AUDIO.WALK_PAINT;
             }
         } else {

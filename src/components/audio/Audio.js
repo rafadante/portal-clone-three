@@ -162,10 +162,12 @@ var AUDIO = {
     PLAYER_INSIDE_TRACTOR_BEAM: document.getElementById("AUDIO-PLAYER_INSIDE_TRACTOR_BEAM"),
     DEATH: document.getElementById("AUDIO-DEATH"),
     WALK: document.getElementById("AUDIO-WALK"),
+    WALK_NORMAL: document.getElementById("AUDIO-WALK"),
     JUMP: document.getElementById("AUDIO-JUMP"),
     AERIAL: document.getElementById("AUDIO-AERIAL"),
     POSITIVE: document.getElementById("AUDIO-POSITIVE"),
     PROPULSION: document.getElementById("AUDIO-PROPULSION"),
+    WALK_PAINT: document.getElementById("WALK_PAINT")
 }
 
 AUDIO.AMBIENT.value = 1;

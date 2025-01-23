@@ -71,7 +71,7 @@ var updateLasers = true;
 
 function updatePhysics(deltatime) {
 
-    applyCustomGravity();
+    //applyCustomGravity();
     updateGelBlob();
 
     if (GLOBALS.HOLDING_ITEM) {
