@@ -6,6 +6,7 @@ import { faithPlate } from '../faithPlate/FaithPlate.js';
 import { applyCustomGravity, gelTrigger } from '../gels/Gels.js';
 import { tweenCamera } from '../../Utils.js';
 import { platformPostStep } from '../platforms/Platform.js';
+import { pelletUpdate } from '../pellet/Pellet.js';
 
 var slipperyMaterial = new CANNON.Material();
 slipperyMaterial.friction = 0.0;
@@ -131,7 +132,8 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
 GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
 
     platformPostStep();
-    applyCustomGravity()
+    applyCustomGravity();
+    pelletUpdate()
 
     GLOBALS.PLAYER.inJump = true;
 

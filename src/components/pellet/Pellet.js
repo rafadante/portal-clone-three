@@ -48,11 +48,11 @@ function addPelletBall(item) {
     energyBallClone.visible = false;
 
     //BODY
-    var shape = new CANNON.Sphere(0.1);
+    var shape = new CANNON.Sphere(0.2);
     var ball = new CANNON.Body({
         shape: shape,
         mass: 1,
-        material: new CANNON.Material()
+        material: GLOBALS.PHYSICS_MATERIAL
     });
     GLOBALS.CANNON_BODIES.push(ball);
     ball.position.copy(energyBall.position);
@@ -66,7 +66,7 @@ function addPelletBall(item) {
 
     var direction = new Vector3(0, 1, 0).applyQuaternion(ball.quaternion);
     ball.direction = direction;
-    ball.originaldirection = direction;
+    ball.originaldirection = direction.clone();
     ball.clone = energyBallClone;
     ball.name = "pellet";
     ball.pellet = energyBall;
@@ -128,6 +128,8 @@ function addPelletBall(item) {
         const threeNormal = new Vector3(normal.x, normal.y, normal.z).negate();
 
         const holder = event.target.direction;
+
+        console.log(threeNormal)
 
         if (threeNormal.equals(event.target.previousDirection.round()))
             event.target.direction = threeNormal.negate();
@@ -205,7 +207,7 @@ function pelletUpdate(deltatime) {
             }
 
             if (window.pellets[i].active) {
-                window.pellets[i].position.add(window.pellets[i].body.direction.clone().multiplyScalar(3 * deltatime)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side
+                window.pellets[i].position.add(window.pellets[i].body.direction.clone().multiplyScalar(0.05)); //* GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[j].side
                 window.pellets[i].body.position.copy(window.pellets[i].position);
                 window.pellets[i].body.previousPosition.copy(window.pellets[i].position)
                 window.pellets[i].body.angularVelocity.setZero();
@@ -244,13 +246,17 @@ function resetBall(ball, translate) {
         //ball.body.quaternion.copy(ball.quaternion);
 
         //ball.body.started = false;
+        //ball.body.direction = ball.body.originaldirection;
         ball.body.direction = ball.body.originaldirection;
+    ball.body.previousDirection = ball.body.originaldirection;
 
         setTimeout(() => {
             ball.visible = true;
             ball.active = true;
         }, 1000);
     }
+
+    
 
     if (!ball.infinity) {
         ball.timeout = setTimeout(() => {

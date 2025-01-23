@@ -31,7 +31,7 @@ function updateEvents(deltaTime) {
   }*/
 
   tractorBeam(deltaTime);
-  pelletUpdate(deltaTime);
+  //pelletUpdate(deltaTime);
 
   var id = 0;
 
