@@ -191,8 +191,11 @@ function teleportationState() {
 
         if (dd == 0 || !GLOBALS.HOLDING_ITEM)
             d.collisionFilterMask = GLOBALS.CGROUP_ALL;
-        else if (GLOBALS.HOLDING_ITEM)
+        else if (!d.holding)
+            d.collisionFilterMask = GLOBALS.CGROUP_ALL;
+        else if (GLOBALS.HOLDING_ITEM) {
             d.collisionFilterMask = GLOBALS.CGROUP_ENVIRONMENT | GLOBALS.CGROUP_DYNAMIC;
+        }
 
         d.inArea = false;
 

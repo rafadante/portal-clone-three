@@ -29,7 +29,7 @@ else
     world.solver = solver;
 
 world.gravity.set(0, -9.8, 0);
-world.allowSleep = true;
+world.allowSleep = false;
 world.broadphase = new CANNON.NaiveBroadphase();
 
 //PHYSICS INTERACTIONS
