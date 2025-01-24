@@ -323,3 +323,7 @@ if (localStorage.getItem("option-player") == "true") {
     $("#option-player").prop('checked', true);
     window.playerState = true;
 }
+
+$("body").on('click', '#options-main span', function () {
+    $("#alert").css("opacity", 0);
+});

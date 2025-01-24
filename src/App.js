@@ -271,7 +271,9 @@ function App() {
         <SpeedInsights />
 
         <div id='alert'>
-          <span>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</span>
+          <span>Project Portal THREEJS is a fan-made clone of the portal games made by VALVE in the web browser, I do not
+            own the original design work and it is only intended for education under "Fair Use"
+            defined in Section 107 of the Copyright Act (1976).</span>
         </div>
 
         <div style={{
@@ -747,10 +749,7 @@ function App() {
         </div>
 
         <div id="loading-parent">
-          <div id="gallery-img">
-            <img alt="image" className="img image" id="back-loading1" src="../assets/loading/3.webp" />
-            <img alt="image" className="img image" id="back-loading2" src="../assets/loading/3.webp" />
-            <img alt="image" className="img image" id="back-loading3" src="../assets/loading/3.webp" />
+          <div id="gallery-img" style={{backgroundImage: 'url(../assets/loading/4.webp)'}}>
           </div>
 
           <div id="back-effect"></div>
@@ -1563,7 +1562,7 @@ function App() {
 
         <div id="blocker">
 
-          <span id="version">version: 0.2.11</span>
+          <span id="version">version: 0.2.12</span>
 
           <div id="social" style={{
             width: "auto",

@@ -199,7 +199,7 @@ $("body").on('click', '#delete', function () {
             }
 
             if (GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].instancedName == "faith_plate") {
-                GLOBALS.SCENE.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target);
+                GLOBALS.ITEMS_ADDED.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target);
                 GLOBALS.GROUP_LINE_TRAGECTORY.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.target.line);
             }
 

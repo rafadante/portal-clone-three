@@ -114,6 +114,10 @@ GLOBALS.PLAYER.addEventListener("collide", function (event) {
         GLOBALS.PLAYER_MOVING = true;
         GLOBALS.PLAYER.linearDamping = 0.01
         faithPlate(event.body, event.target)
+
+        setTimeout(() => {
+            GLOBALS.BLOCK_PLAYER_MOVE = false;
+        }, 1000);
     }
 
     if (event.contact.bj.name == "light_bridge") {

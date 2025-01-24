@@ -132,7 +132,7 @@ void main()
 }
 `;
 
-var background = new TextureLoader().load('./assets/loading/3.webp');
+var background = new TextureLoader().load('./assets/loading/4.webp');
 GLOBALS.TEXTURE_MENU_GRID = new TextureLoader().load('./assets/ui/grid.webp');
 
 GLOBALS.MATERIAL_MAIN_MENU = new ShaderMaterial({

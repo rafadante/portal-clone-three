@@ -71,6 +71,7 @@ function findPath(ini, target, found, found2, line2) {
         obj.rotation.copy(nodes[j].rotation);
         obj.node = nodes[j]
         obj.name = nodes[j].name;
+        obj.side = nodes[j].side;
         scene.add(obj)
         shapes.push(obj);
     }
@@ -81,10 +82,26 @@ function findPath(ini, target, found, found2, line2) {
         for (var j = 1; j < shapes.length; j++) {
             var d = dist(shapes[i].position, shapes[j].position);
             if (shapes[i].id != shapes[j].id && d <= 2) {
-                dmap[shapes[i].id][shapes[j].id] = d;
+
+                if (shapes[i].side == "front" && shapes[j].side == "back" && d == 2) {
+                    continue
+                } else if (shapes[j].side == "front" && shapes[i].side == "back" && d == 2) {
+                    continue
+                } if (shapes[i].side == "right" && shapes[j].side == "left" && d == 2) {
+                    continue
+                } else if (shapes[j].side == "right" && shapes[i].side == "left" && d == 2) {
+                    continue
+                } if (shapes[i].side == "up" && shapes[j].side == "down" && d == 2) {
+                    continue
+                } else if (shapes[j].side == "up" && shapes[i].side == "down" && d == 2) {
+                    continue
+                } else {
+                    dmap[shapes[i].id][shapes[j].id] = d;
+                }
             }
         }
     }
+
 
     dgraph = new Graph(dmap);
 
