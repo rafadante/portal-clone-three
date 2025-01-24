@@ -18,10 +18,10 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
     door.getObjectByName("portal_door_left_06").position.z = -10;
   }
 
-  /*if (door.timeOutDoor1) {
+  if (door.timeOutDoor1) {
     clearTimeout(door.timeOutDoor1);
     clearTimeout(door.timeOutDoor2);
-  }*/
+  }
 
   door.timeOutDoor1 = setTimeout(() => {
 
