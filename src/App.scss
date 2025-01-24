@@ -420,7 +420,7 @@ form {
 #list-custm-chambers,
 #list-main-chambers {
   display: grid;
-  grid-template-columns: auto auto auto auto;
+  grid-template-columns: auto auto auto;
   margin-top: 70px;
   overflow: hidden;
 
@@ -445,7 +445,7 @@ form {
 
   .custom-chamber {
     width: 90%;
-    height: 15vw;
+    height: 20vw;
     margin: 3px;
     position: relative;
     background-position: center;
