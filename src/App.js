@@ -1871,7 +1871,6 @@ function App() {
                 <span className="option settings-video" id="settings-video">GRAPHICS</span>
                 <span className="option settings-audio" id="settings-audio">AUDIO</span>
                 <span className="option" id="settings-language">LANGUAGE</span>
-                <span className="option" id="reset-check-point">RESET TO CHECKPOINT</span>
                 <span className="option" id="back-editor">BACK TO EDITOR</span>
               </div>
 
