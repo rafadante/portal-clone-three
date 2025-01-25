@@ -157,6 +157,14 @@ function portalButton(button, auto, camera, firstToRender) {
                     }
                 }
 
+                if (!auto && GLOBALS.PLAYER.isPlayerInsideFizzler) {
+                    AUDIO.PORTAL_INVALID.pause();
+                    AUDIO.PORTAL_INVALID.currentTime = 0;
+                    play(AUDIO.PORTAL_INVALID)
+                    return;
+                }
+
+
                 var point = new Vector3(x, y, z);
                 // https://stackoverflow.com/questions/39082673/get-face-global-normal-in-three-js
                 // define playerUpDirection

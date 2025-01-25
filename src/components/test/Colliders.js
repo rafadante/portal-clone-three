@@ -189,6 +189,11 @@ function fizzlerTrigger(body) {
 
         if (e.body === GLOBALS.PLAYER) {
 
+            GLOBALS.PLAYER.isPlayerInsideFizzler = true;
+            GLOBALS.PLAYER.fizzlerContact = GLOBALS.PLAYER.position.clone();
+
+            //console.log('Player enter trigger');
+
             for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
                 if (GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("trigger")) {
                     GLOBALS.CONNECTIONS[i]['line'].active = false;

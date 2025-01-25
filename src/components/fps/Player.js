@@ -170,6 +170,15 @@ GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
         }
     }
 
+    if (GLOBALS.PLAYER.isPlayerInsideFizzler) {
+        const distance = GLOBALS.PLAYER.fizzlerContact.distanceTo(GLOBALS.PLAYER.position);
+        const maxDistance = 0.6; // Adjust based on your trigger size
+        if (distance > maxDistance) {
+            GLOBALS.PLAYER.isPlayerInsideFizzler = false; // Player left the trigger
+            //console.log('Player exited trigger');
+        }
+    }
+
     GLOBALS.PLAYER_MOVING = GLOBALS.PLAYER.inJump;
 
     for (let d of GLOBALS.DYNAMIC_OBJECTS) {
@@ -235,10 +244,10 @@ function playerExitPurpleGel() {
 
 function resetPlayerBody() {
     // Position
-    GLOBALS.PLAYER.position.set(0,0,0);
-    GLOBALS.PLAYER.previousPosition.set(0,0,0);
-    GLOBALS.PLAYER.interpolatedPosition.set(0,0,0);
-    GLOBALS.PLAYER.initPosition.set(0,0,0);
+    GLOBALS.PLAYER.position.set(0, 0, 0);
+    GLOBALS.PLAYER.previousPosition.set(0, 0, 0);
+    GLOBALS.PLAYER.interpolatedPosition.set(0, 0, 0);
+    GLOBALS.PLAYER.initPosition.set(0, 0, 0);
 
     // orientation
     GLOBALS.PLAYER.quaternion.set(0, 0, 0, 1);
@@ -247,14 +256,14 @@ function resetPlayerBody() {
     GLOBALS.PLAYER.interpolatedQuaternion.set(0, 0, 0, 1);
 
     // Velocity
-    GLOBALS.PLAYER.velocity.set(0,0,0);
-    GLOBALS.PLAYER.initVelocity.set(0,0,0);
-    GLOBALS.PLAYER.angularVelocity.set(0,0,0);
-    GLOBALS.PLAYER.initAngularVelocity.set(0,0,0);
+    GLOBALS.PLAYER.velocity.set(0, 0, 0);
+    GLOBALS.PLAYER.initVelocity.set(0, 0, 0);
+    GLOBALS.PLAYER.angularVelocity.set(0, 0, 0);
+    GLOBALS.PLAYER.initAngularVelocity.set(0, 0, 0);
 
     // Force
-    GLOBALS.PLAYER.force.set(0,0,0);
-    GLOBALS.PLAYER.torque.set(0,0,0);
+    GLOBALS.PLAYER.force.set(0, 0, 0);
+    GLOBALS.PLAYER.torque.set(0, 0, 0);
 
     GLOBALS.PLAYER.inJump = false;
 }
