@@ -172,7 +172,7 @@ GLOBALS.CANNON_WORLD.addEventListener("postStep", (e) => {
 
     if (GLOBALS.PLAYER.isPlayerInsideFizzler) {
         const distance = GLOBALS.PLAYER.fizzlerContact.distanceTo(GLOBALS.PLAYER.position);
-        const maxDistance = 0.6; // Adjust based on your trigger size
+        const maxDistance = 1; // Adjust based on your trigger size
         if (distance > maxDistance) {
             GLOBALS.PLAYER.isPlayerInsideFizzler = false; // Player left the trigger
             //console.log('Player exited trigger');
