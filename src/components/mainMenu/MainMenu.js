@@ -312,6 +312,8 @@ $("body").on('click', '.custom-chamber1', function () {
 
 $("body").on('click', '.span-chamber', async function () {
 
+    $("#gallery-img").css("background-image", $(this).css("background-image"))
+
     $("#loading-parent").css("opacity", 1);
     $("#loading-parent").css("pointer-events", "all");
 
