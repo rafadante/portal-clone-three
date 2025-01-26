@@ -832,6 +832,8 @@ document.onkeypress = function (e) {
     // use e.keyCode
     //console.log(e.key)
     if (GLOBALS.FPS_MODE && e.key == "p") {
+
+        window.snapshot = true;
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         window.thumbDataURL = GLOBALS.RENDERER.domElement.toDataURL("image/jpeg", 0.25);
 

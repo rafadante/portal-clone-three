@@ -19,6 +19,27 @@ import { onWindowResize } from '../../Main.js';
 
 $("body").on('click', '#view-fps', function () {
     if (window.allowTest) {
+
+        if (!window.snapshot) {
+
+            //var bb = new Box3()
+            //bb.setFromObject(GLOBALS.SCENE);
+           //bb.getCenter(GLOBALS.CONTROLS.target);
+
+            //GLOBALS.CONTROLS.target.set(GLOBALS.CONTROLS.target.x + 8, GLOBALS.CONTROLS.target.y + 2, GLOBALS.CONTROLS.target.z + 6);
+            GLOBALS.MAIN_CAMERA.position.set(-12.2, 17.4, 26.3)
+            GLOBALS.CONTROLS.update();
+
+            GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+            window.thumbDataURL = GLOBALS.RENDERER.domElement.toDataURL("image/jpeg", 0.25);
+
+            /*var link = document.createElement("a");
+            link.download = "name";
+            link.href = window.thumbDataURL;
+            link.click();*/
+        }
+
+
         $("#chamberName").css("opacity", 1);
         $("#chamberName").text($("#chamber-name-to-save").val() + "_by_" + $("#author-name-to-save").val());
 
@@ -252,11 +273,11 @@ function viewFPS(firstRender) {
             GLOBALS.GUN_CLONE2.children[0].visible = true;
             document.getElementById("reticle-img").style.filter = "none";
 
-            if(GLOBALS.PORTAL_GUN_INITIATE == "left"){
+            if (GLOBALS.PORTAL_GUN_INITIATE == "left") {
                 document.getElementById("reticle-img").src = './assets/ui/mobile/portalBlue.png';
-            }else if(GLOBALS.PORTAL_GUN_INITIATE == "right"){
+            } else if (GLOBALS.PORTAL_GUN_INITIATE == "right") {
                 document.getElementById("reticle-img").src = './assets/ui/mobile/portalOrange.png';
-            }else{
+            } else {
                 document.getElementById("reticle-img").src = './assets/textures/crosshairNone.png';
             }
         }
@@ -285,7 +306,7 @@ function viewFPS(firstRender) {
                 //window.checkers.instances[GLOBALS.CONNECTIONS[i]["checker"]].visible = false;
             }
 
-            
+
             findPath(
                 GLOBALS.CONNECTIONS[i]["from"].position,
                 GLOBALS.CONNECTIONS[i]["to"].position,
