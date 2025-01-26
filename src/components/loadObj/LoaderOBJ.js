@@ -473,9 +473,6 @@ function loadAvatar() {
 
     const playerModel = loader.loadAsync('/avatar/medium/chell.glb');
 
-    load3D("/items/window.glb", "window", false);
-    load3D("/items/corridor.glb", "corridor", false);
-
     GLOBALS.PLAYER_ANIMATIONS = {
         //WITH PORTAL GUN
         ANIM_STANDING_IDLE: loader.loadAsync('/avatar/StandingIdle.glb'),
@@ -542,6 +539,9 @@ function loadAvatar() {
         GLOBALS.PLAYER_MODEL.animationActions = {};
         GLOBALS.PLAYER_MODEL_CLONE.animationActions = {};
         GLOBALS.PLAYER_MODEL.modelReady = true;
+
+        load3D("/items/window.glb", "window", false);
+        load3D("/items/corridor.glb", "corridor", false);
     }).then(() => {
         let animationPromises = []
         for (let index in GLOBALS.PLAYER_ANIMATIONS) {
