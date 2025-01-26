@@ -174,7 +174,11 @@ function updateEvents(deltaTime) {
 
               if (active) {
 
-                if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("angled_panel")) {
+                if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_emitter")) {
+                  if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons < GLOBALS.CONNECTIONS[i]['to'].item.userData.connections) {
+                    GLOBALS.CONNECTIONS[i]['to'].item.continuous.visible = !GLOBALS.CONNECTIONS[i]['to'].item.continuous.visible;
+                  }
+                } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("angled_panel")) {
                   tweenCamera(500, GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation,
                     new Vector3(
                       GLOBALS.CONNECTIONS[i]['to'].item.userData.angle * Math.PI / 180,
@@ -329,7 +333,11 @@ function doSetTimeout(to, waitFor, idHolder, connection, body) {
       respawn(body);
     }
 
-    if (to.itemName.includes("angled_panel")) {
+    if (to.itemName.includes("laser_emitter")) {
+      if (to.item.userData.connections == to.item.userData.buttons) {
+        to.item.continuous.visible = !to.item.continuous.visible;
+      }
+    } else if (to.itemName.includes("angled_panel")) {
       if (to.item.userData.connections == to.item.userData.buttons) {
 
         tweenCamera(500, to.item.getObjectByName("pivot2").rotation,
@@ -357,7 +365,7 @@ function doSetTimeout(to, waitFor, idHolder, connection, body) {
       }
     } else if (to.itemName.includes("door") ||
       to.itemName.includes("exitDoor")) {
-        console.log(to)
+      console.log(to)
       if (to.item.userData.connections == to.item.userData.buttons) {
         stateDoor(0, true, false, to.item);
       }
@@ -422,7 +430,11 @@ function resetAll() {
       connectionState(GLOBALS.CONNECTIONS[i], null, false, new Color(0, 2.0, 5.0))
 
       if (active) {
-        if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("angled_panel")) {
+        if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_emitter")) {
+          if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons < GLOBALS.CONNECTIONS[i]['to'].item.userData.connections) {
+            GLOBALS.CONNECTIONS[i]['to'].item.continuous.visible = !GLOBALS.CONNECTIONS[i]['to'].item.continuous.visible;
+          }
+        } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("angled_panel")) {
           tweenCamera(500, GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation,
             new Vector3(
               GLOBALS.CONNECTIONS[i]['to'].item.userData.angle * Math.PI / 180,
@@ -518,7 +530,11 @@ function laserReceiverTrigger(obj, state, catcher) {
           AUDIO.POSITIVE.play();
 
           //Manage Door Trigger
-          if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("angled_panel")) {
+          if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_emitter")) {
+            if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons == GLOBALS.CONNECTIONS[i]['to'].item.userData.connections) {
+              GLOBALS.CONNECTIONS[i]['to'].item.continuous.visible = !GLOBALS.CONNECTIONS[i]['to'].item.continuous.visible;
+            }
+          } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("angled_panel")) {
             if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
               tweenCamera(500, GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation,
                 new Vector3(
@@ -610,7 +626,11 @@ function laserReceiverTrigger(obj, state, catcher) {
     connectionState(holder, "no", false, new Color(0, 2.0, 5.0))
 
     if (active) {
-      if (holder['to'].itemName.includes("angled_panel")) {
+      if (holder['to'].itemName.includes("laser_emitter")) {
+        if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections) {
+          holder['to'].item.continuous.visible = !holder['to'].item.continuous.visible;
+        }
+      }else if (holder['to'].itemName.includes("angled_panel")) {
         tweenCamera(500, holder['to'].item.getObjectByName("pivot2").rotation,
           new Vector3(
             holder['to'].item.userData.angle * Math.PI / 180,

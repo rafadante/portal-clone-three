@@ -325,6 +325,8 @@ function gelTrigger(event) {
                 GLOBALS.PLAYER.upVector = normalCannon;
                 GLOBALS.PLAYER.upVectorThree = normalThree;
 
+                GLOBALS.GUN.visible = false;
+
                 if (!GLOBALS.PLAYER.EULER) {
                     GLOBALS.MAIN_CAMERA_GROUP.position.copy(GLOBALS.MAIN_CAMERA.position);
                     GLOBALS.MAIN_CAMERA.position.set(0, 0, 0);

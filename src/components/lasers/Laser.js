@@ -70,6 +70,10 @@ function laserEmitterRaycast(object, update, rayItem, index) {
     object.continuous = laserParent;
     object.raycaster = raycaster;
     raycaster.laser = laserParent;
+
+    laserParent.visible = object.userData.state;
+
+    //console.log(object)
 }
 
 function addLaserToCube(cube) {
@@ -241,18 +245,18 @@ function updateLaserCubeRaycaster(item, laser) {
 
         laser.clone.visible = true;
 
-        
+
 
         if (GLOBALS.PORTALS[portal2].angled) {
 
             laser.clone.position.copy(GLOBALS.PORTAL_SHADER[portal].position)
-        laser.clone.rotation.copy(GLOBALS.PORTAL_SHADER[portal].rotation)
-        laser.clone.translateY((((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
-        laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 0.9));
+            laser.clone.rotation.copy(GLOBALS.PORTAL_SHADER[portal].rotation)
+            laser.clone.translateY((((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
+            laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 0.9));
 
-        var angle1 = GLOBALS.PORTALS[portal2].mesh.rotation.x + Math.PI;
-        var angle2 = Math.PI - GLOBALS.PORTALS[portal2].mesh.rotation.z;
-        var angle3 = Math.PI + item.rotation.y;
+            var angle1 = GLOBALS.PORTALS[portal2].mesh.rotation.x + Math.PI;
+            var angle2 = Math.PI - GLOBALS.PORTALS[portal2].mesh.rotation.z;
+            var angle3 = Math.PI + item.rotation.y;
 
             laser.clone.rotateX(angle1)
             laser.clone.rotateZ(angle2 + item.rotation.y)
@@ -263,25 +267,25 @@ function updateLaserCubeRaycaster(item, laser) {
 
             if (angle == 0 || Math.abs(angle) == Math.PI) {
                 laser.clone.rotation.copy(GLOBALS.PORTALS[portal].mesh.rotation)
-    
+
                 laser.clone.translateZ(-(((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
                 laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 1.1));
-    
+
                 laser.clone.rotation.copy(laser.rotation)
                 laser.clone.rotateZ(angle - Math.PI)
             } else if (Math.abs(angle).toFixed(2) == (Math.PI / 2).toFixed(2) ||
                 Math.abs(angle).toFixed(2) == (Math.PI + (Math.PI / 2)).toFixed(2)) {
                 laser.clone.rotation.copy(GLOBALS.PORTALS[portal].mesh.rotation)
-    
+
                 laser.clone.translateZ(-(((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
                 laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 1.1));
-    
+
                 laser.clone.rotation.copy(laser.rotation)
                 laser.clone.rotateZ(angle)
             } else {
                 laser.clone.rotation.copy(GLOBALS.PORTALS[portal].mesh.rotation)
                 //laser.clone.rotateZ(angle + (Math.PI * 2))
-    
+
                 laser.clone.translateZ(-(((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
                 laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 0.9));
             }
@@ -357,7 +361,12 @@ function updateLaserEmitterRaycaster() {
 
     for (var i = 0; i < GLOBALS.LASER_EMITTER_RAYCASTER.length; i++) {
 
+        if (!GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.visible)
+            continue
+
         GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.visible = false;
+
+        var intersectsWithPortals = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObjects(GLOBALS.PORTAL_SHADER);
 
         //CHECK FOR WALL INTERSECTION
         var intersectsWall = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
@@ -369,6 +378,9 @@ function updateLaserEmitterRaycaster() {
         var intersectPanel = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObjects(GLOBALS.ANGLED_PANELS);
         if (intersectPanel.length > 0) {
             GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.scale.y = intersectPanel[0].distance;
+
+            if (intersectsWithPortals.length == 0)
+                continue;
         }
 
         var unfiltered = [
@@ -390,6 +402,11 @@ function updateLaserEmitterRaycaster() {
         var blocked = false;
 
         for (var j = 0; j < intersectsLaserCube.length; j++) {
+
+            if(intersectPanel.length > 0)
+                continue
+
+            
             if (intersectsLaserCube[j].object.name == "laser_receiver") {
                 GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsLaserCube[j].instanceId].emitterState = true;
                 GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsLaserCube[j].instanceId].fromLaserCube = false;
@@ -420,7 +437,6 @@ function updateLaserEmitterRaycaster() {
             continue
 
         //CHECK FOR PORTAL INTERSECTION
-        var intersectsWithPortals = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObjects(GLOBALS.PORTAL_SHADER);
         if (intersectsWithPortals.length > 0) {
             var portal, otherPortal;
             if (intersectsWithPortals[0].object.name == "portal-0") {
@@ -464,6 +480,9 @@ function updateLaserEmitterRaycaster() {
             var intersectsInstanceOtherPortalObj = raycasterLaserOtherPortal.intersectObjects(array);
 
             for (var j = 0; j < intersectsInstanceOtherPortalObj.length; j++) {
+
+                if(intersectPanel.length > 0)
+                    continue
 
                 if (intersectsInstanceOtherPortalObj[j].object.name == "laser_receiver") {
                     GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId].fromLaserCube = false;
@@ -583,6 +602,17 @@ function laserEmitterPosition(item, trigger, elem, name) {
             i);
     }
 }
+
+$("body").on('input', '#laser_emitter-state-input', function () {
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.userData.state = this.checked;
+
+    //GLOBALS.LASERS.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.clone);
+    //        GLOBALS.LASERS.remove(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous);
+
+    GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item.continuous.visible = this.checked;
+
+    console.log(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item)
+});
 
 export {
     laserEmitterRaycast,

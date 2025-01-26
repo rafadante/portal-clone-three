@@ -85,7 +85,7 @@ $("body").on('click', '#delete', function () {
             index['from'].item.userData.connectedTo.splice(indexToRemove);
         }
 
-        GLOBALS.LINE.remove(GLOBALS.CONNECTIONS[indexesToDelete[j]]["line"]);
+        GLOBALS.LINES.remove(GLOBALS.CONNECTIONS[indexesToDelete[j]]["line"]);
 
         window.checkers.setVisibilityAt(index["checker"], false);
         window.checkersIndexes[index["checker"]] = false;

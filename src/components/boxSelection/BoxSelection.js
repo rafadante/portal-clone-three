@@ -197,6 +197,7 @@ function raycastSelected(found, event, type) {
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_emitter")) {
                         $(".laser_emitter").css("display", "block");
                         $("#laser_emitter-trigger").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.triggers);
+                        $("#laser_emitter-state-input").prop("checked", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state);
                     }
 
                     if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("laser_receiver")) {

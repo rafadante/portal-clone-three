@@ -15,6 +15,11 @@ function cubeState(button) {
 
     remove = false;
 
+    if(GLOBALS.SELECTED_ID.length > GLOBALS.BUDGET){
+        alert("max budget reached");
+        return;
+    }
+
     if (button == "plus") {
 
         for (var i = 0; i < GLOBALS.SELECTED_ID.length; i++) {
@@ -76,6 +81,8 @@ function cubeState(button) {
 
     if (remove)
         removeSelection();
+
+    document.getElementById("budget").innerHTML = "BUDGET: " + GLOBALS.BUDGET;
 }
 
 function checkSidesWithItems(i, t, side) {
@@ -461,6 +468,8 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
             GLOBALS.PLANE_LEVEL_INSTANCED.setMatrixAt(a, clone.matrix);
             GLOBALS.PLANE_LEVEL_INSTANCED.setVisibilityAt(a, true);
 
+            GLOBALS.BUDGET--;
+
             var portal;
             var planeColor = 0x808080;
 
@@ -546,6 +555,9 @@ function buildLayer(x, y, z, x2, y2, z2, height, width, side, rot, normal) {
             if (itemName == "exitDoor") {
                 addConnectionPoints(GLOBALS.PLANE_USER_DATA[a]);
             }
+
+            
+            document.getElementById("budget").innerHTML = "BUDGET: " + GLOBALS.BUDGET;
 
             a++;
         }

@@ -79,7 +79,11 @@ function interactWithItem() {
                             AUDIO.POSITIVE.play();
 
                             //Manage Door Trigger
-                            if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("angled_panel")) {
+                            if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_emitter")) {
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons == GLOBALS.CONNECTIONS[i]['to'].item.userData.connections) {
+                                    GLOBALS.CONNECTIONS[i]['to'].item.continuous.visible = !GLOBALS.CONNECTIONS[i]['to'].item.continuous.visible;
+                                }
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("angled_panel")) {
                                 if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
                                     tweenCamera(500, GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation,
                                         new Vector3(
@@ -244,7 +248,11 @@ function pedestalTimer(holder) {
     connectionState(holder, "no", false, new Color(0, 2.0, 5.0))
 
     if (active) {
-        if (holder['to'].itemName.includes("angled_panel")) {
+        if (holder['to'].itemName.includes("laser_emitter")) {
+            if (holder['to'].item.userData.buttons < holder['to'].item.userData.connections) {
+                holder['to'].item.continuous.visible = !holder['to'].item.continuous.visible;
+            }
+        } else if (holder['to'].itemName.includes("angled_panel")) {
             tweenCamera(500, holder['to'].item.getObjectByName("pivot2").rotation,
                 new Vector3(
                     holder['to'].item.userData.angle * Math.PI / 180,

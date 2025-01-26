@@ -741,6 +741,8 @@ function App() {
               <input id="author-name-to-save" type="text" placeholder="Name of the Author"></input>
             </div>
           </div>
+
+          <span id="budget">BUDGET: </span>
         </div>
 
         <div id="load-level-panel">
@@ -913,6 +915,12 @@ function App() {
           </li>
 
           {/**/}
+          <li id="laser_emitter-state" className="menu-item hasItem laser_emitter">
+            <a href="#" className="menu-btn">
+              <input type="checkbox" defaultChecked id="laser_emitter-state-input" />
+              <span className="menu-text">State</span>
+            </a>
+          </li>
           <li className="menu-item menu-item-submenu hasItem laser_emitter" id="laser_emitter-trigger"
             data-trigger="Middle Horizontal">
             <button type="button" className="menu-btn">
@@ -1562,7 +1570,7 @@ function App() {
 
         <div id="blocker">
 
-          <span id="version">version: 0.2.12</span>
+          <span id="version">version: 0.2.13</span>
 
           <div id="social" style={{
             width: "auto",

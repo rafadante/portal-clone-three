@@ -18,6 +18,8 @@ $("body").on('click', '#back-editor', function () {
 
 function backToEditor() {
 
+    GLOBALS.ANGLED_PANELS = [];
+    
     for(var i=0; i<window.glass.length;i++){
         if(window.glass[i].cloneTexture){
             window.glass[i].material.alphaMap = null;

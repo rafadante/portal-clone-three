@@ -213,6 +213,8 @@ function playerExitPurpleGel() {
         GLOBALS.PLAYER.EULER = null;
         GLOBALS.CUSTOM_GRAVITY.splice(index, 1);
 
+        GLOBALS.GUN.visible = true;
+
         GLOBALS.PLAYER.upVector = new CANNON.Vec3(0, 1, 0);
         GLOBALS.PLAYER.upVectorThree = new Vector3(0, 1, 0);
         window.nnn = false;
