@@ -8,6 +8,7 @@ import { laserReceiverTrigger } from './components/events/events.js';
 import { applyCustomGravity } from './components/gels/Gels.js';
 import { updateGelBlob } from './components/gels/GelDispenser.js';
 import { updatePlatformPosition } from './components/platforms/Platform.js';
+import { updateTurretRaycast } from './components/turrets/Turrets.js';
 
 // return the cannon world
 // Setup our world
@@ -173,6 +174,7 @@ function updatePhysics(deltatime) {
                     }
                 }
 
+                
                 if (property == "piston_platforms" || property == "track_platforms") {
                     updatePlatformPosition(GLOBALS.DYMANIC_ITEMS[property][i], instanced, i, deltatime);
                 } else {
@@ -197,6 +199,10 @@ function updatePhysics(deltatime) {
 
                         if (property == "laser_cube" && updateLasers)
                             updateLaserCubeRaycaster(item, GLOBALS.DYMANIC_ITEMS[property][i].body.laser);
+
+                        if (property == "turrets"){
+                            updateTurretRaycast(GLOBALS.DYMANIC_ITEMS[property][i].body);
+                        }
                     }
                 }
             }

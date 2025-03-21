@@ -122,6 +122,7 @@ async function load3D(path, name, instanced, interactive, roughness, envIntensit
             if (interactive) {
                 item.scene = scene.children[0];
                 item.clone = scene;
+                console.log(scene)
                 item.clone.children[0].material.envMap = GLOBALS.ENV_MAP;
                 item.clone.children[0].material.envMapIntensity = 0.5;
                 item.clone.children[0].material.roughness = 0.2;
@@ -703,16 +704,16 @@ GLOBALS.LIGHT_PORTAL_0 = new PointLight(new Color(0, 0.3, 1), 0, 2);
 GLOBALS.FLASH = new PointLight(0xff0000, 10);
 
 if (localStorage.getItem("quality-select") == "epic") {
-    //GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
-    //GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
-    //GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
+    GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
 }
 
-/*setTimeout(() => {
+setTimeout(() => {
     GLOBALS.LIGHT_PORTAL_0.visible = false;
     GLOBALS.LIGHT_PORTAL_1.visible = false;
     GLOBALS.FLASH.visible = false;
-}, 3000);*/
+}, 3000);
 
 export {
     loadDefault,

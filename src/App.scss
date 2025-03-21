@@ -420,7 +420,7 @@ form {
 #list-custm-chambers,
 #list-main-chambers {
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: auto auto auto auto;
   margin-top: 70px;
   overflow: hidden;
 
@@ -451,7 +451,6 @@ form {
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-    cursor: pointer;
     transition: all 0.5s;
     border: 5px solid black;
     overflow: hidden;
@@ -459,6 +458,18 @@ form {
     background-size: contain;
     background-position: top;
     background-color: rgba(0, 0, 0, 0.75);
+
+    .open-menu-chamber{
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      font-size: 2vw;
+      cursor: pointer;
+    }
+
+    .open-menu-chamber:hover{
+      color: orange;
+    }
 
     .delete-my-chamber {
       background-color: red;
@@ -483,8 +494,8 @@ form {
       position: absolute;
       bottom: 0px;
       left: 0px;
-      width: auto;
-      height: auto;
+      width: 100%;
+      height: 30%;
       display: flex;
       flex-direction: column;
       pointer-events: none;
@@ -492,22 +503,45 @@ form {
       filter: drop-shadow(2px 4px 6px black);
       z-index: 2;
 
+      span{
+        padding-left: 5px !important;
+        font-size: 1.3vw !important;
+        white-space: nowrap;
+      }
+
       span {
         font-size: 1vw;
         padding-bottom: 5px !important;
         padding-top: 5px !important;
       }
+
+      .like1{
+        display: flex;
+        width: 100%;
+
+        .like2{
+          display: flex;
+          width: auto;
+          margin: 10px;
+
+          i{
+            position: relative;
+            right: auto;
+            top: auto;
+          }
+        }
+      }
     }
 
     .span-chamber {
       position: absolute;
-      bottom: 0px;
+      top: 0px;
       overflow: hidden;
       white-space: nowrap;
       /*animation: marquee 15s linear infinite;*/
       font-size: 1.2vw !important;
       width: 100% !important;
-      height: 100% !important;
+      height: 70% !important;
       padding-top: 0px !important;
       padding-bottom: 0px !important;
       padding-left: 0px !important;
@@ -522,9 +556,6 @@ form {
       transition: all 0.5s !important;
     }
 
-    .span-chamber:hover {
-      transform: scale(0.9);
-    }
 
     .fa-thumbs-up {
       right: 10px;
@@ -2060,4 +2091,99 @@ button:focus {
   font-size: 2vw;
   background-color: yellow;
   color: black;
+}
+
+#alert{
+  visibility: hidden;
+}
+
+#menu-chamber{
+  position: absolute;
+  z-index: 10000000000;
+  background-color: rgb(155, 155, 155);
+  width: 100%;
+  height: 100%;
+  display: none;
+
+  h1{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    color: black;
+    background-color: white;
+    border-right: 2px solid black;
+    border-bottom: 2px solid black;
+    margin: 0px;
+    width: auto;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+  }
+
+  #menu-chamber-left{
+    width: 60%;
+    height: 100%;
+    position: relative;
+
+    #menu-chamber-top{
+      width: 100%;
+      height: 60%;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    #menu-chamber-middle{
+      width: 100%;
+      height: 30%;
+      font-size: 1.8vw;
+      position: relative;
+      z-index: 100;
+
+      #menu-chamber-middle-like{
+        height: 70px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        position: absolute;
+        top: -70px;
+
+        i{
+          margin: 5px;
+        }
+
+        span{
+          margin-right: 20px;
+        }
+      }
+
+      #menu-chamber-middle-desc{
+        height: 100%;
+        padding: 10px;
+        overflow-y: scroll;
+      }
+    }
+
+    #menu-chamber-bottom{
+      width: 100%;
+      height: 10%;
+      display: flex;
+      justify-content: end;
+      align-items: center;
+
+      button{
+        margin: 10px;
+        width: 100px;
+        height: 40px;
+        font-weight: bolder;
+      }
+    }
+  }
+
+  #menu-chamber-right{
+    width: 40%;
+    height: 100%;
+    position: relative;
+  }
 }

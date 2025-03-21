@@ -663,6 +663,19 @@ function getItemValues() {
             ceiling: false,
             trigger: true
         },
+        turrets: {
+            count: 0,
+            max: 10,
+            instanced: true,
+            false: true,
+            roughness: 0.2,
+            envIntensity: 0.5,
+            wall: false,
+            true: false,
+            ceiling: true,
+            trigger: false,
+            interactive: true
+        },
     }
 }
 
@@ -853,7 +866,8 @@ var GLOBALS = {
         piston_platforms: [],
         track_platforms: [],
         incinerator: [],
-        step: []
+        step: [],
+        turrets: []
     },
 
     TRIGGER_BOXES: [],

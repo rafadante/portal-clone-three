@@ -309,43 +309,6 @@ $("body").on('click', '.custom-chamber1', function () {
 
 });
 
-
-$("body").on('click', '.span-chamber', async function () {
-
-    $("#gallery-img").css("background-image", $(this).css("background-image"))
-
-    $("#loading-parent").css("opacity", 1);
-    $("#loading-parent").css("pointer-events", "all");
-
-    const zipURL = await window["getZipPath"]($(this).data("path"));
-
-    const elem = $(this);
-
-    await fetch(zipURL + "?" + uuidv4())
-        .then(res => res.blob()) // Gets the response and returns it as a blob
-        .then(blob => {
-            // Here's where you get access to the blob
-            // And you can use it for whatever you want
-            // Like calling ref().put(blob)
-
-            // Here, I use it to make an image appear on the page
-            let objectURL = URL.createObjectURL(blob);
-
-            var zip = new JSZip();
-            zip.loadAsync(blob /* = file blob */)
-                .then(function (zip) {
-                    // process ZIP file content here
-
-                    zip.file("data.json").async("string").then(function (data) {
-                        // data is a string
-                        // TODO Your code goes here!
-
-                        manageLoadCustom(JSON.parse(data), elem)
-                    })
-                }, function () { alert("Not a valid zip file") });
-        });
-});
-
 async function manageLoadCustom(json, elem) {
     single = false;
     window.allowEdit = false;
@@ -903,6 +866,59 @@ function loadLevel(data) {
         GLOBALS.LINES.remove(GLOBALS.LINES.children[i])
     }
 }
+
+//
+var customElement;
+
+$("body").on('click', '.open-menu-chamber', function () {
+    $("#menu-chamber").css("display", "flex");
+
+    $("#menu-chamber-top").css("background-image", $(this).parent().find(".span-chamber").css("background-image"));
+    customElement = $(this).parent().find(".span-chamber");
+});
+
+$("body").on('click', '#btn-close-custom-panel', function () {
+    $("#menu-chamber").css("display", "none");
+});
+
+$("body").on('click', '#btn-play-custom', async function () {
+    $("#menu-chamber").css("display", "none");
+
+    //
+
+    $("#gallery-img").css("background-image", customElement.css("background-image"))
+
+    $("#loading-parent").css("opacity", 1);
+    $("#loading-parent").css("pointer-events", "all");
+
+    const zipURL = await window["getZipPath"](customElement.data("path"));
+
+    const elem = customElement;
+
+    await fetch(zipURL + "?" + uuidv4())
+        .then(res => res.blob()) // Gets the response and returns it as a blob
+        .then(blob => {
+            // Here's where you get access to the blob
+            // And you can use it for whatever you want
+            // Like calling ref().put(blob)
+
+            // Here, I use it to make an image appear on the page
+            let objectURL = URL.createObjectURL(blob);
+
+            var zip = new JSZip();
+            zip.loadAsync(blob /* = file blob */)
+                .then(function (zip) {
+                    // process ZIP file content here
+
+                    zip.file("data.json").async("string").then(function (data) {
+                        // data is a string
+                        // TODO Your code goes here!
+
+                        manageLoadCustom(JSON.parse(data), elem)
+                    })
+                }, function () { alert("Not a valid zip file") });
+        });
+});
 
 export {
     loadLevelJSON,

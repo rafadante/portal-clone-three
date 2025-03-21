@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, Object3D, MeshBasicMaterial, MeshStandardMaterial, SpotLight, Color } from 'three';
+import { Vector3, Quaternion, Object3D, MeshBasicMaterial, MeshStandardMaterial, SpotLight, Color, CylinderGeometry, Mesh, Group } from 'three';
 import * as CANNON from 'cannon';
 import { threeToCannon, ShapeType } from 'three-to-cannon';
 import { GLOBALS } from '../../Globals.js';
@@ -25,8 +25,8 @@ function colliderItemManager() {
             GLOBALS.GOO_PLANES[i].item.visible = false;
     }
 
-    for(var i=0; i<window.glass.length;i++){
-        if(window.glass[i].cloneTexture){
+    for (var i = 0; i < window.glass.length; i++) {
+        if (window.glass[i].cloneTexture) {
             window.glass[i].material.alphaMap = window.glass[i].cloneTexture;
         }
     }
@@ -39,6 +39,7 @@ function colliderItemManager() {
     addColliderItem(GLOBALS.DYMANIC_ITEMS['dispenser'], "dispenser", 0, 3)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['dispenser'], "dispenser", 0, 4)
 
+    addColliderItem(GLOBALS.DYMANIC_ITEMS['turrets'], "turrets", 5)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['cube'], "cube", 5)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['cube_2'], "cube_2", 5)
     addColliderItem(GLOBALS.DYMANIC_ITEMS['scale_cube'], "scale_cube", 5)
@@ -317,7 +318,11 @@ function addColliderItem(items, type, mass, offset) {
             objHolder.quaternion.copy(rot);
             GLOBALS.SCENE.add(objHolder);
 
-            if (type == "incinerator") {
+
+            if (type == "turrets") {
+                var shape = new CANNON.Box(new CANNON.Vec3(0.37 / 2, 1 / 2, 0.7 / 2));
+                //objHolder.translateY(0.25);
+            } else if (type == "incinerator") {
                 var result = threeToCannon(GLOBALS.ITEMS_ADDED.getObjectByName(type), { type: ShapeType.HULL });
                 var shape = result.shape;
             } else if (type == "step") {
@@ -480,7 +485,7 @@ function addColliderItem(items, type, mass, offset) {
                 material: PHYSICS_MATERIAL
             });
 
-            if(type == "step"){
+            if (type == "step") {
                 box.Material = GLOBALS.PHYSICS_MATERIAL;
             }
 
@@ -505,6 +510,22 @@ function addColliderItem(items, type, mass, offset) {
                 addPositionalAudio('audio-door', items[i], false, false, true, 8, 'sound')
             } else if (type == "laser_cube") {
                 addLaserToCube(box)
+            } else if (type == "turrets") {
+
+                const pivot = new Group();
+                const pivot2 = new Group();
+
+                const geometry = new CylinderGeometry(0.01, 0.01, 20, 32);
+                const material = new MeshBasicMaterial({ color: new Color(10,0,0) });
+                const cylinder = new Mesh(geometry, material); 
+                cylinder.rotateX(-Math.PI/2);
+
+                pivot.add(pivot2);
+                pivot2.add(cylinder);
+                cylinder.translateY(10);
+                GLOBALS.SCENE_FPS.add(pivot);
+
+                box.laser=pivot;
             }
 
             if (type == "faith_plate") {

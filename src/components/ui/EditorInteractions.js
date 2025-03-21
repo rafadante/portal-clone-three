@@ -772,7 +772,7 @@ $("body").on('click', '#options-custom span', async function () {
     } else if ($(this).data("value") == "played") {
         for (var i = 0; i < chambers.length; i++) {
 
-            if (!chambersPlayed.includes(chambers[i].id) )//|| !chambers[i].tested
+            if (!chambersPlayed.includes(chambers[i].id))//|| !chambers[i].tested
                 continue;
 
             manageChmaberCustom(i)
@@ -801,15 +801,24 @@ function manageChmaberCustom(i, canDelete) {
         elemMine = "mine"
     }
 
-    const elem = '<div data-path="'+chambers[i].path+'" data-jsonid="' + j + '"  data-name="' + chambers[i].name + '" data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber ' + elemMine + '"' +
+    const elem = '<div data-path="' + chambers[i].path + '" data-jsonid="' + j + '"  data-name="' + chambers[i].name + '" data-finished="' + chambers[i].finished + '"  data-userid="' + chambers[i].user_id + '"  data-played="' + chambers[i].played + '" data-id="' + chambers[i].id + '" class="custom-chamber ' + elemMine + '"' +
         '>' +
+        '<i class="fas fa-ellipsis-v open-menu-chamber"></i>' +
         '<div class="chamber-stats">' +
-        '<span>played: ' + chambers[i].played + '</span>' +
-        '<span>finished: ' + chambers[i].finished + '</span>' +
-        '<span>author: ' + chambers[i].author + '</span>' +
+        '<span>' + chambers[i].name + ' by ' + chambers[i].author + '</span>' +
+        '<div class="like1">' +
+        '<div  class="like2">' +
+        '<i class="fas fa-thumbs-up"></i>' +
+        '<span>???</span>' +
+        '</div  class="like1">' +
+        '<div  class="like2">' +
+        '<i class="fas fa-thumbs-up"></i>' +
+        '<span>???</span>' +
+        '</div>' +
+        '</div>' +
         '</div>' +
         elemDel +
-        '<div data-path="'+chambers[i].path+'" class="span-chamber" style="background-image: url(' + chambers[i].thumb + ')">' + chambers[i].name + '</div>' +
+        '<div data-path="' + chambers[i].path + '" class="span-chamber" style="background-image: url(' + chambers[i].thumb + ')"></div>' +
         '</div>'
 
     window.arrayJSON.push(chambers[i].json);

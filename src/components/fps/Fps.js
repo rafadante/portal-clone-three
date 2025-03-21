@@ -317,15 +317,16 @@ function isSlerpComplete(currentQuat, endQuat, tolerance = 0.001) {
 }
 
 window.gg = false;
+let idleClock = new Clock();
 
 function animateIdleGun(gun, time) {
-    //const time = idleClock.getElapsedTime();
-    const breathingAmplitude = 0.0025; // Adjust for subtlety
-    const breathingSpeed = 0.001; // How fast the gun moves
+    const time2 = idleClock.getElapsedTime();
+    const breathingAmplitude = 0.0025 * 1; // Adjust for subtlety
+    const breathingSpeed = 0.001 * 1000; // How fast the gun moves
 
     // Apply a gentle up-and-down movement
-    gun.position.y += Math.sin(time * breathingSpeed) * breathingAmplitude;
-    gun.rotation.x += Math.sin(time * breathingSpeed) * (breathingAmplitude / 2);
+    gun.position.y += Math.sin(time2 * breathingSpeed) * breathingAmplitude;
+    gun.rotation.x += Math.sin(time2 * breathingSpeed) * (breathingAmplitude / 2);
 }
 
 const updateCamera = function (deltaTime) {

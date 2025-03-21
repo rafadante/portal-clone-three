@@ -567,6 +567,15 @@ function App() {
                   <span>10</span>
                 </div>
 
+                <div>
+                  <img alt="image"
+                    data-content=""
+                    data-title="TURRETS" className="item" data-name="turrets" src="../assets/ui/items/turrets.webp"
+                    data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" data-allowconnection="false"
+                    id="turrets" />
+                  <span>10</span>
+                </div>
+
                 <div className="">
                   <img alt="image"
                     data-content="Glass panels can be placed in your level which the player cannot break. You can increase and decrease the size of the panel by using the arrows that appear when the object is selected. You can change the barrier type to grating within the properties menu which will allow players to place a portal on the other side."
@@ -751,7 +760,7 @@ function App() {
         </div>
 
         <div id="loading-parent">
-          <div id="gallery-img" style={{backgroundImage: 'url(../assets/loading/4.webp)'}}>
+          <div id="gallery-img" style={{ backgroundImage: 'url(../assets/loading/4.webp)' }}>
           </div>
 
           <div id="back-effect"></div>
@@ -1510,11 +1519,11 @@ function App() {
                 </button>
               </li>
               <li data-gel="purple" data-color="rgb(75,0,130)" className="menu-item gel-type">
-            <button type="purple" className="menu-btn">
-              <i className="fa fa-pallete"></i>
-              <span className="menu-text">Purple</span>
-            </button>
-          </li>
+                <button type="purple" className="menu-btn">
+                  <i className="fa fa-pallete"></i>
+                  <span className="menu-text">Purple</span>
+                </button>
+              </li>
             </ul>
           </li>
 
@@ -1569,6 +1578,35 @@ function App() {
         </ul>
 
         <div id="blocker">
+
+          <div id="menu-chamber">
+            <div id="menu-chamber-left">
+              <h1>TITLE</h1>
+              <div id='menu-chamber-top'></div>
+              <div id='menu-chamber-middle'>
+                <div id='menu-chamber-middle-like'>
+                  <i class="fas fa-thumbs-up"></i>
+                  <span>???</span>
+                  <i class="fas fa-thumbs-down"></i>
+                  <span>???</span>
+                </div>
+                <div id='menu-chamber-middle-desc'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean fringilla felis non tellus faucibus tempor.
+                  Maecenas mollis pellentesque nisl, nec tincidunt sem placerat ut. Aliquam vel consectetur augue. Suspendisse
+                  efficitur faucibus ipsum, in laoreet eros tincidunt ac. Pellentesque interdum nisl eget erat pulvinar.</div>
+              </div>
+              <div id='menu-chamber-bottom'>
+                <button>DELETE</button>
+                <button>EDIT</button>
+                <button>QUEUE</button>
+                <button id='btn-play-custom'>PLAY</button>
+                <button id='btn-close-custom-panel'>CLOSE</button>
+              </div>
+            </div>
+
+            <div id="menu-chamber-right">
+              <h1>LEADERBOARD</h1>
+            </div>
+          </div>
 
           <span id="version">version: 0.2.14</span>
 
