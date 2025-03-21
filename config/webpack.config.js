@@ -245,7 +245,25 @@ module.exports = function (webpackEnv) {
     infrastructureLogging: {
       level: 'none',
     },
-    
+    optimization: {
+      minimize: true,
+      minimizer: [
+        new TerserPlugin({
+          terserOptions: {
+            myCustomOption: true,
+            compress: {
+              drop_console: true
+            }
+          },
+          minify: (file, sourceMap, minimizerOptions) => {
+            const extractedComments = [];
+            const { map, code } = require("uglify-js").minify(file, {});
+            return { map, code, extractedComments };
+          },
+        }),
+        new CssMinimizerPlugin(),
+      ],
+    },
     resolve: {
       // This allows you to set a fallback for where webpack should look for modules.
       // We placed these paths second because we want `node_modules` to "win"
