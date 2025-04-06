@@ -703,11 +703,11 @@ GLOBALS.LIGHT_PORTAL_1 = new PointLight(new Color(1, 0.25, 0), 0, 2);
 GLOBALS.LIGHT_PORTAL_0 = new PointLight(new Color(0, 0.3, 1), 0, 2);
 GLOBALS.FLASH = new PointLight(0xff0000, 10);
 
-if (localStorage.getItem("quality-select") == "epic") {
+/*if (localStorage.getItem("quality-select") == "epic") {
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_0);
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.LIGHT_PORTAL_1);
     GLOBALS.SCENE_CHILDREN.add(GLOBALS.FLASH);
-}
+}*/
 
 setTimeout(() => {
     GLOBALS.LIGHT_PORTAL_0.visible = false;
