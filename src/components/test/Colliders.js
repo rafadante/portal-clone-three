@@ -1,4 +1,4 @@
-import { Vector3, Quaternion, Object3D, MeshBasicMaterial, MeshStandardMaterial, SpotLight, Color, CylinderGeometry, Mesh, Group } from 'three';
+import { Vector3, Quaternion, Object3D, MeshBasicMaterial, MeshStandardMaterial, SpotLight, Color, CylinderGeometry, Mesh, Group, BoxGeometry, Box3 } from 'three';
 import * as CANNON from 'cannon';
 import { threeToCannon, ShapeType } from 'three-to-cannon';
 import { GLOBALS } from '../../Globals.js';
@@ -17,6 +17,7 @@ import $ from 'jquery';
 import { laserReceiverTrigger } from '../events/events.js';
 import { backToEditor } from './BackToEditor.js';
 import { saveChamber } from '../ui/EditorInteractions.js';
+import { turretDesintegrated } from '../turrets/Turrets.js';
 
 function colliderItemManager() {
 
@@ -221,7 +222,7 @@ function fizzlerTrigger(body) {
 
         } else if (e.body.name == "sphere" || e.body.name == "cube" ||
             e.body.name == "radio" || e.body.name == "cube_2" || e.body.name == "laser_cube" ||
-            e.body.name == "scale_cube" || e.body.name == "camera" || e.body.name == "trash") {
+            e.body.name == "scale_cube" || e.body.name == "camera" || e.body.name == "trash" || e.body.name == "turrets") {
             //CREATE A CLONE TO APPLY DISSOLVE SHADER
 
             var clone;
@@ -267,7 +268,24 @@ function fizzlerTrigger(body) {
                 }
             }, 3000);
 
-            if (e.body.name == "camera") {
+            if (e.body.name == "turrets") {
+
+                GLOBALS.SCENE_FPS.remove(e.body.laser);
+
+                turretDesintegrated(e.body);
+
+                var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.item.userData.instancedName);
+                instanced.setVisibilityAt(e.body.item.userData.idInstanced, false);
+                instanced.instanceMatrix.needsUpdate = true;
+                instanced.computeBoundingSphere();
+
+                const body = e.body;
+
+                setTimeout(() => {
+                    GLOBALS.CANNON_WORLD.removeBody(body);
+                }, 100);
+
+            } else if (e.body.name == "camera") {
                 GLOBALS.ITEMS_ADDED.remove(e.body.item);
 
                 const body = e.body;
@@ -293,8 +311,21 @@ function fizzlerTrigger(body) {
                 setTimeout(() => {
                     GLOBALS.CANNON_WORLD.removeBody(body);
                 }, 100);
-            } else
+            } else {
+                var instanced = GLOBALS.ITEMS_ADDED.getObjectByName(e.body.item.userData.instancedName);
+                instanced.setVisibilityAt(e.body.item.userData.idInstanced, false);
+                instanced.instanceMatrix.needsUpdate = true;
+                instanced.computeBoundingSphere();
+
+                const id = e.body.item.userData.idInstanced; 
+                setTimeout(() => {
+                    instanced.setVisibilityAt(id, true);
+                    instanced.instanceMatrix.needsUpdate = true;
+                    instanced.computeBoundingSphere();
+                }, 1000);
+
                 respawn(e.body);
+            }
         }
     });
 }
@@ -320,6 +351,7 @@ function addColliderItem(items, type, mass, offset) {
 
 
             if (type == "turrets") {
+                items[i].cone.visible = false;
                 var shape = new CANNON.Box(new CANNON.Vec3(0.37 / 2, 1 / 2, 0.7 / 2));
                 //objHolder.translateY(0.25);
             } else if (type == "incinerator") {
@@ -512,20 +544,20 @@ function addColliderItem(items, type, mass, offset) {
                 addLaserToCube(box)
             } else if (type == "turrets") {
 
+                addPositionalAudio('audio-radio', box, false, false, false, 10, 'sound')
+
                 const pivot = new Group();
-                const pivot2 = new Group();
 
                 const geometry = new CylinderGeometry(0.01, 0.01, 20, 32);
-                const material = new MeshBasicMaterial({ color: new Color(10,0,0) });
-                const cylinder = new Mesh(geometry, material); 
-                cylinder.rotateX(-Math.PI/2);
+                const material = new MeshBasicMaterial({ color: new Color(10, 0, 0) });
+                const cylinder = new Mesh(geometry, material);
 
-                pivot.add(pivot2);
-                pivot2.add(cylinder);
+                pivot.add(cylinder);
                 cylinder.translateY(10);
+
                 GLOBALS.SCENE_FPS.add(pivot);
 
-                box.laser=pivot;
+                box.laser = pivot;
             }
 
             if (type == "faith_plate") {
@@ -578,7 +610,7 @@ function addColliderItem(items, type, mass, offset) {
                 box.clone = clone;
 
                 if (type != "radio" && type != "trash") {
-                    addPositionalAudio('audio-impact', box, false, false, true, 8, 'sound');
+                    addPositionalAudio('audio-impact', box, false, false, true, 8, 'soundContact');
                 }
 
                 box.addEventListener("collide", function (event) {
@@ -647,9 +679,9 @@ function addColliderItem(items, type, mass, offset) {
                     if ((Math.abs(event.target.velocity.x) > 1.5 ||
                         Math.abs(event.target.velocity.y) > 1.5 ||
                         Math.abs(event.target.velocity.z) > 1.5)) {
-                        event.target.sound.position.copy(event.target.position)
+                        event.target.soundContact.position.copy(event.target.position)
                         //event.target.sound.audio.currentTime = 0;
-                        event.target.sound.audio.play();
+                        event.target.soundContact.audio.play();
                     }
                 });
                 //}

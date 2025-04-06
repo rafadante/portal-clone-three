@@ -289,6 +289,11 @@ function raycastSelected(found, event, type) {
                         $(".soundPlay").css("display", "block");
                         $("#state-trigger-voice-link").prop("value", GLOBALS.PLANE_USER_DATA[instanceId].item.userData.link);
                     }
+
+                    if (GLOBALS.PLANE_USER_DATA[instanceId].itemName.includes("turrets")) {
+                        $(".turrets").css("display", "block");
+                        //$("#portal_gun-state").find(".title").text(GLOBALS.PLANE_USER_DATA[instanceId].item.userData.state + " Portals");
+                    }
                 }
             }
 

@@ -1497,6 +1497,13 @@ select {
   transition: transform 0.1s ease-out, opacity 0.1s ease-out;
   pointer-events: none;
   display: none;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+     -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none; /* Non-prefixed version, currently
+                                supported by Chrome, Edge, Opera and Firefox */
 }
 
 .menu-item {
@@ -1517,6 +1524,7 @@ select {
   white-space: nowrap;
   padding: 6px 8px;
   border-radius: 3px;
+  -webkit-user-drag: none;
 }
 
 button.menu-btn {

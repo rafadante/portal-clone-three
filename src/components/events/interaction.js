@@ -8,6 +8,7 @@ import { tweenCamera } from '../../Utils.js';
 import { laserFieldState, tractorStates, lightBridgeState, dispenserSpawn } from "./states.js";
 import { connectionState } from "./events";
 import { updateAngledPanel } from "../test/Colliders.js";
+import { turretPicked } from "../turrets/Turrets.js";
 
 var itemHolder = null;
 var coords = new Vector3();
@@ -165,6 +166,11 @@ function interactWithItem() {
                 var instancedId = intersects[0].instanceId;
                 var name = intersects[0].object.name;
                 var test;
+
+                if(name == "turrets"){
+                    console.log("1111111111")
+                    turretPicked(GLOBALS.DYMANIC_ITEMS[name][instancedId].body);
+                }
 
                 if (intersects[0].object.name != "camera") {
                     if (GLOBALS.DYMANIC_ITEMS[name][instancedId].body.mass == 0)

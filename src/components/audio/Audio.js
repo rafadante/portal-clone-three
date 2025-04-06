@@ -111,6 +111,8 @@ function addPositionalAudio(path, parent, play, loop, staticPosition, maxDis, na
     parent[nameSound] = sound;
     GLOBALS.SCENE_FPS.add(sound);
 
+    console.log(parent)
+
     if (staticPosition)
         sound.position.copy(parent.position);
 

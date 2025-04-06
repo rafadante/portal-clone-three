@@ -415,7 +415,7 @@ async function addItem(found, loaded) {
                     item.rotation.set(userData.normal.x, Math.PI, userData.normal.z)
                 else
                     item.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
-            } else {
+            } else if(GLOBALS.ITEM_HOLDED_NAME != "turrets") {
                 item.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
             }
 
@@ -426,6 +426,37 @@ async function addItem(found, loaded) {
 
             if (GLOBALS.ITEM_HOLDED_NAME == "radio" || GLOBALS.ITEM_HOLDED_NAME == "trash")
                 item.translateY(0.5);
+
+            if (GLOBALS.ITEM_HOLDED_NAME == "turrets") {
+
+                const holderTurret = new Object3D();
+                holderTurret.position.copy(item.position)
+                holderTurret.rotation.set(userData.normal.x, userData.normal.y, userData.normal.z)
+
+                holderTurret.translateY(0.5);
+
+                console.log(item)
+                console.log(holderTurret)
+
+                item.position.copy(holderTurret.position);
+
+                const geometry = new ConeGeometry(12, 12, 32);
+                const material = new MeshStandardMaterial({ color: 0xff0000, transparent: true, opacity: 0.3 });
+                const cone = new Mesh(geometry, material); 
+
+                const groupCone = new Group();
+                groupCone.rotation.copy(item.rotation);
+                groupCone.position.copy(item.position);
+                groupCone.add(cone);
+
+                cone.rotateX(Math.PI/2);
+                cone.translateY(-6);
+                cone.scale.z = 0.0001;
+
+                GLOBALS.SCENE.add(groupCone);
+
+                item.cone = groupCone;
+            }
 
             if (GLOBALS.ITEM_HOLDED_NAME == "cube" || GLOBALS.ITEM_HOLDED_NAME == "cube_2" ||
                 GLOBALS.ITEM_HOLDED_NAME == "sphere" || GLOBALS.ITEM_HOLDED_NAME == "laser_cube" ||

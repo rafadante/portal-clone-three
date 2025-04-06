@@ -571,7 +571,7 @@ function App() {
                   <img alt="image"
                     data-content=""
                     data-title="TURRETS" className="item" data-name="turrets" src="../assets/ui/items/turrets.webp"
-                    data-floor="true" data-ceiling="false" data-walls="false" data-instanced="true" data-allowconnection="false"
+                    data-floor="true" data-ceiling="true" data-walls="true" data-instanced="true" data-allowconnection="false"
                     id="turrets" />
                   <span>10</span>
                 </div>
@@ -1406,6 +1406,15 @@ function App() {
             <a href="#" className="menu-btn">
               <input type="number" style={{ width: "50px" }} max="100" min="0" defaultValue="2" id="plate-max-height-value" step="1" />
               <span className="menu-text">Max Height</span>
+            </a>
+          </li>
+
+
+          {/*TURRETS*/}
+          <li id="turrets-rotation" className="menu-item hasItem turrets">
+            <a href="#" className="menu-btn">
+              <input type="range" style={{ width: "50px" }} max="360" min="0" defaultValue="0" id="turrets-rotation-value" step="1" />
+              <span className="menu-text">Rotation</span>
             </a>
           </li>
 

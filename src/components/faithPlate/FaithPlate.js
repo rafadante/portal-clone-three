@@ -4,6 +4,7 @@ import { GLOBALS } from "../../Globals.js";
 import { AUDIO, fadeAudio, play } from "../audio/Audio.js";
 import * as CANNON from 'cannon';
 import $ from 'jquery';
+import { turretLaunched } from "../turrets/Turrets.js";
 
 //TARGET
 const map = new TextureLoader().load('./assets/textures/target.png');
@@ -61,6 +62,9 @@ function faithPlate(plate, body) {
       body.name
     );
     body.applyImpulse(imp, body.position);
+
+    if(body.name.includes("turrets"))
+      turretLaunched(body);
   }
 }
 
