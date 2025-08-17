@@ -33,39 +33,17 @@ function App() {
 
   const signOut = async () => {
     if (window.confirm("Confirm you want to logout?") == true) {
-      const { error } = await supabase.auth.signOut({
-        scope: 'global'
-      });
-
-      //window.location.href = window.location.origin; 
-      window.location.href = "/";
+      const { error } = await supabase.auth.signOut();
     }
   }
 
   const signIn = async () => {
     await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: window.location.origin, // isso vai usar http://localhost:3000 em dev
-      }
+      provider: "google"
     })
   }
 
-  const signInNo = async () => {
-    setSession([])
-  }
-
   window["getSession"] = async function () {
-
-    console.log(session)
-
-    if (session.length == 0) {
-      $("#option-community-play").remove();
-      //$("#signOut").remove();
-      $("#save-level").remove();
-    }
-
-
     return session;
   }
 
@@ -270,14 +248,10 @@ function App() {
           <div id="login-back"></div>
 
           <img src="./assets/ui/logo2.png"></img>
-          <span>Registration is required to access custom chambers!!</span>
+          <span>Registration is required to access the project!!</span>
 
           <button type="button" class="login-with-google-btn" onClick={signIn}>
             Sign in with Google
-          </button>
-
-          <button type="button" class="login-without-google-btn" onClick={signInNo}>
-            Access without login
           </button>
         </div>
 
