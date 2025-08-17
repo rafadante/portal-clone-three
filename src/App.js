@@ -48,7 +48,18 @@ function App() {
     })
   }
 
+  const signInNo = async () => {
+    setSession([])
+  }
+
   window["getSession"] = async function () {
+
+    if (session.length == 0) {
+      $("#option-community-play").remove();
+      //$("#signOut").remove();
+      $("#save-level").remove();
+    }
+
     return session;
   }
 
@@ -257,6 +268,10 @@ function App() {
 
           <button type="button" class="login-with-google-btn" onClick={signIn}>
             Sign in with Google
+          </button>
+
+          <button type="button" class="login-without-google-btn" onClick={signInNo}>
+            Access without login
           </button>
         </div>
 
