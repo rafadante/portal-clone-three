@@ -317,7 +317,7 @@ function fizzlerTrigger(body) {
                 instanced.instanceMatrix.needsUpdate = true;
                 instanced.computeBoundingSphere();
 
-                const id = e.body.item.userData.idInstanced; 
+                const id = e.body.item.userData.idInstanced;
                 setTimeout(() => {
                     instanced.setVisibilityAt(id, true);
                     instanced.instanceMatrix.needsUpdate = true;
@@ -938,14 +938,26 @@ function addCollidersToCorridor(mesh) {
                     backToEditor();
                 }, 100);
 
+                if (window.logged) {
 
-                $("#loading-parent").css("opacity", 1)
-                $("#loading-parent").css("pointer-events", "all")
+                    $("#loading-parent").css("opacity", 1)
+                    $("#loading-parent").css("pointer-events", "all")
 
-                setTimeout(() => {
-                    if (window.confirm("Publish Chamber?") == true)
-                        saveChamber(true);
-                }, 1000);
+                    setTimeout(() => {
+                        if (window.confirm("Publish Chamber?") == true)
+                            saveChamber(true);
+                    }, 1000);
+                } else {
+                    document.exitPointerLock();
+                    $("#ui").css("display", "block");
+                    $(".img").removeClass("image");
+                    $("#mobile-controls").css("display", "none");
+                    $("#container").css("filter", "none");
+
+                    $("#blocker").css("display", "none");
+                    $("#blocker").css("pointer-events", "none");
+                    $("#reticle").css("display", "none");
+                }
 
             } else if (GLOBALS.LEVEL_ENTERED && GLOBALS.LOADED_LEVEL && !GLOBALS.FINISHED) {//
 

@@ -95,7 +95,7 @@ $('#quality-select').on('change', function () {
         $("#shadows-resolution-select").val(1024).change();
         localStorage.setItem("antialising", true);
     } else if ($(this).val() == "high") {
-        GLOBALS.RENDERER.shadowMap.enabled = true;
+        GLOBALS.RENDERER.shadowMap.enabled = false;
         $("#recursive-select").val(2).change();
         $("#recursive-render-select").val(1).change();
         $("#resolution-select").val(1).change();

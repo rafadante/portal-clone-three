@@ -181,6 +181,9 @@ function createInstances(meshes, material, index) {
 
         var dummy = new Object3D();
 
+        //if(meshes[i].side == "up")
+        //    continue
+
         if (meshes[i].itemName == "window" || (
             meshes[i].position.x == Math.round(leftWindowObsRoom.position.x) &&
             meshes[i].position.y == Math.round(leftWindowObsRoom.position.y) &&

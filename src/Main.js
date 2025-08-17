@@ -4,7 +4,10 @@ import "./components/ui/EditorInteractions.js";
 import "./Utils.js";
 import { updatePhysics } from './Physics.js';
 import {
-    BoxGeometry, MeshBasicMaterial, Mesh, PMREMGenerator, Clock, Matrix4, Frustum, Vector3, Quaternion
+    BoxGeometry, MeshBasicMaterial, Mesh, PMREMGenerator, Clock, Matrix4, Frustum, Vector3, Quaternion,
+    SphereGeometry,
+    TextureLoader,
+    SRGBColorSpace
 } from 'three';
 import { TWEEN } from './Tween.js';
 import { Lights } from './components/lights/Lights.js';
@@ -80,6 +83,7 @@ GLOBALS.ITEM_CUBE.name = "ITEM_CUBE";
 document.getElementById("container").appendChild(GLOBALS.RENDERER.domElement);
 //
 function init() {
+
     document.getElementById("social").style.display = "none"
     GLOBALS.OBSERVATION_ROOM_IMG.visible = true;
     // SCENE
@@ -117,6 +121,25 @@ function init() {
     window.addEventListener('resize', onWindowResize);
     recreateRay();
     GLOBALS.RENDERER.setAnimationLoop(animate);
+
+    //
+    /**const geometry = new SphereGeometry(500, 60, 40);
+    // invert the geometry on the x-axis so that all of the faces point inward
+    geometry.scale(- 1, 1, 1);
+
+    const texture = new TextureLoader().load('assets/sky.jpg');
+    texture.colorSpace = SRGBColorSpace;
+    const material = new MeshBasicMaterial({ map: texture });
+
+    const mesh = new Mesh(geometry, material);
+
+    GLOBALS.SCENE.add(mesh);
+
+    console.log("xxxxxxxxxxxxxxxxxxx")
+    console.log(mesh) */
+
+    console.log("uuuuuuuuuuuuuuuu")
+    console.log(GLOBALS.SCENE)
 }
 
 function onWindowResize() {
@@ -160,7 +183,7 @@ function onWindowResize() {
         }
     }*/
 
-        console.log("resized")
+    console.log("resized")
 }
 
 GLOBALS.RENDERER.info.autoReset = true;
@@ -237,7 +260,7 @@ window.clockTimer = new Clock(); // Create a clock
 let lastTime2 = performance.now();
 let deltaTime33 = 0;
 
-function togglePause(){
+function togglePause() {
     lastTime2 = performance.now();
 }
 

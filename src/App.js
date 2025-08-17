@@ -38,9 +38,15 @@ function App() {
   }
 
   const signIn = async () => {
+    window.logged = true;
     await supabase.auth.signInWithOAuth({
       provider: "google"
     })
+  }
+
+  const signInNo = async () => {
+    window.logged = false;
+    setSession([])
   }
 
   window["getSession"] = async function () {
@@ -248,10 +254,14 @@ function App() {
           <div id="login-back"></div>
 
           <img src="./assets/ui/logo2.png"></img>
-          <span>Registration is required to access the project!!</span>
+          <span>Registration is required to access custom chambers!!</span>
 
           <button type="button" class="login-with-google-btn" onClick={signIn}>
             Sign in with Google
+          </button>
+
+          <button type="button" class="login-without-google-btn" onClick={signInNo}>
+            Access without login
           </button>
         </div>
 
