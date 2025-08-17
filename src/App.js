@@ -1676,7 +1676,7 @@ function App() {
 
               <div id="options-main" className="optionMenu">
                 <span className="option" id="option-single">SINGLE PLAYER</span>
-                <span className="option" id="option-community">COMMUNITY CHAMBERS</span>
+                <span className="option" id="option-community">CUSTOM CHAMBERS</span>
                 <span className="option" id="option-about">ABOUT</span>
               </div>
 

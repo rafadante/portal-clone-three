@@ -510,7 +510,7 @@ $("body").on('click', '#option-single', function () {
 });
 
 $("body").on('click', '#option-community', function () {
-    optionMenu(GLOBALS.TEXTURE_MENU_GRID, "COMMUNITY CHAMBERS", "#options-community");
+    optionMenu(GLOBALS.TEXTURE_MENU_GRID, "CUSTOM CHAMBERS", "#options-community");
     $(".main-option").css("display", "flex")
     $(".sub-option").css("display", "none")
 });
