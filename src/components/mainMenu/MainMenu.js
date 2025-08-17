@@ -922,7 +922,7 @@ $("body").on('click', '#btn-play-custom', async function () {
 
 if (!window.logged) {
     $("#option-community-play").remove();
-    $("#signOut").remove();
+    //$("#signOut").remove();
     $("#save-level").remove();
 }
 
