@@ -38,18 +38,29 @@ function App() {
   }
 
   const signIn = async () => {
-    window.logged = true;
     await supabase.auth.signInWithOAuth({
-      provider: "google"
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin, // isso vai usar http://localhost:3000 em dev
+      }
     })
   }
 
   const signInNo = async () => {
-    window.logged = false;
     setSession([])
   }
 
   window["getSession"] = async function () {
+
+    console.log(session)
+
+    if (session.length == 0) {
+      $("#option-community-play").remove();
+      //$("#signOut").remove();
+      $("#save-level").remove();
+    }
+
+
     return session;
   }
 
