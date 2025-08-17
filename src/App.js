@@ -33,7 +33,9 @@ function App() {
 
   const signOut = async () => {
     if (window.confirm("Confirm you want to logout?") == true) {
-      const { error } = await supabase.auth.signOut();
+      const { error } = await await supabase.auth.signOut({
+        scope: 'global'
+      });
     }
   }
 
