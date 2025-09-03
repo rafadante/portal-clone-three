@@ -1,5 +1,13 @@
 /*BLOCKER*/
 
+#portal-gun-roughnes{
+  pointer-events: all !important;
+  visibility: hidden;
+}
+
+.option-value input{
+  pointer-events: all !important;
+}
 
 
 #blocker {

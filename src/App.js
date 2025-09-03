@@ -2076,14 +2076,14 @@ function App() {
                 <div className="options-row">
                   <span className="option-name" id="">Gun</span>
                   <div className="option-value">
-                    <input id="option-gun" type="checkbox" />
+                    <input id="option-gun" type="checkbox" defaultChecked/>
                   </div>
                 </div>
                 {/*PLAYER*/}
                 <div className="options-row">
                   <span className="option-name" id="">Player</span>
                   <div className="option-value">
-                    <input id="option-player" type="checkbox" />
+                    <input id="option-player" type="checkbox" defaultChecked/>
                   </div>
                 </div>
                 {/*STATS*/}

@@ -300,6 +300,21 @@ function checkOrientation() {
     }
 }
 
+//GUN
+$("body").on('input', '#option-gun', function () {
+
+    GLOBALS.GUN_GROUP.visible = this.checked;
+    
+    
+    if (this.checked) {
+       $("#reticle").css("visibility", "visible")
+    } else {
+        $("#reticle").css("visibility", "hidden")
+    }
+
+    update()
+});
+
 //PLAYER
 $("body").on('input', '#option-player', function () {
     localStorage.setItem("option-player", this.checked);
