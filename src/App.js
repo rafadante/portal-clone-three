@@ -2072,6 +2072,13 @@ function App() {
                     </select>
                   </div>
                 </div>
+                {/*GUN*/}
+                <div className="options-row">
+                  <span className="option-name" id="">Gun</span>
+                  <div className="option-value">
+                    <input id="option-gun" type="checkbox" />
+                  </div>
+                </div>
                 {/*PLAYER*/}
                 <div className="options-row">
                   <span className="option-name" id="">Player</span>
