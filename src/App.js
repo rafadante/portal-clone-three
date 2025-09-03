@@ -264,7 +264,7 @@ function App() {
           <div id="login-back"></div>
 
           <img src="./assets/ui/logo2.png"></img>
-          <span>Registration is required to access the project!!</span>
+          <span>Registration is required to publish and play custom chambers!</span>
 
           <button type="button" class="login-with-google-btn" onClick={signIn}>
             Sign in with Google
