@@ -934,9 +934,7 @@ function addCollidersToCorridor(mesh) {
 
                 //
 
-                setTimeout(() => {
-                    backToEditor();
-                }, 100);
+                console.log(window.logged)
 
                 if (window.logged) {
 
@@ -944,10 +942,19 @@ function addCollidersToCorridor(mesh) {
                     $("#loading-parent").css("pointer-events", "all")
 
                     setTimeout(() => {
-                        if (window.confirm("Publish Chamber?") == true)
+                        if (window.confirm("Publish Chamber?") == true) {
                             saveChamber(true);
+                            setTimeout(() => {
+                                backToEditor();
+                            }, 100);
+                        }
                     }, 1000);
                 } else {
+
+                    setTimeout(() => {
+                        backToEditor();
+                    }, 100);
+
                     document.exitPointerLock();
                     $("#ui").css("display", "block");
                     $(".img").removeClass("image");

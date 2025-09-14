@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import $ from 'jquery';
 import { v4 as uuidv4 } from 'uuid';
+import "./dev";
 
 /*window.addEventListener('load', function () {
   import('./Main.js')
@@ -25,7 +26,14 @@ function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+
       setSession(session)
+
+      if(session){
+        window.logged = true;
+      }else{
+        window.logged = false;
+      }
     })
 
     return () => subscription.unsubscribe()
@@ -370,6 +378,7 @@ function App() {
             </button>
             <div className="header">
               <span id="header-items">ITEMS</span>
+              <span id="header-props">PROPS</span>
               <span id="header-settings">SETTINGS</span>
             </div>
             <div className="body bodyEditor">
@@ -431,7 +440,7 @@ function App() {
                   <span>10</span>
                 </div>
 
-                <div>
+                {/**<div>
                   <img alt="image"
                     data-content="A dropper will come with it. If the player loses the cube the dropper will replace it. You can even disable the dropper if you'd like from the properties menu."
                     data-title="CUBE 2" className="item" data-name="cube_2" src="../assets/ui/items/cube_blue.webp"
@@ -447,7 +456,7 @@ function App() {
                     data-allowconnection="true" data-rotate="false" data-floor="true" data-ceiling="true" data-walls="false"
                     data-instanced="true" id="scale_cube" />
                   <span>10</span>
-                </div>
+                </div> */}
 
                 <div>
                   <img alt="image"

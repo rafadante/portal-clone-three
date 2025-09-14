@@ -203,7 +203,7 @@ function animate(time) {
         //GLOBALS.COMPOSER.render();
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         TWEEN.update();
-        document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
+        //document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
     } else if (!GLOBALS.PAUSED) {
         render(time);
     }
