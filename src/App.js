@@ -6,6 +6,8 @@ import { supabase } from './supabaseClient';
 import $ from 'jquery';
 import { v4 as uuidv4 } from 'uuid';
 import "./dev";
+import InteractiveMenu from './components/mainMenu/page';
+import "./globals.css";
 
 /*window.addEventListener('load', function () {
   import('./Main.js')
@@ -29,9 +31,9 @@ function App() {
 
       setSession(session)
 
-      if(session){
+      if (session) {
         window.logged = true;
-      }else{
+      } else {
         window.logged = false;
       }
     })
@@ -297,6 +299,11 @@ function App() {
       <div className="App">
         <Analytics />
         <SpeedInsights />
+
+        <div id="custom-menu2">
+          <InteractiveMenu></InteractiveMenu>
+        </div>
+
 
         <div id='alert'>
           <span>Project Portal THREEJS is a fan-made clone of the portal games made by VALVE in the web browser, I do not
@@ -2085,14 +2092,14 @@ function App() {
                 <div className="options-row">
                   <span className="option-name" id="">Gun</span>
                   <div className="option-value">
-                    <input id="option-gun" type="checkbox" defaultChecked/>
+                    <input id="option-gun" type="checkbox" defaultChecked />
                   </div>
                 </div>
                 {/*PLAYER*/}
                 <div className="options-row">
                   <span className="option-name" id="">Player</span>
                   <div className="option-value">
-                    <input id="option-player" type="checkbox" defaultChecked/>
+                    <input id="option-player" type="checkbox" defaultChecked />
                   </div>
                 </div>
                 {/*STATS*/}

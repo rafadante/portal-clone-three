@@ -1,11 +1,11 @@
 /*BLOCKER*/
 
-#portal-gun-roughnes{
+#portal-gun-roughnes {
   pointer-events: all !important;
   visibility: hidden;
 }
 
-.option-value input{
+.option-value input {
   pointer-events: all !important;
 }
 
@@ -52,6 +52,7 @@
       pointer-events: none;
       padding-left: 20px !important;
       padding-right: 20px !important;
+      color: white;
     }
 
     .settings-menu {
@@ -155,6 +156,7 @@
         padding-left: 20px;
         transition: all 0.1s;
         font-size: 3vh;
+        color: white;
       }
 
       span:hover {
@@ -928,6 +930,7 @@ form {
   right: 20px;
   z-index: 100000;
   font-size: 30px;
+  color: white;
 }
 
 #social-patreon {
@@ -1276,7 +1279,7 @@ select {
   font-family: sans-serif;
   margin: auto;
   min-height: 100vh;
-  padding-bottom: 4em;
+  padding: 0px;
   background: black;
   display: block;
 }
@@ -1973,6 +1976,8 @@ button:focus {
   position: fixed;
   top: 20px;
   left: 20px;
+  background-color: white;
+  padding: 5px;
 }
 
 #signOut:hover {
@@ -1988,6 +1993,7 @@ button:focus {
   height: 100%;
   width: 100%;
   position: fixed;
+  color: white;
 
   img {
     width: 50%;
@@ -2212,5 +2218,128 @@ button:focus {
     width: 40%;
     height: 100%;
     position: relative;
+  }
+}
+
+
+#custom-menu2 {
+  z-index: 1000;
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  display: none;
+
+  /* Custom badge styles with proper contrast */
+  .ranking-badge {
+    background-color: #facc15 !important;
+    color: #000000 !important;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.125rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 0;
+  }
+
+  .category-badge {
+    background-color: #06b6d4 !important;
+    color: #ffffff !important;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.125rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 0;
+  }
+
+  .difficulty-badge-easy {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.125rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 0;
+  }
+
+  .difficulty-badge-medium {
+    background-color: #f59e0b !important;
+    color: #ffffff !important;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.125rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 0;
+  }
+
+  .difficulty-badge-hard {
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.125rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 0;
+  }
+
+  /* Custom scrollbar for webkit browsers */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgb(30 41 59);
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgb(34 197 94), rgb(59 130 246));
+    border-radius: 4px;
+    border: 1px solid rgb(51 65 85);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgb(22 163 74), rgb(37 99 235));
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+  }
+
+  /* Custom scrollbar for Firefox */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(34 197 94) rgb(30 41 59);
+  }
+
+  /* Leaderboard scrollbar with different colors */
+  .leaderboard-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .leaderboard-scrollbar::-webkit-scrollbar-track {
+    background: rgb(51 65 85);
+    border-radius: 3px;
+  }
+
+  .leaderboard-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgb(168 85 247), rgb(236 72 153));
+    border-radius: 3px;
+  }
+
+  .leaderboard-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgb(147 51 234), rgb(219 39 119));
+    box-shadow: 0 0 6px rgba(168, 85, 247, 0.5);
+  }
+
+  .leaderboard-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(168 85 247) rgb(51 65 85);
   }
 }

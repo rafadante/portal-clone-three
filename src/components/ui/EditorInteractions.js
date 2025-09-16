@@ -723,6 +723,41 @@ var chambersFinished = [];
 var j = 0;
 window.arrayJSON = [];
 
+$("body").on('click', '#option-community-play', async function () {
+    window.arrayJSON = [];
+
+    $("#options-custom span").css("background", "none");
+
+    document.getElementById("loading-parent").style.opacity = "1";
+    document.getElementById("loading-parent").style.pointerEvents = "all";
+
+    if (!chambers) {
+        chambers = await window["selectAllChambers"]();
+        chambersPlayed = await window["selectAllChambersPlayed"](false);
+        chambersFinished = await window["selectAllChambersPlayed"](true);
+    }
+
+    $(".custom-chamber").remove();
+
+    j = 0;
+    const session = await window["getSession"]();
+
+    for (var i = 0; i < chambers.length; i++) {
+
+        //if (!chambers[i].tested || chambersPlayed.includes(chambers[i].id) || chambersFinished.includes(chambers[i].id))
+        //    continue;
+
+        if (chambers[i].user_id == session.user.id)
+            manageChmaberCustom(i, true)
+        else
+            manageChmaberCustom(i)
+
+    }
+
+    document.getElementById("loading-parent").style.opacity = "0";
+    document.getElementById("loading-parent").style.pointerEvents = "none";
+})
+
 $("body").on('click', '#options-custom span', async function () {
 
     window.arrayJSON = [];
@@ -825,7 +860,37 @@ function manageChmaberCustom(i, canDelete) {
 
     j++;
 
-    $("#list-custm-chambers").append(elem);
+    console.log("1")
+
+    //$("#list-custm-chambers").append(elem);
+
+    var cat = "Others"
+
+    if (elemMine == "mine") {
+        cat = "My chambers"
+    }
+
+    // Adicionar um projeto simples
+    window.ProjectManager.addProject({
+        title: chambers[i].name,
+        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean fringilla felis non tellus faucibus tempor. Maecenas mollis pellentesque nisl, nec tincidunt sem placerat ut. Aliquam vel consectetur augue. Suspendisse efficitur faucibus ipsum, in laoreet eros tincidunt ac. Pellentesque interdum nisl eget erat pulvinar.",
+        category: cat,
+        difficulty: "Medium",
+        thumbnail: chambers[i].thumb,
+        image: chambers[i].thumb,
+        leaderboard: [
+            { username: "username12345", score: "3:85", portals: 2, steps: 23 },
+            { username: "username12345", score: "3:85", portals: 2, steps: 23 },
+            { username: "username12345", score: "3:85", portals: 2, steps: 23 },
+            { username: "username12345", score: "3:85", portals: 2, steps: 23 },
+        ],
+        path: chambers[i].path,
+        user_id: chambers[i].user_id,
+        chamber_id: chambers[i].id,
+        elemMine: elemMine,
+        finished: chambers[i].finished,
+        played: chambers[i].played
+    });
 }
 
 $("body").on('click', '.delete-my-chamber', async function () {

@@ -309,7 +309,7 @@ $("body").on('click', '.custom-chamber1', function () {
 
 });
 
-async function manageLoadCustom(json, elem) {
+async function manageLoadCustom(json, user_id, chamber_id, name, finished, played1, mine) {
     single = false;
     window.allowEdit = false;
 
@@ -317,14 +317,14 @@ async function manageLoadCustom(json, elem) {
 
     window.isCustom = true;
 
-    if (elem.parent().parent().attr("id") == "list-custm-chambers")
+    /*if (elem.parent().parent().attr("id") == "list-custm-chambers")
         $("#next-map-btn").css("display", "none");
     else {
         $("#next-map-btn").css("display", "block");
         window.currentLevel = elem.parent().data("id");
-    }
+    }*/
 
-    if (elem.parent().hasClass("mine"))
+    if (mine == "mine")
         window.allowEdit = true;
 
     const session = await window["getSession"]();
@@ -345,16 +345,16 @@ async function manageLoadCustom(json, elem) {
         dlAnchorElem.setAttribute("download", "chamber.json");
         dlAnchorElem.click();*/
 
-        window.chamberID = elem.parent().data("id");
-        window.chamberUSERID = elem.parent().data("userid");
-        window.chamberFinished = elem.parent().data("finished");
+        window.chamberID = chamber_id;
+        window.chamberUSERID = user_id;
+        window.chamberFinished = finished;
 
-        const played = parseInt(elem.parent().data("played")) + 1;
+        const played = parseInt(played1) + 1;
 
         window.session = session;
 
-        if (elem.parent().data("userid") != session.user.id) {
-            window["updateChamberPlayedValue"](elem.parent().data("id"), played);
+        if (user_id != session.user.id) {
+            window["updateChamberPlayedValue"](chamber_id, played);
         }
 
         window.stopMenuLoop = true;
@@ -364,7 +364,7 @@ async function manageLoadCustom(json, elem) {
     //
 
 
-    $("#chamber-name-to-save").val(elem.parent().data("name"));
+    $("#chamber-name-to-save").val(name);
 
     if (first) {
 
@@ -544,7 +544,8 @@ function optionMenu(texture, title, id) {
     pointerState("block", "none", title, "flex", id);
 }
 
-$("body").on('click', '#back-main', function () {
+$("body").on('click', '#back-main, #back-main2', function () {
+    console.log("iiiiiiiiiiiii")
     GLOBALS.MATERIAL_SUB_MENU.uniforms.iTime.value = 1.2;
     transition2 = true;
     transition = false;
@@ -562,6 +563,8 @@ $("body").on('click', '#back-main', function () {
     $(".body").css("z-index", "1");
     $(".body").css("margin-left", "15vh");
     $(".body").css("background-color", "transparent");
+
+    $("#custom-menu2").css("display", "none");
 });
 
 function pointerState(display1, display2, title, titleDisplay, id) {
@@ -616,6 +619,8 @@ $("body").on('click', '#option-community-play', function () {
     $(".body").css("z-index", "10000000");
     $(".body").css("margin-left", "0px");
     $(".body").css("background-color", "black");
+
+    $("#custom-menu2").css("display", "block");
 });
 
 var chamberName = "null";
@@ -881,17 +886,20 @@ $("body").on('click', '#btn-close-custom-panel', function () {
     $("#menu-chamber").css("display", "none");
 });
 
-$("body").on('click', '#btn-play-custom', async function () {
+
+window["playCustom"] = async function (image, path, user_id, chamber_id, name, finished, played1, mine) {
+    console.log("uuuuuuuuuuuuu")
     $("#menu-chamber").css("display", "none");
+    $("#custom-menu2").css("display", "none");
 
     //
 
-    $("#gallery-img").css("background-image", customElement.css("background-image"))
+    $("#gallery-img").css("background-image", "url(" +image + ")")
 
     $("#loading-parent").css("opacity", 1);
     $("#loading-parent").css("pointer-events", "all");
 
-    const zipURL = await window["getZipPath"](customElement.data("path"));
+    const zipURL = await window["getZipPath"](path);
 
     const elem = customElement;
 
@@ -914,11 +922,11 @@ $("body").on('click', '#btn-play-custom', async function () {
                         // data is a string
                         // TODO Your code goes here!
 
-                        manageLoadCustom(JSON.parse(data), elem)
+                        manageLoadCustom(JSON.parse(data), user_id, chamber_id, name, finished, played1, mine)
                     })
                 }, function () { alert("Not a valid zip file") });
         });
-});
+};
 
 export {
     loadLevelJSON,
