@@ -371,6 +371,7 @@ select {
       filter: drop-shadow(2px 4px 6px black);
       pointer-events: none;
       font-size: 12px;
+      color: white;
     }
   }
 }
@@ -927,7 +928,7 @@ form {
 #version {
   position: absolute;
   bottom: 20px;
-  right: 20px;
+  left: 20px;
   z-index: 100000;
   font-size: 30px;
   color: white;
@@ -2342,4 +2343,9 @@ button:focus {
     scrollbar-width: thin;
     scrollbar-color: rgb(168 85 247) rgb(51 65 85);
   }
+}
+
+#social{
+  top: 20px;
+  left: 80px !important;
 }

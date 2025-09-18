@@ -340,7 +340,7 @@ function App() {
             <span>After that, just share the link and copy in the voice input field.</span>
           </div>
 
-          <div id="tags-menu">
+          {/**<div id="tags-menu">
             <span>CHAMBER TAGS</span>
             <div>
               <label htmlFor="tag">Chill</label>
@@ -370,7 +370,7 @@ function App() {
               <label htmlFor="tag">Original</label>
               <input name="tag" type="checkbox" ></input>
             </div>
-          </div>
+          </div> */}
 
           <div id="side-bar-left">
             <div id="info-box">
@@ -778,12 +778,12 @@ function App() {
 
           <div id="ui-top" className="">
             <div id="top-menu-left">
-              <span id="save-level">Save</span>
+              <span id="save-level">Download</span>
               <span id="load-level">Load</span>
               <span id="view-fps">Test</span>
-              <input id="chamber-name-to-save" type="text" placeholder="Name of the Chamber"></input>
+              {/**<input id="chamber-name-to-save" type="text" placeholder="Name of the Chamber"></input>
               <span style={{ fontWeight: "normal" }}>by</span>
-              <input id="author-name-to-save" type="text" placeholder="Name of the Author"></input>
+              <input id="author-name-to-save" type="text" placeholder="Name of the Author"></input> */}
             </div>
           </div>
 

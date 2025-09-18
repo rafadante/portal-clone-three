@@ -245,7 +245,7 @@ module.exports = function (webpackEnv) {
     infrastructureLogging: {
       level: 'none',
     },
-    /*optimization: {
+    optimization: {
       minimize: true,
       minimizer: [
         new TerserPlugin({
@@ -263,7 +263,7 @@ module.exports = function (webpackEnv) {
         }),
         new CssMinimizerPlugin(),
       ],
-    },*/
+    },
     resolve: {
       // This allows you to set a fallback for where webpack should look for modules.
       // We placed these paths second because we want `node_modules` to "win"
