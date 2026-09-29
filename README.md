@@ -1,70 +1,129 @@
-# Getting Started with Create React App
+# Portal Clone Three
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A browser-based clone of **Portal**, built with **Three.js** and **React**. Explore test chambers, place connected portals, and solve physics-based puzzles inspired by the Portal games.
 
-## Available Scripts
+**[Play the live demo](https://portal-clone-three.vercel.app/)**
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- **Portal mechanics:** place blue and orange portals and travel between them.
+- **First-person gameplay:** mouse look, movement, jumping, crouching, and object interaction.
+- **Physics-based puzzles:** cubes, buttons, doors, moving platforms, lasers, and energy pellets.
+- **Portal-inspired mechanics:** gels, faith plates, tractor beams, light bridges, fizzlers, and turrets.
+- **Ten tutorial chambers** included in the project.
+- **Built-in level editor** for creating custom test chambers.
+- **Community chambers** backed by Supabase, with authentication and saved play records.
+- **Mobile touch controls**, including a virtual joystick and action buttons.
+- **Custom shaders, sound effects, and post-processing** for the game environment.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The level editor is experimental; changes may affect compatibility with existing custom maps.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Tech Stack
 
-### `npm test`
+- **Three.js** — 3D rendering, cameras, materials, and shaders.
+- **Cannon.js** — physics simulation and collisions.
+- **React** — application interface and authentication flow.
+- **Supabase** — authentication, chamber metadata, and level storage.
+- **Webpack and Babel** — build tooling based on Create React App, with configuration maintained in the repository.
+- **Sass** — interface styling.
+- **Electron** — desktop wrapper and packaging scripts.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Getting Started
 
-### `npm run build`
+### Prerequisites
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Node.js and npm.
+- A browser with WebGL support.
+- A Supabase project URL and public anonymous key.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Installation
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Download or clone this repository, open a terminal in the project directory, and install its dependencies:
 
-### `npm run eject`
+```bash
+npm install
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Environment Variables
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Create a `.env.local` file in the project root with your Supabase configuration:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```dotenv
+REACT_APP_SUPABASE_URL=https://your-project.supabase.co
+REACT_APP_SUPABASE_ANON_KEY=your-public-anon-key
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+The application initializes Supabase at startup, so these values are required even when using guest mode. If you already have `.env` or `.env.development.local` files, check for conflicting values; `.env.development.local` takes precedence during development.
 
-## Learn More
+Authentication and community features also require the corresponding Supabase backend configuration. The code references Google OAuth, the `chambers` and `chambers_played` tables, and a Storage bucket named `json`. Environment variables alone do not create these resources.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Development
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+npm start
+```
 
-### Code Splitting
+Open [http://localhost:3000](http://localhost:3000). Restart the development server after changing environment variables.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Production Build
 
-### Analyzing the Bundle Size
+```bash
+npm run build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+The production files are generated in `build/` and can be served by a static hosting provider. Configure the same environment variables before building for deployment.
 
-### Making a Progressive Web App
+## Controls
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Desktop gameplay uses the following controls:
 
-### Advanced Configuration
+- **W / A / S / D** — move.
+- **Mouse** — look around.
+- **Left mouse button** — fire the blue portal.
+- **Right mouse button** — fire the orange portal.
+- **Space** — jump.
+- **Left Ctrl** — crouch.
+- **E** — interact with objects.
+- **Esc** — release the mouse pointer and open the pause menu.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Portal availability depends on the current chamber. On mobile, use the on-screen joystick and action buttons.
 
-### Deployment
+## Project Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```text
+public/
+  assets/         3D models, textures, and images
+  audio/          Music and sound effects
+  levels/         Tutorial chambers and preview images
+  electron.js     Electron entry point
+src/
+  components/     Gameplay systems, editor tools, shaders, and UI
+  App.js          React interface and Supabase integration
+  Main.js         Main game setup and coordination
+  Physics.js      Physics world and simulation
+  Globals.js      Shared game state
+  supabaseClient.js
+config/           Webpack and test configuration
+scripts/          Development, build, and test scripts
+```
 
-### `npm run build` fails to minify
+## Desktop Development
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Start the web development server with `npm start`, then run the Electron wrapper in another terminal:
+
+```bash
+npm run electron-dev
+```
+
+To package the desktop application:
+
+```bash
+npm run build
+npm run electron-pack
+```
+
+Desktop packaging output is configured to use the `release/` directory. Available targets depend on the host platform and the Electron Builder configuration in `package.json`.
+
+## Credits
+
+Inspired by **Portal** and **Portal 2** by Valve. This is an unofficial fan project and is not affiliated with or endorsed by Valve.
