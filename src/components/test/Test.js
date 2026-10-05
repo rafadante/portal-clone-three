@@ -1,3 +1,5 @@
+import { rememberChamber } from '../../multiplayer/loadedChamber';
+import { serializeChamber } from '../ui/EditorInteractions';
 import { Group, Vector3, Quaternion, Box3, Object3D, Color } from 'three';
 import $ from 'jquery';
 import { GLOBALS } from '../../Globals.js';
@@ -19,6 +21,7 @@ import { onWindowResize } from '../../Main.js';
 
 $("body").on('click', '#view-fps', function () {
     if (window.allowTest) {
+        rememberChamber(serializeChamber());
 
         if (!window.snapshot) {
 
@@ -380,6 +383,7 @@ function setup() {
     //GLOBALS.RENDERER.dispose()
     window.loaded = true;
     GLOBALS.MULTIPLAYER?.onReady();
+    window.dispatchEvent(new Event("chamber-play-ready"));
 }
 
 function blockPortal() {

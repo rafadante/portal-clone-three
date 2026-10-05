@@ -1,6 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import "./chambers.css"
+
+import { useState, useEffect, type CSSProperties } from "react"
 import { Button } from "../ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Heart, MessageCircle, Trophy, Zap, Star, Filter, X } from "lucide-react"
@@ -166,46 +168,26 @@ export default function InteractiveMenu() {
   }
 
   return (
-    <div className="h-screen bg-slate-900 p-4 md:p-6 relative overflow-hidden flex flex-col">
-
-
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/50 to-slate-900"></div>
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
-
-      <div className="max-w-7xl mx-auto relative z-10 flex flex-col h-full">
+    <div className="aperture-chambers" style={{ "--chamber-background": `url(${process.env.PUBLIC_URL}/community/4.webp)` } as CSSProperties}>
+      <aside className="aperture-sidebar">
+        <div className="aperture-brand"><span className="aperture-symbol" aria-hidden="true">◉</span><div>APERTURE<small>LABORATORIES</small></div></div>
+        <button id="back-main2" className="aperture-back"><span aria-hidden="true">←</span> BACK</button>
+        <div className="aperture-current"><span aria-hidden="true">◇</span> CUSTOM CHAMBERS</div>
+        <button className="aperture-filter-toggle" aria-expanded={showFilters} onClick={() => setShowFilters(!showFilters)}><Filter size={19} /> FILTERS</button>
+        <nav aria-label="Chamber categories">
+          {[{ key: "All", label: "All chambers" }, { key: "My chambers", label: "My chambers" }, { key: "Others", label: "Community" }].map(({ key, label }) => (
+            <button key={key} className={selectedCategory === key ? "is-selected" : ""} aria-pressed={selectedCategory === key} onClick={() => setSelectedCategory(key)}>
+              <span>{label}</span><span>{key === "All" ? allTemplates.length : allTemplates.filter(t => t.category === key).length}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="aperture-sidebar-footer"><span className="aperture-status-light" /> COMMUNITY TESTING<br /><small>Science is a collaborative effort.</small></div>
+      </aside>
+      <div className="aperture-content">
         <div className="flex-shrink-0">
-          <div className="flex flex-col sm:flex-row items-center justify-between mb-6 md:mb-8">
-            <div className="flex items-center gap-4 mb-4 sm:mb-0">
-              <Button
-                id="back-main2"
-                className="bg-slate-600 hover:bg-slate-500 text-white border-0 transition-all duration-300 hover:scale-105 flex items-center gap-2"
-              >
-                <div className="w-4 h-4">←</div>
-                Back
-              </Button>
-              <h1 className="text-2xl md:text-4xl font-bold text-white text-center drop-shadow-2xl">
-                🎮 Custom Chambers
-              </h1>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <Button
-                onClick={() => setShowFilters(!showFilters)}
-                className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg transition-all duration-300 hover:scale-105 border-0"
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                Filters{" "}
-                {(selectedCategory !== "All" || selectedDifficulty !== "All" || sortBy !== "popularity") && "(Active)"}
-              </Button>
-
-              <div className="text-sm text-slate-300">
-                Showing {filteredTemplates.length} of {allTemplates.length} chambers
-              </div>
-            </div>
-
+          <header className="aperture-heading"><h1>CUSTOM CHAMBERS</h1><p>TESTING INITIATIVE <span /></p></header>
+          <div className="aperture-tools">
+            <div className="aperture-results" aria-live="polite">SHOWING {filteredTemplates.length} OF {allTemplates.length} CHAMBERS</div>
             {showFilters && (
               <Card className="mt-4 border border-slate-700 bg-slate-800 shadow-xl">
                 <CardContent className="p-4">
@@ -288,8 +270,8 @@ export default function InteractiveMenu() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 pb-6">
+        <div className="aperture-scroll custom-scrollbar">
+          <div className="aperture-grid">
             {filteredTemplates.map((template, index) => (
               <Card
                 key={template.id}
@@ -297,7 +279,11 @@ export default function InteractiveMenu() {
                   setSelectedTemplate(template)
                   setShowMenu(true)
                 }}
-                className="transition-all duration-300 transform hover:scale-105 border border-slate-700 bg-slate-800 hover:bg-slate-700 hover:shadow-xl hover:shadow-purple-500/20 cursor-pointer"
+                role="button"
+                tabIndex={0}
+                aria-label={`Open ${template.title}`}
+                onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelectedTemplate(template); setShowMenu(true); } }}
+                className="aperture-chamber-card"
               >
                 {/* ... existing card content ... */}
                 <div className="relative overflow-hidden rounded-t-lg">
@@ -323,14 +309,13 @@ export default function InteractiveMenu() {
 
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-bold text-white flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-yellow-400" />
                     {template.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-3 text-sm mb-3">
                     <div className="flex items-center gap-1 text-pink-300">
-                      <Heart className="w-4 h-4 fill-current" />
+                      <Heart className="w-4 h-4" />
                       <span className="font-semibold text-white">{template.likes}</span>
                     </div>
                     <div className="flex items-center gap-1 text-cyan-300">
@@ -355,8 +340,8 @@ export default function InteractiveMenu() {
                   <div className="text-slate-400 mb-2">
                     <Filter className="w-12 h-12 mx-auto mb-3" />
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-2">No templates found</h3>
-                  <p className="text-slate-300 text-sm mb-4">Try adjusting the filters to find more templates</p>
+                  <h3 className="text-lg font-bold text-white mb-2">No chambers found</h3>
+                  <p className="text-slate-300 text-sm mb-4">Try adjusting the filters to find more chambers</p>
                   <Button
                     onClick={clearFilters}
                     size="sm"
@@ -377,7 +362,7 @@ export default function InteractiveMenu() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-4 border-b border-slate-700 flex justify-between items-center">
-                <h2 className="text-xl font-bold text-white">Template Details</h2>
+                <h2 className="text-xl font-bold text-white">Chamber Details</h2>
                 <Button
                   onClick={() => setShowMenu(false)}
                   size="sm"
@@ -504,7 +489,7 @@ export default function InteractiveMenu() {
                   <div className="text-slate-400 mb-4">
                     <Trophy className="w-16 h-16 mx-auto mb-4 text-purple-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Select a Template</h3>
+                  <h3 className="text-xl font-bold text-white mb-2">Select a Chamber</h3>
                   <p className="text-slate-300 text-sm">Click on one of the cards to see details and leaderboard</p>
                 </div>
               )}

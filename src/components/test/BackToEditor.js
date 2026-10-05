@@ -18,6 +18,7 @@ $("body").on('click', '#back-editor', function () {
 
 function backToEditor() {
     GLOBALS.MULTIPLAYER?.close();
+    window.dispatchEvent(new Event("chamber-play-ended"));
 
     GLOBALS.ANGLED_PANELS = [];
     

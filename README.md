@@ -141,6 +141,8 @@ Multiplayer uses the existing editor, chamber assets, physics and portal rendere
 
 In shared-pair mode, either mouse button places your assigned portal. In independent-pairs mode, left/right click place your two portals. Both players can traverse any complete pair. The normal movement and chamber controls remain available.
 
+Saved cooperative chambers also show **Create room & invite** after loading from **Custom Chambers**. Click it to host the saved map and reveal the invitation code/link, without returning to the editor. This is available even when you cannot edit the chamber. Single-player and older files without cooperative metadata do not show this action.
+
 ### Chamber format
 
 The existing `[settings, planes]` file structure is preserved. `settings[4]` stores chamber metadata:

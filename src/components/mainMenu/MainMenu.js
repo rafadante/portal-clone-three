@@ -1,3 +1,4 @@
+import { rememberChamber } from '../../multiplayer/loadedChamber';
 import { applyChamberConfig } from '../ui/EditorInteractions.js';
 import { readChamberConfig } from '../../multiplayer/chamberConfig.js';
 import { PlaneGeometry, Mesh, Color, Clock, Object3D, Vector2, TextureLoader, SRGBColorSpace, RepeatWrapping } from 'three';
@@ -432,6 +433,7 @@ if (localStorage.getItem("load") == "true") {
 }
 
 function loadLevelJSON() {
+    rememberChamber(level);
     applyChamberConfig(readChamberConfig(level));
 
     $("#option-single").css("display", "none");
@@ -646,6 +648,7 @@ $("#input-level").on('change', function (e) {
         if (data[0][3])
             $("#chamber_style-select").val(data[0][3]).change();
 
+        rememberChamber(data);
         applyChamberConfig(readChamberConfig(data));
         loadLevel(data[1])
 
@@ -951,6 +954,7 @@ async function loadNetworkChamber(document, cancelled = () => false) {
     $('#ambient-sound-select').val(document[0][1]).change();
     if (document[0][2]) $('#color-wall-portal').val(document[0][2]).change();
     $('#chamber_style-select').val(document[0][3] || 'standard').change();
+    rememberChamber(document);
     applyChamberConfig(readChamberConfig(document));
     loadLevel(document[1]);
     await waitFor(() => window.totalItemsLoaded >= window.totalItemsToLoad && window.allowTest);

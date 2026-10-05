@@ -1,3 +1,4 @@
+import { getLoadedCoopChamber } from './loadedChamber';
 import $ from 'jquery';
 import { Vector3 } from 'three';
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
@@ -51,6 +52,7 @@ class Session {
     $('#room-join-fields').prop('hidden', true);
     $('#room-dismiss').prop('hidden', false);
     $('#room-invitation, #room-leave, #room-show').prop('hidden', false);
+    $('#room-show').text('Room · 1/2');
     $('#room-code-display').text(code);
     $('#room-controls').text(host ? 'You are player 1. Share this code with player 2.' : 'You are player 2. Loading the host’s chamber…');
     status('Connecting…');
@@ -65,6 +67,9 @@ class Session {
   onReady() {
     if (this.closed || this.ready) return;
     this.ready = true;
+    for (const index of ownedPortals(GLOBALS.CHAMBER_CONFIG, this.slot)) {
+      this.portalChanged(index, GLOBALS.PORTALS[index]?.netData || null);
+    }
     // Reuse the existing animated character asset and chamber geometry.
     this.avatar = clone(GLOBALS.PLAYER_MODEL);
     this.avatar.traverse(object => {
@@ -130,6 +135,7 @@ class Session {
     $('#room-join-fields, #room-dismiss').prop('hidden', false);
     $('#room-connect').prop('disabled', false);
     status('You left the room.');
+    refreshRoomButton();
   }
 }
 
@@ -138,13 +144,28 @@ $('body').on('click', '#option-multiplayer-create', () => {
   applyChamberConfig({ mode: 'multiplayer', portalMode: 'shared' });
 });
 $('body').on('click', '#option-multiplayer-join', () => show());
-$('body').on('click', '#host-chamber-room', () => {
+function refreshRoomButton() {
+  const canHost = GLOBALS.FPS_MODE && window.loaded && GLOBALS.CHAMBER_CONFIG.mode === 'multiplayer' && Boolean(getLoadedCoopChamber());
+  if (!active) $('#room-show').text('Create room & invite').prop('hidden', !canHost);
+}
+function hostCurrentChamber() {
   show();
   if (active) return;
-  if (!window.allowTest) return status('The entrance and exit bounds must be green before hosting.');
   if (GLOBALS.CHAMBER_CONFIG.mode !== 'multiplayer') return status('Select Multiplayer in chamber settings.');
-  try { new Session(true, roomCode(), serializeChamber()); $('#view-fps').trigger('click'); }
-  catch (error) { status(error.message); }
+  const playing = GLOBALS.FPS_MODE && window.loaded;
+  if (!playing && !window.allowTest) return status('The entrance and exit bounds must be green before hosting.');
+  try {
+    const document = playing ? getLoadedCoopChamber() : serializeChamber();
+    if (!document) return status('Reopen the saved cooperative chamber before hosting.');
+    const session = new Session(true, roomCode(), document);
+    if (playing) { session.onReady(); show(); }
+    else $('#view-fps').trigger('click');
+  } catch (error) { status(error.message); }
+}
+$('body').on('click', '#host-chamber-room', hostCurrentChamber);
+window.addEventListener('chamber-play-ready', refreshRoomButton);
+window.addEventListener('chamber-play-ended', () => {
+  $('#room-show, #chamber-room-panel').prop('hidden', true);
 });
 $('body').on('click', '#room-connect', () => {
   if (active) return;
@@ -159,7 +180,10 @@ $('body').on('click', '#room-copy', async () => {
   catch { status(`Copy the room code above: ${active.code}`); }
 });
 $('body').on('click', '#room-dismiss', () => $('#chamber-room-panel').prop('hidden', true));
-$('body').on('click', '#room-show', () => { document.exitPointerLock?.(); show(); });
+$('body').on('click', '#room-show', () => {
+  document.exitPointerLock?.();
+  if (active) show(); else hostCurrentChamber();
+});
 $('body').on('click', '#room-leave', () => active?.close());
 window.addEventListener('beforeunload', () => active?.close());
 panel();
