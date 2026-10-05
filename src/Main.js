@@ -18,6 +18,7 @@ import { updateRay, recreateRay } from './components/ray/Ray.js';
 import './components/test/Test.js';
 import Stats from "stats-gl";
 import "./components/mainMenu/MainMenu.js";
+import './multiplayer/Session.js';
 import { renderGoo } from './components/goo/Goo.js';
 import { updateEvents } from './components/events/events.js';
 import { loadMaterials } from "./components/materials/Materials.js";
@@ -378,17 +379,13 @@ function animatePortal(currentTime) {
             lastTime = currentTime - (deltaTime % interval);
 
             // Your update and render logic
-            renderPortal2(0, 1)
-            renderPortal2(1, 0)
+            for (let i = 0; i < GLOBALS.PORTALS.length; i++) renderPortal2(i, i ^ 1);
         }
     } else {
-        if (GLOBALS.PORTALS[0] && GLOBALS.PORTALS[1]) {
-            if (GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value == 1) {
-                GLOBALS.PORTALS[0].mesh.material.uniforms.texture1.value = null;
-                GLOBALS.PORTALS[1].mesh.material.uniforms.texture1.value = null;
-                GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value = 0;
-                GLOBALS.PORTALS[1].portalShader.material.uniforms.iOpened.value = 0;
-            }
+        for (const portal of GLOBALS.PORTALS) {
+            if (!portal) continue;
+            portal.mesh.material.uniforms.texture1.value = null;
+            portal.portalShader.material.uniforms.iOpened.value = 0;
         }
     }
 
@@ -409,16 +406,9 @@ function animatePortal(currentTime) {
         GLOBALS.PLAYER_MODEL_CLONE.visible = cloneVisible;
     }
 
-    if (GLOBALS.PORTALS[0] === null && GLOBALS.PORTALS[1] !== null) {
-        GLOBALS.PORTALS[1].mesh.visible = false
-    }
-    if (GLOBALS.PORTALS[0] !== null && GLOBALS.PORTALS[1] === null) {
-        GLOBALS.PORTALS[0].mesh.visible = false
-    }
-    if (GLOBALS.PORTALS[0] !== null && GLOBALS.PORTALS[1] !== null) {
-        GLOBALS.PORTALS[0].mesh.visible = true
-        GLOBALS.PORTALS[1].mesh.visible = true
-    }
+    GLOBALS.PORTALS.forEach((portal, index) => {
+        if (portal) portal.mesh.visible = Boolean(GLOBALS.PORTALS[index ^ 1]);
+    });
 
     GLOBALS.RENDERER.shadowMap.autoUpdate = currentShadowAutoUpdate;
 }

@@ -1,7 +1,7 @@
 import { GLOBALS } from "../../Globals.js";
 import { AUDIO, play } from "../audio/Audio.js";
 import { stateDoor } from "../door/Door.js";
-import { deletePortal } from "../portal/CreatePortal.js";
+import { deleteOwnedPortals } from "../portal/CreatePortal.js";
 import { interactWithItem } from "./interaction.js";
 
 function laserFieldState(obj) {
@@ -124,9 +124,7 @@ function respawn(d) {
         time = 500;
         time2 = 500;
 
-        deletePortal(0)
-        deletePortal(1)
-        GLOBALS.PORTAL_BOX = [];
+        deleteOwnedPortals();
 
         for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
             if (GLOBALS.CONNECTIONS[i]['from'].instancedName && GLOBALS.CONNECTIONS[i]['to'].instancedName) {

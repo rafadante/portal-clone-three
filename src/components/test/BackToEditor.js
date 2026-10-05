@@ -17,6 +17,7 @@ $("body").on('click', '#back-editor', function () {
 });
 
 function backToEditor() {
+    GLOBALS.MULTIPLAYER?.close();
 
     GLOBALS.ANGLED_PANELS = [];
     
@@ -154,8 +155,7 @@ function backToEditor() {
     $("#blocker").css("pointer-events", "none");
     $("#reticle").css("display", "none");
 
-    deletePortal(0)
-    deletePortal(1)
+    GLOBALS.PORTALS.forEach((portal, index) => deletePortal(index));
     GLOBALS.PORTAL_BOX = [];
 
     GLOBALS.MAIN_CAMERA.position.set(-12.2, 17.4, 26.3)

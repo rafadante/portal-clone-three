@@ -1,6 +1,6 @@
 import {
     Plane, CylinderGeometry, Matrix4, BoxGeometry, ShaderMaterial, Texture, Mesh, DoubleSide,
-    MeshBasicMaterial, ArrowHelper, EqualStencilFunc, ReplaceStencilOp, Group, Vector3
+    MeshBasicMaterial, ArrowHelper, EqualStencilFunc, ReplaceStencilOp, Group, Vector3, PointLight
 } from 'three';
 import { GeneralBB } from '../generalBB/GeneralBB.js'
 import { GLOBALS } from '../../Globals.js';
@@ -145,6 +145,12 @@ class Portal extends Group {
             light.intensity = 3;
         }
 
+        if (index >= 2) {
+            light = new PointLight(ringColor, 3, 2);
+            this.add(light);
+        }
+        this.mesh.userData.this = index;
+        this.mesh.userData.other = index ^ 1;
         light.position.copy(this.mesh.position)
         light.visible = true;
         this.light = light;

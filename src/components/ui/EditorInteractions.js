@@ -14,6 +14,7 @@ import { respawn } from '../events/states';
 import { AUDIO } from '../audio/Audio';
 import { checkToUpdateContinuous } from '../cubeManager/UpdateRaycast';
 import JSZip from "jszip";
+import { chamberDocument, normalizeChamberConfig } from '../../multiplayer/chamberConfig';
 import { updateAngledPanel } from '../test/Colliders';
 
 window.addEventListener("contextmenu", e => e.preventDefault());
@@ -545,22 +546,20 @@ $("body").on('click', '#save-level', function () {
 });
 
 function saveChamber(publish) {
-    var data = [];
-    var userDataHolder = [];
-    var itemHolder = [];
-
-    for (var i = 0; i < GLOBALS.PLANE_USER_DATA.length; i++) {
-
-        if (GLOBALS.PLANE_USER_DATA[i].item) {
-
-            userDataHolder.push(GLOBALS.PLANE_USER_DATA[i])
-            itemHolder.push(GLOBALS.PLANE_USER_DATA[i].item)
-            GLOBALS.PLANE_USER_DATA[i].item = GLOBALS.PLANE_USER_DATA[i].item.userData;
-        }
-
-        GLOBALS.PLANE_USER_DATA[i].body = null;
+    const data = serializeChamber();
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+    if (publish) {
+        zipJson(JSON.stringify(data), window.chamberID);
+    } else {
+        const link = document.createElement('a');
+        link.href = dataStr;
+        link.download = $("#chamber-name-to-save").val()
+            ? $("#chamber-name-to-save").val() + "_by_" + $("#author-name-to-save").val() + ".json" : "chamber.json";
+        link.click();
     }
+}
 
+function serializeChamber() {
     const settings = [
         GLOBALS.PORTAL_GUN_INITIATE,
         AUDIO.AMBIENT.value,
@@ -568,29 +567,23 @@ function saveChamber(publish) {
         window.oldAperture
     ]
 
-    data.push(settings);
-    data.push(GLOBALS.PLANE_USER_DATA);
-
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-
-
-    if (publish) {
-        zipJson(JSON.stringify(data), window.chamberID)
-    } else {
-        var dlAnchorElem = document.createElement('a');
-        dlAnchorElem.setAttribute("href", dataStr);
-
-        if ($("#chamber-name-to-save").val())
-            dlAnchorElem.setAttribute("download", $("#chamber-name-to-save").val() + "_by_" + $("#author-name-to-save").val() + ".json");
-        else
-            dlAnchorElem.setAttribute("download", "chamber.json");
-
-        dlAnchorElem.click();
-    }
-
-    for (var i = 0; i < userDataHolder.length; i++)
-        userDataHolder[i].item = itemHolder[i];
+    return chamberDocument(settings, GLOBALS.PLANE_USER_DATA, GLOBALS.CHAMBER_CONFIG);
 }
+
+function applyChamberConfig(config) {
+    GLOBALS.CHAMBER_CONFIG = normalizeChamberConfig(config);
+    const multiplayer = GLOBALS.CHAMBER_CONFIG.mode === 'multiplayer';
+    $('#chamber-mode-select').val(GLOBALS.CHAMBER_CONFIG.mode).prop('disabled', Boolean(GLOBALS.MULTIPLAYER));
+    $('#chamber-portal-mode-select').val(GLOBALS.CHAMBER_CONFIG.portalMode).prop('disabled', !multiplayer || Boolean(GLOBALS.MULTIPLAYER));
+    $('#host-chamber-room').prop('disabled', !multiplayer || Boolean(GLOBALS.MULTIPLAYER));
+    $('#portal-gun-select').prop('disabled', multiplayer);
+    if (multiplayer) { GLOBALS.PORTAL_GUN_INITIATE = 'all'; $('#portal-gun-select').val('all'); }
+}
+
+$('body').on('change', '#chamber-mode-select, #chamber-portal-mode-select', function () {
+    if (GLOBALS.MULTIPLAYER) return;
+    applyChamberConfig({ mode: $('#chamber-mode-select').val(), portalMode: $('#chamber-portal-mode-select').val() });
+});
 
 // Function to zip a JSON object
 async function zipJson(jsonObject, update) {
@@ -927,4 +920,4 @@ document.onkeypress = function (e) {
     }
 };
 
-export { saveChamber }
+export { saveChamber, serializeChamber, applyChamberConfig }

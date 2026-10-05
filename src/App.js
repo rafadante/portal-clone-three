@@ -53,9 +53,13 @@ function App() {
   }
 
   const signIn = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google"
-    })
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + window.location.pathname,
+      },
+    });
+    if (error) window.alert("Could not start Google sign-in: " + error.message);
   }
 
   const signInNo = async () => {
@@ -390,6 +394,16 @@ function App() {
             </div>
             <div className="body bodyEditor">
               <div id="settings">
+                <div className="options-row chamber-network-setting">
+                  <span className="option-name">Chamber type:</span>
+                  <div className="option-value"><select id="chamber-mode-select" defaultValue="single"><option value="single">Single player</option><option value="multiplayer">Multiplayer (2 players)</option></select></div>
+                </div>
+                <div className="options-row chamber-network-setting">
+                  <span className="option-name">Multiplayer portals:</span>
+                  <div className="option-value"><select id="chamber-portal-mode-select" defaultValue="shared" disabled><option value="shared">1 portal each — shared pair</option><option value="independent">2 portals each — independent pairs</option></select></div>
+                </div>
+                <div className="options-row chamber-network-setting"><button id="host-chamber-room" type="button" disabled>Host this chamber online</button></div>
+
                 <div className="options-row">
                   <span className="option-name" id="">Portal Gun Initiate:</span>
                   <div className="option-value">
@@ -1692,6 +1706,8 @@ function App() {
 
               <div id="options-main" className="optionMenu">
                 <span className="option" id="option-single">SINGLE PLAYER</span>
+                <span className="option" id="option-multiplayer-create">CREATE MULTIPLAYER CHAMBER</span>
+                <span className="option" id="option-multiplayer-join">JOIN MULTIPLAYER ROOM</span>
                 <span className="option" id="option-community">CUSTOM CHAMBERS</span>
                 <span className="option" id="option-about">ABOUT</span>
               </div>

@@ -137,6 +137,7 @@ function updateLaserCubeRaycaster(item, laser) {
         GLOBALS.ITEMS_ADDED.getObjectByName("scale_cube"),
         GLOBALS.ITEMS_ADDED.getObjectByName("laser_receiver"),
         GLOBALS.ITEMS_ADDED.getObjectByName("laser_relay"),
+        GLOBALS.ITEMS_ADDED.getObjectByName("bomb_cube"),
     ]
 
     var array = unfiltered.filter(function (el) {
@@ -177,20 +178,15 @@ function updateLaserCubeRaycaster(item, laser) {
         }
     }
 
-    if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null)
+    if (!GLOBALS.PORTALS.some(p => p?.output))
         return
 
-    var laserCubeRayIntersectsWithPortals = raycasterLaserCube.intersectObjects(GLOBALS.PORTAL_SHADER);
+    var laserCubeRayIntersectsWithPortals = raycasterLaserCube.intersectObjects(GLOBALS.PORTAL_SHADER.filter((mesh, i) => GLOBALS.PORTALS[i]?.output));
     if (laserCubeRayIntersectsWithPortals.length > 0) {
 
         var portal, portal2;
-        if (laserCubeRayIntersectsWithPortals[0].object.name == "portal-0") {
-            portal = 1;
-            portal2 = 0
-        } else {
-            portal = 0;
-            portal2 = 1
-        }
+        portal2 = Number(laserCubeRayIntersectsWithPortals[0].object.name.split("-").pop());
+            portal = portal2 ^ 1;
 
         laser.clone.position.copy(GLOBALS.PORTAL_SHADER[portal].position)
         //
@@ -366,7 +362,7 @@ function updateLaserEmitterRaycaster() {
 
         GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.visible = false;
 
-        var intersectsWithPortals = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObjects(GLOBALS.PORTAL_SHADER);
+        var intersectsWithPortals = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObjects(GLOBALS.PORTAL_SHADER.filter((mesh, i) => GLOBALS.PORTALS[i]?.output));
 
         //CHECK FOR WALL INTERSECTION
         var intersectsWall = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
@@ -391,6 +387,7 @@ function updateLaserEmitterRaycaster() {
             GLOBALS.ITEMS_ADDED.getObjectByName("scale_cube"),
             GLOBALS.ITEMS_ADDED.getObjectByName("laser_receiver"),
             GLOBALS.ITEMS_ADDED.getObjectByName("laser_relay"),
+            GLOBALS.ITEMS_ADDED.getObjectByName("bomb_cube"),
         ]
 
         var array = unfiltered.filter(function (el) {
@@ -433,19 +430,14 @@ function updateLaserEmitterRaycaster() {
         if (blocked)
             continue
 
-        if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null)
+        if (!GLOBALS.PORTALS.some(p => p?.output))
             continue
 
         //CHECK FOR PORTAL INTERSECTION
         if (intersectsWithPortals.length > 0) {
             var portal, otherPortal;
-            if (intersectsWithPortals[0].object.name == "portal-0") {
-                portal = 1;
-                otherPortal = 0
-            } else {
-                portal = 0;
-                otherPortal = 1;
-            }
+            otherPortal = Number(intersectsWithPortals[0].object.name.split("-").pop());
+            portal = otherPortal ^ 1;
 
             let dir = new Vector3()
             GLOBALS.PORTAL_SHADER[portal].getWorldDirection(dir)

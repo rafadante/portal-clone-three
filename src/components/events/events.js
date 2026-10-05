@@ -188,7 +188,7 @@ function updateEvents(deltaTime) {
 
                   const holderItem = GLOBALS.CONNECTIONS[i]['to'].item;
 
-                  if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+                  if (Boolean(GLOBALS.PORTALS[holderItem.getObjectByName("panel").hasPortal])) {
                     deletePortal(holderItem.getObjectByName("panel").hasPortal)
                   }
 
@@ -349,7 +349,7 @@ function doSetTimeout(to, waitFor, idHolder, connection, body) {
 
         const holderItem = to.item;
 
-        if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+        if (Boolean(GLOBALS.PORTALS[holderItem.getObjectByName("panel").hasPortal])) {
           deletePortal(holderItem.getObjectByName("panel").hasPortal)
         }
 
@@ -444,7 +444,7 @@ function resetAll() {
 
           const holderItem = GLOBALS.CONNECTIONS[i]['to'].item;
 
-          if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+          if (Boolean(GLOBALS.PORTALS[holderItem.getObjectByName("panel").hasPortal])) {
             deletePortal(holderItem.getObjectByName("panel").hasPortal)
           }
 
@@ -545,7 +545,7 @@ function laserReceiverTrigger(obj, state, catcher) {
 
               const holderItem = GLOBALS.CONNECTIONS[i]['to'].item;
 
-              if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+              if (Boolean(GLOBALS.PORTALS[holderItem.getObjectByName("panel").hasPortal])) {
                 deletePortal(holderItem.getObjectByName("panel").hasPortal)
               }
 
@@ -640,7 +640,7 @@ function laserReceiverTrigger(obj, state, catcher) {
 
         const holderItem = holder['to'].item;
 
-        if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+        if (Boolean(GLOBALS.PORTALS[holderItem.getObjectByName("panel").hasPortal])) {
           deletePortal(holderItem.getObjectByName("panel").hasPortal)
         }
 

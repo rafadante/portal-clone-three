@@ -168,6 +168,17 @@ const generateMeshPortalShader = () => {
     plane.renderOrder = -1;
     plane.name = "portal-1";
     GLOBALS.PORTAL_SHADER[1] = plane;
+    for (let i = 2; i < 4; i++) {
+        const extra = plane.clone();
+        extra.material = mat2.clone();
+        extra.material.fragmentShader = fshader.replace(/}\s*$/, `
+            vec3 tint = iPortal == 2 ? vec3(0.65, 0.15, 1.0) : vec3(0.15, 1.0, 0.35);
+            gl_FragColor.rgb = tint * max(color, 0.3);
+        }`);
+        extra.material.uniforms.iPortal.value = i;
+        extra.name = 'portal-' + i;
+        GLOBALS.PORTAL_SHADER[i] = extra;
+    }
 };
 
 export {

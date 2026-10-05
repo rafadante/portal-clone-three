@@ -234,24 +234,19 @@ window.tractorClones = [];
 
 function createLightBridgesFromPortal(portal, rayItem) {
 
-    if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null)
+    if (!GLOBALS.PORTALS.some(p => p?.output))
         return
 
     for (var g = 0; g < rayItem.length; g++) {
 
-        var intersects = rayItem[g].intersectObjects(GLOBALS.PORTAL_SHADER);
+        var intersects = rayItem[g].intersectObjects(GLOBALS.PORTAL_SHADER.filter((mesh, i) => GLOBALS.PORTALS[i]?.output));
 
         if (intersects.length > 0) {
 
             var otherPortal;
 
-            if (intersects[0].object.name == "portal-0") {
-                portal = 1;
-                otherPortal = 0;
-            } else {
-                portal = 0;
-                otherPortal = 1;
-            }
+            otherPortal = Number(intersects[0].object.name.split("-").pop());
+            portal = otherPortal ^ 1;
 
             if (rayItem[g].name == "light_bridge") {
                 if (GLOBALS.LIGHT_BRIDGE_CLONE[g]) {

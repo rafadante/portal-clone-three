@@ -95,7 +95,7 @@ function interactWithItem() {
 
                                     const holderItem = GLOBALS.CONNECTIONS[i]['to'].item;
 
-                                    if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+                                    if (Boolean(GLOBALS.PORTALS[holderItem.getObjectByName("panel").hasPortal])) {
                                         deletePortal(holderItem.getObjectByName("panel").hasPortal)
                                     }
 
@@ -268,7 +268,7 @@ function pedestalTimer(holder) {
 
             const holderItem = holder['to'].item;
 
-            if (holderItem.getObjectByName("panel").hasPortal == 0 || holderItem.getObjectByName("panel").hasPortal == 1) {
+            if (Boolean(GLOBALS.PORTALS[holderItem.getObjectByName("panel").hasPortal])) {
                 deletePortal(holderItem.getObjectByName("panel").hasPortal)
             }
 

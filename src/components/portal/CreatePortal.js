@@ -7,12 +7,17 @@ import { GLOBALS } from '../../Globals.js';
 import { AUDIO, play } from '../audio/Audio.js';
 import { fillPaintingGun, shootGel } from '../gels/PaintingGun.js';
 import { outOfTheTractor } from '../tractorBeam/TractorBeam.js';
+import { shotPortal, ownedPortals } from '../../multiplayer/chamberConfig';
 
 var coords = new Vector3();
 var raycaster2 = new Raycaster();
 var allowPortal = true;
 
 function portalButton(button, auto, camera, firstToRender) {
+    const targetIndex = auto ? (button === 0 ? 0 : 1) : shotPortal(GLOBALS.CHAMBER_CONFIG, GLOBALS.MULTIPLAYER?.slot ?? 0, button);
+    if (targetIndex === null) return;
+    if (!auto && GLOBALS.CHAMBER_CONFIG.mode === 'multiplayer') button = targetIndex % 2 === 0 ? 0 : 2;
+    const partnerIndex = targetIndex ^ 1;
 
     if (!GLOBALS.LEVEL_ENTERED && !auto)
         return;
@@ -148,7 +153,7 @@ function portalButton(button, auto, camera, firstToRender) {
                 && (!userData.hasItem || auto || userData.itemName.includes("camera") || userData.itemName.includes("radio") || userData.itemName.includes("trigger")))) {//!userData.hasItem || (userData.itemName.includes("camera"))
 
                 if (intersectPanel.length > 0) {
-                    if ((intersectPanel[0].object.hasPortal == 0 && button == 2) || (intersectPanel[0].object.hasPortal == 1 && button == 0)) {
+                    if (GLOBALS.PORTALS[intersectPanel[0].object.hasPortal] && intersectPanel[0].object.hasPortal !== targetIndex) {
                         //NONPORTABLE WALL
                         AUDIO.PORTAL_INVALID.pause();
                         AUDIO.PORTAL_INVALID.currentTime = 0;
@@ -215,13 +220,13 @@ function portalButton(button, auto, camera, firstToRender) {
 
                 //IF THE PORTAL IS SPAWNING IN THE SAME POSITION OF ANOTHER PORTAL RETURN
                 var portalID;
-                if (button == 0)
-                    portalID = 1;
-                else if (button == 2)
-                    portalID = 0;
+                portalID = partnerIndex;
 
                 if (!paintMode && !auto && intersectPanel.length == 0) {
-                    if (GLOBALS.PORTAL_BOX[portalID]) {
+                    for (let other = 0; other < GLOBALS.PORTALS.length; other++) {
+                      if (other === targetIndex || !GLOBALS.PORTALS[other]) continue;
+                      portalID = other;
+                      if (GLOBALS.PORTAL_BOX[portalID]) {
                         for (let p of portalPoints) {
                             if (!isInOtherPortalArea(p, normal, intersects[0].object, portalID)) {
                                 AUDIO.PORTAL_INVALID.pause();
@@ -230,6 +235,7 @@ function portalButton(button, auto, camera, firstToRender) {
                                 return;
                             }
                         }
+                    }
                     }
 
                     //CHECK IF THE PORTAL IS GOING OUT OF BOUNDS AND REPOSITIONING IT
@@ -316,10 +322,10 @@ function portalButton(button, auto, camera, firstToRender) {
                     }
 
                     // delete the old portal this new one is replacing
-                    if (GLOBALS.PORTALS[0] !== null)
-                        deletePortal(0);
+                    if (GLOBALS.PORTALS[targetIndex] !== null)
+                        deletePortal(targetIndex);
 
-                    newPortal(0, 1, point, normal, body, playerUpDirection, portalPoints, userData.side, angled)
+                    newPortal(targetIndex, partnerIndex, point, normal, body, playerUpDirection, portalPoints, userData.side, angled)
 
                     GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(0.0, 1.25, 2.5);
 
@@ -331,7 +337,7 @@ function portalButton(button, auto, camera, firstToRender) {
                         }
                     }
 
-                    GLOBALS.PORTALS[0].normal = normal;
+                    GLOBALS.PORTALS[targetIndex].normal = normal;
 
                     //if (!auto) {
                     AUDIO.PORTAL_GUN_ORANGE.pause();
@@ -362,10 +368,10 @@ function portalButton(button, auto, camera, firstToRender) {
                     }
 
                     // delete the old portal this new one is replacing
-                    if (GLOBALS.PORTALS[1] !== null)
-                        deletePortal(1);
+                    if (GLOBALS.PORTALS[targetIndex] !== null)
+                        deletePortal(targetIndex);
 
-                    newPortal(1, 0, point, normal, body, playerUpDirection, userData.rotation, userData.side, angled)
+                    newPortal(targetIndex, partnerIndex, point, normal, body, playerUpDirection, portalPoints, userData.side, angled)
 
 
                     GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iColor.value = new Vector3(2.5, 0.7, 0.0);
@@ -378,7 +384,7 @@ function portalButton(button, auto, camera, firstToRender) {
                         }
                     }
 
-                    GLOBALS.PORTALS[1].normal = normal;
+                    GLOBALS.PORTALS[targetIndex].normal = normal;
 
                     //if (!auto) {
                     AUDIO.PORTAL_GUN_BLUE.pause();
@@ -388,20 +394,17 @@ function portalButton(button, auto, camera, firstToRender) {
                 }
 
                 if (intersectPanel.length > 0) {
-                    if (button == 0)
-                        intersectPanel[0].object.hasPortal = 0;
-                    else
-                        intersectPanel[0].object.hasPortal = 1;
+                    intersectPanel[0].object.hasPortal = targetIndex;
 
                 }
 
                 setTimeout(() => {
                     if (button == 0) {
-                        createLightBridgesFromPortal(1, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
-                        createLightBridgesFromPortal(1, GLOBALS.TRACTOR_BEAM_RAYCASTER);
+                        createLightBridgesFromPortal(partnerIndex, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
+                        createLightBridgesFromPortal(partnerIndex, GLOBALS.TRACTOR_BEAM_RAYCASTER);
                     } else if (button == 2) {
-                        createLightBridgesFromPortal(0, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
-                        createLightBridgesFromPortal(0, GLOBALS.TRACTOR_BEAM_RAYCASTER);
+                        createLightBridgesFromPortal(partnerIndex, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
+                        createLightBridgesFromPortal(partnerIndex, GLOBALS.TRACTOR_BEAM_RAYCASTER);
                     }
                 }, 300);
             } else {
@@ -455,6 +458,7 @@ function validPortalPoint(point, normal, object) {
 
 // deletes the portal with index portalIndex from the scene
 function deletePortal(portalIndex) {
+    if (!GLOBALS.PORTALS[portalIndex]) return;
 
     for (var i = 0; i < GLOBALS.ANGLED_PANELS.length; i++) {
         if (GLOBALS.ANGLED_PANELS[i].hasPortal == portalIndex) {
@@ -513,7 +517,7 @@ function deletePortal(portalIndex) {
     //
 
     GLOBALS.PORTALS[portalIndex].light.visible = false;
-    GLOBALS.PORTAL_AUDIO[portalIndex].sound.audio.pause();
+    GLOBALS.PORTAL_AUDIO[portalIndex]?.sound?.audio.pause();
 
     if (GLOBALS.PORTALS[portalIndex].hostObjects !== null) {
 
@@ -523,8 +527,7 @@ function deletePortal(portalIndex) {
             // mark this object as collideable with portal 0 bb objects
             GLOBALS.WALL_BODIES[i].collisionFilterGroup &= ~GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[portalIndex]
             // add back to environment group only if collideable with both portal objects
-            if (!(GLOBALS.WALL_BODIES[i].collisionFilterGroup & GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[0]) &&
-                !(GLOBALS.WALL_BODIES[i].collisionFilterGroup & GLOBALS.CGROUP_PORTAL_HOST_CDISABLE[1])) {
+            if (!GLOBALS.CGROUP_PORTAL_HOST_CDISABLE.some(mask => GLOBALS.WALL_BODIES[i].collisionFilterGroup & mask)) {
                 GLOBALS.WALL_BODIES[i].collisionFilterGroup |= GLOBALS.CGROUP_ENVIRONMENT
             }
         }
@@ -532,6 +535,15 @@ function deletePortal(portalIndex) {
     GLOBALS.SCENE.remove(GLOBALS.PORTALS[portalIndex]);
     GLOBALS.PORTALS[portalIndex].portalShader.material.uniforms.iOpened.value = 0;
     GLOBALS.PORTALS[portalIndex] = null;
+    GLOBALS.PORTAL_BOX[portalIndex] = null;
+    GLOBALS.PORTAL_INNER_BOX[portalIndex] = null;
+    const partner = GLOBALS.PORTALS[portalIndex ^ 1];
+    if (partner) { partner.output = null; partner.mesh.visible = false; partner.portalShader.material.uniforms.iOpened.value = 0; }
+    GLOBALS.MULTIPLAYER?.portalChanged(portalIndex, null);
+}
+
+function deleteOwnedPortals() {
+    for (const index of ownedPortals(GLOBALS.CHAMBER_CONFIG, GLOBALS.MULTIPLAYER?.slot ?? 0)) deletePortal(index);
 }
 
 // creates a new portal and adds it to the scene
@@ -583,16 +595,26 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
     if (GLOBALS.PORTALS[otherPortalIndex] !== null)
         GLOBALS.PORTALS[otherPortalIndex].output = GLOBALS.PORTALS[thisPortalIndex]
 
-    if (GLOBALS.PORTALS[0] !== null && GLOBALS.PORTALS[1] !== null) {
-        GLOBALS.PORTALS[0].portalShader.material.uniforms.iOpened.value = 1;
-        GLOBALS.PORTALS[1].portalShader.material.uniforms.iOpened.value = 1;
+    if (GLOBALS.PORTALS[thisPortalIndex] !== null && GLOBALS.PORTALS[otherPortalIndex] !== null) {
+        GLOBALS.PORTALS[thisPortalIndex].portalShader.material.uniforms.iOpened.value = 1;
+        GLOBALS.PORTALS[otherPortalIndex].portalShader.material.uniforms.iOpened.value = 1;
     }
 
-    GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.position.copy(GLOBALS.PORTALS[thisPortalIndex].mesh.position);
-    GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.quaternion.copy(GLOBALS.PORTALS[thisPortalIndex].mesh.quaternion);
-    play(GLOBALS.PORTAL_AUDIO[thisPortalIndex].sound.audio);
+    const audio = GLOBALS.PORTAL_AUDIO[thisPortalIndex]?.sound;
+    if (audio) {
+        audio.position.copy(GLOBALS.PORTALS[thisPortalIndex].mesh.position);
+        audio.quaternion.copy(GLOBALS.PORTALS[thisPortalIndex].mesh.quaternion);
+        play(audio.audio);
+    }
 
     GLOBALS.PORTALS[thisPortalIndex].gels = [];
+    const netData = {
+        p: point.toArray(), n: normal.toArray(), up: playerUpDirection.toArray(), side, angled: Boolean(angled),
+        plane: GLOBALS.PLANE_USER_DATA.findIndex(data => data.body === hostObject),
+        panel: angled ? GLOBALS.ANGLED_PANELS.findIndex(panel => panel.body === hostObject) : -1,
+    };
+    GLOBALS.PORTALS[thisPortalIndex].netData = netData;
+    GLOBALS.MULTIPLAYER?.portalChanged(thisPortalIndex, netData);
 
     for (var i = 0; i < GLOBALS.GEL_TRIGGER.length; i++) {
         for (var j = 0; j < 9; j++) {
@@ -636,5 +658,6 @@ function newPortal(thisPortalIndex, otherPortalIndex, point, normal, hostObject,
 export {
     portalButton,
     deletePortal,
+    deleteOwnedPortals,
     newPortal
 }

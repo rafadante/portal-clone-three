@@ -1,3 +1,5 @@
+import { applyChamberConfig } from '../ui/EditorInteractions.js';
+import { readChamberConfig } from '../../multiplayer/chamberConfig.js';
 import { PlaneGeometry, Mesh, Color, Clock, Object3D, Vector2, TextureLoader, SRGBColorSpace, RepeatWrapping } from 'three';
 import $ from 'jquery';
 import { addConnectionPoints, addItem } from '../items/AddItem.js';
@@ -430,6 +432,7 @@ if (localStorage.getItem("load") == "true") {
 }
 
 function loadLevelJSON() {
+    applyChamberConfig(readChamberConfig(level));
 
     $("#option-single").css("display", "none");
     $("#option-community").css("display", "none");
@@ -643,6 +646,7 @@ $("#input-level").on('change', function (e) {
         if (data[0][3])
             $("#chamber_style-select").val(data[0][3]).change();
 
+        applyChamberConfig(readChamberConfig(data));
         loadLevel(data[1])
 
         /*for (var i = 0; i < data[1].length; i++) {
@@ -928,7 +932,33 @@ window["playCustom"] = async function (image, path, user_id, chamber_id, name, f
         });
 };
 
+// Network sessions enter the same editor/load/test pipeline as local files.
+async function loadNetworkChamber(document, cancelled = () => false) {
+    const waitFor = predicate => new Promise((resolve, reject) => {
+        const deadline = Date.now() + 60000;
+        const timer = setInterval(() => {
+            if (cancelled() || Date.now() > deadline) {
+                clearInterval(timer); reject(new Error('Chamber loading cancelled or timed out.'));
+            } else if (predicate()) { clearInterval(timer); resolve(); }
+        }, 100);
+    });
+    GLOBALS.LOADED_LEVEL = false;
+    if (!GLOBALS.PLANE_LEVEL_INSTANCED || !window.stopMenuLoop) $('#option-community-build').trigger('click');
+    await waitFor(() => GLOBALS.PLANE_LEVEL_INSTANCED && GLOBALS.ENTER_DOOR && GLOBALS.EXIT_DOOR && window.stopMenuLoop);
+    chamberName = 'Multiplayer_by_Host.json';
+    window.chamberID = null;
+    $('#portal-gun-select').val(document[0][0]).change();
+    $('#ambient-sound-select').val(document[0][1]).change();
+    if (document[0][2]) $('#color-wall-portal').val(document[0][2]).change();
+    $('#chamber_style-select').val(document[0][3] || 'standard').change();
+    applyChamberConfig(readChamberConfig(document));
+    loadLevel(document[1]);
+    await waitFor(() => window.totalItemsLoaded >= window.totalItemsToLoad && window.allowTest);
+    if (!cancelled()) $('#view-fps').trigger('click');
+}
+
 export {
+    loadNetworkChamber,
     loadLevelJSON,
     fetchLevel
 }

@@ -379,6 +379,7 @@ function setup() {
     //GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
     //GLOBALS.RENDERER.dispose()
     window.loaded = true;
+    GLOBALS.MULTIPLAYER?.onReady();
 }
 
 function blockPortal() {

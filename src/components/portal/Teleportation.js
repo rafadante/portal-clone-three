@@ -35,8 +35,8 @@ function teleportPhysicalObject(object, portal) {
     let velocity = cannonToThreeVector3(object.velocity);
 
     //CORRECT VELOCITY WHEN LOPING VERTICALLY TO AVOID INFINITY VELOCITY
-    if ((Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) &&
-        GLOBALS.PORTALS[0].normal.y != GLOBALS.PORTALS[1].normal.y) {
+    if ((Math.abs(portal.normal.y) == 1 && Math.abs(portal.output.normal.y) == 1) &&
+        portal.normal.y != portal.output.normal.y) {
 
         const heightDifference = getHeightDifference(portal.portalShader.position, portal.output.portalShader.position);
 
@@ -73,7 +73,7 @@ function teleportPhysicalObject(object, portal) {
 
 
 
-    if (Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1) {
+    if (Math.abs(portal.normal.y) == 1 && Math.abs(portal.output.normal.y) == 1) {
         if (velocity.x < 3)
             velocity.x = 0;
 
@@ -87,7 +87,7 @@ function teleportPhysicalObject(object, portal) {
     object.quaternion.copy(orientation)
 
     //APPLY PORTAL FUNNELLING
-    if (Math.abs(GLOBALS.PORTALS[0].normal.y) == 1 && Math.abs(GLOBALS.PORTALS[1].normal.y) == 1 && object.looping2 == true) {
+    if (Math.abs(portal.normal.y) == 1 && Math.abs(portal.output.normal.y) == 1 && object.looping2 == true) {
         if (!object.centering) {
 
             object.centering = true;
@@ -152,16 +152,13 @@ function teleportationState() {
         GLOBALS.PLAYER_MODEL.visible = true;
     }
 
-    if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null) return;
+    if (!GLOBALS.PORTALS.some(p => p?.output)) return;
 
     var dd = 0;
 
     for (var i = 0; i < GLOBALS.CAMERAS.length; i++) {
         if (
-            (GLOBALS.CAMERAS[i].box3.containsPoint(GLOBALS.PORTAL_BOX[0].position) ||
-                GLOBALS.CAMERAS[i].box3.containsPoint(
-                    GLOBALS.PORTAL_BOX[1].position
-                )) &&
+            GLOBALS.PORTAL_BOX.some(box => box && GLOBALS.CAMERAS[i].box3.containsPoint(box.position)) &&
             GLOBALS.CAMERAS[i].fixed
         ) {
             GLOBALS.CAMERAS[i].fixed = false;
@@ -199,7 +196,6 @@ function teleportationState() {
 
         d.inArea = false;
 
-        if (GLOBALS.PORTALS[0] === null || GLOBALS.PORTALS[1] === null) continue;
 
         var inArea = 0;
 
@@ -216,6 +212,7 @@ function teleportationState() {
         let CDBB_isOverlap = false;
 
         for (let p = 0; p < GLOBALS.PORTALS.length; p++) {
+            if (!GLOBALS.PORTALS[p]?.output) continue;
             // collision disable, might be partially intersecting with portal
             if (GLOBALS.PORTALS[p].CDBB.containsPoint(pos)) {
 
@@ -326,7 +323,7 @@ function teleportationState() {
                     d.collisionFilterMask |=
                         GLOBALS.PORTALS[p].hostObjects.collisionFilterGroup;
                     d.collisionFilterMask &=
-                        ~GLOBALS.PORTALS[1 - p].hostObjects.collisionFilterGroup;
+                        ~GLOBALS.PORTALS[p].output.hostObjects.collisionFilterGroup;
 
                     break;
                 }
@@ -372,6 +369,7 @@ function addCameraBody(obj) {
 }
 
 export {
+    teleportPhysicalObject,
     teleportObject3D,
     teleportationState
 }

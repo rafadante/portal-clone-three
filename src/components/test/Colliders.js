@@ -3,7 +3,7 @@ import * as CANNON from 'cannon';
 import { threeToCannon, ShapeType } from 'three-to-cannon';
 import { GLOBALS } from '../../Globals.js';
 import { addPositionalAudio } from '../audio/Audio.js';
-import { deletePortal } from '../portal/CreatePortal.js';
+import { deleteOwnedPortals } from '../portal/CreatePortal.js';
 import { tweenCamera, } from '../../Utils.js';
 import { interactWithItem } from '../events/interaction.js';
 import { respawn } from '../events/states.js';
@@ -207,9 +207,7 @@ function fizzlerTrigger(body) {
                 stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
             }
 
-            deletePortal(0)
-            deletePortal(1)
-            GLOBALS.PORTAL_BOX = [];
+            deleteOwnedPortals();
 
             for (var i = 0; i < GLOBALS.LASER_TRIGGERS.length; i++) {
 

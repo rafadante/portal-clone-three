@@ -127,3 +127,46 @@ Desktop packaging output is configured to use the `release/` directory. Availabl
 ## Credits
 
 Inspired by **Portal** and **Portal 2** by Valve. This is an unofficial fan project and is not affiliated with or endorsed by Valve.
+
+## Multiplayer chambers (experimental)
+
+Multiplayer uses the existing editor, chamber assets, physics and portal renderer.
+
+1. Select **CREATE MULTIPLAYER CHAMBER**, or open your chamber and choose **Settings → Chamber type → Multiplayer (2 players)**.
+2. Choose **1 portal each — shared pair** (cyan for player 1, yellow for player 2), or **2 portals each — independent pairs** (cyan/yellow and purple/green).
+3. Build the chamber as usual. Entrance and exit bounds must be green, just as for the existing Test action.
+4. Select **Host this chamber online** and share the room code or invitation link.
+5. The second player selects **JOIN MULTIPLAYER ROOM** and enters the code. The host's chamber transfers automatically, without publishing it first.
+6. Select **PLAY** in the normal game menu. The **Room** button opens the invitation and Leave controls. Returning to the editor ends the session.
+
+In shared-pair mode, either mouse button places your assigned portal. In independent-pairs mode, left/right click place your two portals. Both players can traverse any complete pair. The normal movement and chamber controls remain available.
+
+### Chamber format
+
+The existing `[settings, planes]` file structure is preserved. `settings[4]` stores chamber metadata:
+
+```json
+{ "version": 1, "mode": "multiplayer", "portalMode": "shared" }
+```
+
+Use `"independent"` for four portals, or `"single"` for the chamber mode to play solo. Files without metadata default to single-player. Saving and publishing preserve these settings, which are locked during a room session.
+
+### Networking and current scope
+
+Rooms use the existing Supabase variables and Realtime Broadcast. No new database tables or dedicated server are needed; the project must allow public Realtime channels. Each room admits two players and transfers the authored chamber in acknowledged chunks, up to 4 MB of serialized data. Player transforms and owned portal revisions are sent at 10 Hz. Stale packets and updates claiming the other player's portal slots are ignored.
+
+Keep both tabs active. Leaving or losing the connection ends the session; create another room to reconnect. Room codes are invitations for trusted partners, not authenticated private lobbies. There is no host migration or persistent session recovery.
+
+This integration synchronizes the chamber, player avatars and portals. **Movable cubes, switches, scripted devices and chamber completion still run locally and are not synchronized between players.** Puzzles that depend on shared object state require an additional replication layer.
+
+### Tests
+
+```bash
+npm run test:coop
+```
+
+Tests cover legacy file compatibility, serialization without mutating live objects, both portal ownership modes, chamber transfer, admission limits, disconnects, packet ordering and malformed state rejection.
+
+## Google sign-in during local development
+
+The login flow returns to the origin and pathname where it was started. In Supabase, open **Authentication > URL Configuration > Redirect URLs** and add the exact development URLs you use, for example `http://localhost:3000/` and `http://192.168.100.77:3000/`. Keep the production **Site URL** unchanged. If the requested return URL is not allowed, Supabase can fall back to the production Site URL. Update this list when the local IP or port changes.

@@ -120,6 +120,7 @@
     "workbox-webpack-plugin": "^6.4.1"
   },
   "scripts": {
+    "test:coop": "node scripts/test.js --watchAll=false --runInBand --config config/jest.coop.config.js",
     "start": "node scripts/start.js",
     "electron": "electron .",
     "build": "cross-env CI=false node scripts/build.js",

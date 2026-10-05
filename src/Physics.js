@@ -85,8 +85,8 @@ function updatePhysics(deltatime) {
         raycaster.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
 
         //DETECT IF THE CAMERA IS IN FRONT OF A PORTAL
-        if (GLOBALS.PORTAL_INNER_BOX[0] != null && GLOBALS.PORTAL_INNER_BOX[1] != null) {
-            var intersectPortal = raycaster.intersectObjects(GLOBALS.PORTAL_INNER_BOX);
+        if (GLOBALS.PORTALS.some(p => p?.output)) {
+            var intersectPortal = raycaster.intersectObjects(GLOBALS.PORTAL_INNER_BOX.filter((box, i) => box && GLOBALS.PORTALS[i]?.output));
             if (intersectPortal.length > 0) {
                 if (intersectPortal[0].distance < 1.25)
                     portalInFront = true;

@@ -35,10 +35,9 @@ const animateShader2 = (time) => {
     GLOBALS.UNIFORMS_PORTAL_GUN_ENERGY.iTime.value += val;
 
     //PORTALS
-    if (GLOBALS.PORTALS[0])
-        GLOBALS.PORTALS[0].portalShader.material.uniforms.iTime.value += val;
-    if (GLOBALS.PORTALS[1])
-        GLOBALS.PORTALS[1].portalShader.material.uniforms.iTime.value += val;
+    GLOBALS.PORTALS.forEach(portal => {
+        if (portal) portal.portalShader.material.uniforms.iTime.value += val;
+    });
 
     //LIGHT BRIDGES
     let t = clock.getElapsedTime();
