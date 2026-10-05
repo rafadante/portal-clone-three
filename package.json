@@ -221,6 +221,7 @@
     "three-perf": "^1.0.10"
   },
   "browser": {
-    "crypto": false
+    "crypto": false,
+    "canvas": false
   }
 }
