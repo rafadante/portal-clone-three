@@ -4,7 +4,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import $ from 'jquery';
-import { v4 as uuidv4 } from 'uuid';
+import { publishChamber } from './chambers/publishChamber';
 import "./dev";
 import InteractiveMenu from './components/mainMenu/page';
 import "./globals.css";
@@ -78,40 +78,12 @@ function App() {
   }
 
   window["saveChamber"] = async (name, json) => {
-
-    const filePath = session.user.id + "/" + uuidv4(); // Path in the bucket
-
-    // Step 1: Upload the file to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from("json")
-      .upload(filePath, json, {
-        upsert: false, // Prevent overwriting existing files
-      });
-
-    //console.log(filePath)
-
-    const { data, error } = await supabase
-      .from('chambers')
-      .insert([
-        {
-          path: filePath,
-          user_id: session.user.id,
-          email: session.user.email,
-          thumb: window.thumbDataURL,
-          tested: false,
-          name: name,
-          author: session.user.user_metadata.full_name
-        },
-      ])
-
-    if (error) {
-      //console.log(error);
-      alert("error when saving!")
-    } else {
-      //console.log(data);
-      alert("chamber saved with success!")
-    }
-
+    try {
+      await publishChamber(supabase, { user: session?.user, name, blob: json, thumb: window.thumbDataURL });
+      alert("Chamber saved successfully!");
+    } catch (error) {
+      alert("Could not save chamber. " + error.message);
+    } finally {
     document.getElementById("loading-parent").style.opacity = "0";
     document.getElementById("loading-parent").style.pointerEvents = "none";
 
@@ -123,6 +95,7 @@ function App() {
     $("#blocker").css("display", "none");
     $("#blocker").css("pointer-events", "none");
     $("#reticle").css("display", "none");
+    }
   }
 
   window["selectAllChambers"] = async function () {
@@ -195,37 +168,15 @@ function App() {
   }
 
   window["updateChamber"] = async function (name, id, json) {
-
-    const { data, error } = await supabase
-      .from('chambers')
-      .update({
-        thumb: window.thumbDataURL,
-        tested: false,
-        name: name,
-      })
-      .eq('id', id)
-      .select()
-
-    //console.log(data)
-
-    const { data1, error1 } = await supabase
-      .storage
-      .from('json')
-      .update(data[0].path, json, {
-        cacheControl: '3600',
-        upsert: true
-      })
-
-    if (error) {
-      //console.log(error);
-      alert("error when saving!")
-    } else {
-      //console.log(data);
-      alert("chamber saved with success!")
+    try {
+      await publishChamber(supabase, { user: session?.user, name, id, blob: json, thumb: window.thumbDataURL });
+      alert("Chamber saved successfully!");
+    } catch (error) {
+      alert("Could not save chamber. " + error.message);
+    } finally {
+      document.getElementById("loading-parent").style.opacity = "0";
+      document.getElementById("loading-parent").style.pointerEvents = "none";
     }
-
-    document.getElementById("loading-parent").style.opacity = "0";
-    document.getElementById("loading-parent").style.pointerEvents = "none";
   }
 
   window["updateChamberFinishedValue"] = async function (id, value) {
@@ -795,9 +746,9 @@ function App() {
               <span id="save-level">Download</span>
               <span id="load-level">Load</span>
               <span id="view-fps">Test</span>
-              {/**<input id="chamber-name-to-save" type="text" placeholder="Name of the Chamber"></input>
+              <input id="chamber-name-to-save" type="text" aria-label="Chamber name" placeholder="Name of the Chamber"></input>
               <span style={{ fontWeight: "normal" }}>by</span>
-              <input id="author-name-to-save" type="text" placeholder="Name of the Author"></input> */}
+              <input id="author-name-to-save" type="text" aria-label="Author name" placeholder="Name of the Author"></input>
             </div>
           </div>
 

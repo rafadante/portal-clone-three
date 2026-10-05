@@ -599,7 +599,7 @@ async function zipJson(jsonObject, update) {
     // Generate the zip file as a Blob
     //const zipBlob = await zip.generateAsync({ type: "blob" });
 
-    zip.generateAsync({
+    return zip.generateAsync({
         type: "blob",
         /* NOTE THESE ADDED COMPRESSION OPTIONS */
         /* deflate is the name of the compression algorithm used */
@@ -622,9 +622,12 @@ async function zipJson(jsonObject, update) {
             document.body.removeChild(link);*/
 
             if (update)
-                window["updateChamber"]($("#chamber-name-to-save").val(), window.chamberID, content);
+                return window["updateChamber"]($("#chamber-name-to-save").val(), window.chamberID, content);
             else
-                window["saveChamber"]($("#chamber-name-to-save").val(), content);
+                return window["saveChamber"]($("#chamber-name-to-save").val(), content);
+        }).catch(error => {
+            $("#loading-parent").css({ opacity: 0, pointerEvents: 'none' });
+            alert("Could not prepare chamber file: " + error.message);
         });
 }
 
