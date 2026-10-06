@@ -1,4 +1,5 @@
 import { rememberChamber } from '../../multiplayer/loadedChamber';
+import { readChamberFile } from '../../chambers/chamberFile';
 import { applyChamberConfig } from '../ui/EditorInteractions.js';
 import { readChamberConfig } from '../../multiplayer/chamberConfig.js';
 import { PlaneGeometry, Mesh, Color, Clock, Object3D, Vector2, TextureLoader, SRGBColorSpace, RepeatWrapping } from 'three';
@@ -603,7 +604,8 @@ function animate(time) {
     }
 }
 
-$("body").on('click', '#load-level', function () {
+$("body").on('click', '#load-level, #option-chamber-file', function () {
+    $('#chamber-file-status').text('');
     $("#load-level-panel").css("display", "flex")
 })
 
@@ -630,46 +632,50 @@ $("body").on('click', '#option-community-play', function () {
 
 var chamberName = "null";
 
-$("#input-level").on('change', function (e) {
-    window.chamberID = null;
-    GLOBALS.LOADED_LEVEL = false;
-    var file = e.target.files[0];
-    chamberName = file.name;
-    var path = (window.URL || window.webkitURL).createObjectURL(file);
-    readTextFile(path, function (text) {
-        var data = JSON.parse(text);
-
-        $("#portal-gun-select").val(data[0][0]).change();
-        $("#ambient-sound-select").val(data[0][1]).change();
-
-        if (data[0][2])
-            $("#color-wall-portal").val(data[0][2]).change();
-
-        if (data[0][3])
-            $("#chamber_style-select").val(data[0][3]).change();
-
+$('body').on('change', '#input-level', async function (event) {
+    const input = event.target, file = input.files?.[0];
+    if (!file) return;
+    input.disabled = true;
+    $('#chamber-file-status').text('Lendo arquivo…');
+    try {
+        // Read and validate before changing the currently open chamber.
+        const data = await readChamberFile(file);
+        GLOBALS.MULTIPLAYER?.close();
+        if (GLOBALS.FPS_MODE) backToEditor();
+        if (!GLOBALS.PLANE_LEVEL_INSTANCED || !window.stopMenuLoop) {
+            $('#option-community-build').trigger('click');
+            await new Promise((resolve, reject) => {
+                const deadline = Date.now() + 60000;
+                const timer = setInterval(() => {
+                    if (GLOBALS.PLANE_LEVEL_INSTANCED && GLOBALS.ENTER_DOOR && GLOBALS.EXIT_DOOR && window.stopMenuLoop) {
+                        clearInterval(timer); resolve();
+                    } else if (Date.now() > deadline) {
+                        clearInterval(timer); reject(new Error('O editor não terminou de carregar. Tente novamente.'));
+                    }
+                }, 100);
+            });
+        }
+        window.chamberID = null; window.chamberUSERID = null;
+        window.allowEdit = true; window.isCustom = false; single = false;
+        GLOBALS.LOADED_LEVEL = false;
+        chamberName = file.name;
+        $('#portal-gun-select').val(data[0][0] || 'all').change();
+        $('#ambient-sound-select').val(data[0][1] || 'none').change();
+        $('#color-wall-portal').val(data[0][2] || '#ffffff').change();
+        $('#chamber_style-select').val(data[0][3] || 'standard').change();
         rememberChamber(data);
         applyChamberConfig(readChamberConfig(data));
-        loadLevel(data[1])
-
-        /*for (var i = 0; i < data[1].length; i++) {
-            AddGoo(data[1][i], true);
-        }*/
-    });
-})
-
-function readTextFile(file, callback) {
-    var rawFile = new XMLHttpRequest();
-    rawFile.overrideMimeType("application/json");
-    rawFile.open("GET", file, true);
-    rawFile.onreadystatechange = function () {
-        if (rawFile.readyState === 4 && rawFile.status == "200") {
-            callback(rawFile.responseText);
-        }
+        loadLevel(data[1]);
+        $('#back-editor').css('display', 'block');
+        $('#load-level-panel').css('display', 'none');
+        $('#chamber-file-status').text('');
+    } catch (error) {
+        $('#chamber-file-status').text(error.message || 'Não foi possível carregar a câmara.');
+    } finally {
+        input.disabled = false;
+        input.value = '';
     }
-    rawFile.send(null);
-}
-
+});
 window.totalItemsToLoad = 0;
 window.totalItemsLoaded = 0;
 
@@ -697,8 +703,10 @@ function loadLevel(data) {
     }
 
     if (!window.chamberID) {
-        $("#chamber-name-to-save").val(chamberName.substring(0, chamberName.indexOf("_by_")));
-        $("#author-name-to-save").val(chamberName.split('_by_').pop().replace('.json', ''));
+        const base = chamberName.replace(/\.(json|zip)$/i, '');
+        const split = base.lastIndexOf('_by_');
+        $("#chamber-name-to-save").val(split >= 0 ? base.slice(0, split) : base);
+        $("#author-name-to-save").val(split >= 0 ? base.slice(split + 4) : '');
     }
 
 

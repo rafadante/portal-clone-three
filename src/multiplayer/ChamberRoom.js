@@ -1,3 +1,8 @@
+import { validAvatar } from './avatarProfile';
+import { validAnimation } from './RemoteAvatar';
+import { validPing } from './PingMarkers';
+import { validObjects } from './SharedObjects';
+import { validChamberState } from './SharedChamber';
 import { ownedPortals, readChamberConfig, validateChamberDocument } from './chamberConfig';
 
 export const ROOM_PATTERN = /^[A-Z0-9]{12}$/;
@@ -14,8 +19,14 @@ export function validPortal(p) {
     && ['front', 'back', 'left', 'right', 'up', 'down'].includes(p.side) && typeof p.angled === 'boolean');
 }
 export function validState(state, config, slot) {
-  return state && typeof state.ready === 'boolean' && vector(state.p) && vector(state.q, 4)
-    && Math.abs(Math.hypot(...state.q) - 1) < 0.01 && Array.isArray(state.portals)
+  return state && (state.avatar === undefined || validAvatar(state.avatar)) && (state.gun === undefined || typeof state.gun === "boolean") && (state.animation === undefined || validAnimation(state.animation)) && (state.entered === undefined || typeof state.entered === 'boolean') && (state.actions === undefined || (Array.isArray(state.actions) && state.actions.length <= 32 && state.actions.every(a => a && Number.isSafeInteger(a.seq) && a.seq > 0 && Number.isSafeInteger(a.id) && a.id >= 0)))
+    && (state.animationRevision === undefined || (Number.isSafeInteger(state.animationRevision) && state.animationRevision >= 0))
+    && (state.ping === undefined || validPing(state.ping))
+    && (state.paused === undefined || typeof state.paused === 'boolean') && (state.world === undefined || (slot === 0 && validChamberState(state.world)))
+    && (state.objects === undefined || validObjects(state.objects)) && typeof state.ready === 'boolean' && vector(state.p) && vector(state.q, 4)
+    && Math.abs(Math.hypot(...state.q) - 1) < 0.01
+    && (state.cq === undefined || (vector(state.cq, 4) && Math.abs(Math.hypot(...state.cq) - 1) < 0.01))
+    && Array.isArray(state.portals)
     && state.portals.length === ownedPortals(config, slot).length
     && state.portals.every((p, i) => p && p.index === ownedPortals(config, slot)[i]
       && Number.isSafeInteger(p.rev) && p.rev >= 0 && validPortal(p.data));
@@ -24,10 +35,10 @@ export function validState(state, config, slot) {
 // Two seats on the existing Supabase Realtime service. The host supplies the
 // authored chamber. Each peer publishes only its own avatar and portal slots.
 export class ChamberRoom {
-  constructor(client, { host, code, document, getState, onState, onDocument, onStatus, onPeer, onError }) {
+  constructor(client, { host, code, document, getState, onState, onDocument, onStatus, onPeer, onJoin, onError }) {
     if (!ROOM_PATTERN.test(code)) throw new Error('Enter a 12-character room code.');
     if (host && (!validateChamberDocument(document) || readChamberConfig(document).mode !== 'multiplayer')) throw new Error('Choose a multiplayer chamber first.');
-    Object.assign(this, { client, host, code, getState, onState, onDocument, onStatus, onPeer, onError });
+    Object.assign(this, { client, host, code, getState, onState, onDocument, onStatus, onPeer, onJoin, onError });
     // getRandomValues also works on HTTP LAN origins, where randomUUID
     // is unavailable. A peer ID only needs an opaque, collision-resistant token.
     this.id = Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join('');
@@ -84,6 +95,7 @@ export class ChamberRoom {
     if (this.closed || !m || m.v !== 1 || typeof m.sender !== 'string' || m.sender.length > 64 || m.sender === this.id || (m.to && m.to !== this.id)) return;
     if (this.host && m.type === 'join') {
       if (this.peer && this.peer !== m.sender) return this.send('full', { to: m.sender });
+      if (!this.peer) this.onJoin?.();
       this.peer = m.sender;
       this.lastPeer = Date.now();
       this.send('welcome');

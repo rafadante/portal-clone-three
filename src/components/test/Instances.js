@@ -1,3 +1,4 @@
+import { replacesEntrance } from '../../multiplayer/spawnPoints';
 import { PlaneGeometry, Object3D, InstancedMesh, Matrix4, Color } from 'three';
 import { GLOBALS } from '../../Globals.js';
 import { shuffle, groupByPercentage } from '../../Utils.js';
@@ -22,7 +23,7 @@ function manageInstances() {
     var sideLeft = [];
 
     var enterDoor = "enterDoor";
-    if (GLOBALS.ITEMS_ADDED.getObjectByName("spawn")) {
+    if (replacesEntrance(GLOBALS.ITEMS_ADDED, GLOBALS.CHAMBER_CONFIG.mode === 'multiplayer')) {
         enterDoor = ".."
     }
 

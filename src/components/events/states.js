@@ -1,3 +1,5 @@
+import { playerSpawn, markEntrance } from '../../multiplayer/spawnPoints';
+import { chamberTimeout } from '../../multiplayer/chamberTimeout';
 import { GLOBALS } from "../../Globals.js";
 import { AUDIO, play } from "../audio/Audio.js";
 import { stateDoor } from "../door/Door.js";
@@ -10,7 +12,7 @@ function laserFieldState(obj) {
 
     GLOBALS.CANNON_BODIES.push(obj.item.bodyLaserField);
 
-    setTimeout(() => {
+    chamberTimeout(() => {
         if (obj.item.userData.state)
             GLOBALS.CANNON_WORLD.addBody(obj.item.bodyLaserField);
         else
@@ -25,23 +27,23 @@ function lightBridgeState(obj) {
 
     GLOBALS.CANNON_BODIES.push(obj.item.bodyBridge);
 
-    setTimeout(() => {
+    chamberTimeout(() => {
         if (obj.item.userData.state)
             GLOBALS.CANNON_WORLD.addBody(obj.item.bodyBridge);
         else
             GLOBALS.CANNON_WORLD.removeBody(obj.item.bodyBridge);
 
 
-        if (obj.item.clone) {
-            if (obj.item.clone.bodyBridge) {
-                obj.item.clone.visible = obj.item.continuous.visible;
+        for (const clone of obj.item.portalClones || (obj.item.clone ? [obj.item.clone] : [])) {
+            if (clone.bodyBridge) {
+                clone.visible = obj.item.continuous.visible;
 
-                GLOBALS.CANNON_BODIES.push(obj.item.clone.bodyBridge);
+                GLOBALS.CANNON_BODIES.push(clone.bodyBridge);
 
                 if (obj.item.userData.state)
-                    GLOBALS.CANNON_WORLD.addBody(obj.item.clone.bodyBridge);
+                    GLOBALS.CANNON_WORLD.addBody(clone.bodyBridge);
                 else
-                    GLOBALS.CANNON_WORLD.removeBody(obj.item.clone.bodyBridge);
+                    GLOBALS.CANNON_WORLD.removeBody(clone.bodyBridge);
             }
         }
     }, 100);
@@ -52,8 +54,8 @@ function tractorStates(obj) {
         obj.item.userData.state = !obj.item.userData.state;
         obj.item.continuous.visible = !obj.item.continuous.visible;
 
-        if (obj.item.clone)
-            obj.item.clone.visible = obj.item.continuous.visible;
+        for (const clone of obj.item.portalClones || (obj.item.clone ? [obj.item.clone] : []))
+            clone.visible = obj.item.continuous.visible;
     }
 
     if (obj.item.userData.triggers == "Direction" || obj.item.userData.triggers == "Both") {
@@ -64,12 +66,14 @@ function tractorStates(obj) {
         else
             obj.item.continuous.material = GLOBALS.MATERIAL_TRACTOR_BEAM;
 
-        if (obj.item.clone)
-            obj.item.clone.material = obj.item.continuous.material;
+        for (const clone of obj.item.portalClones || (obj.item.clone ? [obj.item.clone] : []))
+            clone.material = obj.item.continuous.material;
     }
 }
 
 function dispenserSpawn(item) {
+    if (GLOBALS.MULTIPLAYER?.slot === 1) return;
+    GLOBALS.MULTIPLAYER?.takeBody(item.body);
     item.body.position.set(item.dispenserPosition.x, item.dispenserPosition.y - 1, item.dispenserPosition.z);
     item.body.mass = item.body.initialMass;
     item.body.allowSleep = true;
@@ -94,6 +98,7 @@ function wakeUpAll() {
 }
 
 function respawn(d) {
+    if (d.name !== "player" && GLOBALS.MULTIPLAYER && !GLOBALS.MULTIPLAYER.ownsBody(d)) return;
     if (d.name.includes("gel") || d.name.includes("camera") || d.name.includes("pellet")) return;
 
     // Velocity
@@ -137,7 +142,7 @@ function respawn(d) {
         }
     }
 
-    setTimeout(() => {
+    chamberTimeout(() => {
         d.repawning = false;
 
         // Velocity
@@ -155,7 +160,7 @@ function respawn(d) {
         if (d.name != "player")
             d.mass = 0;
 
-        setTimeout(() => {
+        chamberTimeout(() => {
 
             if (d.name != "player") {
 
@@ -176,11 +181,16 @@ function respawn(d) {
 }
 
 function levelEnteredFunction(trigger) {
+    const session = GLOBALS.MULTIPLAYER;
+    const atEntrance = GLOBALS.ENTER_DOOR.box3.containsPoint(GLOBALS.PLAYER.position);
+    const hasSpawn = Boolean(playerSpawn(GLOBALS.ITEMS_ADDED, session?.slot || 0));
+    const entered = session ? markEntrance(session, atEntrance, hasSpawn) : atEntrance || trigger || hasSpawn;
+    if (session?.slot === 1) return;
     if (!GLOBALS.LEVEL_ENTERED) {
-        if (GLOBALS.ENTER_DOOR.box3.containsPoint(GLOBALS.PLAYER.position) || trigger || GLOBALS.ITEMS_ADDED.getObjectByName("spawn")) {
+        if (entered) {
             GLOBALS.LEVEL_ENTERED = true;
 
-            /*setTimeout(() => {
+            /*chamberTimeout(() => {
                 GLOBALS.LIGHT_PORTAL_0.visible = false;
                 GLOBALS.LIGHT_PORTAL_1.visible = false;
                 
@@ -190,7 +200,7 @@ function levelEnteredFunction(trigger) {
 
             GLOBALS.RENDERER.compile(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
 
-            setTimeout(() => {
+            chamberTimeout(() => {
                 for (var i = 0; i < GLOBALS.BOX_BODY.length; i++) {
                     if (GLOBALS.BOX_BODY[i].item.userData.opened)
                         dispenserSpawn(GLOBALS.BOX_BODY[i].item);
@@ -200,7 +210,7 @@ function levelEnteredFunction(trigger) {
                     document.getElementById("warning-game").innerHTML = "Press E to interact with objects!";
                     document.getElementById("warning-game").style.opacity = "1";
 
-                    setTimeout(() => {
+                    chamberTimeout(() => {
                         document.getElementById("warning-game").style.opacity = "0";
                     }, 7000);
                 }

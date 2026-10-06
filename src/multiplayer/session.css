@@ -11,3 +11,54 @@
 #settings .chamber-network-setting .option-name, #settings .chamber-network-setting .option-value { width: 100%; text-align: left; }
 #settings .chamber-network-setting select { width: 100%; max-width: 100%; font-size: 12px; }
 #host-chamber-room { padding: 8px; cursor: pointer; }
+
+#room-invite-link { display: block; width: 100%; box-sizing: border-box; margin-top: 12px; padding: 8px; font: 13px monospace; }
+#room-shared-pause { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 10002; padding: 14px 22px; background: #101b24ee; color: white; border: 1px solid #00baca; font: 16px Arial; pointer-events: none; }
+#room-shared-pause[hidden] { display: none; }
+
+#coop-avatar-picker { position: fixed; z-index: 200000; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(620px, 94vw); max-height: 94vh; overflow-y: auto; box-sizing: border-box; background: linear-gradient(115deg,#f1f3f4,#dfe4e7); color: #273137; border: 1px solid #bbc5cb; border-radius: 3px; box-shadow: 0 18px 70px #0008, 0 0 0 100vmax #071217d9; font: 18px/1.4 "Arial Narrow", "Segoe UI", sans-serif; }
+#coop-avatar-picker * { box-sizing: border-box; }
+#coop-avatar-picker [hidden] { display: none !important; }
+#coop-avatar-picker header { display: flex; align-items: center; gap: 22px; padding: 28px 34px; background: linear-gradient(110deg,#cdd4d8,#e7ebed); border-bottom: 1px solid #c7cfd4; }
+#coop-avatar-picker .avatar-aperture { width: 62px; height: 62px; fill: #283338; flex-shrink: 0; }
+#coop-avatar-picker h2 { margin: 0; font-size: clamp(22px,3vw,30px); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; line-height: 1.15; }
+#coop-avatar-picker .avatar-rule { flex: 1; min-width: 20px; height: 1px; background: #9daab2; }
+#coop-avatar-picker .avatar-picker-body { padding: 26px 36px 30px; }
+#coop-avatar-picker .avatar-intro { display: flex; align-items: center; gap: 24px; margin-bottom: 22px; }
+#coop-avatar-picker .avatar-intro svg { width: 76px; height: 76px; flex-shrink: 0; }
+#coop-avatar-picker h3 { margin: 0 0 5px; font-size: 22px; font-weight: 500; }
+#coop-avatar-picker p { margin: 0; color: #6c7b85; font-size: 17px; }
+#coop-avatar-picker label { display: block; margin: 19px 0 7px; text-transform: uppercase; letter-spacing: 1px; font-size: 15px; font-weight: 700; color: #6e7d87; }
+#coop-avatar-picker select, #coop-avatar-picker input[type="number"], #coop-avatar-picker .avatar-gun-color { width: 100%; min-height: 52px; padding: 10px 15px; border: 1px solid #b9c4cb; border-radius: 3px; background: #ffffff50; color: #273137; font: inherit; }
+#coop-avatar-picker select { cursor: pointer; }
+#coop-avatar-picker .avatar-swatches { display: flex; gap: 12px; flex-wrap: wrap; padding: 4px; }
+#coop-avatar-picker .avatar-swatch, #coop-avatar-picker #coop-avatar-color { width: 43px; height: 43px; border-radius: 3px; border: 1px solid #0003; background: var(--swatch); padding: 0; cursor: pointer; }
+#coop-avatar-picker .avatar-swatch[aria-pressed="true"] { outline: 3px solid #20bfec; outline-offset: 3px; }
+#coop-avatar-picker #coop-avatar-color { margin-left: auto; border: 1px dashed #879ba6; padding: 3px; }
+#coop-avatar-picker fieldset { border: 0; border-top: 1px solid #bbc5cb; padding: 0; margin: 28px 0 0; min-width: 0; }
+#coop-avatar-picker legend { padding-right: 15px; color: #6e7d87; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; font-size: 17px; }
+#coop-avatar-picker legend img { width: 42px; height: 42px; object-fit: contain; vertical-align: middle; margin-right: 12px; filter: grayscale(1); }
+#coop-avatar-picker .avatar-gun-color { display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; }
+#coop-avatar-picker #portal-gun-color { width: 100%; height: 38px; border: 0; padding: 0 36px 0 0; background: transparent; cursor: pointer; }
+#coop-avatar-picker #portal-gun-color::-webkit-color-swatch-wrapper { padding: 0; }
+#coop-avatar-picker #portal-gun-color::-webkit-color-swatch { max-width: 38px; border: 1px solid #8199a5; border-radius: 3px; }
+#coop-avatar-picker .avatar-gun-color span { color: #81919b; pointer-events: none; }
+#coop-avatar-picker .avatar-material-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+#coop-avatar-picker #coop-avatar-confirm { display: flex; justify-content: center; align-items: center; gap: 22px; width: 100%; margin-top: 28px; padding: 16px; border: 1px solid #12b9e9; border-radius: 3px; background: #25c1ed; color: #081b23; cursor: pointer; font: 800 20px "Arial Narrow", "Segoe UI", sans-serif; text-transform: uppercase; letter-spacing: 1px; }
+#coop-avatar-picker #coop-avatar-confirm:hover { background: #56d4f7; }
+#coop-avatar-picker :focus-visible { outline: 3px solid #00a7d7; outline-offset: 3px; }
+@media (max-width: 480px), (max-height: 700px) {
+  #coop-avatar-picker header { padding: 18px 22px; gap: 14px; }
+  #coop-avatar-picker .avatar-aperture { width: 44px; height: 44px; }
+  #coop-avatar-picker .avatar-picker-body { padding: 18px 22px; }
+  #coop-avatar-picker .avatar-intro { gap: 14px; margin-bottom: 12px; }
+  #coop-avatar-picker .avatar-intro svg { width: 52px; height: 52px; }
+  #coop-avatar-picker h3 { font-size: 18px; }
+  #coop-avatar-picker p { font-size: 14px; }
+  #coop-avatar-picker .avatar-swatches { gap: 10px; }
+  #coop-avatar-picker .avatar-swatch, #coop-avatar-picker #coop-avatar-color { width: 34px; height: 34px; }
+  #coop-avatar-picker .avatar-material-fields { gap: 12px; }
+  #coop-avatar-picker label { margin-top: 12px; }
+  #coop-avatar-picker fieldset { margin-top: 18px; }
+  #coop-avatar-picker #coop-avatar-confirm { margin-top: 20px; }
+}

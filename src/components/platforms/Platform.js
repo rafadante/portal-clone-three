@@ -51,6 +51,12 @@ $("body").on('change', '#state-piston-top', function () {
 });
 
 function updatePlatformPosition(obj, instanced, i, deltaTime) {
+    if (GLOBALS.MULTIPLAYER?.slot === 1 && obj.body) {
+        const item = new Object3D();
+        item.position.copy(obj.body.position); item.quaternion.copy(obj.body.quaternion); item.updateMatrix();
+        instanced.setMatrixAt(i, item.matrix); instanced.instanceMatrix.needsUpdate = true;
+        return;
+    }
 
     if (Math.abs(deltaTime) > 1) {
         return

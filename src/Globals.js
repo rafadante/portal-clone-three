@@ -68,6 +68,10 @@ portalGunCamera.layers.mask = 2;
 portalGunCamera.near = 0.00001;
 portalGunCamera.updateProjectionMatrix();
 
+//CAMERA USED TO LOOK THROUGH THE OTHER COOP PLAYER (REMOTE OR SIMULATED)
+const remoteCamera = camera.clone();
+remoteCamera.rotation.order = 'YXZ';
+
 //POINT OF OBJECTS WHILE HOLDING WITH THE GUN
 const cubeHolder = new Object3D()
 cubeHolder.position.z = -1.25;
@@ -635,6 +639,7 @@ function getItemValues() {
             count: 0,
             max: 10
         },
+        spawn_player2: { count: 0, max: 1 },
         spawn: {
             count: 0,
             max: 1
@@ -701,6 +706,10 @@ var GLOBALS = {
     MAIN_CAMERA_GROUP: new Group(),
     PIVOT: null,
     PORTAL_GUN_CAMERA: portalGunCamera,
+    REMOTE_CAMERA: remoteCamera,
+    ACTIVE_CAMERA: camera,
+    SECOND_PLAYER: null,
+    VIEW_REMOTE: false,
     CONTROLS: controls,
     POINTER_CONTROLS: null,
     RENDERER: renderer,
@@ -859,6 +868,7 @@ var GLOBALS = {
         angled_panel: [],
         paint_gun: [],
         spawn: [],
+        spawn_player2: [],
         bed: [],
         trash: [],
         toilet: [],

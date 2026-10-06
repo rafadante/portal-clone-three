@@ -271,7 +271,7 @@ select {
   left: 0px;
   width: 100%;
   height: 100%;
-  z-index: 10;
+  z-index: 200001;
   background-color: white;
   display: none;
   justify-content: center;
@@ -301,7 +301,10 @@ select {
     color: white;
   }
 
-  #input-level {}
+  > div { width: min(520px, 90vw); padding: 28px; color: #24343c; font: 16px/1.5 Arial, sans-serif; }
+  h2 { margin-top: 0; }
+  #input-level { width: 100%; padding: 12px; border: 1px solid #a8b8c0; border-radius: 4px; }
+  #chamber-file-status { min-height: 24px; color: #526b78; }
 }
 
 #viewer-3d {

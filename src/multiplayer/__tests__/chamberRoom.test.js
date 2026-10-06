@@ -125,3 +125,17 @@ test('HTTP LAN browsers without randomUUID can host, join and exchange states', 
     jest.useRealTimers();
   }
 });
+
+test('late join requests synchronization once and delivers the live host world without reloading the host', () => {
+ jest.useFakeTimers(); const net=network(),code=roomCode();
+ const live={...state('shared',0),paused:false,world:{entered:true,connections:[true],items:[{id:0,flags:{buttons:1,isActive:true},nodes:[]}]}};
+ const host=peer(net,true,code,'shared',{getState:()=>live,onJoin:jest.fn()});
+ const guest=peer(net,false,code,'shared',{getState:()=>({...state('shared',1),ready:false,paused:true})});
+ guest.room.pulse(); net.flush(); guest.room.send('join'); net.flush();
+ expect(host.options.onJoin).toHaveBeenCalledTimes(1);
+ host.room.pulse(); net.flush(); host.room.pulse(); net.flush();
+ expect(host.options.onDocument).not.toHaveBeenCalled();
+ expect(guest.options.onDocument).toHaveBeenCalledTimes(1);
+ expect(guest.options.onState).toHaveBeenCalledWith(live);
+ host.room.close(); guest.room.close(); jest.useRealTimers();
+});

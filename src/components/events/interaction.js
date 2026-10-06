@@ -1,3 +1,4 @@
+import { chamberTimeout } from '../../multiplayer/chamberTimeout';
 import { Vector3, Color, Raycaster } from "three";
 import { GLOBALS } from "../../Globals.js";
 import { stateDoor } from '../door/Door.js';
@@ -15,6 +16,7 @@ var coords = new Vector3();
 var raycaster2 = new Raycaster();
 
 function interactWithItem() {
+    if (GLOBALS.MULTIPLAYER?.isPaused()) return;
 
     raycaster2.setFromCamera(coords, GLOBALS.MAIN_CAMERA);
 
@@ -62,102 +64,8 @@ function interactWithItem() {
             if (intersects[0].distance < 1) {
 
                 var item = GLOBALS.DYMANIC_ITEMS[intersects[0].object.name][intersects[0].instanceId];
-                var goal = GLOBALS.PLANE_USER_DATA[item.userData.planeInstancedId];
-
-                //Go through each connection to check for triggers
-                for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
-                    if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("pedestal")) {
-                        continue
-                    }
-                    //if item or player touches the trigger
-                    if (goal == GLOBALS.CONNECTIONS[i]['from']) {//TRIGER START
-                        //Verify if the button accepts the body
-                        if (!GLOBALS.CONNECTIONS[i]['line'].active) {
-                            GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
-                            connectionState(GLOBALS.CONNECTIONS[i], "no", true, new Color(2, 1.3, 0))
-
-                            //PLAY AUDIO POSITIVE
-                            AUDIO.POSITIVE.play();
-
-                            //Manage Door Trigger
-                            if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_emitter")) {
-                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons == GLOBALS.CONNECTIONS[i]['to'].item.userData.connections) {
-                                    GLOBALS.CONNECTIONS[i]['to'].item.continuous.visible = !GLOBALS.CONNECTIONS[i]['to'].item.continuous.visible;
-                                }
-                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("angled_panel")) {
-                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
-                                    tweenCamera(500, GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation,
-                                        new Vector3(
-                                            GLOBALS.CONNECTIONS[i]['to'].item.userData.angleTrigger * Math.PI / 180,
-                                            GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation.y,
-                                            GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation.z)
-                                    );
-
-                                    const holderItem = GLOBALS.CONNECTIONS[i]['to'].item;
-
-                                    if (Boolean(GLOBALS.PORTALS[holderItem.getObjectByName("panel").hasPortal])) {
-                                        deletePortal(holderItem.getObjectByName("panel").hasPortal)
-                                    }
-
-                                    holderItem.getObjectByName("panel").hasPortal = 100;
-
-                                    setTimeout(() => {
-                                        updateAngledPanel(holderItem.getObjectByName("panel").body,
-                                            holderItem.getObjectByName("Cube"));
-                                    }, 500);
-                                }
-                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
-                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
-                                    GLOBALS.CONNECTIONS[i]['to'].item.userData.state = true;
-                                }
-                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
-                                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
-
-                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
-                                    stateDoor(0, true, false, GLOBALS.CONNECTIONS[i]['to'].item);
-                                }
-                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("cube") ||
-                                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("sphere")) {
-                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
-                                    dispenserSpawn(GLOBALS.CONNECTIONS[i]['to'].item);
-                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("tractor")) {
-                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
-                                    tractorStates(GLOBALS.CONNECTIONS[i]['to']);
-                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("light_bridge")) {
-                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
-                                    lightBridgeState(GLOBALS.CONNECTIONS[i]['to'])
-                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field") ||
-                                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("fizzler")) {
-                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
-                                    laserFieldState(GLOBALS.CONNECTIONS[i]['to'])
-                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
-                                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
-
-                                GLOBALS.CONNECTIONS[i]['to'].item.active = true;
-
-                                if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0"))
-                                    portalButton(0, GLOBALS.CONNECTIONS[i]['to'].item, GLOBALS.MAIN_CAMERA)
-                                else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1"))
-                                    portalButton(2, GLOBALS.CONNECTIONS[i]['to'].item, GLOBALS.MAIN_CAMERA)
-                            }
-
-                            if (!GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalInfinity) {
-
-                                if (!GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") &&
-                                    !GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
-                                    const audioTikTok = document.getElementById("tiktok").cloneNode(true);
-                                    audioTikTok.play();
-                                    setTimeout(() => {
-                                        audioTikTok.pause();
-                                    }, GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalValue * 1000);
-                                }
-
-
-                                setTimeout(pedestalTimer, GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalValue * 1000, GLOBALS.CONNECTIONS[i]);
-                            }
-                        }
-                    }
-                }
+                if (GLOBALS.MULTIPLAYER?.slot === 1) GLOBALS.MULTIPLAYER.queuePedestal(item.userData.planeInstancedId);
+                else activatePedestal(item);
             }
         } else {
 
@@ -187,6 +95,7 @@ function interactWithItem() {
                     //return;
                 }
 
+                if (GLOBALS.MULTIPLAYER?.objects && !GLOBALS.MULTIPLAYER.objects.claim(test.body)) return;
                 GLOBALS.HOLDING_ITEM = true;//0.00009, -0.00013, -0.00012
                 tweenCamera(250, GLOBALS.GUN.children[0].children[0].position, new Vector3(0.007, -0.01, -0.004))
 
@@ -243,6 +152,105 @@ function interactWithItem() {
     GLOBALS.LIGHTNIN_STRIKE_3.visible = GLOBALS.HOLDING_ITEM;
 }
 
+function activatePedestal(item) {
+                var goal = GLOBALS.PLANE_USER_DATA[item.userData.planeInstancedId];
+
+                //Go through each connection to check for triggers
+                for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
+                    if (!GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("pedestal")) {
+                        continue
+                    }
+                    //if item or player touches the trigger
+                    if (goal == GLOBALS.CONNECTIONS[i]['from']) {//TRIGER START
+                        //Verify if the button accepts the body
+                        if (!GLOBALS.CONNECTIONS[i]['line'].active) {
+                            GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons += 1;
+                            connectionState(GLOBALS.CONNECTIONS[i], "no", true, new Color(2, 1.3, 0))
+
+                            //PLAY AUDIO POSITIVE
+                            AUDIO.POSITIVE.play();
+
+                            //Manage Door Trigger
+                            if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_emitter")) {
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons == GLOBALS.CONNECTIONS[i]['to'].item.userData.connections) {
+                                    GLOBALS.CONNECTIONS[i]['to'].item.continuous.visible = !GLOBALS.CONNECTIONS[i]['to'].item.continuous.visible;
+                                }
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("angled_panel")) {
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
+                                    tweenCamera(500, GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation,
+                                        new Vector3(
+                                            GLOBALS.CONNECTIONS[i]['to'].item.userData.angleTrigger * Math.PI / 180,
+                                            GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation.y,
+                                            GLOBALS.CONNECTIONS[i]['to'].item.getObjectByName("pivot2").rotation.z)
+                                    );
+
+                                    const holderItem = GLOBALS.CONNECTIONS[i]['to'].item;
+
+                                    if (Boolean(GLOBALS.PORTALS[holderItem.getObjectByName("panel").hasPortal])) {
+                                        deletePortal(holderItem.getObjectByName("panel").hasPortal)
+                                    }
+
+                                    holderItem.getObjectByName("panel").hasPortal = 100;
+
+                                    chamberTimeout(() => {
+                                        updateAngledPanel(holderItem.getObjectByName("panel").body,
+                                            holderItem.getObjectByName("Cube"));
+                                    }, 500);
+                                }
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
+                                    GLOBALS.CONNECTIONS[i]['to'].item.userData.state = true;
+                                }
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("door") ||
+                                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("exitDoor")) {
+
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons) {
+                                    stateDoor(0, true, false, GLOBALS.CONNECTIONS[i]['to'].item);
+                                }
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("cube") ||
+                                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("sphere")) {
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
+                                    dispenserSpawn(GLOBALS.CONNECTIONS[i]['to'].item);
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("tractor")) {
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
+                                    tractorStates(GLOBALS.CONNECTIONS[i]['to']);
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("light_bridge")) {
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
+                                    lightBridgeState(GLOBALS.CONNECTIONS[i]['to'])
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("laser_field") ||
+                                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("fizzler")) {
+                                if (GLOBALS.CONNECTIONS[i]['to'].item.userData.connections == GLOBALS.CONNECTIONS[i]['to'].item.userData.buttons)
+                                    laserFieldState(GLOBALS.CONNECTIONS[i]['to'])
+                            } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") ||
+                                GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
+
+                                GLOBALS.CONNECTIONS[i]['to'].item.active = true;
+
+                                if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0"))
+                                    portalButton(0, GLOBALS.CONNECTIONS[i]['to'].item, GLOBALS.MAIN_CAMERA)
+                                else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1"))
+                                    portalButton(2, GLOBALS.CONNECTIONS[i]['to'].item, GLOBALS.MAIN_CAMERA)
+                            }
+
+                            if (!GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalInfinity) {
+
+                                if (!GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_0") &&
+                                    !GLOBALS.CONNECTIONS[i]['to'].itemName.includes("portal_1")) {
+                                    const audioTikTok = document.getElementById("tiktok").cloneNode(true);
+                                    audioTikTok.play();
+                                    chamberTimeout(() => {
+                                        audioTikTok.pause();
+                                    }, GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalValue * 1000);
+                                }
+
+
+                                chamberTimeout(pedestalTimer, GLOBALS.CONNECTIONS[i]['from'].item.userData.pedestalValue * 1000, GLOBALS.CONNECTIONS[i]);
+                            }
+                        }
+                    }
+                }
+}
+
 function pedestalTimer(holder) {
 
     var active = false;;
@@ -274,7 +282,7 @@ function pedestalTimer(holder) {
 
             holderItem.getObjectByName("panel").hasPortal = 100;
 
-            setTimeout(() => {
+            chamberTimeout(() => {
                 updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
             }, 500);
         } else if (holder['to'].itemName.includes("faith_plate")) {
@@ -300,5 +308,5 @@ function pedestalTimer(holder) {
 }
 
 export {
-    interactWithItem
+    interactWithItem, activatePedestal
 }

@@ -1,4 +1,6 @@
-import { Object3D, Vector3, Raycaster, BoxGeometry, CylinderGeometry, BufferAttribute, Mesh, Box3, PlaneGeometry, Color, Box3Helper } from 'three';
+import { traceEffectPath } from '../portal/EffectPath.js';
+import { outOfTheTractor } from '../tractorBeam/TractorBeam.js';
+import { Object3D, Vector3, Raycaster, BoxGeometry, CylinderGeometry, BufferAttribute, Mesh, Box3, PlaneGeometry, Color } from 'three';
 import * as CANNON from 'cannon';
 import { threeToCannon, ShapeType } from 'three-to-cannon';
 import { GLOBALS } from '../../Globals.js';
@@ -233,218 +235,99 @@ function createLightBridges(item, rayItem, object, instanced, update, index) {
 window.tractorClones = [];
 
 function createLightBridgesFromPortal(portal, rayItem) {
-
-    if (!GLOBALS.PORTALS.some(p => p?.output))
-        return
-
-    for (var g = 0; g < rayItem.length; g++) {
-
-        var intersects = rayItem[g].intersectObjects(GLOBALS.PORTAL_SHADER.filter((mesh, i) => GLOBALS.PORTALS[i]?.output));
-
-        if (intersects.length > 0) {
-
-            var otherPortal;
-
-            otherPortal = Number(intersects[0].object.name.split("-").pop());
-            portal = otherPortal ^ 1;
-
-            if (rayItem[g].name == "light_bridge") {
-                if (GLOBALS.LIGHT_BRIDGE_CLONE[g]) {
-                    GLOBALS.ITEMS_ADDED.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
-                    GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
-                    GLOBALS.LIGHT_BRIDGE_CLONE[g].item.clone = null;
-                }
-            } else if (rayItem[g].name == "tractor_beam") {
-
-                if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
-                    GLOBALS.ITEMS_ADDED.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
-                    GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
-                }
-            }
-
-            let dir = new Vector3()
-            GLOBALS.PORTAL_SHADER[portal].getWorldDirection(dir)
-
-            var raycasterBridge = new Raycaster();
-            raycasterBridge.set(GLOBALS.PORTAL_SHADER[portal].position, dir);
-
-            var intersectsInstance = raycasterBridge.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
-
-            if (intersects.length > 0) {
-                if (rayItem[g].name == "light_bridge") {
-                    if (intersects[0].uv.x > 0.3 && intersects[0].uv.x < 0.7) {
-                        if (GLOBALS.LIGHT_BRIDGE_CLONE[g]) {
-                            GLOBALS.ITEMS_ADDED.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
-                            GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
-                            GLOBALS.LIGHT_BRIDGE_CLONE[g].item.clone = null;
-                        }
-                    } else {
-                        return;
-                    }
-                } else if (rayItem[g].name == "tractor_beam") {
-                    if (intersects[0].uv.x > 0.3 && intersects[0].uv.x < 0.7 &&
-                        intersects[0].uv.y > 0.3 && intersects[0].uv.y < 0.7
-                    ) {
-                        if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
-                            GLOBALS.ITEMS_ADDED.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
-                            GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
-                        }
-                    } else {
-                        return;
-                    }
-                }
-            }
-
-            var material = GLOBALS.MATERIAL_LIGHT_BRIDGERS;
-
-            if (rayItem[g].name == "light_bridge") {
-                var geometry = new BoxGeometry(0.9, 0.025, intersectsInstance[0].distance);
-            } else if (rayItem[g].name == "tractor_beam") {
-                var geometry = new CylinderGeometry(0.9, 0.9, intersectsInstance[0].distance + 0, 32, 1, true);
-
-                // Add custom attributes to geometry (e.g., for height)
-                var vertices = geometry.attributes.position.array;
-                var heights = new Float32Array(vertices.length / 3);  // Assuming height for each vertex
-
-                for (var i = 0; i < heights.length; i++) {
-                    heights[i] = intersectsInstance[0].distance / 5;
-                }
-
-                geometry.setAttribute('height', new BufferAttribute(heights, 1));
-                material = GLOBALS.MATERIAL_TRACTOR_BEAM;
-            }
-
-            const plane = new Mesh(geometry, material);
-            GLOBALS.ITEMS_ADDED.add(plane);
-
-            if (rayItem[g].name == "tractor_beam") {
-                plane.rotation.x = Math.PI / 2;
-                plane.updateMatrix();
-                plane.geometry.applyMatrix4(plane.matrix);
-            }
-
-            plane.position.copy(GLOBALS.PORTAL_SHADER[portal].position);
-            plane.rotation.copy(GLOBALS.PORTAL_SHADER[portal].rotation);
-
-            var vertical = false;
-
-
-
-            if (GLOBALS.PORTALS[otherPortal].angled) {
-                var angle = GLOBALS.PORTALS[otherPortal].mesh.rotation.x + Math.PI;
-                plane.rotateX(angle)
-                plane.translateZ(intersectsInstance[0].distance / 2);
-            } else {
-
-                if (rayItem[g].name == "light_bridge") {
-
-                    var dummy = new Object3D();
-                    dummy.rotation.copy(plane.rotation);
-                    dummy.position.copy(plane.position);
-
-                    if (rayItem[g].item.userData.triggers == "Middle Vertical") {
-                        dummy.rotateZ(Math.PI / 2);
-                        vertical = true;
-                    } else if (rayItem[g].item.userData.triggers == "Left") {
-                        dummy.rotateZ(Math.PI / 2);
-                        vertical = true;
-                    } else if (rayItem[g].item.userData.triggers == "Right") {
-                        dummy.rotateZ(Math.PI / 2);
-                        vertical = true;
-                    }
-
-                    plane.rotation.copy(dummy.rotation);
-                }
-
-                plane.translateZ(intersectsInstance[0].distance / 2);
-            }
-
-
-
-
-            if (vertical) {
-                plane.translateX((((intersects[0].uv.y) - 0.5) * 1.8));
-                plane.translateY((((intersects[0].uv.x) - 0.5) * 0.9));
-            } else {
-                plane.translateY((((intersects[0].uv.y) - 0.5) * 1.8));
-                plane.translateX(-(((intersects[0].uv.x) - 0.5) * 0.9));
-            }
-
-            const result = threeToCannon(plane, {
-                type: ShapeType.BOX
-            });
-
-            let PHYSICS_MATERIAL = new CANNON.Material();
-            PHYSICS_MATERIAL.friction = 0.4; //0.01
-            PHYSICS_MATERIAL.restitution = 0; //0.1
-
-            var box = new CANNON.Body({
-                shape: result.shape,
-                mass: 0,
-                material: PHYSICS_MATERIAL
-            })
-            //GLOBALS.CANNON_BODIES.push(box);
-            box.position.copy(plane.position);
-            box.quaternion.copy(plane.quaternion);
-
-            plane.visible = rayItem[g].item.continuous.visible;
-            plane.material = rayItem[g].item.continuous.material;
-            plane.item = rayItem[g].item;
-
-            rayItem[g].item.clone = plane;
-
-            GLOBALS.PORTALS[portal].field = plane;
-
-            if (rayItem[g].name == "light_bridge") {
-                box.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT
-                box.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC | GLOBALS.CGROUP_PLAYER;
-                GLOBALS.CANNON_BODIES_CONTINUOUS.push(box);
-                GLOBALS.CANNON_WORLD.addBody(box);
-
-                GLOBALS.LIGHT_BRIDGE_CLONE[g] = plane;
-                GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g] = box;
-
-                rayItem[g].item.clone.bodyBridge = box;
-
-                GLOBALS.PORTALS[portal].fieldBody = box;
-                GLOBALS.PORTALS[portal].fieldBodyClone = rayItem[g].item.clone;
-            } else if (rayItem[g].name == "tractor_beam") {
-
-                //plane.updateMatrix();
-                //plane.geometry.applyMatrix4(plane.matrix);
-
-                var bb = new Box3(); // for re-use
-                bb.setFromObject(plane, true);
-                bb.side = 1;
-
-                const helper = new Box3Helper(bb, 0xffff00);
-                //GLOBALS.ITEMS_ADDED.add(helper);
-
-                plane.inTractor = false;
-                plane.dir = dir;
-
-                GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g] = plane;
-                GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = bb;
-                GLOBALS.PORTALS[portal].fieldTrigger = bb;
-            }
+    const bridge = rayItem === GLOBALS.LIGHT_BRIDGE_RAYCASTER || rayItem[0]?.name === 'light_bridge';
+    const old = bridge ? GLOBALS.LIGHT_BRIDGE_CLONE : GLOBALS.TRACTOR_BEAM.slice(GLOBALS.TRACTOR_BEAM_LENGTH);
+    for (const plane of old || []) {
+        if (!plane) continue;
+        GLOBALS.ITEMS_ADDED.remove(plane);
+        plane.geometry.dispose();
+        if (plane.bodyBridge) {
+            GLOBALS.CANNON_WORLD.removeBody(plane.bodyBridge);
+            const index = GLOBALS.CANNON_BODIES_CONTINUOUS.indexOf(plane.bodyBridge);
+            if (index >= 0) GLOBALS.CANNON_BODIES_CONTINUOUS.splice(index, 1);
         } else {
-            if (rayItem[g].name == "light_bridge") {
-                if (GLOBALS.LIGHT_BRIDGE_CLONE[g]) {
-                    GLOBALS.ITEMS_ADDED.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
-                    GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
-
-                    GLOBALS.LIGHT_BRIDGE_CLONE[g].item.clone = null;
-                }
-            } else if (rayItem[g].name == "tractor_beam") {
-                if (GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]) {
-                    GLOBALS.ITEMS_ADDED.remove(GLOBALS.TRACTOR_BEAM[GLOBALS.TRACTOR_BEAM_LENGTH + g]);
-                    GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[GLOBALS.TRACTOR_BEAM_LENGTH + g] = null;
-                }
+            const index = GLOBALS.TRACTOR_BEAM.indexOf(plane);
+            for (const body of GLOBALS.DYNAMIC_OBJECTS || []) {
+                if (body.inTractor && body.tractor === index) outOfTheTractor(body, index);
+            }
+        }
+        plane.item.portalClones = [];
+        plane.item.clone = null;
+    }
+    if (bridge) {
+        GLOBALS.LIGHT_BRIDGE_CLONE = [];
+        GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE = [];
+    } else {
+        GLOBALS.TRACTOR_BEAM.length = GLOBALS.TRACTOR_BEAM_LENGTH;
+        GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.length = GLOBALS.TRACTOR_BEAM_LENGTH;
+    }
+    GLOBALS.PLANE_LEVEL_INSTANCED.updateWorldMatrix(true, false);
+    for (const ray of rayItem) {
+        const item = ray.item;
+        item.portalClones = [];
+        item.clone = null;
+        const segments = traceEffectPath({
+            origin: ray.ray.origin, direction: ray.ray.direction,
+            portals: GLOBALS.PORTALS, shaders: GLOBALS.PORTAL_SHADER,
+            obstacles: [GLOBALS.PLANE_LEVEL_INSTANCED, ...(GLOBALS.ANGLED_PANELS || [])],
+            acceptPortal: hit => hit.uv && hit.uv.x > .3 && hit.uv.x < .7 &&
+                (bridge || (hit.uv.y > .3 && hit.uv.y < .7)),
+        });
+        const source = item.continuous;
+        const first = segments[0];
+        source.scale.y = first.length / ray.distance;
+        source.position.copy(first.origin).addScaledVector(first.direction, first.length / 2);
+        if (bridge && item.bodyBridge) {
+            item.bodyBridge.position.copy(source.position);
+            item.bodyBridge.shapes[0].halfExtents.y = first.length / 2;
+            item.bodyBridge.shapes[0].updateConvexPolyhedronRepresentation();
+            item.bodyBridge.updateBoundingRadius();
+            item.bodyBridge.aabbNeedsUpdate = true;
+        } else if (!bridge) {
+            const index = GLOBALS.TRACTOR_BEAM.indexOf(source);
+            if (index >= 0) GLOBALS.TRACTOR_BEAM_BOUNDING_BOX[index] = new Box3().setFromObject(source, true);
+        }
+        for (const segment of segments.slice(1)) {
+            // Do not create physical fields outside the chamber when an exit ray misses it.
+            if (!segment.hit) continue;
+            let geometry;
+            if (bridge) geometry = new BoxGeometry(.9, segment.length, .1);
+            else {
+                geometry = new CylinderGeometry(.9, .9, segment.length, 32, 1, true);
+                const heights = new Float32Array(geometry.attributes.position.count).fill(segment.length / 5);
+                geometry.setAttribute('height', new BufferAttribute(heights, 1));
+            }
+            const plane = new Mesh(geometry, source.material);
+            plane.position.copy(segment.origin).addScaledVector(segment.direction, segment.length / 2);
+            plane.quaternion.copy(source.quaternion).premultiply(segment.rotation);
+            plane.visible = source.visible;
+            plane.item = item;
+            plane.renderOrder = -1;
+            GLOBALS.ITEMS_ADDED.add(plane);
+            item.portalClones.push(plane);
+            item.clone = item.portalClones[0];
+            if (bridge) {
+                const result = threeToCannon(plane, { type: ShapeType.BOX });
+                const material = new CANNON.Material();
+                material.friction = .4; material.restitution = 0;
+                const body = new CANNON.Body({ shape: result.shape, mass: 0, material });
+                body.position.copy(plane.position); body.quaternion.copy(plane.quaternion);
+                body.collisionFilterGroup = GLOBALS.CGROUP_ENVIRONMENT;
+                body.collisionFilterMask = GLOBALS.CGROUP_DYNAMIC | GLOBALS.CGROUP_PLAYER;
+                plane.bodyBridge = body;
+                GLOBALS.CANNON_BODIES_CONTINUOUS.push(body);
+                if (plane.visible) GLOBALS.CANNON_WORLD.addBody(body);
+                GLOBALS.LIGHT_BRIDGE_CLONE.push(plane);
+                GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE.push(body);
+            } else {
+                plane.dir = segment.direction;
+                plane.inTractor = false;
+                GLOBALS.TRACTOR_BEAM.push(plane);
+                GLOBALS.TRACTOR_BEAM_BOUNDING_BOX.push(new Box3().setFromObject(plane, true));
             }
         }
     }
 }
-
 function ContinuousTrigger(item, trigger, elem, name) {
 
     item.userData.triggers = trigger;

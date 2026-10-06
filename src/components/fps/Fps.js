@@ -1,10 +1,12 @@
 import { Vector3, Quaternion, Clock } from 'three';
+import { botDanceAnimation } from '../../multiplayer/botDance';
 import { portalButton } from '../portal/CreatePortal.js'
 import { interactWithItem } from '../events/interaction.js'
 import { GLOBALS } from '../../Globals.js';
 import { AUDIO, play } from '../audio/Audio.js';
 import "./Player.js";
 import "./Input.js";
+import "./SecondPlayer.js";
 import { INPUT } from './index.js';
 import { Crouch, openMenu } from './Input.js';
 import * as CANNON from "cannon";
@@ -404,7 +406,7 @@ const updateCamera = function (deltaTime) {
         GLOBALS.PLAYER_MODEL.quaternion.multiply(new Quaternion(0, 50, 0)).normalize()
 
         //GLOBALS.PLAYER_MODEL.position.y += 0.2;
-        GLOBALS.PLAYER_MODEL.translateY(0.4)
+        GLOBALS.PLAYER_MODEL.translateY(GLOBALS.PLAYER_MODEL.userData.bot ? 1 - GLOBALS.PLAYER.shapes[0].halfExtents.y + GLOBALS.PLAYER_MODEL.userData.floorOffset : 0.4)
 
         GLOBALS.PLAYER_MODEL_CLONE.position.copy(GLOBALS.PLAYER.position).add(GLOBALS.PLAYER.upVectorThree.clone().multiplyScalar(-1))
         //
@@ -412,7 +414,7 @@ const updateCamera = function (deltaTime) {
         GLOBALS.PLAYER_MODEL_CLONE.quaternion.multiply(new Quaternion(0, 50, 0)).normalize()
 
         //GLOBALS.PLAYER_MODEL.position.y += 0.2;
-        GLOBALS.PLAYER_MODEL_CLONE.translateY(0.4)
+        GLOBALS.PLAYER_MODEL_CLONE.translateY(GLOBALS.PLAYER_MODEL_CLONE.userData.bot ? 1 - GLOBALS.PLAYER.shapes[0].halfExtents.y + GLOBALS.PLAYER_MODEL_CLONE.userData.floorOffset : 0.4)
 
         /*GLOBALS.SCENE_CHILDREN.remove(GLOBALS.PLAYER_MODEL_CLONE)
         GLOBALS.PLAYER_MODEL_CLONE = SkeletonUtils.clone(GLOBALS.PLAYER_MODEL);
@@ -462,8 +464,10 @@ const updateCamera = function (deltaTime) {
 
         if (GLOBALS.PLAYER_MODEL.modelReady) {
             if (GLOBALS.PLAYER.inJump && !GLOBALS.PLAYER.inTractor) {
-                action = GLOBALS.PLAYER_MODEL.animationActions[jump]
-                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[jump]
+                const falling = GLOBALS.PLAYER_MODEL.userData.bot && GLOBALS.PLAYER.velocity.dot(GLOBALS.PLAYER.upVectorThree) < -1;
+                const airborne = falling ? (GLOBALS.PORTAL_GUN_INITIATE === 'none' ? 'ANIM_FALLING_IDLE_NO_GUN' : 'ANIM_FALLING_IDLE') : jump;
+                action = GLOBALS.PLAYER_MODEL.animationActions[airborne]
+                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[airborne]
             } else if (fowardPressed && leftPressed && rightPressed && backwardPressed) {
                 action = GLOBALS.PLAYER_MODEL.animationActions[idle]
                 actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[idle]
@@ -533,9 +537,15 @@ const updateCamera = function (deltaTime) {
                 }
             }
 
+            const delta = clock.getDelta();
+            const dance = botDanceAnimation(GLOBALS.PLAYER_MODEL, delta, action !== GLOBALS.PLAYER_MODEL.animationActions[idle]);
+            if (dance) {
+                action = GLOBALS.PLAYER_MODEL.animationActions[dance];
+                actionClone = GLOBALS.PLAYER_MODEL_CLONE.animationActions[dance];
+            }
+            GLOBALS.PLAYER_MODEL.currentAnimation = Object.keys(GLOBALS.PLAYER_MODEL.animationActions).find(name => GLOBALS.PLAYER_MODEL.animationActions[name] === action);
             setAction(action);
             setActionClone(actionClone);
-            const delta = clock.getDelta();
 
             GLOBALS.MIXERS.update(delta);
             GLOBALS.MIXERS_CLONE.update(delta);

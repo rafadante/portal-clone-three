@@ -1,9 +1,9 @@
-import { Object3D, Vector3, Raycaster, CylinderGeometry, MeshBasicMaterial, Mesh, Group, Color, Quaternion, MathUtils } from 'three';
+import { traceEffectPath } from '../portal/EffectPath.js';
+import { Object3D, Vector3, Raycaster, CylinderGeometry, MeshBasicMaterial, Mesh, Group, Color } from 'three';
 import { GLOBALS } from '../../Globals.js';
 //import { animate } from '../../Main.js';
 import $ from 'jquery';
 import { laserReceiverTrigger } from '../events/events.js';
-import { MAX } from 'uuid';
 
 var red = 1;
 
@@ -39,6 +39,7 @@ function laserEmitterRaycast(object, update, rayItem, index) {
             return;
         } else {
             GLOBALS.LASERS.remove(object.continuous);
+            for (const clone of object.continuous.portalSegments || [object.continuous.clone]) clone.removeFromParent();
         }
 
         GLOBALS.LASER_EMITTER_RAYCASTER[index] = raycaster;
@@ -98,423 +99,81 @@ function addLaserToCube(cube) {
     cube.laser = laserParent;
 }
 
-var raycasterLaserCube = new Raycaster();
-var raycasterLaserOtherPortal = new Raycaster();
-
-function updateLaserCubeRaycaster(item, laser) {
-
-    if (!GLOBALS.LEVEL_ENTERED)
-        return;
-
-    laser.visible = laser.active;
-    laser.clone.visible = false;
-
-    if (!laser.active) {
-        return;
-    }
-
-    let dir = new Vector3();
-    item.getWorldDirection(dir);
-
-
-    dir.negate();
-    raycasterLaserCube.set(item.position, dir);
-
-    var laserCubeRayIntersects = raycasterLaserCube.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
-
-    laser.position.copy(item.position);
-    laser.rotation.copy(item.rotation);
-    laser.rotateX(-Math.PI / 2)
-
-    if (laserCubeRayIntersects.length > 0)
-        laser.scale.y = laserCubeRayIntersects[0].distance;
-
-    var unfiltered = [
-        GLOBALS.ITEMS_ADDED.getObjectByName("laser_cube"),
-        GLOBALS.ITEMS_ADDED.getObjectByName("cube"),
-        GLOBALS.ITEMS_ADDED.getObjectByName("sphere"),
-        GLOBALS.ITEMS_ADDED.getObjectByName("cube_2"),
-        GLOBALS.ITEMS_ADDED.getObjectByName("scale_cube"),
-        GLOBALS.ITEMS_ADDED.getObjectByName("laser_receiver"),
-        GLOBALS.ITEMS_ADDED.getObjectByName("laser_relay"),
-        GLOBALS.ITEMS_ADDED.getObjectByName("bomb_cube"),
-    ]
-
-    var array = unfiltered.filter(function (el) {
-        return el != null;
-    });
-
-    var laserCubeRayIntersects = raycasterLaserCube.intersectObjects(array);
-
-    for (var i = 0; i < laserCubeRayIntersects.length; i++) {
-        if (laserCubeRayIntersects[i].distance > 0.5) {
-
-            if (laserCubeRayIntersects[i].object.name == "laser_receiver") {
-                GLOBALS.DYMANIC_ITEMS['laser_receiver'][laserCubeRayIntersects[i].instanceId].emitterState = true;
-                GLOBALS.DYMANIC_ITEMS['laser_receiver'][laserCubeRayIntersects[i].instanceId].fromLaserCube = true;
-                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_receiver'][laserCubeRayIntersects[i].instanceId], true, false);
-            } else if (laserCubeRayIntersects[i].object.name == "laser_relay") {
-                GLOBALS.DYMANIC_ITEMS['laser_relay'][laserCubeRayIntersects[i].instanceId].emitterState = true;
-                GLOBALS.DYMANIC_ITEMS['laser_relay'][laserCubeRayIntersects[i].instanceId].fromLaserCube = true;
-                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_relay'][laserCubeRayIntersects[i].instanceId], true, false);
-            }
-
-            if (laserCubeRayIntersects[i].object.name == "laser_cube") {
-                const cube = GLOBALS.DYMANIC_ITEMS['laser_cube'][laserCubeRayIntersects[i].instanceId];
-
-                if (!cube.body.laser.active) {
-                    cube.body.laser.active = true;
-                    var item2 = new Object3D();
-                    item2.position.copy(cube.body.position);
-                    item2.quaternion.copy(cube.body.quaternion);
-                    updateLaserCubeRaycaster(item2, cube.body.laser)
-                }
-            }
-
-            if (laserCubeRayIntersects[i].object.name != "laser_relay") {
-                laser.scale.y = laserCubeRayIntersects[i].distance;
-                return;
-            }
-        }
-    }
-
-    if (!GLOBALS.PORTALS.some(p => p?.output))
-        return
-
-    var laserCubeRayIntersectsWithPortals = raycasterLaserCube.intersectObjects(GLOBALS.PORTAL_SHADER.filter((mesh, i) => GLOBALS.PORTALS[i]?.output));
-    if (laserCubeRayIntersectsWithPortals.length > 0) {
-
-        var portal, portal2;
-        portal2 = Number(laserCubeRayIntersectsWithPortals[0].object.name.split("-").pop());
-            portal = portal2 ^ 1;
-
-        laser.clone.position.copy(GLOBALS.PORTAL_SHADER[portal].position)
-        //
-
-        const portalARotation = GLOBALS.PORTALS[portal2].mesh.quaternion.clone();
-        const portalBRotation = GLOBALS.PORTALS[portal].mesh.quaternion.clone();
-
-        // Compute the difference Quaternion
-        const differenceQuaternion = new Quaternion().copy(portalARotation).multiply(portalBRotation.invert());
-
-        // Extract the angle and axis from the difference Quaternion
-        var angle = 2 * Math.acos(MathUtils.clamp(differenceQuaternion.w, -1, 1));
-        const axis = new Vector3(differenceQuaternion.x, differenceQuaternion.y, differenceQuaternion.z).normalize();
-
-        // Define a reference direction (e.g., positive Y direction)
-        const referenceDirection = new Vector3(0, 1, 0);
-
-        // Project the rotation axis onto the reference direction
-        const projection = axis.dot(referenceDirection);
-
-        // Determine the sign based on the projection
-        const sign = Math.sign(projection);
-
-        angle *= sign;
-
-        /*if (angle == 0 || Math.abs(angle) == Math.PI) {
-            laser.clone.rotation.copy(GLOBALS.PORTALS[portal].mesh.rotation)
-
-            laser.clone.translateZ(-(((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
-            laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 1.1));
-
-            laser.clone.rotation.copy(laser.rotation)
-            laser.clone.rotateZ(angle - Math.PI)
-        } else if (Math.abs(angle).toFixed(2) == (Math.PI / 2).toFixed(2) ||
-            Math.abs(angle).toFixed(2) == (Math.PI + (Math.PI / 2)).toFixed(2)) {
-            laser.clone.rotation.copy(GLOBALS.PORTALS[portal].mesh.rotation)
-
-            laser.clone.translateZ(-(((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
-            laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 1.1));
-
-            laser.clone.rotation.copy(laser.rotation)
-            laser.clone.rotateZ(angle)
-        } else {
-            laser.clone.rotation.copy(GLOBALS.PORTALS[portal].mesh.rotation)
-            //laser.clone.rotateZ(angle + (Math.PI * 2))
-
-            laser.clone.translateZ(-(((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
-            laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 0.9));
-        }
-
-        laser.clone.visible = true;*/
-
-        laser.clone.visible = true;
-
-
-
-        if (GLOBALS.PORTALS[portal2].angled) {
-
-            laser.clone.position.copy(GLOBALS.PORTAL_SHADER[portal].position)
-            laser.clone.rotation.copy(GLOBALS.PORTAL_SHADER[portal].rotation)
-            laser.clone.translateY((((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
-            laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 0.9));
-
-            var angle1 = GLOBALS.PORTALS[portal2].mesh.rotation.x + Math.PI;
-            var angle2 = Math.PI - GLOBALS.PORTALS[portal2].mesh.rotation.z;
-            var angle3 = Math.PI + item.rotation.y;
-
-            laser.clone.rotateX(angle1)
-            laser.clone.rotateZ(angle2 + item.rotation.y)
-        } else {
-            //laser.clone.rotateX(Math.PI / 2)
-            //laser.clone.rotateZ(angle3)
-            //laser.clone.rotation.y = Math.PI + item.rotation.y;
-
-            if (angle == 0 || Math.abs(angle) == Math.PI) {
-                laser.clone.rotation.copy(GLOBALS.PORTALS[portal].mesh.rotation)
-
-                laser.clone.translateZ(-(((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
-                laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 1.1));
-
-                laser.clone.rotation.copy(laser.rotation)
-                laser.clone.rotateZ(angle - Math.PI)
-            } else if (Math.abs(angle).toFixed(2) == (Math.PI / 2).toFixed(2) ||
-                Math.abs(angle).toFixed(2) == (Math.PI + (Math.PI / 2)).toFixed(2)) {
-                laser.clone.rotation.copy(GLOBALS.PORTALS[portal].mesh.rotation)
-
-                laser.clone.translateZ(-(((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
-                laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 1.1));
-
-                laser.clone.rotation.copy(laser.rotation)
-                laser.clone.rotateZ(angle)
-            } else {
-                laser.clone.rotation.copy(GLOBALS.PORTALS[portal].mesh.rotation)
-                //laser.clone.rotateZ(angle + (Math.PI * 2))
-
-                laser.clone.translateZ(-(((laserCubeRayIntersectsWithPortals[0].uv.y) - 0.5) * 1.8));
-                laser.clone.translateX(-(((laserCubeRayIntersectsWithPortals[0].uv.x) - 0.5) * 0.9));
-            }
-        }
-
-        //
-        var direction = new Vector3(0, 1, 0).applyQuaternion(laser.clone.quaternion);
-
-
-        raycasterLaserOtherPortal.set(laser.clone.position, direction);
-
-        var intersectsInstanceOtherPortalWall = raycasterLaserOtherPortal.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
-
-        if (intersectsInstanceOtherPortalWall.length > 0) {
-            laser.clone.scale.y = intersectsInstanceOtherPortalWall[0].distance;
-        }
-
-        var intersectsInstanceOtherPortalObj = raycasterLaserOtherPortal.intersectObjects(array);
-
-        for (var j = 0; j < intersectsInstanceOtherPortalObj.length; j++) {
-
-            if (intersectsInstanceOtherPortalObj[j].object.name == "laser_receiver") {
-                GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId].emitterState = true;
-                GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId].fromLaserCube = true;
-                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId], true, false);
-            } else if (intersectsInstanceOtherPortalObj[j].object.name == "laser_relay") {
-                GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId].emitterState = true;
-                GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId].fromLaserCube = true;
-                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId], true, false);
-            }
-
-            if (intersectsInstanceOtherPortalObj[j].object.name == "laser_cube") {
-                const cube = GLOBALS.DYMANIC_ITEMS['laser_cube'][intersectsInstanceOtherPortalObj[j].instanceId];
-                if (!cube.body.laser.active) {
-                    cube.body.laser.active = true;
-                    var item = new Object3D();
-                    item.position.copy(cube.body.position);
-                    item.quaternion.copy(cube.body.quaternion);
-                    updateLaserCubeRaycaster(item, cube.body.laser)
-                }
-            }
-
-            laser.clone.visible = true;
-
-            if (intersectsInstanceOtherPortalObj[j].object.name != "laser_relay") {
-                laser.clone.scale.y = intersectsInstanceOtherPortalObj[j].distance;
-                break;
-            }
-        }
-    }
+function laserObjects() {
+    return ['laser_cube', 'cube', 'sphere', 'cube_2', 'scale_cube', 'laser_receiver', 'laser_relay', 'bomb_cube']
+        .map(name => GLOBALS.ITEMS_ADDED.getObjectByName(name)).filter(Boolean);
 }
 
-function angleDifference(angle1, angle2) {
-    let diff = angle2 - angle1;
-    diff = ((diff + Math.PI) % (2 * Math.PI)) - Math.PI;
-    return diff;
+function updateLaserPath(laser, origin, direction, fromCube) {
+    const objects = laserObjects();
+    const segments = traceEffectPath({
+        origin, direction, portals: GLOBALS.PORTALS, shaders: GLOBALS.PORTAL_SHADER,
+        obstacles: [GLOBALS.PLANE_LEVEL_INSTANCED, ...(GLOBALS.ANGLED_PANELS || []),
+            ...objects.filter(object => object.name !== 'laser_relay')],
+        firstNear: fromCube ? .51 : .001,
+    });
+    const clones = laser.portalSegments || (laser.portalSegments = [laser.clone]);
+    for (const clone of clones) clone.visible = false;
+    segments.forEach((segment, index) => {
+        let visual = laser;
+        if (index > 0) {
+            if (!clones[index - 1]) {
+                const clone = new Group();
+                clone.add(laser.children[0].clone());
+                laser.parent.add(clone);
+                clones[index - 1] = clone;
+            }
+            visual = clones[index - 1];
+        }
+        visual.visible = true;
+        visual.position.copy(segment.origin);
+        visual.quaternion.setFromUnitVectors(new Vector3(0,1,0), segment.direction);
+        visual.scale.y = segment.length;
+        const hits = segment.ray.intersectObjects(objects).filter(hit => hit.distance <= segment.length + .001);
+        for (const hit of hits) {
+            const item = GLOBALS.DYMANIC_ITEMS[hit.object.name]?.[hit.instanceId];
+            if (!item) continue;
+            if (hit.object.name === 'laser_receiver' || hit.object.name === 'laser_relay') {
+                item.emitterState = true;
+                item.fromLaserCube = fromCube;
+                laserReceiverTrigger(item, true, false);
+            } else if (hit.object.name === 'laser_cube' && !item.body.laser.active) {
+                item.body.laser.active = true;
+                const source = new Object3D();
+                source.position.copy(item.body.position);
+                source.quaternion.copy(item.body.quaternion);
+                updateLaserCubeRaycaster(source, item.body.laser);
+            }
+        }
+    });
+}
+
+function updateLaserCubeRaycaster(item, laser) {
+    if (!GLOBALS.LEVEL_ENTERED) return;
+    laser.visible = !!laser.active;
+    for (const clone of laser.portalSegments || [laser.clone]) clone.visible = false;
+    if (!laser.active) return;
+    const direction = new Vector3(0,0,-1).applyQuaternion(item.quaternion);
+    updateLaserPath(laser, item.position, direction, true);
 }
 
 function updateLaserEmitterRaycaster() {
-
-    if (!GLOBALS.LEVEL_ENTERED)
-        return;
-
-    for (var j = 0; j < GLOBALS.DYMANIC_ITEMS['laser_cube'].length; j++) {
-        if (GLOBALS.DYMANIC_ITEMS['laser_cube'][j].length != 0) {
-            GLOBALS.DYMANIC_ITEMS['laser_cube'][j].body.laser.active = false;
-        }
+    if (!GLOBALS.LEVEL_ENTERED) return;
+    for (const cube of GLOBALS.DYMANIC_ITEMS['laser_cube']) {
+        if (cube.body?.laser) cube.body.laser.active = false;
     }
-
-    for (var i = 0; i < GLOBALS.LASER_TRIGGERS.length; i++) {
-        GLOBALS.LASER_TRIGGERS[i].emitterState = false;
+    for (const trigger of GLOBALS.LASER_TRIGGERS) {
+        trigger.emitterState = false;
+        trigger.fromLaserCube = false;
     }
-
-    for (var i = 0; i < GLOBALS.LASER_EMITTER_RAYCASTER.length; i++) {
-
-        if (!GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.visible)
-            continue
-
-        GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.visible = false;
-
-        var intersectsWithPortals = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObjects(GLOBALS.PORTAL_SHADER.filter((mesh, i) => GLOBALS.PORTALS[i]?.output));
-
-        //CHECK FOR WALL INTERSECTION
-        var intersectsWall = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
-        if (intersectsWall.length > 0) {
-            GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.scale.y = intersectsWall[0].distance;
-        }
-
-        //CHECK FOR PANELS INTERSECTION
-        var intersectPanel = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObjects(GLOBALS.ANGLED_PANELS);
-        if (intersectPanel.length > 0) {
-            GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.scale.y = intersectPanel[0].distance;
-
-            if (intersectsWithPortals.length == 0)
-                continue;
-        }
-
-        var unfiltered = [
-            GLOBALS.ITEMS_ADDED.getObjectByName("laser_cube"),
-            GLOBALS.ITEMS_ADDED.getObjectByName("cube"),
-            GLOBALS.ITEMS_ADDED.getObjectByName("sphere"),
-            GLOBALS.ITEMS_ADDED.getObjectByName("cube_2"),
-            GLOBALS.ITEMS_ADDED.getObjectByName("scale_cube"),
-            GLOBALS.ITEMS_ADDED.getObjectByName("laser_receiver"),
-            GLOBALS.ITEMS_ADDED.getObjectByName("laser_relay"),
-            GLOBALS.ITEMS_ADDED.getObjectByName("bomb_cube"),
-        ]
-
-        var array = unfiltered.filter(function (el) {
-            return el != null;
-        });
-
-        //CHECK FOR LASER CUBE INTERSECTION
-        var intersectsLaserCube = GLOBALS.LASER_EMITTER_RAYCASTER[i].intersectObjects(array);
-        var blocked = false;
-
-        for (var j = 0; j < intersectsLaserCube.length; j++) {
-
-            if(intersectPanel.length > 0)
-                continue
-
-            
-            if (intersectsLaserCube[j].object.name == "laser_receiver") {
-                GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsLaserCube[j].instanceId].emitterState = true;
-                GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsLaserCube[j].instanceId].fromLaserCube = false;
-                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsLaserCube[j].instanceId], true, false);
-            } else if (intersectsLaserCube[j].object.name == "laser_relay") {
-                GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsLaserCube[j].instanceId].emitterState = true;
-                GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsLaserCube[j].instanceId].fromLaserCube = false;
-                laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsLaserCube[j].instanceId], true, false);
-            }
-
-            if (intersectsLaserCube[j].object.name == "laser_cube") {
-                const cube = GLOBALS.DYMANIC_ITEMS['laser_cube'][intersectsLaserCube[j].instanceId];
-                cube.body.laser.active = true;
-            }
-
-
-            if (intersectsLaserCube[j].object.name != "laser_relay") {
-                GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.scale.y = intersectsLaserCube[j].distance;
-                blocked = true;
-                break;
-            }
-        }
-
-        if (blocked)
-            continue
-
-        if (!GLOBALS.PORTALS.some(p => p?.output))
-            continue
-
-        //CHECK FOR PORTAL INTERSECTION
-        if (intersectsWithPortals.length > 0) {
-            var portal, otherPortal;
-            otherPortal = Number(intersectsWithPortals[0].object.name.split("-").pop());
-            portal = otherPortal ^ 1;
-
-            let dir = new Vector3()
-            GLOBALS.PORTAL_SHADER[portal].getWorldDirection(dir)
-
-            raycasterLaserOtherPortal.set(GLOBALS.PORTAL_SHADER[portal].position, dir);
-
-            var intersectsInstanceOtherPortalWall = raycasterLaserOtherPortal.intersectObject(GLOBALS.PLANE_LEVEL_INSTANCED);
-            if (intersectsInstanceOtherPortalWall.length > 0) {
-                GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.scale.y = intersectsInstanceOtherPortalWall[0].distance * 1.1;
-                GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.position.copy(GLOBALS.PORTAL_SHADER[portal].position)
-                GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.rotation.copy(GLOBALS.PORTAL_SHADER[portal].rotation)
-                GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.translateY((((intersectsWithPortals[0].uv.y) - 0.5) * 1.8));
-                GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.translateX(-(((intersectsWithPortals[0].uv.x) - 0.5) * 0.9));
-
-                var angle = GLOBALS.PORTALS[otherPortal].mesh.rotation.x + Math.PI;
-                var angle2 = Math.PI - GLOBALS.PORTALS[otherPortal].mesh.rotation.z;
-
-                if (GLOBALS.PORTALS[otherPortal].angled) {
-                    GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.rotateX(angle)
-                    GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.rotateZ(angle2)
-                } else {
-                    GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.rotateX(Math.PI / 2)
-                }
-
-                GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.visible = true;
-            }
-
-            const dir2 = new Vector3(0, 1, 0); // Local Y-axis
-            dir2.applyQuaternion(GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.quaternion); // Transform to world space
-
-            raycasterLaserOtherPortal.set(GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.position, dir2);
-            var intersectsInstanceOtherPortalObj = raycasterLaserOtherPortal.intersectObjects(array);
-
-            for (var j = 0; j < intersectsInstanceOtherPortalObj.length; j++) {
-
-                if(intersectPanel.length > 0)
-                    continue
-
-                if (intersectsInstanceOtherPortalObj[j].object.name == "laser_receiver") {
-                    GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId].fromLaserCube = false;
-                    GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId].emitterState = true;
-                    laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_receiver'][intersectsInstanceOtherPortalObj[j].instanceId], true, false);
-                } else if (intersectsInstanceOtherPortalObj[j].object.name == "laser_relay") {
-                    GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId].fromLaserCube = false;
-                    GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId].emitterState = true;
-                    laserReceiverTrigger(GLOBALS.DYMANIC_ITEMS['laser_relay'][intersectsInstanceOtherPortalObj[j].instanceId], true, false);
-                }
-
-                if (intersectsInstanceOtherPortalObj[j].object.name == "laser_cube") {
-                    const cube = GLOBALS.DYMANIC_ITEMS['laser_cube'][intersectsInstanceOtherPortalObj[j].instanceId];
-                    //cube.body.laser.active = true;
-                    if (!cube.body.laser.active) {
-                        cube.body.laser.active = true;
-                        var item = new Object3D();
-                        item.position.copy(cube.body.position);
-                        item.quaternion.copy(cube.body.quaternion);
-                        updateLaserCubeRaycaster(item, cube.body.laser)
-                    }
-                }
-
-                GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.visible = true;
-
-                if (intersectsInstanceOtherPortalObj[j].object.name != "laser_relay") {
-                    GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.scale.y = intersectsInstanceOtherPortalObj[j].distance * 1.1;
-                    break;
-                }
-            }
-        }
+    for (const ray of GLOBALS.LASER_EMITTER_RAYCASTER) {
+        for (const clone of ray.laser.portalSegments || [ray.laser.clone]) clone.visible = false;
+        if (ray.laser.visible) updateLaserPath(ray.laser, ray.ray.origin, ray.ray.direction, false);
     }
-
-    for (var i = 0; i < GLOBALS.LASER_TRIGGERS.length; i++) {
-        if (!GLOBALS.LASER_TRIGGERS[i].emitterState && !GLOBALS.LASER_TRIGGERS[i].fromLaserCube) {
-            laserReceiverTrigger(GLOBALS.LASER_TRIGGERS[i], false, false);
-        }
+    for (const trigger of GLOBALS.LASER_TRIGGERS) {
+        if (!trigger.emitterState) laserReceiverTrigger(trigger, false, false);
     }
 }
-
 $("body").on('click', '.laser_emitter-triggers', function () {
     GLOBALS.LASER_EMITTER_TRIGGER = $(this).data("trigger");
     laserEmitterPosition(GLOBALS.PLANE_USER_DATA[GLOBALS.SELECTED_ID[0]].item,

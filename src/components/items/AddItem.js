@@ -101,7 +101,7 @@ async function addItem(found, loaded) {
         && GLOBALS.ITEM_HOLDED_NAME != "trigger_save"
         && GLOBALS.ITEM_HOLDED_NAME != "trigger_voice"
         && GLOBALS.ITEM_HOLDED_NAME != "trigger_audio"
-        && GLOBALS.ITEM_HOLDED_NAME != "spawn"
+        && !GLOBALS.ITEM_HOLDED_NAME.startsWith("spawn")
         && GLOBALS.ITEM_HOLDED_NAME != "goo"
         && GLOBALS.ITEM_HOLDED_NAME != "door") {
 
@@ -220,9 +220,9 @@ async function addItem(found, loaded) {
 
         if ((!userData.hasItem && !userData.continuousEnding) || loaded) {// 
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "spawn") {
+            if (GLOBALS.ITEM_HOLDED_NAME.startsWith("spawn")) {
                 const geometry = new ConeGeometry(0.75, 2, 8);
-                const material = new MeshBasicMaterial({ color: 0xff0000 });
+                const material = new MeshBasicMaterial({ color: GLOBALS.ITEM_HOLDED_NAME === "spawn_player2" ? 0x00bfff : 0xff0000 });
                 const cone = new Mesh(geometry, material);
                 var item = cone;
             } else if (GLOBALS.ITEM_HOLDED_NAME.includes("trigger")) {
@@ -596,11 +596,11 @@ async function addItem(found, loaded) {
                 targetFaithPlateStart(item);
             }
 
-            if (GLOBALS.ITEM_HOLDED_NAME == "spawn") {
+            if (GLOBALS.ITEM_HOLDED_NAME.startsWith("spawn")) {
                 GLOBALS.ITEMS_ADDED.add(item);
                 item.translateY(1);
                 item.rotation.x = -Math.PI;
-                item.name = "spawn";
+                item.name = GLOBALS.ITEM_HOLDED_NAME;
             } else if (GLOBALS.ITEM_HOLDED_NAME == "angled_panel") {
                 GLOBALS.DYMANIC_ITEMS['angled_panel'].push(item)
                 GLOBALS.ITEMS_ADDED.add(item);

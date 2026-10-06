@@ -1,3 +1,5 @@
+import { updateCrosshair } from '../../multiplayer/crosshair';
+import { chamberTimeout } from '../../multiplayer/chamberTimeout';
 import { Vector3, Color, Clock } from "three";
 import { GLOBALS } from "../../Globals.js";
 import { stateDoor } from '../door/Door.js';
@@ -17,8 +19,7 @@ let interval = 1 / 60;
 
 function updateEvents(deltaTime) {
 
-  if (!GLOBALS.ITEMS_ADDED.getObjectByName("spawn"))
-    levelEnteredFunction(false);
+  levelEnteredFunction(false);
 
   /*delta += clock.getDelta();
 
@@ -55,13 +56,7 @@ function updateEvents(deltaTime) {
             document.getElementById("reticle-img").style.filter = "none";
             //document.getElementById("reticle-img").src = './assets/textures/crosshairNone.webp';
 
-            if (GLOBALS.PORTAL_GUN_INITIATE == "left") {
-              document.getElementById("reticle-img").src = './assets/ui/mobile/portalBlue.png';
-            } else if (GLOBALS.PORTAL_GUN_INITIATE == "right") {
-              document.getElementById("reticle-img").src = './assets/ui/mobile/portalOrange.png';
-            } else {
-              document.getElementById("reticle-img").src = './assets/textures/crosshairNone.png';
-            }
+            updateCrosshair('none');
 
             GLOBALS.GUN.visible = true;
             GLOBALS.GUN_MODE = "portal";
@@ -73,7 +68,7 @@ function updateEvents(deltaTime) {
 
             document.getElementById("warning-game").style.opacity = "1";
 
-            setTimeout(() => {
+            chamberTimeout(() => {
               document.getElementById("warning-game").style.opacity = "0";
             }, 7000);
 
@@ -194,7 +189,7 @@ function updateEvents(deltaTime) {
 
                   holderItem.getObjectByName("panel").hasPortal = 100;
 
-                  setTimeout(() => {
+                  chamberTimeout(() => {
                     updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
                   }, 500);
                 } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
@@ -254,6 +249,7 @@ var Timer = function (callback, delay) {
   var timerId, start, remaining = delay;
 
   this.pause = function () {
+    if (!timerId) return;
     window.clearTimeout(timerId);
     timerId = null;
     remaining -= Date.now() - start;
@@ -323,7 +319,7 @@ function doSetTimeout(to, waitFor, idHolder, connection, body) {
 
       //GLOBALS.MATERIAL_DISSOLVER
 
-      setTimeout(() => {
+      chamberTimeout(() => {
         if (GLOBALS.SCENE_FPS && clone.sound) {
           GLOBALS.SCENE.remove(clone);
           GLOBALS.SCENE_FPS.remove(clone.sound);
@@ -355,7 +351,7 @@ function doSetTimeout(to, waitFor, idHolder, connection, body) {
 
         holderItem.getObjectByName("panel").hasPortal = 100;
 
-        setTimeout(() => {
+        chamberTimeout(() => {
           updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
         }, 500);
       }
@@ -450,7 +446,7 @@ function resetAll() {
 
           holderItem.getObjectByName("panel").hasPortal = 100;
 
-          setTimeout(() => {
+          chamberTimeout(() => {
             updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
           }, 500);
         } else if (GLOBALS.CONNECTIONS[i]['to'].itemName.includes("faith_plate")) {
@@ -551,7 +547,7 @@ function laserReceiverTrigger(obj, state, catcher) {
 
               holderItem.getObjectByName("panel").hasPortal = 100;
 
-              setTimeout(() => {
+              chamberTimeout(() => {
                 updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
               }, 500);
             }
@@ -646,7 +642,7 @@ function laserReceiverTrigger(obj, state, catcher) {
 
         holderItem.getObjectByName("panel").hasPortal = 100;
 
-        setTimeout(() => {
+        chamberTimeout(() => {
           updateAngledPanel(holderItem.getObjectByName("panel").body, holderItem.getObjectByName("Cube"));
         }, 500);
       } else if (holder['to'].itemName.includes("faith_plate")) {

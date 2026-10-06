@@ -1,3 +1,4 @@
+import { updateBotGun } from './multiplayer/botGun';
 import "./components/materials/Materials.js";
 import "./components/ui/UI.js";
 import "./components/ui/EditorInteractions.js";
@@ -174,7 +175,7 @@ function onWindowResize() {
         GLOBALS.RENDERER.localClippingEnabled = false;
         GLOBALS.RENDERER.clippingPlanes = [];
 
-        if (localStorage.getItem("quality-select") == "epic" && GLOBALS.COMPOSER) {
+    if (localStorage.getItem("quality-select") == "epic" && GLOBALS.COMPOSER && GLOBALS.ACTIVE_CAMERA === GLOBALS.MAIN_CAMERA) {
             GLOBALS.COMPOSER.render();
         } else {
             GLOBALS.RENDERER.autoClear = false;
@@ -205,7 +206,7 @@ function animate(time) {
         GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
         TWEEN.update();
         //document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
-    } else if (!GLOBALS.PAUSED) {
+    } else if (!GLOBALS.PAUSED && !GLOBALS.MULTIPLAYER?.isPaused()) {
         render(time);
     }
 
@@ -228,7 +229,10 @@ function fixedUpdate() { //60 fps always for physics
     const deltaTime = clock2.getDelta();
 
     if (fps > 15) {//IF FPS IS LOWER THAN 15, AVOID THE PLAYER TO CONTROL THE CHARACTER TO AVOID PHYSICS ERRORS
-        updatePlayer(deltaTime);
+        if (GLOBALS.SECOND_PLAYER && GLOBALS.SECOND_PLAYER.active)
+            GLOBALS.SECOND_PLAYER.tickInput(deltaTime);
+        else
+            updatePlayer(deltaTime);
         updateRay(deltaTime);
     }
 
@@ -264,6 +268,7 @@ let lastTime2 = performance.now();
 let deltaTime33 = 0;
 
 function togglePause() {
+    clock2.getDelta();
     lastTime2 = performance.now();
 }
 
@@ -287,11 +292,16 @@ function render(time) {
     animateShader();
     renderGoo();
     //const deltaTime = clock3.getDelta();
+    GLOBALS.MULTIPLAYER?.applyWorld();
     updatePhysics(deltaTime33);
     updateCamera(deltaTime33);
+    GLOBALS.MULTIPLAYER?.animateAvatar(deltaTime33);
+    GLOBALS.SECOND_PLAYER && GLOBALS.SECOND_PLAYER.tickView();
     teleportationState()
+    GLOBALS.MULTIPLAYER?.applyWorld();
     updateEvents(deltaTime33);
     checkForTriggerContact();
+    GLOBALS.MULTIPLAYER?.applyWorld();
     TWEEN.update();
     animatePortal(time);
 
@@ -321,10 +331,12 @@ function render(time) {
     } else {
         GLOBALS.RENDERER.autoClear = false;
         GLOBALS.RENDERER.clear();
-        GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.MAIN_CAMERA);
+        GLOBALS.RENDERER.render(GLOBALS.SCENE, GLOBALS.ACTIVE_CAMERA);
         document.getElementById("drawcalls").innerHTML = "Drawcalls: " + GLOBALS.RENDERER.info.render.calls;
-        GLOBALS.RENDERER.clearDepth()
-        GLOBALS.RENDERER.render(GLOBALS.GUN_GROUP, GLOBALS.PORTAL_GUN_CAMERA);
+        if (GLOBALS.ACTIVE_CAMERA === GLOBALS.MAIN_CAMERA) {
+            GLOBALS.RENDERER.clearDepth()
+            GLOBALS.RENDERER.render(GLOBALS.GUN_GROUP, GLOBALS.PORTAL_GUN_CAMERA);
+        }
     }
 }
 
@@ -347,7 +359,8 @@ function animatePortal(currentTime) {
     currentRenderTarget = GLOBALS.RENDERER.getRenderTarget();
     GLOBALS.RENDERER.xr.enabled = false;
 
-    GLOBALS.GUN_CLONE.visible = GLOBALS.PLAYER_MODEL.visible;
+    GLOBALS.GUN_CLONE.visible = GLOBALS.PLAYER_MODEL.visible && !GLOBALS.PLAYER_MODEL.userData.bot;
+    if (GLOBALS.PLAYER_MODEL.userData.bot) updateBotGun(GLOBALS.PLAYER_MODEL, GLOBALS.MAIN_CAMERA.quaternion, GLOBALS.PORTAL_GUN_INITIATE !== 'none');
 
     var positionBoneHand = new Vector3();
     window.hand.getWorldPosition(positionBoneHand);
@@ -393,8 +406,12 @@ function animatePortal(currentTime) {
     //GLOBALS.RENDERER.autoClear = false;
 
     GLOBALS.GUN_CLONE.visible = false;
-    GLOBALS.GUN_CLONE2.visible = cloneVisible;
+    GLOBALS.GUN_CLONE2.visible = cloneVisible && !GLOBALS.PLAYER_MODEL.userData.bot;
 
+    if (cloneVisible && GLOBALS.PLAYER_MODEL_CLONE.userData.bot) {
+        const aim = GLOBALS.PLAYER_MODEL_CLONE.quaternion.clone().multiply(GLOBALS.PLAYER_MODEL.quaternion.clone().invert()).multiply(GLOBALS.MAIN_CAMERA.quaternion);
+        updateBotGun(GLOBALS.PLAYER_MODEL_CLONE, aim, GLOBALS.PORTAL_GUN_INITIATE !== 'none');
+    }
     if (cloneVisible && GLOBALS.GUN_CLONE2 && window.posW) {
         GLOBALS.GUN_CLONE2.position.copy(window.posW);
         GLOBALS.GUN_CLONE2.quaternion.copy(GLOBALS.PLAYER_MODEL_CLONE.quaternion);
@@ -421,9 +438,10 @@ function renderPortal2(thisIndex, pairIndex) {
         return
 
     var qua = new Quaternion();
-    GLOBALS.MAIN_CAMERA.getWorldQuaternion(qua);
+    const viewCamera = GLOBALS.ACTIVE_CAMERA || GLOBALS.MAIN_CAMERA;
+    viewCamera.getWorldQuaternion(qua);
 
-    portalCamera.position.copy(GLOBALS.PIVOT.position);
+    viewCamera.getWorldPosition(portalCamera.position);
     portalCamera.quaternion.copy(qua);
 
     // ensure that uniforms and render target are correctly sized
@@ -466,7 +484,7 @@ function renderPortal2(thisIndex, pairIndex) {
             GLOBALS.GUN_CLONE2.visible = false;
         } else {
             GLOBALS.PLAYER_MODEL_CLONE.visible = cloneVisible;
-            GLOBALS.GUN_CLONE2.visible = cloneVisible;
+            GLOBALS.GUN_CLONE2.visible = cloneVisible && !GLOBALS.PLAYER_MODEL.userData.bot;
         }
 
         if (level > GLOBALS.PORTAL_RENDER_LEVEL)

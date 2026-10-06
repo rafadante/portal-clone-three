@@ -71,7 +71,6 @@ function App() {
     if (session.length == 0) {
       $("#option-community-play").remove();
       //$("#signOut").remove();
-      $("#save-level").remove();
     }
 
     return session;
@@ -535,10 +534,18 @@ function App() {
                 </div>
 
                 <div>
-                  <img alt="image" data-content="" data-title="Spawn Point" className="item" data-name="spawn"
+                  <img alt="image" data-content="" data-title="Spawn Point · Player 1" className="item" data-name="spawn"
                     src="../assets/ui/items/spawn.webp" data-allowconnection="false" data-rotate="false" data-floor="true"
                     data-ceiling="false" data-walls="false" id="spawn" />
-                  <span>10</span>
+                  <span>1</span>
+                </div>
+                <div>
+                  <img alt="Player 2 spawn" data-content="Spawn position for player 2 in a cooperative chamber."
+                    data-title="Spawn Point · Player 2" className="item" data-name="spawn_player2"
+                    src="../assets/ui/items/spawn.webp" style={{ filter: 'hue-rotate(180deg)' }}
+                    data-allowconnection="false" data-rotate="false" data-floor="true"
+                    data-ceiling="false" data-walls="false" id="spawn_player2" />
+                  <span>1</span>
                 </div>
 
                 <div>
@@ -743,8 +750,8 @@ function App() {
 
           <div id="ui-top" className="">
             <div id="top-menu-left">
-              <span id="save-level">Download</span>
-              <span id="load-level">Load</span>
+              <span id="save-level">Baixar câmara</span>
+              <span id="load-level">Carregar arquivo</span>
               <span id="view-fps">Test</span>
               <input id="chamber-name-to-save" type="text" aria-label="Chamber name" placeholder="Name of the Chamber"></input>
               <span style={{ fontWeight: "normal" }}>by</span>
@@ -757,7 +764,9 @@ function App() {
 
         <div id="load-level-panel">
           <span id="close-load-level-panel">X</span>
-          <input type="file" id="input-level" accept="application/json"></input>
+          <div><h2>Carregar câmara de um arquivo</h2><p>Selecione uma câmara JSON ou ZIP para abrir no editor e testar.</p>
+          <input type="file" id="input-level" accept=".json,.zip,application/json,application/zip" aria-label="Arquivo de câmara"></input>
+          <p id="chamber-file-status" role="status"></p></div>
         </div>
 
         <div id="loading-parent">
@@ -1659,6 +1668,7 @@ function App() {
                 <span className="option" id="option-single">SINGLE PLAYER</span>
                 <span className="option" id="option-multiplayer-create">CREATE MULTIPLAYER CHAMBER</span>
                 <span className="option" id="option-multiplayer-join">JOIN MULTIPLAYER ROOM</span>
+                <span className="option" id="option-chamber-file">CARREGAR ARQUIVO DE CÂMARA</span>
                 <span className="option" id="option-community">CUSTOM CHAMBERS</span>
                 <span className="option" id="option-about">ABOUT</span>
               </div>
@@ -1929,6 +1939,7 @@ function App() {
                 <span className="option settings-audio" id="settings-audio">AUDIO</span>
                 <span className="option" id="settings-language">LANGUAGE</span>
                 <span className="option" id="back-editor">BACK TO EDITOR</span>
+                <span className="option" id="download-playing-chamber">BAIXAR CÂMARA</span>
               </div>
 
               <div id="options-audio">
@@ -2088,27 +2099,6 @@ function App() {
                   <span className="option-name" id="">Debug Collisions</span>
                   <div className="option-value">
                     <input id="debug-input" type="checkbox" />
-                  </div>
-                </div>
-                {/*PORTAL GUN PROPERTIES*/}
-                <div className="options-row">
-                  <span className="option-name" id="">Portal gun Color</span>
-                  <div className="option-value">
-                    <input id="portal-gun-color" type="color" />
-                  </div>
-                </div>
-                <div className="options-row">
-                  <span className="option-name" id="">Portal gun Roughness</span>
-                  <div className="option-value">
-                    <input id="portal-gun-roughness" defaultValue="1" type="number" min="0" max="1" step="0.1"
-                      style={{ pointerEvents: "all !important" }} />
-                  </div>
-                </div>
-                <div className="options-row">
-                  <span className="option-name" id="">Portal gun Metalness</span>
-                  <div className="option-value">
-                    <input id="portal-gun-metalness" defaultValue="0" type="number" min="0" max="1" step="0.1"
-                      style={{ pointerEvents: "all !important" }} />
                   </div>
                 </div>
                 {/*FAITH PLATE LINE*/}

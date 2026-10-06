@@ -1,3 +1,5 @@
+import { chamberTimeout } from '../../multiplayer/chamberTimeout';
+import { startBotDance } from '../../multiplayer/botDance';
 import { Clock, Vector3 } from 'three';
 import $ from 'jquery';
 import nipplejs from 'nipplejs';
@@ -138,6 +140,13 @@ document.addEventListener('keydown', (event) => {
     //if (event.code == "ControlLeft" && !crouched)
 
     if (GLOBALS.FPS_MODE && allowEnterFPS) {
+        if (GLOBALS.CHAMBER_CONFIG.mode === "multiplayer" && !GLOBALS.requestCoopPlay?.()) return;
+        const editing = event.target?.isContentEditable || /^(INPUT|SELECT|TEXTAREA)$/.test(event.target?.tagName);
+        if (!event.repeat && !editing && !GLOBALS.PAUSED && !GLOBALS.MULTIPLAYER?.isPaused() &&
+            startBotDance(GLOBALS.PLAYER_MODEL, GLOBALS.PLAYER_MODEL_CLONE, event.code)) {
+            event.preventDefault();
+            return;
+        }
         if (INPUT.controller[event.code])
             INPUT.controller[event.code].pressed = true;
 
@@ -173,7 +182,7 @@ const yawLimit = Math.PI * 2;    // Full horizontal rotation (360 degrees)
 
 document.body.addEventListener('mousemove', (event) => {
 
-    if (document.pointerLockElement === document.body && !GLOBALS.PAUSED) {
+    if (document.pointerLockElement === document.body && !GLOBALS.PAUSED && !(GLOBALS.SECOND_PLAYER && GLOBALS.SECOND_PLAYER.active)) {
 
         GLOBALS.MAIN_CAMERA.rotation.y -= event.movementX / 1000;
         GLOBALS.MAIN_CAMERA.rotation.x -= event.movementY / 1000;
@@ -205,7 +214,9 @@ var msg = false;
 
 $("body").on('click', '#settings-close', function () {
     if (GLOBALS.FPS_MODE && allowEnterFPS) {
+        if (GLOBALS.CHAMBER_CONFIG.mode === "multiplayer" && !GLOBALS.requestCoopPlay?.()) return;
 
+        GLOBALS.MULTIPLAYER?.setPaused(false);
         togglePause()
 
         if (!msg && window.allowEdit) {
@@ -271,7 +282,7 @@ $("body").on('click', '#settings-close', function () {
         if (!GLOBALS.DOOR_OPEN_STATE) {
             GLOBALS.DOOR_OPEN_STATE = true;
 
-            setTimeout(() => {
+            chamberTimeout(() => {
                 tweenCamera(1000, GLOBALS.CORRIDOR_ENTER.getObjectByName("rightDoor").rotation,
                     new Vector3(
                         GLOBALS.CORRIDOR_ENTER.getObjectByName("rightDoor").rotation.x,
@@ -284,11 +295,11 @@ $("body").on('click', '#settings-close', function () {
                         Math.PI * 0.9,
                         GLOBALS.CORRIDOR_ENTER.getObjectByName("leftDoor").rotation.z))
 
-                setTimeout(() => {
+                chamberTimeout(() => {
                     GLOBALS.BODY_ELEVATOR.position.y = 10000;
                 }, 500);
 
-                setTimeout(() => {
+                chamberTimeout(() => {
                     stateDoor(1000, true, false, GLOBALS.ENTER_DOOR)
                 }, 1000);
             }, 500);
@@ -323,7 +334,7 @@ document.addEventListener('pointerlockchange', () => {
             }
 
             for (var i = 0; i < window.timeoutEvent.length; i++) {
-                window.timeoutEvent[i].resume()
+                if (!GLOBALS.MULTIPLAYER?.isPaused()) window.timeoutEvent[i].resume()
             }
         }
     } else {
@@ -338,6 +349,7 @@ function openMenu() {
     GLOBALS.ALLOW_PLACE_PORTALS = false;
     allowEnterFPS = false;
     GLOBALS.PAUSED = true;
+    GLOBALS.MULTIPLAYER?.setPaused(true);
 
     window.curentTimeOffset = GLOBALS.STATS_UI.time;
 
@@ -399,6 +411,7 @@ document.addEventListener('keyup', (event) => {
     holdDown = false;
 
     if (GLOBALS.FPS_MODE && allowEnterFPS) {
+        if (GLOBALS.CHAMBER_CONFIG.mode === "multiplayer" && !GLOBALS.requestCoopPlay?.()) return;
 
         if (INPUT.controller[event.code])
             INPUT.controller[event.code].pressed = false;
@@ -429,7 +442,13 @@ $("body").on('pointerup', '#crouch', function () {
 })
 
 document.addEventListener('mousedown', (event) => {
-    if (!GLOBALS.MOBILE && document.pointerLockElement !== null)
+    if (GLOBALS.MULTIPLAYER?.isPaused()) return;
+    if (event.button === 1 && GLOBALS.FPS_MODE && !GLOBALS.PAUSED && document.pointerLockElement === document.body) {
+        event.preventDefault();
+        GLOBALS.MULTIPLAYER?.pingLocation();
+        return;
+    }
+    if (!GLOBALS.MOBILE && document.pointerLockElement !== null && !(GLOBALS.SECOND_PLAYER && GLOBALS.SECOND_PLAYER.active))
         portalButton(event.button, null, GLOBALS.MAIN_CAMERA)
 });
 
@@ -437,6 +456,7 @@ document.addEventListener('mousedown', (event) => {
 document.getElementById("portal_l").addEventListener('pointerdown', portal_l_Touch, false);
 
 function portal_l_Touch() {
+    if (GLOBALS.MULTIPLAYER?.isPaused()) return;
     GLOBALS.ALLOW_PLACE_PORTALS = true;
     portalButton(0, null, GLOBALS.MAIN_CAMERA);
 }
@@ -444,6 +464,7 @@ function portal_l_Touch() {
 document.getElementById("portal_r").addEventListener('pointerdown', portal_r_Touch, false);
 
 function portal_r_Touch() {
+    if (GLOBALS.MULTIPLAYER?.isPaused()) return;
     GLOBALS.ALLOW_PLACE_PORTALS = true;
     portalButton(2, null, GLOBALS.MAIN_CAMERA)
 }

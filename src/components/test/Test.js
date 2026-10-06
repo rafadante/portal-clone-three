@@ -1,3 +1,9 @@
+import { updateCrosshair } from '../../multiplayer/crosshair';
+import { prewarmPortals } from '../portal/prewarmPortals';
+import { portalCount } from '../../multiplayer/chamberConfig';
+import { chooseAvatar } from '../../multiplayer/avatarProfile';
+import { installLocalBot, restoreOriginalAvatar } from '../../multiplayer/BotAvatar';
+import { playerSpawn, replacesEntrance } from '../../multiplayer/spawnPoints';
 import { rememberChamber } from '../../multiplayer/loadedChamber';
 import { serializeChamber } from '../ui/EditorInteractions';
 import { Group, Vector3, Quaternion, Box3, Object3D, Color } from 'three';
@@ -122,7 +128,27 @@ function renderThingsBefore() {
 
 GLOBALS.SCENE_FPS = new Group();
 
-function viewFPS(firstRender) {
+let enteringScene = false;
+async function viewFPS(firstRender) {
+    if (enteringScene) return;
+    enteringScene = true;
+    try {
+        if (GLOBALS.CHAMBER_CONFIG.mode === 'multiplayer') {
+            const profile = GLOBALS.MULTIPLAYER?.profile || await chooseAvatar();
+            await installLocalBot(profile);
+        } else if (window.allowEdit) {
+            const profile = await chooseAvatar({ test: true });
+            if (profile.model === 'chell') restoreOriginalAvatar();
+            else await installLocalBot(profile);
+        } else restoreOriginalAvatar();
+        beginViewFPS(firstRender);
+    } catch (error) {
+        $('#loading-parent').css({ opacity: 0, pointerEvents: 'none' });
+        alert('Não foi possível carregar o avatar: ' + error.message);
+    } finally { enteringScene = false; }
+}
+
+function beginViewFPS(firstRender) {
 
     resetPlayerBody();
 
@@ -276,13 +302,7 @@ function viewFPS(firstRender) {
             GLOBALS.GUN_CLONE2.children[0].visible = true;
             document.getElementById("reticle-img").style.filter = "none";
 
-            if (GLOBALS.PORTAL_GUN_INITIATE == "left") {
-                document.getElementById("reticle-img").src = './assets/ui/mobile/portalBlue.png';
-            } else if (GLOBALS.PORTAL_GUN_INITIATE == "right") {
-                document.getElementById("reticle-img").src = './assets/ui/mobile/portalOrange.png';
-            } else {
-                document.getElementById("reticle-img").src = './assets/textures/crosshairNone.png';
-            }
+            updateCrosshair('none');
         }
 
         //
@@ -327,11 +347,16 @@ function viewFPS(firstRender) {
 
         window.checkers.material.envMap = GLOBALS.ENV_MAP;
 
-        if (GLOBALS.ITEMS_ADDED.getObjectByName("spawn")) {
-            GLOBALS.CORRIDOR_ENTER.visible = false;
-            GLOBALS.ITEMS_ADDED.getObjectByName("spawn").visible = false;
-            GLOBALS.PLAYER.spawnPosition = GLOBALS.ITEMS_ADDED.getObjectByName("spawn").position.clone();
-            GLOBALS.ENTER_DOOR.visible = false;
+        const spawn = playerSpawn(GLOBALS.ITEMS_ADDED, GLOBALS.MULTIPLAYER?.slot || 0);
+        for (const name of ['spawn', 'spawn_player2']) {
+            const marker = GLOBALS.ITEMS_ADDED.getObjectByName(name);
+            if (marker) marker.visible = false;
+        }
+        if (spawn) {
+            const hideEntrance = replacesEntrance(GLOBALS.ITEMS_ADDED, GLOBALS.CHAMBER_CONFIG.mode === 'multiplayer');
+            GLOBALS.CORRIDOR_ENTER.visible = !hideEntrance;
+            GLOBALS.PLAYER.spawnPosition = spawn.position.clone();
+            GLOBALS.ENTER_DOOR.visible = !hideEntrance;
             GLOBALS.PLAYER.position.copy(GLOBALS.PLAYER.spawnPosition);
 
 
@@ -342,7 +367,7 @@ function viewFPS(firstRender) {
     }, 500);
 };
 
-function setup() {
+async function setup() {
 
     onWindowResize();
 
@@ -363,8 +388,19 @@ function setup() {
     addGel();
     GLOBALS.DEBUGGER_GROUP.visible = true;
     GLOBALS.MAIN_CAMERA.lookAt(GLOBALS.ENTER_DOOR.position);
+    GLOBALS.PAUSED = true;
+    window.loaded = false;
+    try {
+        await prewarmPortals({ renderer: GLOBALS.RENDERER, scene: GLOBALS.SCENE, camera: GLOBALS.MAIN_CAMERA,
+            shaders: GLOBALS.PORTAL_SHADER, count: portalCount(GLOBALS.CHAMBER_CONFIG),
+            targets: [...GLOBALS.PORTAL_TARGETS.slice(0, portalCount(GLOBALS.CHAMBER_CONFIG)), ...GLOBALS.PORTAL_TMP_TARGETS.slice(0, portalCount(GLOBALS.CHAMBER_CONFIG))],
+            width: GLOBALS.PORTAL_WIDTH, height: GLOBALS.PORTAL_HEIGHT });
+    } catch (error) {
+        console.error('Portal shader warmup failed', error);
+        // Allow the renderer's normal compilation path if preloading is unavailable.
+    }
     GLOBALS.PAUSED = false;
-    GLOBALS.CORRIDOR_ENTER.visible = true;
+    GLOBALS.CORRIDOR_ENTER.visible = !replacesEntrance(GLOBALS.ITEMS_ADDED, GLOBALS.CHAMBER_CONFIG.mode === 'multiplayer');
     setTimeout(() => {
         GLOBALS.PAUSED = true;
     }, 100);

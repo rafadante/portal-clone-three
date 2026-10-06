@@ -1,3 +1,6 @@
+import { readGunAppearance, applyGunAppearance } from '../../multiplayer/gunAppearance';
+import { downloadChamberFile } from '../../chambers/chamberFile';
+import { getLoadedChamber } from '../../multiplayer/loadedChamber';
 import $ from 'jquery';
 import { ContinuousTrigger } from '../continuous/Continuous';
 import { GLOBALS } from '../../Globals';
@@ -541,21 +544,16 @@ $("body").on('click', '#portalable', function () {
     document.querySelector('.menu').classList.remove('menu-show');
 });
 
-$("body").on('click', '#save-level', function () {
-    saveChamber(false)
+$("body").on('click', '#save-level, #download-playing-chamber', function () {
+    try { saveChamber(false); } catch (error) { alert(error.message); }
 });
 
 function saveChamber(publish) {
-    const data = serializeChamber();
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+    const data = !publish && GLOBALS.FPS_MODE ? getLoadedChamber() || serializeChamber() : serializeChamber();
     if (publish) {
         zipJson(JSON.stringify(data), window.chamberID);
     } else {
-        const link = document.createElement('a');
-        link.href = dataStr;
-        link.download = $("#chamber-name-to-save").val()
-            ? $("#chamber-name-to-save").val() + "_by_" + $("#author-name-to-save").val() + ".json" : "chamber.json";
-        link.click();
+        downloadChamberFile(data, $("#chamber-name-to-save").val(), $("#author-name-to-save").val());
     }
 }
 
@@ -667,21 +665,12 @@ $("body").on('click', '.portal_gun-state', function () {
     $("#portal_gun-state").find(".title").text($(this).data("state") + " Portals");
 });
 
-$("body").on('input', '#portal-gun-color', function () {
-    var color = hex2rgb(this.value);
-    localStorage.setItem("portal_gun_color", this.value);
-    GLOBALS.GUN.getObjectByName("Object_6").material.color = new Color(color.r / 255, color.g / 255, color.b / 255);
-})
-
-$("body").on('input', '#portal-gun-roughness', function () {
-    localStorage.setItem("portal_gun_roughness", this.value);
-    GLOBALS.GUN.getObjectByName("Object_6").material.roughness = this.value;
-})
-
-$("body").on('input', '#portal-gun-metalness', function () {
-    localStorage.setItem("portal_gun_metalness", this.value);
-    GLOBALS.GUN.getObjectByName("Object_6").material.metalness = this.value;
-})
+$("body").on('input', '#portal-gun-color, #portal-gun-roughness, #portal-gun-metalness', function () {
+    const key = this.id.replace('portal-gun-', '');
+    try { localStorage.setItem('portal_gun_' + key, this.value); } catch (_) {}
+    const style = readGunAppearance();
+    for (const root of [GLOBALS.GUN, GLOBALS.GUN_CLONE, GLOBALS.GUN_CLONE2, GLOBALS.PLAYER_MODEL?.portalGun, GLOBALS.PLAYER_MODEL_CLONE?.portalGun]) applyGunAppearance(root, style);
+});
 
 $("body").on('change', '#option-goo-reflections', function () {
     GLOBALS.GOO_REFLECTIONS = this.checked;

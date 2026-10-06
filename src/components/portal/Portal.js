@@ -1,6 +1,7 @@
+import { getPortalViewMaterial } from './PortalViewMaterial';
 import {
-    Plane, CylinderGeometry, Matrix4, BoxGeometry, ShaderMaterial, Texture, Mesh, DoubleSide,
-    MeshBasicMaterial, ArrowHelper, EqualStencilFunc, ReplaceStencilOp, Group, Vector3, PointLight
+    Plane, CylinderGeometry, Matrix4, BoxGeometry, Mesh,
+    MeshBasicMaterial, ArrowHelper, Group, Vector3, PointLight
 } from 'three';
 import { GeneralBB } from '../generalBB/GeneralBB.js'
 import { GLOBALS } from '../../Globals.js';
@@ -53,67 +54,8 @@ class Portal extends Group {
         this.plane.applyMatrix4(this.transform)
         this.plane.translate(normal.clone().multiplyScalar(0.0001));
 
-        // create the 3d model for the portal
-        const VERT_SHADER = `
-        void main() 
-        {
-            vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
-            gl_Position = projectionMatrix * modelViewPosition;
-        }
-        `
-        const FRAG_SHADER = `
-        uniform sampler2D texture1;
-        uniform float ww;
-        uniform float wh;
-        
-        void main() {
-            gl_FragColor = texture2D(texture1, gl_FragCoord.xy / vec2(ww, wh));
-
-
-            #include <tonemapping_fragment>
-            #include <colorspace_fragment>
-        }
-        `
-
-        /*#include <tonemapping_fragment>
-            #include <colorspace_fragment>*/
-
-        const {
-            width,
-            height
-        } = GLOBALS.RENDERER.domElement
-
         const geometry = new CylinderGeometry(GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_WIDTH, GLOBALS.PORTAL_HEIGHT);
-        const uniforms = {
-            texture1: {
-                type: 't',
-                value: new Texture()
-            },
-            ww: {
-                type: 'f',
-                value: width
-            }, // not correct values at time of creation necessarily, will be updated later in render loop
-            wh: {
-                type: 'f',
-                value: height
-            }
-        }
-
-        const material = new ShaderMaterial({
-            vertexShader: VERT_SHADER,
-            fragmentShader: FRAG_SHADER,
-            uniforms: uniforms,
-            stencilWrite: true, // stencil optimization, only for culling portal
-            stencilFunc: EqualStencilFunc,
-            stencilRef: 1,
-            stencilFail: ReplaceStencilOp,
-            depthTest: true,
-            depthWrite: true,
-            polygonOffset: false,
-            polygonOffsetFactor: -2,
-            side: DoubleSide
-        });
-
+        const material = getPortalViewMaterial(GLOBALS.RENDERER, index);
         this.mesh = new Mesh(geometry, material);
         this.mesh.applyMatrix4(this.transform)
         this.mesh.updateMatrix()

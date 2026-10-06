@@ -128,6 +128,8 @@ function backToEditor() {
         GLOBALS.ENTER_DOOR.visible = true;
     }
 
+    const secondSpawn = GLOBALS.ITEMS_ADDED.getObjectByName('spawn_player2');
+    if (secondSpawn) secondSpawn.visible = true;
     GLOBALS.DEBUGGER_GROUP.visible = false;
 
     GLOBALS.GROUP_LINE_TRAGECTORY.visible = true;
@@ -174,6 +176,7 @@ function backToEditor() {
         GLOBALS.ITEMS_ADDED.remove(GLOBALS.LIGHT_BRIDGE_CLONE[g]);
         GLOBALS.CANNON_WORLD.removeBody(GLOBALS.LIGHT_BRIDGE_COLLIDER_CLONE[g]);
         GLOBALS.LIGHT_BRIDGE_CLONE[g].item.clone = null;
+        GLOBALS.LIGHT_BRIDGE_CLONE[g].item.portalClones = [];
     }
 
     GLOBALS.CANNON_BODIES = [];
@@ -271,7 +274,7 @@ function backToEditor() {
 
     for (var i = 0; i < GLOBALS.LASER_EMITTER_RAYCASTER.length; i++) {
 
-        GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone.visible = false;
+        for (const clone of GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.portalSegments || [GLOBALS.LASER_EMITTER_RAYCASTER[i].laser.clone]) clone.visible = false;
 
     }
 }

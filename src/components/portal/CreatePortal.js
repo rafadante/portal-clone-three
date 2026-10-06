@@ -1,3 +1,4 @@
+import { updateCrosshair } from '../../multiplayer/crosshair';
 import { Vector3, Raycaster, Color, Box3, Matrix3 } from 'three';
 import { TWEEN } from '../../Tween.js';
 import { createLightBridgesFromPortal } from '../continuous/Continuous.js';
@@ -312,13 +313,7 @@ function portalButton(button, auto, camera, firstToRender) {
                         document.getElementById("reticle-img").style.filter = "none";
                         //document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
 
-                        if (GLOBALS.PORTAL_GUN_INITIATE == "left") {
-                            document.getElementById("reticle-img").src = './assets/ui/mobile/portalBlue.png';
-                        } else if (GLOBALS.PORTAL_GUN_INITIATE == "right") {
-                            document.getElementById("reticle-img").src = './assets/ui/mobile/portalOrange.png';
-                        } else {
-                            document.getElementById("reticle-img").src = './assets/textures/crosshairBlue.png';
-                        }
+                        updateCrosshair('left');
                     }
 
                     // delete the old portal this new one is replacing
@@ -358,13 +353,7 @@ function portalButton(button, auto, camera, firstToRender) {
                         document.getElementById("reticle-img").style.filter = "none";
                         //document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
 
-                        if (GLOBALS.PORTAL_GUN_INITIATE == "left") {
-                            document.getElementById("reticle-img").src = './assets/ui/mobile/portalBlue.png';
-                        } else if (GLOBALS.PORTAL_GUN_INITIATE == "right") {
-                            document.getElementById("reticle-img").src = './assets/ui/mobile/portalOrange.png';
-                        } else {
-                            document.getElementById("reticle-img").src = './assets/textures/crosshairOrange.png';
-                        }
+                        updateCrosshair('right');
                     }
 
                     // delete the old portal this new one is replacing
@@ -539,6 +528,8 @@ function deletePortal(portalIndex) {
     GLOBALS.PORTAL_INNER_BOX[portalIndex] = null;
     const partner = GLOBALS.PORTALS[portalIndex ^ 1];
     if (partner) { partner.output = null; partner.mesh.visible = false; partner.portalShader.material.uniforms.iOpened.value = 0; }
+    createLightBridgesFromPortal(0, GLOBALS.LIGHT_BRIDGE_RAYCASTER);
+    createLightBridgesFromPortal(0, GLOBALS.TRACTOR_BEAM_RAYCASTER);
     GLOBALS.MULTIPLAYER?.portalChanged(portalIndex, null);
 }
 

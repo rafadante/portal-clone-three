@@ -1,3 +1,4 @@
+import { chamberTimeout } from '../../multiplayer/chamberTimeout';
 import { play, playVoice } from '../audio/Audio.js';
 import { Vector3 } from "three";
 import { tweenCamera } from "../../Utils.js";
@@ -23,7 +24,7 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
     clearTimeout(door.timeOutDoor2);
   }
 
-  door.timeOutDoor1 = setTimeout(() => {
+  door.timeOutDoor1 = chamberTimeout(() => {
 
     if (playing && door.sound) {
       door.sound.audio.currentTime = 0;
@@ -31,7 +32,7 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
     }
 
     playing = false;
-    setTimeout(() => {
+    chamberTimeout(() => {
       playing = true;
     }, 100);
 
@@ -52,7 +53,7 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
         door.body.collisionResponse = 1;
     }
 
-    door.timeOutDoor2 = setTimeout(() => {
+    door.timeOutDoor2 = chamberTimeout(() => {
 
       if (GLOBALS.LEVEL_ENTERED && door == GLOBALS.ENTER_DOOR && !GLOBALS.EXIT_DOOR.open) {
         GLOBALS.CORRIDOR_ENTER.visible = false;
@@ -65,7 +66,7 @@ function stateDoor(timeToTrigger, open, enter, door, editor) {
 
       //if (GLOBALS.FPS_MODE) {
       if (enter) {
-        setTimeout(() => {
+        chamberTimeout(() => {
           GLOBALS.EXIT_DOOR.add(GLOBALS.CORRIDOR_ENTER);
           corridorColliderNames(GLOBALS.CORRIDOR_ENTER, true);
 
