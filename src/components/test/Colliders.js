@@ -202,7 +202,8 @@ function fizzlerTrigger(body) {
                 }
             }
 
-            if (e.target.name == "exit" && !GLOBALS.EXIT_DOOR.finished) {
+            if (e.target.name == "exit" && GLOBALS.MULTIPLAYER) GLOBALS.MULTIPLAYER.exitInside = true;
+            if (e.target.name == "exit" && !GLOBALS.MULTIPLAYER && !GLOBALS.EXIT_DOOR.finished) {
                 GLOBALS.EXIT_DOOR.finished = true;
                 stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
             }
@@ -925,7 +926,18 @@ function addCollidersToCorridor(mesh) {
         GLOBALS.BODY_ELEVATOR = wall;
         wall.addEventListener("collide", function (event) {
 
-            console.log("exitCorridor")
+            if (event.body !== GLOBALS.PLAYER) return;
+            if (GLOBALS.MULTIPLAYER) {
+                GLOBALS.MULTIPLAYER.exitReached = true;
+                return;
+            }
+            completeChamber();
+        });
+        GLOBALS.COMPLETE_CHAMBER = completeChamber;
+    }
+}
+
+function completeChamber() {
 
             if (GLOBALS.LEVEL_ENTERED && (!GLOBALS.LOADED_LEVEL || window.allowEdit) && !GLOBALS.FINISHED) {
                 GLOBALS.FINISHED = true;
@@ -1001,8 +1013,6 @@ function addCollidersToCorridor(mesh) {
 
                 }*/
             }
-        })
-    }
 }
 
 export {

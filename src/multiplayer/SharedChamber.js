@@ -4,6 +4,9 @@ const NODES = ['pivot2', 'portal_door_right_04', 'portal_door_left_06', 'central
 const scalar = v => typeof v === 'boolean' || (Number.isFinite(v) && Math.abs(v) <= 10000);
 const vec = (v,n) => Array.isArray(v) && v.length === n && v.every(x => Number.isFinite(x) && Math.abs(x) <= 10000);
 export function validChamberState(state) {
+  if (state?.exit !== undefined && (!state.exit || typeof state.exit.open !== 'boolean'
+    || typeof state.exit.visible !== 'boolean' || !Array.isArray(state.exit.nodes)
+    || state.exit.nodes.length > NODES.length || !state.exit.nodes.every(n => NODES.includes(n.name) && vec(n.p,3) && vec(n.q,4) && Math.abs(Math.hypot(...n.q)-1)<.01))) return false;
   return state && (state.connections === undefined || (Array.isArray(state.connections) && state.connections.length <= 100000 && state.connections.every(x => typeof x === 'boolean'))) && typeof state.entered === 'boolean' && Array.isArray(state.items) && state.items.length <= 100000
     && state.items.every(o => o && Number.isSafeInteger(o.id) && o.id >= 0
       && o.flags && Object.keys(o.flags).every(k => FLAGS.includes(k) && scalar(o.flags[k]))
@@ -12,7 +15,12 @@ export function validChamberState(state) {
       && Array.isArray(o.nodes) && o.nodes.length <= NODES.length && o.nodes.every(n => NODES.includes(n.name) && vec(n.p,3) && vec(n.q,4) && Math.abs(Math.hypot(...n.q)-1)<.01));
 }
 export function snapshotChamber(globals) {
-  return { connections: (globals.CONNECTIONS || []).map(c => Boolean(c.line.active)), entered: Boolean(globals.LEVEL_ENTERED), items: globals.PLANE_USER_DATA.flatMap((plane,id) => {
+  const door = globals.EXIT_DOOR;
+  const exit = door ? { open: Boolean(door.open), visible: Boolean(globals.CORRIDOR_ENTER?.visible), nodes: NODES.flatMap(name => {
+    const n = door.getObjectByName?.(name);
+    return n ? [{name,p:n.position.toArray(),q:n.quaternion.toArray()}] : [];
+  }) } : undefined;
+  return { ...(exit ? {exit} : {}), connections: (globals.CONNECTIONS || []).map(c => Boolean(c.line.active)), entered: Boolean(globals.LEVEL_ENTERED), items: globals.PLANE_USER_DATA.flatMap((plane,id) => {
     const item = plane?.item;
     if (!item?.userData) return [];
     const flags = Object.fromEntries(FLAGS.filter(k => scalar(item.userData[k])).map(k => [k,item.userData[k]]));
@@ -26,6 +34,15 @@ export function snapshotChamber(globals) {
 }
 export function applyChamberState(globals, state, onConnection) {
   globals.LEVEL_ENTERED = state.entered;
+  if (state.exit && globals.EXIT_DOOR) {
+    globals.EXIT_DOOR.open = state.exit.open;
+    if (globals.EXIT_DOOR.body) globals.EXIT_DOOR.body.collisionResponse = state.exit.open ? 0 : 1;
+    if (globals.CORRIDOR_ENTER) globals.CORRIDOR_ENTER.visible = state.exit.visible;
+    for (const n of state.exit.nodes) {
+      const child = globals.EXIT_DOOR.getObjectByName?.(n.name);
+      if (child) { child.position.fromArray(n.p); child.quaternion.fromArray(n.q); }
+    }
+  }
   state.connections?.forEach((active, index) => {
     const connection = globals.CONNECTIONS?.[index];
     if (connection) onConnection?.(connection, active);

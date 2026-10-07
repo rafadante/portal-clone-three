@@ -9,6 +9,10 @@ var playing = true;
 
 function stateDoor(timeToTrigger, open, enter, door, editor) {
 
+  const room = GLOBALS.MULTIPLAYER;
+  if (!editor && door === GLOBALS.EXIT_DOOR && !open && room
+    && (room.exitInside || room.remote?.exitInside || room.exitReached || room.remote?.exitReached)
+    && !(room.exitReached && room.remote?.exitReached)) return;
   door.open = open;
 
   if (enter || editor) {

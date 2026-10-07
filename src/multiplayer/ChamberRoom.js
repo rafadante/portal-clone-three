@@ -19,7 +19,7 @@ export function validPortal(p) {
     && ['front', 'back', 'left', 'right', 'up', 'down'].includes(p.side) && typeof p.angled === 'boolean');
 }
 export function validState(state, config, slot) {
-  return state && (state.avatar === undefined || validAvatar(state.avatar)) && (state.gun === undefined || typeof state.gun === "boolean") && (state.animation === undefined || validAnimation(state.animation)) && (state.entered === undefined || typeof state.entered === 'boolean') && (state.actions === undefined || (Array.isArray(state.actions) && state.actions.length <= 32 && state.actions.every(a => a && Number.isSafeInteger(a.seq) && a.seq > 0 && Number.isSafeInteger(a.id) && a.id >= 0)))
+  return state && (state.avatar === undefined || validAvatar(state.avatar)) && (state.gun === undefined || typeof state.gun === "boolean") && (state.animation === undefined || validAnimation(state.animation)) && (state.exitInside === undefined || typeof state.exitInside === 'boolean') && (state.exitReached === undefined || typeof state.exitReached === 'boolean') && (state.entered === undefined || typeof state.entered === 'boolean') && (state.actions === undefined || (Array.isArray(state.actions) && state.actions.length <= 32 && state.actions.every(a => a && Number.isSafeInteger(a.seq) && a.seq > 0 && Number.isSafeInteger(a.id) && a.id >= 0)))
     && (state.animationRevision === undefined || (Number.isSafeInteger(state.animationRevision) && state.animationRevision >= 0))
     && (state.ping === undefined || validPing(state.ping))
     && (state.paused === undefined || typeof state.paused === 'boolean') && (state.world === undefined || (slot === 0 && validChamberState(state.world)))

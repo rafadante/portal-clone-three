@@ -1,3 +1,5 @@
+import { stateDoor } from '../components/door/Door';
+import { corridorColliderNames } from '../components/test/Colliders';
 import { chooseAvatar, readAvatar } from './avatarProfile';
 import { createBot } from './BotAvatar';
 import { updateBotGun } from './botGun';
@@ -111,7 +113,7 @@ class Session {
     const p = GLOBALS.PLAYER?.position;
     const q = GLOBALS.PLAYER_MODEL?.quaternion;
     const cq = GLOBALS.MAIN_CAMERA?.quaternion;
-    return { avatar: this.profile, gun: GLOBALS.PORTAL_GUN_INITIATE !== "none", animation: GLOBALS.PLAYER_MODEL?.currentAnimation || 'ANIM_STANDING_IDLE', animationRevision: GLOBALS.PLAYER_MODEL?.danceRevision || 0, entered: this.entered === true, actions: this.actions, paused: this.pause.local, ...(this.slot === 0 && this.ready ? { world: snapshotChamber(GLOBALS) } : {}),
+    return { avatar: this.profile, gun: GLOBALS.PORTAL_GUN_INITIATE !== "none", animation: GLOBALS.PLAYER_MODEL?.currentAnimation || 'ANIM_STANDING_IDLE', animationRevision: GLOBALS.PLAYER_MODEL?.danceRevision || 0, exitInside: this.exitInside === true, exitReached: this.exitReached === true, entered: this.entered === true, actions: this.actions, paused: this.pause.local, ...(this.slot === 0 && this.ready ? { world: snapshotChamber(GLOBALS) } : {}),
       objects: this.objects?.snapshot() || [], ready: this.ready && this.pause.hydrated, p: p ? [p.x, p.y, p.z] : [0, 0, 0], q: q ? q.toArray() : [0, 0, 0, 1],
       cq: cq ? cq.toArray() : [0, 0, 0, 1],
       ping: this.pings?.snapshot() || null,
@@ -157,6 +159,24 @@ class Session {
       if (c.line.active !== active) connectionState(c, 'no', active, active ? new Color(2, 1.3, 0) : new Color(0, 2, 5));
     });
     this.objects?.apply();
+    if (this.slot === 1 && GLOBALS.LEVEL_ENTERED && GLOBALS.CORRIDOR_ENTER
+      && GLOBALS.CORRIDOR_ENTER.parent !== GLOBALS.EXIT_DOOR) {
+      GLOBALS.EXIT_DOOR.add(GLOBALS.CORRIDOR_ENTER);
+      GLOBALS.EXIT_DOOR.updateMatrixWorld(true);
+      corridorColliderNames(GLOBALS.CORRIDOR_ENTER, true);
+      const sign = GLOBALS.CORRIDOR_ENTER.getObjectByName('sign');
+      if (sign) sign.visible = false;
+    }
+    if (this.slot === 0 && this.ready && !GLOBALS.FINISHED && !GLOBALS.EXIT_DOOR.open
+      && (this.exitInside || this.remote?.exitInside)
+      && !(this.exitReached && this.remote?.exitReached)) {
+      stateDoor(0, true, false, GLOBALS.EXIT_DOOR);
+    }
+    if (this.ready && this.exitReached && this.remote?.exitReached && !GLOBALS.FINISHED) {
+      GLOBALS.EXIT_DOOR.finished = true;
+      stateDoor(0, false, false, GLOBALS.EXIT_DOOR);
+      GLOBALS.COMPLETE_CHAMBER?.();
+    }
   }
   loadPeerAvatar(profile) {
     const key = profile.model + profile.color;

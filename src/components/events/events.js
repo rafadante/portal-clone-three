@@ -1,3 +1,4 @@
+import { triggerBodies, triggerPoints, occupiesTrigger } from '../../multiplayer/triggerOccupancy';
 import { updateCrosshair } from '../../multiplayer/crosshair';
 import { chamberTimeout } from '../../multiplayer/chamberTimeout';
 import { Vector3, Color, Clock } from "three";
@@ -36,10 +37,12 @@ function updateEvents(deltaTime) {
 
   var id = 0;
 
-  for (let d of GLOBALS.DYNAMIC_OBJECTS) {
+  const bodies = triggerBodies(GLOBALS);
+  for (let d of bodies) {
 
     let pos = new Vector3(d.position.x, d.position.y, d.position.z);
 
+    if (!d.remoteTrigger) {
     if (d.name == "player") {
       for (var i = 0; i < GLOBALS.PORTAL_GUN_BOX.length; i++) {
         if (GLOBALS.PORTAL_GUN_BOX[i].containsPoint(pos) && GLOBALS.PORTAL_GUN_BOX[i].item.visible) {
@@ -101,14 +104,8 @@ function updateEvents(deltaTime) {
       }
     }
 
-    const posArray = [
-      new Vector3(d.position.x + d.shapes[0].height / 2, d.position.y, d.position.z),
-      new Vector3(d.position.x - d.shapes[0].height / 2, d.position.y, d.position.z),
-      new Vector3(d.position.x, d.position.y + d.shapes[0].height / 2, d.position.z),
-      new Vector3(d.position.x, d.position.y - d.shapes[0].height / 2, d.position.z),
-      new Vector3(d.position.x, d.position.y, d.position.z + d.shapes[0].height / 2),
-      new Vector3(d.position.x, d.position.y, d.position.z - d.shapes[0].height / 2)
-    ]
+    }
+    const posArray = triggerPoints(d);
 
     //Go through each connection to check for triggers
     for (var i = 0; i < GLOBALS.CONNECTIONS.length; i++) {
@@ -118,6 +115,7 @@ function updateEvents(deltaTime) {
         || GLOBALS.CONNECTIONS[i]['from'].instancedName.includes("pellet_catcher"))
         continue
 
+      if (GLOBALS.MULTIPLAYER?.slot === 1) continue;
       var notInPos = 0;
 
       for (var f = 0; f < posArray.length; f++) {
@@ -156,7 +154,7 @@ function updateEvents(deltaTime) {
 
           notInPos++;
 
-          if (notInPos >= 6) {
+          if (notInPos >= posArray.length && !bodies.some(other => other !== d && occupiesTrigger(other, GLOBALS.CONNECTIONS[i].from.box3))) {
             if (GLOBALS.CONNECTIONS[i]['line'].active && GLOBALS.CONNECTIONS[i]['line'].idConnection == id) {
 
               var active = false;;
